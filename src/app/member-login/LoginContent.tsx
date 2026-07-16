@@ -19,6 +19,30 @@ export function LoginContent() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [showRecovery, setShowRecovery] = useState(false);
+  const [recoveryEmail, setRecoveryEmail] = useState("");
+  const [recoveryMessage, setRecoveryMessage] = useState("");
+  const [recoveryLoading, setRecoveryLoading] = useState(false);
+
+  const handleCodeRecovery = async (event: React.FormEvent) => {
+    event.preventDefault();
+    setRecoveryLoading(true);
+    setRecoveryMessage("");
+    try {
+      const response = await fetch("/api/auth/resend-member-code", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: recoveryEmail }),
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || "Envoi impossible");
+      setRecoveryMessage(result.message);
+    } catch (caughtError: unknown) {
+      setRecoveryMessage(caughtError instanceof Error ? caughtError.message : "Envoi impossible");
+    } finally {
+      setRecoveryLoading(false);
+    }
+  };
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -165,12 +189,33 @@ export function LoginContent() {
           </form>
 
           {!isRegister && (
-            <div className="flex gap-3 rounded-2xl bg-emerald-50 p-4 text-left">
-              <Download className="mt-0.5 h-5 w-5 shrink-0 text-emerald-600" />
-              <p className="text-xs leading-relaxed text-emerald-800">
-                Une fois connecté, vous pourrez installer l&apos;application Label Vanlife directement depuis votre espace membre.
-              </p>
-            </div>
+            <>
+              <div className="flex gap-3 rounded-2xl bg-emerald-50 p-4 text-left">
+                <Download className="mt-0.5 h-5 w-5 shrink-0 text-emerald-600" />
+                <p className="text-xs leading-relaxed text-emerald-800">
+                  Une fois connecté, vous pourrez installer l&apos;application Label Vanlife directement depuis votre espace membre.
+                </p>
+              </div>
+
+              <div className="text-center">
+                <button type="button" onClick={() => setShowRecovery((value) => !value)} className="min-h-11 text-sm font-medium text-emerald-700 hover:text-emerald-800">
+                  Je n&apos;ai plus mon code
+                </button>
+              </div>
+
+              {showRecovery && (
+                <form onSubmit={handleCodeRecovery} className="space-y-3 rounded-2xl border border-neutral-200 bg-neutral-50 p-4">
+                  <label className="block space-y-2 text-left text-sm font-medium text-neutral-600">
+                    <span>Email utilisé lors de l&apos;adhésion</span>
+                    <input type="email" value={recoveryEmail} onChange={(event) => setRecoveryEmail(event.target.value)} className="h-12 w-full rounded-xl border border-neutral-200 bg-white px-4 focus:ring-2 focus:ring-emerald-500" required autoComplete="email" />
+                  </label>
+                  <Button type="submit" variant="secondary-dark" className="w-full" disabled={recoveryLoading || !recoveryEmail}>
+                    {recoveryLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Renvoyer mon code"}
+                  </Button>
+                  {recoveryMessage && <p className="text-xs leading-relaxed text-neutral-500" role="status">{recoveryMessage}</p>}
+                </form>
+              )}
+            </>
           )}
         </Card>
       </div>

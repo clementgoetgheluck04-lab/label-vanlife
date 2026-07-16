@@ -19,15 +19,12 @@ export async function POST(request: NextRequest) {
     const requestHost = (request.headers.get("host") || "").split(":")[0];
     const localAdminPreview = isLocalPreviewHost(request.nextUrl.hostname) || isLocalPreviewHost(requestHost);
     const validAdminPreviewCode = adminPreviewCodeMatches(rawCode);
-    if (validAdminPreviewCode && !localAdminPreview) {
-      return NextResponse.json({ error: "La prévisualisation administrateur est limitée à localhost" }, { status: 403 });
-    }
-    if (localAdminPreview && validAdminPreviewCode) {
+    if (validAdminPreviewCode) {
       const response = NextResponse.json({ url: "/member", preview: true }, { headers: { "Cache-Control": "no-store" } });
       response.cookies.set(ADMIN_PREVIEW_COOKIE, getAdminPreviewCookieValue(), {
         httpOnly: true,
         sameSite: "strict",
-        secure: false,
+        secure: !localAdminPreview,
         path: "/",
         maxAge: 8 * 60 * 60,
       });
