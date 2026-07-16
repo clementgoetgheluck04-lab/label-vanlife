@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 
 interface BeforeInstallPromptEvent extends Event {
   readonly platforms: string[];
@@ -18,112 +19,90 @@ declare global {
 }
 
 export default function PwaInstall() {
+  const pathname = usePathname();
   const [deferredPrompt, setDeferredPrompt] =
     useState<BeforeInstallPromptEvent | null>(null);
-  const [isVisible, setIsVisible] = useState(false);
-  const [isInstalled, setIsInstalled] = useState(false);
+  const [isInstalled, setIsInstalled] = useState(
+    () => typeof window !== "undefined" && window.matchMedia("(display-mode: standalone)").matches
+  );
+  const [isDismissed, setIsDismissed] = useState(false);
+  const [showManualHelp, setShowManualHelp] = useState(false);
 
-  // Vérifie si l'app est déjà installée (display-mode: standalone)
-  // Intercepte l'événement beforeinstallprompt
+  const isMemberArea = pathname === "/member" || pathname.startsWith("/member/");
+
   useEffect(() => {
-    const handler = (e: BeforeInstallPromptEvent) => {
-      e.preventDefault();
-      const dismissedAt = Number(localStorage.getItem("pwa-install-dismissed") || 0);
-      if (dismissedAt && Date.now() - dismissedAt < 7 * 24 * 60 * 60 * 1_000) return;
-      setDeferredPrompt(e);
-      setIsVisible(true);
+    const handleInstallPrompt = (event: BeforeInstallPromptEvent) => {
+      event.preventDefault();
+      setDeferredPrompt(event);
     };
-
-    window.addEventListener("beforeinstallprompt", handler);
-    return () => window.removeEventListener("beforeinstallprompt", handler);
-  }, []);
-
-  // Détecte l'installation réussie
-  useEffect(() => {
-    const handler = () => {
+    const handleInstalled = () => {
       setIsInstalled(true);
-      setIsVisible(false);
       setDeferredPrompt(null);
     };
 
-    window.addEventListener("appinstalled", handler);
-    return () => window.removeEventListener("appinstalled", handler);
+    window.addEventListener("beforeinstallprompt", handleInstallPrompt);
+    window.addEventListener("appinstalled", handleInstalled);
+    return () => {
+      window.removeEventListener("beforeinstallprompt", handleInstallPrompt);
+      window.removeEventListener("appinstalled", handleInstalled);
+    };
   }, []);
 
   const handleInstall = useCallback(async () => {
-    if (!deferredPrompt) return;
-
-    deferredPrompt.prompt();
-
-    const { outcome } = await deferredPrompt.userChoice;
-    if (outcome === "accepted") {
-      console.log("PWA installée par l'utilisateur");
-    } else {
-      console.log("Installation PWA refusée");
+    if (!deferredPrompt) {
+      setShowManualHelp(true);
+      return;
     }
 
+    await deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
     setDeferredPrompt(null);
-    setIsVisible(false);
+    if (outcome === "dismissed") setIsDismissed(true);
   }, [deferredPrompt]);
 
-  const handleDismiss = useCallback(() => {
-    setIsVisible(false);
-    // Ne pas réafficher pendant 7 jours
-    localStorage.setItem("pwa-install-dismissed", Date.now().toString());
-  }, []);
-
-  // Vérifie si l'utilisateur a déjà dismiss récemment
-  if (!isVisible || isInstalled) return null;
+  if (!isMemberArea || isInstalled || isDismissed) return null;
 
   return (
-    <div className="fixed bottom-4 left-4 right-4 z-50 max-w-md mx-auto">
-      <div className="backdrop-blur-lg bg-white/80 dark:bg-charcoal/80 border border-white/20 shadow-xl rounded-2xl p-4 flex items-center gap-3">
-        {/* Icone native */}
-        <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-gradient-to-br from-[#10B981] to-[#065F46] flex items-center justify-center shadow-sm">
-          <svg
-            viewBox="0 0 24 24"
-            className="w-6 h-6 text-white"
-            fill="currentColor"
-          >
+    <div className="fixed bottom-4 left-4 right-4 z-50 mx-auto max-w-md">
+      <div className="flex items-center gap-3 rounded-2xl border border-white/20 bg-white/90 p-4 shadow-xl backdrop-blur-lg">
+        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#10B981] to-[#065F46] shadow-sm" aria-hidden="true">
+          <svg viewBox="0 0 24 24" className="h-6 w-6 text-white" fill="currentColor">
             <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z" />
           </svg>
         </div>
 
-        {/* Texte */}
-        <div className="flex-1 min-w-0">
-          <p className="text-sm font-semibold text-charcoal dark:text-white">
-            Installez Label Vanlife
-          </p>
+        <div className="min-w-0 flex-1">
+          <p className="text-sm font-semibold text-charcoal">Installer l&apos;application membre</p>
           <p className="text-xs text-muted-foreground">
-            Ajoutez à votre écran d&apos;accueil pour un accès rapide
+            Votre carte membre et la MAP accessibles depuis votre téléphone
           </p>
         </div>
 
-        {/* Actions */}
-        <div className="flex-shrink-0 flex items-center gap-1">
+        <div className="flex shrink-0 items-center gap-1">
           <button
             onClick={handleInstall}
-            className="px-4 py-2 text-sm font-medium rounded-lg bg-[#10B981] hover:bg-[#059669] text-white transition-colors shadow-sm"
+            className="min-h-11 rounded-lg bg-[#10B981] px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-[#059669]"
           >
             Installer
           </button>
           <button
-            onClick={handleDismiss}
-            className="p-2 text-muted-foreground hover:text-charcoal dark:hover:text-white transition-colors rounded-lg hover:bg-black/5"
+            onClick={() => setIsDismissed(true)}
+            className="flex h-11 w-11 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-black/5 hover:text-charcoal"
             aria-label="Fermer"
           >
-            <svg
-              viewBox="0 0 24 24"
-              className="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-            >
+            <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M18 6L6 18M6 6l12 12" />
             </svg>
           </button>
         </div>
       </div>
+
+      {showManualHelp && (
+        <p className="mt-2 rounded-xl border border-emerald-100 bg-white px-4 py-3 text-xs text-neutral-600 shadow-lg">
+          Si le navigateur ne propose pas l&apos;installation, ouvrez son menu puis choisissez
+          <strong> « Ajouter à l&apos;écran d&apos;accueil »</strong>.
+        </p>
+      )}
     </div>
   );
 }
