@@ -57,6 +57,16 @@ const nextConfig: NextConfig = {
         permanent: true,
       },
       {
+        source: "/compte",
+        destination: "/member-login",
+        permanent: true,
+      },
+      {
+        source: "/map",
+        destination: "/explorer",
+        permanent: true,
+      },
+      {
         source: "/membre-login",
         destination: "/member-login",
         permanent: true,

@@ -12,8 +12,13 @@ export function requireServerEnv(name: string): string {
 }
 
 export function getAppUrl(): string {
-  const value = requireServerEnv("NEXT_PUBLIC_APP_URL");
-  const url = new URL(value);
+  const value = process.env.NEXT_PUBLIC_APP_URL
+    || process.env.VERCEL_PROJECT_PRODUCTION_URL
+    || process.env.VERCEL_URL
+    || (process.env.NODE_ENV !== "production" ? "http://localhost:3000" : "");
+  if (!value) throw new ServerConfigurationError("NEXT_PUBLIC_APP_URL");
+  const normalized = value.includes("://") ? value : `https://${value}`;
+  const url = new URL(normalized);
   if (!['http:', 'https:'].includes(url.protocol)) {
     throw new ServerConfigurationError("NEXT_PUBLIC_APP_URL");
   }

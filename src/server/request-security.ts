@@ -1,5 +1,4 @@
 import { NextRequest } from "next/server";
-import { getAppUrl } from "@/server/env";
 
 type Bucket = { count: number; resetAt: number };
 const buckets = new Map<string, Bucket>();
@@ -26,13 +25,7 @@ function clientAddress(request: NextRequest): string {
 
 export function assertSameOrigin(request: NextRequest): void {
   const origin = request.headers.get("origin");
-  const hostname = request.nextUrl.hostname;
-  const localRequest = hostname === "localhost" || hostname === "127.0.0.1" || hostname === "::1" || hostname === "[::1]";
-  const expectedOrigin = process.env.NEXT_PUBLIC_APP_URL
-    ? getAppUrl()
-    : localRequest
-      ? request.nextUrl.origin
-      : getAppUrl();
+  const expectedOrigin = request.nextUrl.origin;
   if (!origin || origin !== expectedOrigin) throw new OriginError();
 }
 
