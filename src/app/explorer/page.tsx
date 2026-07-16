@@ -29,7 +29,7 @@ export default function ExplorerPage() {
       <div className="sticky top-16 z-30 bg-white/90 backdrop-blur-md border-b border-neutral-200">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="flex items-center gap-3 py-3">
-            <Link href="/" className="shrink-0">
+            <Link href="/" className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full hover:bg-neutral-100" aria-label="Retour à l'accueil">
               <ChevronLeft className="h-5 w-5 text-neutral-500" />
             </Link>
             <h1 className="text-lg font-semibold text-neutral-800 flex-1" style={{ fontFamily: "Outfit, sans-serif" }}>
@@ -42,7 +42,7 @@ export default function ExplorerPage() {
                 placeholder="Rechercher un lieu, une ville..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-48 sm:w-64 pl-9 pr-3 py-2 text-sm bg-neutral-100 rounded-full border-none focus:outline-none focus:ring-2 focus:ring-emerald-500/50 placeholder:text-neutral-400"
+                className="h-11 w-48 rounded-full border-none bg-neutral-100 pl-9 pr-3 text-sm placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 sm:w-64"
               />
             </div>
           </div>
@@ -74,7 +74,7 @@ export default function ExplorerPage() {
             <button
               key={t.key}
               onClick={() => setTab(t.key as FilterTab)}
-              className={`shrink-0 px-4 py-1.5 text-xs font-medium rounded-full transition-all whitespace-nowrap ${
+              className={`min-h-11 shrink-0 px-4 py-1.5 text-xs font-medium rounded-full transition-all whitespace-nowrap ${
                 tab === t.key
                   ? "bg-emerald-500 text-white"
                   : "bg-neutral-100 text-neutral-500 hover:bg-neutral-200"
@@ -181,7 +181,7 @@ export default function ExplorerPage() {
                 <Building2 className="h-5 w-5 text-emerald-500" />
                 <h3 className="text-sm font-bold text-neutral-900 line-clamp-1">{claimModal.nom}</h3>
               </div>
-              <button onClick={() => setClaimModal(null)} className="p-1 hover:bg-neutral-100 rounded-lg"><X className="h-4 w-4" /></button>
+              <button onClick={() => setClaimModal(null)} className="flex h-11 w-11 items-center justify-center rounded-lg hover:bg-neutral-100" aria-label="Fermer"><X className="h-4 w-4" /></button>
             </div>
             <p className="text-xs text-neutral-500">C&apos;est mon établissement. Je souhaite :</p>
             <div className="space-y-2">
