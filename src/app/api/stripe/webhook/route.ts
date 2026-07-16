@@ -6,7 +6,7 @@ import { Prisma } from "@/generated/prisma/client";
 import { formatEuro } from "@/config/products";
 import { getPrisma } from "@/lib/prisma";
 import { getAppUrl, requireServerEnv } from "@/server/env";
-import { generateMemberAccessCode, hashMemberAccessCode } from "@/server/member-access";
+import { generateMemberAccessCode, hashMemberAccessCode, hashMemberAccessLookupCode } from "@/server/member-access";
 import { getStripe } from "@/server/stripe";
 
 export const dynamic = "force-dynamic";
@@ -66,7 +66,7 @@ async function sendMembershipActivation(orderId: string): Promise<void> {
   const prisma = getPrisma();
   const order = await prisma.checkoutOrder.findUnique({
     where: { id: orderId },
-    include: { user: { include: { profile: true, memberCard: true } } },
+    include: { user: { include: { profile: true, memberCard: true, membership: true } } },
   });
   if (!order || order.product !== "MEMBERSHIP") return;
 
@@ -81,7 +81,11 @@ async function sendMembershipActivation(orderId: string): Promise<void> {
     code,
     requireServerEnv("MEMBER_ACCESS_CODE_SECRET"),
   );
-  const codeExpiresAt = new Date(Date.now() + 24 * 60 * 60 * 1_000);
+  const codeLookupHash = hashMemberAccessLookupCode(
+    code,
+    requireServerEnv("MEMBER_ACCESS_CODE_SECRET"),
+  );
+  const codeExpiresAt = order.user.membership?.expiresAt ?? new Date(Date.now() + 365 * 24 * 60 * 60 * 1_000);
   const profile = order.user.profile;
   const fullName = [profile?.firstName, profile?.lastName].filter(Boolean).join(" ") || "Nouveau membre";
   const cardNumber = order.user.memberCard?.cardNumber || "en cours de création";
@@ -98,7 +102,7 @@ async function sendMembershipActivation(orderId: string): Promise<void> {
     from: "Label Vanlife <contact@labelvanlife.com>",
     to: order.user.email,
     subject: "Votre carte membre Label Vanlife est activée",
-    text: `Bonjour ${profile?.firstName || ""},\n\nVotre paiement de ${formatEuro(order.amount)} est confirmé et votre espace membre est actif pendant 12 mois.\n\nCode de connexion à usage unique : ${code}\nCe code est valable 24 heures. Saisissez-le avec votre email sur ${getAppUrl()}/member-login.\n\nNuméro de carte membre : ${cardNumber}\nPrésentez votre carte numérique et ce numéro aux lieux labellisés pour faire vérifier sa validité et bénéficier des avantages membres.\n\nVous avez maintenant accès à la MAP interactive et à votre carte membre depuis votre espace en ligne.\n\nL'équipe Label Vanlife`,
+    text: `Bonjour ${profile?.firstName || ""},\n\nVotre paiement de ${formatEuro(order.amount)} est confirmé et votre espace membre est actif pendant 12 mois.\n\nVotre code d'accès personnel : ${code}\nConservez-le : il reste valable pendant toute la durée de votre carte membre. Saisissez uniquement ce code sur ${getAppUrl()}/member-login.\n\nNuméro de carte membre : ${cardNumber}\nPrésentez votre carte numérique et ce numéro aux lieux labellisés pour faire vérifier sa validité et bénéficier des avantages membres.\n\nVous avez maintenant accès à la MAP interactive, à votre carte membre et au téléchargement de l'application depuis votre espace en ligne.\n\nL'équipe Label Vanlife`,
   });
   if (memberEmailError) throw new Error("Membership activation email failed");
 
@@ -108,6 +112,7 @@ async function sendMembershipActivation(orderId: string): Promise<void> {
       payload: {
         ...payload,
         memberAccessCodeHash: codeHash,
+        memberAccessCodeLookupHash: codeLookupHash,
         memberAccessCodeExpiresAt: codeExpiresAt.toISOString(),
         memberAccessCodeUsedAt: null,
         activationEmailSentAt: new Date().toISOString(),

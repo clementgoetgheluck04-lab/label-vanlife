@@ -4,10 +4,9 @@ import { getPrisma } from "@/lib/prisma";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getAppUrl, requireServerEnv } from "@/server/env";
 import { apiError } from "@/server/http";
-import { memberAccessCodeMatches, normalizeMemberAccessCode } from "@/server/member-access";
+import { hashMemberAccessLookupCode, memberAccessCodeMatches, normalizeMemberAccessCode } from "@/server/member-access";
 import { assertSameOrigin, enforceRateLimit } from "@/server/request-security";
-import { parseEmail } from "@/server/validation";
-import { ADMIN_PREVIEW_COOKIE, adminPreviewCodeMatches, getAdminPreviewCookieValue, isAdminPreviewEmail, isLocalPreviewHost } from "@/server/admin-preview";
+import { ADMIN_PREVIEW_COOKIE, adminPreviewCodeMatches, getAdminPreviewCookieValue, isLocalPreviewHost } from "@/server/admin-preview";
 
 export const dynamic = "force-dynamic";
 
@@ -16,11 +15,10 @@ export async function POST(request: NextRequest) {
     assertSameOrigin(request);
     enforceRateLimit(request, "member-access-code", 8, 15 * 60 * 1_000);
     const body = await request.json() as Record<string, unknown>;
-    const email = parseEmail(body.email);
     const rawCode = typeof body.code === "string" ? body.code : "";
     const requestHost = (request.headers.get("host") || "").split(":")[0];
     const localAdminPreview = isLocalPreviewHost(request.nextUrl.hostname) || isLocalPreviewHost(requestHost);
-    const validAdminPreviewCode = isAdminPreviewEmail(email) && adminPreviewCodeMatches(rawCode);
+    const validAdminPreviewCode = adminPreviewCodeMatches(rawCode);
     if (validAdminPreviewCode && !localAdminPreview) {
       return NextResponse.json({ error: "La prévisualisation administrateur est limitée à localhost" }, { status: 403 });
     }
@@ -36,23 +34,25 @@ export async function POST(request: NextRequest) {
       return response;
     }
     const code = normalizeMemberAccessCode(rawCode);
-    if (!email || code.length !== 8) {
-      return NextResponse.json({ error: "Email ou code invalide" }, { status: 400 });
+    if (code.length !== 18) {
+      return NextResponse.json({ error: "Code invalide" }, { status: 400 });
     }
 
     const prisma = getPrisma();
-    const user = await prisma.user.findUnique({
-      where: { email },
-      include: {
-        membership: true,
-        checkoutOrders: {
-          where: { product: "MEMBERSHIP", status: "PAID" },
-          orderBy: { paidAt: "desc" },
-          take: 1,
-        },
+    const secret = requireServerEnv("MEMBER_ACCESS_CODE_SECRET");
+    const lookupHash = hashMemberAccessLookupCode(code, secret);
+    const order = await prisma.checkoutOrder.findFirst({
+      where: {
+        product: "MEMBERSHIP",
+        status: "PAID",
+        payload: { path: ["memberAccessCodeLookupHash"], equals: lookupHash },
       },
+      include: {
+        user: { include: { membership: true } },
+      },
+      orderBy: { paidAt: "desc" },
     });
-    const order = user?.checkoutOrders[0];
+    const user = order?.user;
     const payload = order?.payload && typeof order.payload === "object" && !Array.isArray(order.payload)
       ? { ...(order.payload as Record<string, unknown>) }
       : null;
@@ -61,18 +61,18 @@ export async function POST(request: NextRequest) {
     const validMembership = user?.membership?.status === "ACTIVE"
       && (!user.membership.expiresAt || user.membership.expiresAt > new Date());
     const valid = Boolean(
-      user && order && payload && validMembership && !payload.memberAccessCodeUsedAt
+      user && order && payload && validMembership
       && expiresAt && expiresAt > new Date() && expectedHash
-      && memberAccessCodeMatches(email, code, requireServerEnv("MEMBER_ACCESS_CODE_SECRET"), expectedHash),
+      && memberAccessCodeMatches(user.email, code, secret, expectedHash),
     );
     if (!valid || !user || !order || !payload) {
-      return NextResponse.json({ error: "Code invalide, expiré ou déjà utilisé" }, { status: 401 });
+      return NextResponse.json({ error: "Code invalide ou carte membre expirée" }, { status: 401 });
     }
 
     const supabase = createAdminClient();
     const { data, error } = await supabase.auth.admin.generateLink({
       type: "magiclink",
-      email,
+      email: user.email,
       options: { redirectTo: `${getAppUrl()}/auth/callback?next=/member` },
     });
     if (error || !data.properties?.action_link) throw error || new Error("Access link unavailable");
@@ -82,7 +82,7 @@ export async function POST(request: NextRequest) {
       data: {
         payload: {
           ...payload,
-          memberAccessCodeUsedAt: new Date().toISOString(),
+          memberAccessCodeLastUsedAt: new Date().toISOString(),
         } as Prisma.InputJsonObject,
       },
     });

@@ -41,7 +41,7 @@ test("email and text validation reject malformed or oversized input", () => {
 
 test("member access codes are strong, normalized and never stored in clear text", () => {
   const code = generateMemberAccessCode();
-  assert.match(code, /^\d{4}-\d{4}$/);
+  assert.match(code, /^LV-[A-F0-9]{4}-[A-F0-9]{4}-[A-F0-9]{4}-[A-F0-9]{4}$/);
   const hash = hashMemberAccessCode("MEMBRE@example.com", code, "test-secret");
   assert.match(hash, /^[a-f0-9]{64}$/);
   assert.equal(memberAccessCodeMatches("membre@example.com", code, "test-secret", hash), true);

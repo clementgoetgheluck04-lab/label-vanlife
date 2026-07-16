@@ -1,12 +1,18 @@
-import { createHash, randomInt, timingSafeEqual } from "node:crypto";
+import { createHash, randomBytes, timingSafeEqual } from "node:crypto";
 
 export function generateMemberAccessCode(): string {
-  const digits = randomInt(0, 100_000_000).toString().padStart(8, "0");
-  return `${digits.slice(0, 4)}-${digits.slice(4)}`;
+  const value = randomBytes(8).toString("hex").toUpperCase();
+  return `LV-${value.slice(0, 4)}-${value.slice(4, 8)}-${value.slice(8, 12)}-${value.slice(12, 16)}`;
 }
 
 export function normalizeMemberAccessCode(value: string): string {
-  return value.replace(/\D/g, "").slice(0, 8);
+  return value.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 18);
+}
+
+export function hashMemberAccessLookupCode(code: string, secret: string): string {
+  return createHash("sha256")
+    .update(`${normalizeMemberAccessCode(code)}:${secret}`)
+    .digest("hex");
 }
 
 export function hashMemberAccessCode(email: string, code: string, secret: string): string {
