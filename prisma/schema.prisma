@@ -1,0 +1,668 @@
+// ===== LABEL VANLIFE — Prisma Schema v1 =====
+// Architecture complète : Membres, Établissements, Lieux, Paiements, Badges, Road Trips
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── AUTH / UTILISATEURS ──────────────────────────────────
+
+enum UserRole {
+  VISITOR
+  MEMBER
+  ESTABLISHMENT
+  ADMIN
+}
+
+enum OrderProduct {
+  MEMBERSHIP
+  LABELLISATION
+}
+
+enum OrderStatus {
+  PENDING
+  CHECKOUT_CREATED
+  PAID
+  CANCELED
+  FAILED
+  REFUNDED
+}
+
+enum StripeEventStatus {
+  PROCESSING
+  PROCESSED
+  FAILED
+}
+
+model User {
+  id               String   @id @default(cuid())
+  email            String   @unique
+  password         String?
+  role             UserRole @default(VISITOR)
+  stripeCustomerId String?  @unique
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  profile        Profile?
+  membership     Membership?
+  memberCard     MemberCard?
+  favorites      Favorite[]
+  roadTrips      RoadTrip[]
+  userBadges     UserBadge[]
+  passportStamps PassportStamp[]
+  reviews        PlaceReview[]
+  notifications  Notification[]
+  supportTickets SupportTicket[]
+  payments       Payment[]
+  checkoutOrders CheckoutOrder[]
+  blogPosts      BlogPost[]
+
+  establishmentProfile EstablishmentProfile?
+  placeApplications    PlaceApplication[]
+  managedPlaces        Place[]               @relation("PlaceManager")
+
+  @@map("users")
+}
+
+// ─── PROFIL MEMBRE ────────────────────────────────────────
+
+enum MembershipOffer {
+  MONTHLY
+  YEARLY
+}
+
+model Profile {
+  id        String  @id @default(cuid())
+  userId    String  @unique
+  firstName String
+  lastName  String?
+  avatarUrl String?
+  phone     String?
+  points    Int     @default(0)
+  level     String  @default("EXPLORATEUR")
+  bio       String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("profiles")
+}
+
+// ─── ABONNEMENT MEMBRE ────────────────────────────────────
+
+enum MembershipStatus {
+  ACTIVE
+  PAST_DUE
+  CANCELED
+  EXPIRED
+}
+
+model Membership {
+  id                   String           @id @default(cuid())
+  userId               String           @unique
+  offer                MembershipOffer
+  status               MembershipStatus @default(ACTIVE)
+  startedAt            DateTime         @default(now())
+  expiresAt            DateTime?
+  canceledAt           DateTime?
+  stripeSubscriptionId String?          @unique
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("memberships")
+}
+
+// ─── CARTE MEMBRE DIGITALE ────────────────────────────────
+
+model MemberCard {
+  id         String   @id @default(cuid())
+  userId     String   @unique
+  cardNumber String   @unique
+  qrCodeUrl  String?
+  issuedAt   DateTime @default(now())
+  renewedAt  DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("member_cards")
+}
+
+// ─── ÉTABLISSEMENTS ───────────────────────────────────────
+
+enum EstablishmentStatus {
+  PROSPECT
+  AUDIT
+  CERTIFIED
+  ACTIVE
+  SUSPENDED
+}
+
+model EstablishmentProfile {
+  id                String  @id @default(cuid())
+  userId            String  @unique
+  establishmentName String
+  siret             String?
+  legalStatus       String?
+  phone             String
+  website           String?
+  socialLinks       Json?
+
+  addressLine1 String
+  addressLine2 String?
+  city         String
+  postalCode   String
+  region       String
+  country      String  @default("France")
+
+  status            EstablishmentStatus @default(PROSPECT)
+  certificationDate DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user          User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  applications  PlaceApplication[]
+  scores        PlaceScore[]
+  managedPlaces Place[]            @relation("EstablishmentPlaces")
+
+  @@map("establishment_profiles")
+}
+
+// ─── LIEUX ────────────────────────────────────────────────
+
+enum PlaceType {
+  CAMPING
+  CAMPING_FERME
+  CAMPING_MUNICIPAL
+  PARKING
+  ETAPE_NATURE
+  HEBERGEMENT_INSOLITE
+  RESTAURANT
+  ACTIVITE
+  VILLAGE
+}
+
+enum PlaceStatus {
+  DRAFT
+  PENDING
+  PUBLISHED
+  SUSPENDED
+}
+
+model Place {
+  id          String    @id @default(cuid())
+  name        String
+  slug        String    @unique
+  type        PlaceType
+  description String
+  shortDesc   String?
+
+  addressLine1 String?
+  addressLine2 String?
+  city         String
+  postalCode   String?
+  region       String
+  country      String  @default("France")
+  lat          Float
+  lng          Float
+
+  mainImageUrl String?
+  images       Json?
+
+  priceRange      String?
+  memberPrice     String?
+  discountPercent Int?
+
+  rating      Float @default(0)
+  reviewCount Int   @default(0)
+  tags        Json?
+  services    Json?
+  features    Json?
+
+  status         PlaceStatus @default(PUBLISHED)
+  isFeatured     Boolean     @default(false)
+  favoritesCount Int         @default(0)
+
+  phone   String?
+  email   String?
+  website String?
+  hours   String?
+
+  createdById String?
+  createdBy   User?                 @relation("PlaceManager", fields: [createdById], references: [id])
+  ownerId     String?
+  owner       EstablishmentProfile? @relation("EstablishmentPlaces", fields: [ownerId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  reviews        PlaceReview[]
+  favorites      Favorite[]
+  application    PlaceApplication?
+  scores         PlaceScore[]
+  passportStamps PassportStamp[]
+  roadTripEtapes RoadTripEtape[]
+
+  @@index([status, createdAt])
+  @@index([country, region, city])
+  @@index([type, status])
+  @@map("places")
+}
+
+// ─── CANDIDATURE LABELLISATION ────────────────────────────
+
+enum ApplicationStatus {
+  DRAFT
+  SUBMITTED
+  UNDER_REVIEW
+  ACCEPTED
+  REJECTED
+}
+
+model PlaceApplication {
+  id      String  @id @default(cuid())
+  placeId String? @unique
+  userId  String
+  proId   String
+
+  motivation  String
+  placeName   String
+  placeType   PlaceType
+  description String
+
+  score           Int?
+  recommendations Json?
+  reviewedBy      String?
+  reviewedAt      DateTime?
+
+  status      ApplicationStatus @default(DRAFT)
+  submittedAt DateTime?
+  decidedAt   DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user  User                 @relation(fields: [userId], references: [id])
+  pro   EstablishmentProfile @relation(fields: [proId], references: [id])
+  place Place?               @relation(fields: [placeId], references: [id])
+
+  @@index([userId, createdAt])
+  @@index([proId, status])
+  @@index([status, createdAt])
+  @@map("place_applications")
+}
+
+// ─── SCORE AUDIT ──────────────────────────────────────────
+
+model PlaceScore {
+  id      String @id @default(cuid())
+  placeId String
+  proId   String
+
+  accueil        Int @default(0)
+  equipement     Int @default(0)
+  environnement  Int @default(0)
+  services       Int @default(0)
+  rapportQualite Int @default(0)
+  total          Int @default(0)
+
+  evaluatedAt    DateTime  @default(now())
+  nextEvaluation DateTime?
+
+  place Place                @relation(fields: [placeId], references: [id], onDelete: Cascade)
+  pro   EstablishmentProfile @relation(fields: [proId], references: [id], onDelete: Cascade)
+
+  @@index([placeId, evaluatedAt])
+  @@index([proId, evaluatedAt])
+  @@map("place_scores")
+}
+
+// ─── AVIS MEMBRES ─────────────────────────────────────────
+
+model PlaceReview {
+  id         String  @id @default(cuid())
+  placeId    String
+  userId     String
+  rating     Int
+  comment    String?
+  photos     Json?
+  isVerified Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  place Place @relation(fields: [placeId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([placeId, userId])
+  @@index([placeId, createdAt])
+  @@index([userId, createdAt])
+  @@map("place_reviews")
+}
+
+// ─── FAVORIS ──────────────────────────────────────────────
+
+model Favorite {
+  id      String @id @default(cuid())
+  userId  String
+  placeId String
+
+  createdAt DateTime @default(now())
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  place Place @relation(fields: [placeId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, placeId])
+  @@index([userId, createdAt])
+  @@index([placeId])
+  @@map("favorites")
+}
+
+// ─── ROAD TRIPS ───────────────────────────────────────────
+
+enum RoadTripDifficulty {
+  FACILE
+  MOYEN
+  AVANCE
+}
+
+model RoadTrip {
+  id          String             @id @default(cuid())
+  userId      String
+  title       String
+  description String
+  duration    Int
+  budget      Float?
+  distance    Int?
+  difficulty  RoadTripDifficulty @default(FACILE)
+  isPublic    Boolean            @default(false)
+  tags        Json?
+  likes       Int                @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user   User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  etapes RoadTripEtape[]
+
+  @@index([userId, createdAt])
+  @@index([isPublic, createdAt])
+  @@map("roadtrips")
+}
+
+model RoadTripEtape {
+  id         String  @id @default(cuid())
+  roadTripId String
+  placeId    String
+  order      Int
+  day        Int
+  duration   String?
+  activities Json?
+  notes      String?
+
+  roadTrip RoadTrip @relation(fields: [roadTripId], references: [id], onDelete: Cascade)
+  place    Place    @relation(fields: [placeId], references: [id])
+
+  @@unique([roadTripId, order])
+  @@index([placeId])
+  @@map("roadtrip_etapes")
+}
+
+// ─── BADGES & PASSEPORT ───────────────────────────────────
+
+model Badge {
+  id          String @id @default(cuid())
+  code        String @unique
+  name        String
+  description String
+  icon        String
+  category    String
+
+  userBadges UserBadge[]
+
+  @@map("badges")
+}
+
+model UserBadge {
+  id       String   @id @default(cuid())
+  userId   String
+  badgeId  String
+  earnedAt DateTime @default(now())
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  badge Badge @relation(fields: [badgeId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, badgeId])
+  @@index([badgeId])
+  @@map("user_badges")
+}
+
+model PassportStamp {
+  id        String   @id @default(cuid())
+  userId    String
+  placeId   String
+  visitedAt DateTime @default(now())
+  note      Int?
+  comment   String?
+  photoUrl  String?
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  place Place @relation(fields: [placeId], references: [id])
+
+  @@unique([userId, placeId])
+  @@index([placeId, visitedAt])
+  @@map("passport_stamps")
+}
+
+// ─── PAIEMENTS ────────────────────────────────────────────
+
+enum PaymentStatus {
+  PENDING
+  SUCCEEDED
+  FAILED
+  REFUNDED
+}
+
+enum PaymentType {
+  MEMBERSHIP
+  LABELLISATION
+  RENEWAL
+  OTHER
+}
+
+model Payment {
+  id              String        @id @default(cuid())
+  userId          String
+  stripePaymentId String?       @unique
+  amount          Int
+  currency        String        @default("eur")
+  status          PaymentStatus @default(PENDING)
+  type            PaymentType
+  description     String?
+  applicationId   String?
+  orderId         String?       @unique
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user  User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  order CheckoutOrder? @relation(fields: [orderId], references: [id], onDelete: Restrict)
+
+  @@index([userId, createdAt])
+  @@index([status, createdAt])
+  @@map("payments")
+}
+
+model CheckoutOrder {
+  id                      String       @id @default(cuid())
+  userId                  String
+  product                 OrderProduct
+  status                  OrderStatus  @default(PENDING)
+  amount                  Int
+  currency                String       @default("eur")
+  payload                 Json?
+  stripeCheckoutSessionId String?      @unique
+  stripePaymentIntentId   String?      @unique
+  paidAt                  DateTime?
+  createdAt               DateTime     @default(now())
+  updatedAt               DateTime     @updatedAt
+
+  user     User      @relation(fields: [userId], references: [id], onDelete: Restrict)
+  payments Payment[]
+
+  @@index([userId, createdAt])
+  @@index([status, createdAt])
+  @@map("checkout_orders")
+}
+
+model StripeEvent {
+  id          String            @id
+  type        String
+  status      StripeEventStatus @default(PROCESSING)
+  error       String?
+  processedAt DateTime?
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  @@index([status, createdAt])
+  @@map("stripe_events")
+}
+
+// ─── BLOG ─────────────────────────────────────────────────
+
+enum PostStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+model BlogPost {
+  id              String     @id @default(cuid())
+  title           String
+  slug            String     @unique
+  excerpt         String?
+  content         String
+  coverImage      String?
+  authorId        String?
+  categoryId      String?
+  tags            Json?
+  status          PostStatus @default(DRAFT)
+  publishedAt     DateTime?
+  metaTitle       String?
+  metaDescription String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  author   User?         @relation(fields: [authorId], references: [id])
+  category BlogCategory? @relation(fields: [categoryId], references: [id])
+
+  @@index([status, publishedAt])
+  @@index([categoryId, publishedAt])
+  @@map("blog_posts")
+}
+
+model BlogCategory {
+  id          String  @id @default(cuid())
+  name        String
+  slug        String  @unique
+  description String?
+
+  posts BlogPost[]
+
+  @@map("blog_categories")
+}
+
+// ─── SUPPORT ──────────────────────────────────────────────
+
+enum TicketStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}
+
+enum TicketPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+model SupportTicket {
+  id         String         @id @default(cuid())
+  userId     String
+  subject    String
+  message    String
+  status     TicketStatus   @default(OPEN)
+  priority   TicketPriority @default(MEDIUM)
+  assignedTo String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@index([status, priority, createdAt])
+  @@map("support_tickets")
+}
+
+// ─── NOTIFICATIONS ────────────────────────────────────────
+
+model Notification {
+  id     String  @id @default(cuid())
+  userId String
+  type   String
+  title  String
+  body   String?
+  data   Json?
+  isRead Boolean @default(false)
+
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, isRead, createdAt])
+  @@map("notifications")
+}
+
+// ─── LOGS ADMIN ───────────────────────────────────────────
+
+model AdminLog {
+  id        String  @id @default(cuid())
+  adminId   String
+  action    String
+  target    String?
+  metadata  Json?
+  ipAddress String?
+
+  createdAt DateTime @default(now())
+
+  @@index([adminId, createdAt])
+  @@map("admin_logs")
+}
+
+model NewsletterSubscriber {
+  id             String    @id @default(cuid())
+  email          String    @unique
+  source         String    @default("web")
+  consentAt      DateTime  @default(now())
+  unsubscribedAt DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@index([unsubscribedAt, createdAt])
+  @@map("newsletter_subscribers")
+}

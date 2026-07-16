@@ -1,0 +1,18 @@
+{
+  "name": "Label Vanlife — La vanlife a enfin son label",
+  "short_name": "Label Vanlife",
+  "description": "Des lieux calmes, respectueux et vraiment adaptés à la vanlife — sélectionnés et labellisés, avec 10 à 20% de réduction pour nos membres.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FAFAFA",
+  "theme_color": "#059669",
+  "categories": ["travel", "lifestyle", "navigation", "outdoor"],
+  "lang": "fr-FR",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "id": "/",
+  "icons": [
+    { "src": "/brand/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "/brand/favicon.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

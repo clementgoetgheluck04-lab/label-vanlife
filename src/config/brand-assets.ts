@@ -1,0 +1,16 @@
+export const BRAND_ASSETS = {
+  logo: "/brand/logo-officiel.png",
+  headerLogo: "/brand/logo-noir.png",
+  logoVector: "/brand/logo-officiel.svg",
+  logoCompact: "/brand/logo-label.png",
+  logoDark: "/brand/logo-noir.png",
+  favicon: "/brand/favicon.png",
+  faviconVector: "/brand/favicon.svg",
+  socialCover: "/brand/couverture-facebook.jpg",
+  socialCoverCollage: "/brand/couverture-facebook-collage.png",
+  memberCardCouple: "/brand/carte-membre-couple-2026.png",
+  memberCardFamily: "/brand/carte-membre-famille-2026.png",
+  mapLogo: "/brand/logo-map.png",
+  mapBadge: "/brand/logo-carte.png",
+  plaque2026: "/brand/plaque-2026.jpg",
+} as const;
