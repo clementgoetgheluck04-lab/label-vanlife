@@ -1,5 +1,9 @@
 import type { NextConfig } from "next";
 
+const scriptSources = process.env.NODE_ENV === "production"
+  ? "script-src 'self' 'unsafe-inline'"
+  : "script-src 'self' 'unsafe-inline' 'unsafe-eval'";
+
 const securityHeaders = [
   { key: "X-DNS-Prefetch-Control", value: "on" },
   {
@@ -22,7 +26,7 @@ const securityHeaders = [
     key: "Content-Security-Policy",
     value: [
       "default-src 'self'",
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
+      scriptSources,
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       "img-src 'self' data: blob: https://*.vercel.app https://*.basemaps.cartocdn.com https://api.bienvenue-a-la-ferme.com",
       "font-src 'self' data: https://fonts.gstatic.com",

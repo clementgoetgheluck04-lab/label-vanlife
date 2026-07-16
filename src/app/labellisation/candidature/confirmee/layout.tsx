@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Candidature confirmée | Label Vanlife",
+  title: "Candidature confirmée",
   robots: { index: false, follow: false },
 };
 

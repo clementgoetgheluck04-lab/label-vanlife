@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Manifeste — Pour une vanlife responsable et sereine | Label Vanlife",
+  title: "Manifeste — Pour une vanlife responsable et sereine",
   description:
     "Lire le manifeste Label Vanlife. Notre vision d'une vanlife plus respectueuse : moins de spots sauvages, plus de confiance, de calme et de durabilité. Rejoignez le mouvement.",
   openGraph: {

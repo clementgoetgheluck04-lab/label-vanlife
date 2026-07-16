@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Carte des lieux vanlife — Spots labellisés France | Label Vanlife",
+  title: "Carte des lieux vanlife — Spots labellisés France",
   description:
     "Explore notre carte interactive des lieux labellisés Label Vanlife en France. Campings, étapes nature et hébergements insolites sélectionnés pour une vanlife de qualité, avec réductions membres.",
   openGraph: {

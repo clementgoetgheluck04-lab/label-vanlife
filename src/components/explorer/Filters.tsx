@@ -92,12 +92,12 @@ export default function Filters({
           placeholder="Rechercher un lieu..."
           value={selected.search}
           onChange={(e) => update({ search: e.target.value })}
-          className="w-full h-10 pl-10 pr-4 text-sm bg-white/80 rounded-xl border border-border focus:outline-none focus:ring-2 focus:ring-sage focus:border-sage transition-all text-charcoal placeholder:text-stone"
+          className="w-full h-11 pl-10 pr-12 text-sm bg-white/80 rounded-xl border border-border focus:outline-none focus:ring-2 focus:ring-sage focus:border-sage transition-all text-charcoal placeholder:text-stone"
         />
         {selected.search && (
           <button
             onClick={() => update({ search: "" })}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-stone hover:text-charcoal"
+            className="absolute right-0 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center text-stone hover:text-charcoal"
             aria-label="Effacer la recherche"
           >
             <X className="h-4 w-4" />
@@ -153,7 +153,7 @@ export default function Filters({
                 key={opt.value}
                 onClick={() => update({ minNote: opt.value })}
                 className={cn(
-                  "flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium border transition-all",
+                  "flex min-h-11 items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium border transition-all",
                   selected.minNote === opt.value
                     ? "bg-sage text-white border-sage"
                     : "bg-white text-stone border-border hover:border-sage hover:text-sage"
@@ -173,7 +173,7 @@ export default function Filters({
           <select
             value={selected.region}
             onChange={(e) => update({ region: e.target.value })}
-            className="w-full h-9 px-3 text-sm bg-white rounded-xl border border-border focus:outline-none focus:ring-2 focus:ring-sage focus:border-sage text-charcoal transition-all appearance-none"
+            className="w-full h-11 px-3 text-sm bg-white rounded-xl border border-border focus:outline-none focus:ring-2 focus:ring-sage focus:border-sage text-charcoal transition-all appearance-none"
             style={{
               backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`,
               backgroundRepeat: "no-repeat",
@@ -193,7 +193,7 @@ export default function Filters({
       {hasActiveFilters && (
         <button
           onClick={clearAll}
-          className="flex items-center gap-1.5 text-xs font-medium text-stone hover:text-charcoal transition-colors"
+          className="flex min-h-11 items-center gap-1.5 text-xs font-medium text-stone hover:text-charcoal transition-colors"
         >
           <X className="h-3 w-3" />
           R\u00e9initialiser les filtres

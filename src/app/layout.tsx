@@ -79,7 +79,6 @@ export const metadata: Metadata = {
     description:
       "La vanlife a enfin son label. Des lieux calmes, respectueux et adaptés à la vanlife, avec 10 à 20% de réduction membres.",
     images: [`${BASE_URL}${BRAND_ASSETS.socialCover}`],
-    creator: "@labelvanlife",
   },
   other: {
     "google-site-verification": "",

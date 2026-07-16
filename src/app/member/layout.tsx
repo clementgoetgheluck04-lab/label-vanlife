@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { requireActiveMember } from "@/server/auth";
 
 export const metadata: Metadata = {
-  title: "Road Trips Vanlife — Itinéraires et idées de voyage | Label Vanlife",
+  title: "Espace membre — Carte, MAP et avantages",
   description:
     "Découvrez les road trips vanlife sélectionnés par Label Vanlife. Itinéraires détaillés, lieux d'étape labellisés, budgets et conseils pour voyager en van.",
   robots: {

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Blog Vanlife — Guides, conseils et actualités | Label Vanlife",
+  title: "Blog Vanlife — Guides, conseils et actualités",
   description:
     "Le blog Label Vanlife : guides road trip, conseils vanlife, sélections de spots, charte responsable et actualités de la communauté. Inspirez-vous pour vos prochains voyages en van.",
   openGraph: {

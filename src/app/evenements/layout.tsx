@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Événements vanlife 2025 — Rassemblements et salons | Label Vanlife",
+  title: "Événements vanlife 2025 — Rassemblements et salons",
   description:
     "Tous les événements vanlife, rassemblements VW, salons camping-car et rencontres de la communauté Label Vanlife en France. Calendrier 2025-2026.",
   openGraph: {

@@ -103,7 +103,7 @@ export default function Navbar() {
           <button
             onClick={() => setOpen((value) => !value)}
             className={cn(
-              "lg:hidden p-2 rounded-lg transition-colors",
+              "lg:hidden flex min-h-11 min-w-11 items-center justify-center rounded-lg transition-colors",
               overlaysHero ? "text-white hover:bg-white/10" : "text-neutral-500 hover:bg-neutral-50"
             )}
             aria-label="Menu"

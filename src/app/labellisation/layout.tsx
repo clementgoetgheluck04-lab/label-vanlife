@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Labellisation — Offre 2026 à 110€ | Label Vanlife",
+  title: "Labellisation — Offre 2026 à 110€",
   description:
     "Candidatez à la certification Label Vanlife. Offre 2026 à 110€ au lieu de 220€, remboursée intégralement si le lieu est déclaré non conforme.",
   openGraph: {

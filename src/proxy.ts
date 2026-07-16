@@ -13,10 +13,17 @@ function isPublicPath(pathname: string): boolean {
   return PUBLIC_ROUTES.some((route) => pathname === route || pathname.startsWith(`${route}/`));
 }
 
+function withDeploymentHeaders(response: NextResponse, request: NextRequest): NextResponse {
+  if (request.nextUrl.hostname.endsWith(".vercel.app")) {
+    response.headers.set("X-Robots-Tag", "noindex, nofollow");
+  }
+  return response;
+}
+
 export async function proxy(request: NextRequest) {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  if (!url || !key) return NextResponse.next();
+  if (!url || !key) return withDeploymentHeaders(NextResponse.next(), request);
 
   let response = NextResponse.next({ request });
   const supabase = createServerClient(url, key, {
@@ -34,7 +41,7 @@ export async function proxy(request: NextRequest) {
   const adminPreview = isAdminPreviewCookie(request.cookies.get(ADMIN_PREVIEW_COOKIE)?.value);
   if (isPublicPath(pathname)) {
     await supabase.auth.getUser();
-    return response;
+    return withDeploymentHeaders(response, request);
   }
 
   const { data: { user } } = await supabase.auth.getUser();
@@ -43,10 +50,10 @@ export async function proxy(request: NextRequest) {
   if (!user && (protectedWithoutPreview || memberWithoutAccess)) {
     const loginUrl = new URL("/member-login", request.url);
     loginUrl.searchParams.set("redirect", pathname);
-    return NextResponse.redirect(loginUrl);
+    return withDeploymentHeaders(NextResponse.redirect(loginUrl), request);
   }
 
-  return response;
+  return withDeploymentHeaders(response, request);
 }
 
 export const config = {

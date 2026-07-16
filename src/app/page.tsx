@@ -40,7 +40,7 @@ export default function Home() {
               <span className="text-xs font-semibold tracking-[0.15em] uppercase text-white/80">1er label pour vanlifers</span>
             </div>
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-6 max-w-3xl mx-auto leading-tight" style={{ fontFamily: "Outfit, sans-serif" }}>
-              La vanlife a enfin<br />son label.
+              La vanlife a enfin<br />{" "}son label.
             </h1>
             <p className="text-lg text-white/70 max-w-2xl mx-auto mb-10 leading-relaxed">
               Des lieux calmes, respectueux et vraiment adaptés à la vanlife — sélectionnés et labellisés, avec <strong className="text-amber-300">10 à 20% de réduction</strong> pour nos membres.
@@ -197,7 +197,7 @@ export default function Home() {
                     <div className="flex items-center justify-between">
                       <span className="text-xs text-emerald-600 font-semibold">-{lieu.discountPercent}% pour les membres</span>
                       <Link href="/devenir-membre">
-                        <Button variant="cta" size="sm" className="text-[10px] h-7 px-3 gap-1">Devenir membre <ArrowRight className="h-3 w-3" /></Button>
+                        <Button variant="cta" size="sm" className="min-h-11 px-3 text-xs gap-1">Devenir membre <ArrowRight className="h-3 w-3" /></Button>
                       </Link>
                     </div>
                   </div>

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Marketplace Vanlife — Équipements, vans et goodies | Label Vanlife",
+  title: "Marketplace Vanlife — Équipements, vans et goodies",
   description:
     "La marketplace Label Vanlife : produits dérivés, équipements pour van, vans aménagés à vendre et bonnes affaires de la communauté des vanlifers.",
   openGraph: {

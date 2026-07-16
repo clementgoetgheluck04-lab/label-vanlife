@@ -31,7 +31,7 @@ function Chip({
   return (
     <button
       className={cn(
-        "inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium border",
+        "inline-flex min-h-11 items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium border",
         "transition-all duration-200",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage focus-visible:ring-offset-1",
         chipVariants[variant],
