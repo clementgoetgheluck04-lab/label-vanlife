@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { ENRICHED_LIEUX } from "@/data/enriched-lieux";
+import { REGION_GUIDE_SLUGS } from "@/data/region-guides";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = "https://labelvanlife.com";
@@ -21,6 +22,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${baseUrl}/road-trips`, lastModified: new Date(), changeFrequency: "monthly" as const, priority: 0.8 },
     { url: `${baseUrl}/dormir-en-van`, lastModified: new Date(), changeFrequency: "monthly" as const, priority: 0.8 },
     { url: `${baseUrl}/vanlife-solo`, lastModified: new Date(), changeFrequency: "monthly" as const, priority: 0.8 },
+    { url: `${baseUrl}/vanlife-regions`, lastModified: new Date(), changeFrequency: "monthly" as const, priority: 0.8 },
   ];
 
   const lieuPages = ENRICHED_LIEUX.map((lieu) => ({
@@ -30,5 +32,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.7,
   }));
 
-  return [...staticPages, ...lieuPages];
+  const regionPages = REGION_GUIDE_SLUGS.map((slug) => ({
+    url: `${baseUrl}/vanlife-regions/${slug}`,
+    lastModified: new Date(),
+    changeFrequency: "monthly" as const,
+    priority: 0.8,
+  }));
+
+  return [...staticPages, ...regionPages, ...lieuPages];
 }

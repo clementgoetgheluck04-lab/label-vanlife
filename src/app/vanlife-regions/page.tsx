@@ -1,0 +1,16 @@
+import type { Metadata } from "next";
+import Image from "next/image";
+import Link from "next/link";
+import { ArrowRight, ChevronRight, MapPinned } from "lucide-react";
+import { REGION_GUIDES } from "@/data/region-guides";
+
+export const metadata: Metadata = {
+  title: "Vanlife par région : 6 destinations en France",
+  description: "Explorez la Bretagne, la Provence, l’Ardèche, les Pyrénées, les Landes et les Alpes en van avec nos itinéraires et lieux labellisés.",
+  alternates: { canonical: "/vanlife-regions" },
+  openGraph: { title: "Vanlife par région", description: "Six destinations françaises à découvrir en van.", url: "/vanlife-regions", images: [{ url: "/images/hero-label-vanlife.png", width: 1536, height: 1024 }] },
+};
+
+export default function VanlifeRegionsPage() {
+  return <main className="bg-white pb-24 pt-16 text-neutral-800"><div className="mx-auto max-w-6xl px-6 pt-8"><nav aria-label="Fil d’Ariane" className="flex items-center gap-2 text-xs text-neutral-400"><Link href="/">Accueil</Link><ChevronRight className="h-3.5 w-3.5" /><Link href="/vanlife">Vanlife France</Link><ChevronRight className="h-3.5 w-3.5" /><span className="text-neutral-700">Destinations</span></nav></div><header className="mx-auto grid max-w-6xl gap-10 px-6 py-12 lg:grid-cols-[.95fr_1.05fr] lg:items-center lg:py-16"><div className="animate-fade-in-up"><p className="text-xs font-bold uppercase tracking-[0.22em] text-[#9a7445]">Vanlife par région</p><h1 className="mt-4 text-4xl font-bold leading-[1.08] text-neutral-950 sm:text-6xl">Six régions, six manières de vivre la vanlife</h1><p className="mt-5 text-lg leading-8 text-neutral-600">Côtes bretonnes, rivières ardéchoises, cols alpins ou pinèdes landaises : choisissez votre décor et préparez chaque étape.</p></div><div className="relative aspect-[4/3] overflow-hidden rounded-[2rem] shadow-2xl shadow-neutral-900/15"><Image src="/images/hero-label-vanlife.png" alt="Van au bord d’un lac pour découvrir les régions de France" fill priority sizes="(max-width:1024px) 100vw,52vw" className="object-cover" /></div></header><section className="mx-auto max-w-6xl px-6"><div className="text-center"><MapPinned className="mx-auto h-9 w-9 text-emerald-700" /><h2 className="mt-3 text-3xl font-bold text-neutral-950 sm:text-4xl">Choisissez votre prochaine destination</h2></div><div className="mt-10 grid gap-5 md:grid-cols-2 lg:grid-cols-3">{REGION_GUIDES.map((guide) => <Link key={guide.slug} href={`/vanlife-regions/${guide.slug}`} className="micro-card group rounded-2xl border border-neutral-200 bg-white p-6"><p className="text-xs font-bold uppercase tracking-[0.18em] text-[#9a7445]">{guide.eyebrow}</p><h2 className="mt-2 text-2xl font-bold text-neutral-950">{guide.name}</h2><p className="mt-3 line-clamp-3 text-sm leading-6 text-neutral-600">{guide.intro}</p><div className="mt-5 flex flex-wrap gap-2">{guide.tags.slice(0, 2).map((tag) => <span key={tag} className="rounded-full bg-[#f7f1e8] px-3 py-1 text-xs font-semibold text-[#7d5d38]">{tag}</span>)}</div><span className="mt-6 inline-flex items-center gap-2 text-sm font-bold text-emerald-700">Découvrir la région <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" /></span></Link>)}</div></section></main>;
+}
