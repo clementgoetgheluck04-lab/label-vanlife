@@ -299,7 +299,7 @@ export default function Home() {
               { icon: "🌿", title: "Slow travel & vanlife", desc: "Voyager moins vite pour profiter davantage — la philosophie du slow travel.", href: "/slow-travel-vanlife" },
               { icon: "🗺️", title: "Road trips en van", desc: "Les meilleurs itinéraires van à travers toute la France.", href: "/road-trips" },
               { icon: "🌙", title: "Dormir en van en France", desc: "Règles, aires, campings et lieux d'accueil pour préparer chaque nuit.", href: "/dormir-en-van" },
-              { icon: "🧭", title: "Vanlife solo", desc: "Voyager seul(e) en van : sécurité, choix du van, communauté et itinéraires.", href: "/vanlife#equipement" },
+              { icon: "🧭", title: "Vanlife solo", desc: "Voyager seul(e) en van : sécurité, choix du van, communauté et itinéraires.", href: "/vanlife-solo" },
               { icon: "🌊", title: "Vanlife par région", desc: "Bretagne, Provence, Ardèche, Pyrénées, Landes, Alpes — nos guides régionaux.", href: "/road-trips" },
             ].map((guide) => (
               <Link key={guide.title} href={guide.href} className="group block">
