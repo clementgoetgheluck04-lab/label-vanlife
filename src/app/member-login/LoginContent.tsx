@@ -181,7 +181,7 @@ export function LoginContent() {
               variant="cta"
               size="lg"
               className="w-full gap-2 text-base"
-              disabled={loading || (isRegister ? !email || !password || !firstName || !lastName || !phone : accessCode.replace(/[^A-Z0-9]/g, "").length < 18)}
+              disabled={loading || (isRegister ? !email || !password || !firstName || !lastName || !phone : accessCode.replace(/[^A-Z0-9]/g, "").length < 14)}
             >
               {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : <ArrowRight className="h-5 w-5" />}
               {isRegister ? "Créer mon compte" : "Accéder à mon espace"}
