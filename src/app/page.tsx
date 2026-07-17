@@ -123,13 +123,22 @@ export default function Home() {
       </section>
 
       {/* ===== L'ESPRIT LABEL VANLIFE ===== */}
-      <section className="py-20 sm:py-24 bg-emerald-50/30">
-        <div className="max-w-4xl mx-auto px-6">
+      <section className="relative overflow-hidden py-20 sm:py-24">
+        <Image
+          src="/images/home/camping-vanlife.png"
+          alt=""
+          fill
+          sizes="100vw"
+          className="object-cover object-center"
+          aria-hidden="true"
+        />
+        <div className="absolute inset-0 bg-gradient-to-br from-neutral-950/85 via-neutral-950/68 to-emerald-950/62" />
+        <div className="relative z-10 max-w-5xl mx-auto px-6">
           <div className="text-center mb-12">
-            <span className="inline-block text-xs font-semibold tracking-[0.2em] uppercase text-emerald-500 mb-4">L'esprit Label Vanlife</span>
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-neutral-900 leading-tight" style={{ fontFamily: "Outfit, sans-serif" }}>
+            <span className="inline-block rounded-full border border-white/15 bg-black/15 px-4 py-2 text-xs font-semibold tracking-[0.2em] uppercase text-[#dfc59f] backdrop-blur-sm mb-4">L'esprit Label Vanlife</span>
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white leading-tight drop-shadow-lg" style={{ fontFamily: "Outfit, sans-serif" }}>
               Partir sans savoir où tu vas.<br />
-              <span className="text-emerald-500">MAIS</span> Savoir que tu seras bien accueilli.
+              <span className="text-[#dfc59f]">MAIS</span> Savoir que tu seras bien accueilli.
             </h2>
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -139,18 +148,18 @@ export default function Home() {
               { icon: <Star className="w-6 h-6" />, title: "Authenticité", desc: "Des lieux labellisés Label Vanlife, contrôlés par des vanlifers qui respectent la philosophie vanlife." },
               { icon: <Moon className="w-6 h-6" />, title: "Nuit tranquille", desc: "Zéro parking sauvage. Zéro voisin mécontent. Juste le silence et les étoiles." },
             ].map((item) => (
-              <Card key={item.title} className="micro-card p-5 text-center space-y-2">
-                <div className="micro-icon inline-flex h-10 w-10 rounded-xl bg-emerald-50 items-center justify-center text-emerald-500">{item.icon}</div>
-                <h3 className="font-bold text-neutral-900 text-sm">{item.title}</h3>
-                <p className="text-xs text-neutral-500 leading-relaxed">{item.desc}</p>
+              <Card key={item.title} className="micro-card border-white/15 bg-neutral-950/45 p-5 text-center text-white shadow-xl backdrop-blur-md space-y-2">
+                <div className="micro-icon inline-flex h-10 w-10 rounded-xl border border-white/10 bg-white/10 items-center justify-center text-[#dfc59f]">{item.icon}</div>
+                <h3 className="font-bold text-white text-sm">{item.title}</h3>
+                <p className="text-xs text-white/70 leading-relaxed">{item.desc}</p>
               </Card>
             ))}
           </div>
-          <div className="mt-8 text-center space-y-2">
-            <p className="text-sm text-neutral-500 italic">— Des lieux qui t'attendent · Des prix adaptés à la vanlife · Des hôtes qui comprennent ta façon de voyager</p>
-            <p className="text-sm font-semibold text-emerald-600">👉 Tu arrives. Tu montres ta carte. Tu es chez toi.</p>
-            <p className="text-sm font-bold text-neutral-800">La vanlife redevient simple.</p>
-            <p className="text-xs text-neutral-400">— Clément, fondateur</p>
+          <div className="mt-8 rounded-2xl border border-white/10 bg-black/20 px-5 py-5 text-center backdrop-blur-sm space-y-2">
+            <p className="text-sm text-white/65 italic">— Des lieux qui t'attendent · Des prix adaptés à la vanlife · Des hôtes qui comprennent ta façon de voyager</p>
+            <p className="text-sm font-semibold text-[#dfc59f]">👉 Tu arrives. Tu montres ta carte. Tu es chez toi.</p>
+            <p className="text-sm font-bold text-white">La vanlife redevient simple.</p>
+            <p className="text-xs text-white/45">— Clément, fondateur</p>
           </div>
         </div>
       </section>
