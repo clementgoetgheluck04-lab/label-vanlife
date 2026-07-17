@@ -483,7 +483,7 @@ enum PaymentType {
 
 model Payment {
   id              String        @id @default(cuid())
-  userId          String
+  userId          String?
   stripePaymentId String?       @unique
   amount          Int
   currency        String        @default("eur")
@@ -496,7 +496,7 @@ model Payment {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  user  User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user  User?          @relation(fields: [userId], references: [id], onDelete: SetNull)
   order CheckoutOrder? @relation(fields: [orderId], references: [id], onDelete: Restrict)
 
   @@index([userId, createdAt])
@@ -506,7 +506,7 @@ model Payment {
 
 model CheckoutOrder {
   id                      String       @id @default(cuid())
-  userId                  String
+  userId                  String?
   product                 OrderProduct
   status                  OrderStatus  @default(PENDING)
   amount                  Int
@@ -518,7 +518,7 @@ model CheckoutOrder {
   createdAt               DateTime     @default(now())
   updatedAt               DateTime     @updatedAt
 
-  user     User      @relation(fields: [userId], references: [id], onDelete: Restrict)
+  user     User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
   payments Payment[]
 
   @@index([userId, createdAt])

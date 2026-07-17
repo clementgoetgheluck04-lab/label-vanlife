@@ -26,7 +26,7 @@ export default function ExplorerPage() {
   return (
     <div className="min-h-screen bg-neutral-50 pt-16 pb-24">
       {/* Top Bar */}
-      <div className="sticky top-16 z-30 bg-white/90 backdrop-blur-md border-b border-neutral-200">
+      <div className="fixed left-0 right-0 top-16 z-30 bg-white/95 backdrop-blur-md border-b border-neutral-200 shadow-sm">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="flex items-center gap-3 py-3">
             <Link href="/" className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full hover:bg-neutral-100" aria-label="Retour à l'accueil">
@@ -49,7 +49,7 @@ export default function ExplorerPage() {
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 space-y-6">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 pb-6 pt-24 space-y-6">
         {/* Présentation du réseau */}
         <div className="bg-white rounded-2xl p-6 border border-neutral-200 shadow-sm space-y-4">
           <div className="flex items-center gap-2">
@@ -87,7 +87,7 @@ export default function ExplorerPage() {
 
         {/* Grille */}
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-          {lieuxFiltres.map((lieu) => {
+          {lieuxFiltres.map((lieu, index) => {
             const typeLabel: Record<string, string> = {
               camping: "Camping",
               parking: "Parking",
@@ -99,12 +99,13 @@ export default function ExplorerPage() {
               <Link
                 href={`/lieux/${lieu.id}`}
                 key={lieu.id}
-                className="group bg-white rounded-2xl border border-neutral-200 overflow-hidden hover:shadow-elevated hover:-translate-y-1 transition-all duration-300 block"
+                className="group animate-stagger-in bg-white rounded-2xl border border-neutral-200 overflow-hidden hover:shadow-elevated hover:-translate-y-1 transition-all duration-300 block"
+                style={{ animationDelay: `${Math.min(index, 9) * 45}ms` }}
               >
                 {/* Photo */}
                 <div className="relative h-44 bg-gradient-to-br from-emerald-50 to-neutral-50 overflow-hidden">
                   {lieu.photoUrl ? (
-                    <div className="w-full h-full bg-cover bg-center" style={{ backgroundImage: `url(${lieu.photoUrl})` }} />
+                    <div className="w-full h-full bg-cover bg-center transition-transform duration-500 ease-out group-hover:scale-[1.04]" style={{ backgroundImage: `url(${lieu.photoUrl})` }} />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">
                       <MapPin className="h-10 w-10 text-emerald-300" />

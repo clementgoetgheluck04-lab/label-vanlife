@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getLabellisationProduct } from "@/config/products";
 import { getPrisma } from "@/lib/prisma";
-import { ensureAppUser, getAuthenticatedUser } from "@/server/auth";
 import { getAppUrl } from "@/server/env";
 import { apiError } from "@/server/http";
 import { getStripe } from "@/server/stripe";
@@ -14,10 +13,8 @@ export async function POST(request: NextRequest) {
   try {
     assertSameOrigin(request);
     enforceRateLimit(request, "labellisation-checkout", 10, 10 * 60 * 1_000);
-    const user = await getAuthenticatedUser();
-    await ensureAppUser(user);
     const payload = parseLabellisationPayload(await request.json());
-    if (!payload) {
+    if (!payload || !payload.draftId || (payload.attachmentPaths?.length ?? 0) < 2) {
       return NextResponse.json({ error: "Invalid application data" }, { status: 400 });
     }
 
@@ -27,7 +24,7 @@ export async function POST(request: NextRequest) {
     const prisma = getPrisma();
     const order = await prisma.checkoutOrder.create({
       data: {
-        userId: user.id,
+        userId: null,
         product: product.code,
         amount: product.amount,
         currency: product.currency,
@@ -47,9 +44,9 @@ export async function POST(request: NextRequest) {
           },
           quantity: 1,
         }],
-        customer_email: user.email ?? payload.email,
+        customer_email: payload.email,
         client_reference_id: order.id,
-        metadata: { orderId: order.id, product: product.code, userId: user.id },
+        metadata: { orderId: order.id, product: product.code, draftId: payload.draftId },
         payment_intent_data: { metadata: { orderId: order.id, product: product.code } },
         success_url: `${appUrl}/labellisation/success?session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${appUrl}/labellisation/paiement?canceled=true`,

@@ -111,8 +111,8 @@ export default function Home() {
               { num: "02", title: "Je prépare mon étape", desc: "Je compare les lieux, leurs équipements et leurs conditions, puis je réserve selon les modalités indiquées." },
               { num: "03", title: "Je profite de l'avantage", desc: "Sur place, je présente ma carte à jour. En ligne, j'utilise le code privé lorsque le lieu en propose un." },
             ].map((step) => (
-              <div key={step.num} className="relative rounded-2xl border border-neutral-200 bg-white p-6 pt-5 text-center shadow-sm sm:p-8">
-                <span className="relative z-10 mx-auto flex h-16 w-16 items-center justify-center rounded-full border-4 border-white bg-[#c39960] text-sm font-bold text-white shadow-md">{step.num}</span>
+              <div key={step.num} className="micro-card relative rounded-2xl border border-neutral-200 bg-white p-6 pt-5 text-center shadow-sm sm:p-8">
+                <span className="micro-icon relative z-10 mx-auto flex h-16 w-16 items-center justify-center rounded-full border-4 border-white bg-[#c39960] text-sm font-bold text-white shadow-md">{step.num}</span>
                 <h3 className="mt-6 text-lg font-bold text-neutral-900">{step.title}</h3>
                 <p className="mt-3 text-sm leading-relaxed text-neutral-500">{step.desc}</p>
                 <Check className="mx-auto mt-5 h-5 w-5 text-emerald-500" />
@@ -139,8 +139,8 @@ export default function Home() {
               { icon: <Star className="w-6 h-6" />, title: "Authenticité", desc: "Des lieux labellisés Label Vanlife, contrôlés par des vanlifers qui respectent la philosophie vanlife." },
               { icon: <Moon className="w-6 h-6" />, title: "Nuit tranquille", desc: "Zéro parking sauvage. Zéro voisin mécontent. Juste le silence et les étoiles." },
             ].map((item) => (
-              <Card key={item.title} className="p-5 text-center space-y-2">
-                <div className="inline-flex h-10 w-10 rounded-xl bg-emerald-50 items-center justify-center text-emerald-500">{item.icon}</div>
+              <Card key={item.title} className="micro-card p-5 text-center space-y-2">
+                <div className="micro-icon inline-flex h-10 w-10 rounded-xl bg-emerald-50 items-center justify-center text-emerald-500">{item.icon}</div>
                 <h3 className="font-bold text-neutral-900 text-sm">{item.title}</h3>
                 <p className="text-xs text-neutral-500 leading-relaxed">{item.desc}</p>
               </Card>
@@ -174,7 +174,7 @@ export default function Home() {
                 className="group bg-white rounded-2xl border border-neutral-200 overflow-hidden hover:shadow-elevated hover:-translate-y-1 transition-all duration-300 block"
               >
                 <Link href={`/lieux/${lieu.id}`} className="relative block h-44 bg-gradient-to-br from-emerald-50 to-neutral-50 overflow-hidden" aria-label={`Découvrir ${lieu.nom}`}>
-                  <div className="w-full h-full bg-cover bg-center" style={{ backgroundImage: `url(${lieu.photoUrl})` }} />
+                  <div className="w-full h-full bg-cover bg-center transition-transform duration-500 ease-out group-hover:scale-[1.04]" style={{ backgroundImage: `url(${lieu.photoUrl})` }} />
                   <span className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm text-[10px] font-semibold px-2.5 py-1 rounded-full shadow-sm text-emerald-700">{getTypeLabel(lieu.type)}</span>
                   {lieu.discountPercent > 0 && (
                     <span className="absolute top-3 right-3 bg-amber-500 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-sm">-{lieu.discountPercent}%</span>
@@ -238,8 +238,8 @@ export default function Home() {
               { icon: <Star className="w-6 h-6" />, title: "Qualité", desc: "Des rencontres authentiques et humaines" },
               { icon: <Shield className="w-6 h-6" />, title: "Confiance", desc: "Un réseau vérifié et bienveillant" },
             ].map((v) => (
-              <Card key={v.title} className="p-5 text-center space-y-2">
-                <div className="inline-flex h-10 w-10 rounded-xl bg-emerald-50 items-center justify-center text-emerald-500 mx-auto">{v.icon}</div>
+              <Card key={v.title} className="micro-card p-5 text-center space-y-2">
+                <div className="micro-icon inline-flex h-10 w-10 rounded-xl bg-emerald-50 items-center justify-center text-emerald-500 mx-auto">{v.icon}</div>
                 <h3 className="font-bold text-neutral-900 text-sm">{v.title}</h3>
                 <p className="text-xs text-neutral-500">{v.desc}</p>
               </Card>

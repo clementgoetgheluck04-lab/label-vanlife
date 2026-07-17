@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, ArrowRight, Building2, Check, ClipboardCheck, FileText, Loader2, Percent, Upload, X } from "lucide-react";
@@ -32,6 +32,21 @@ function scrollToTopImmediately() {
   root.style.scrollBehavior = previousBehavior;
 }
 
+function normalizeWebsite(value: string) {
+  const trimmed = value.trim();
+  if (!trimmed) return "";
+  return /^[a-z][a-z0-9+.-]*:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
+}
+
+function isValidWebsite(value: string) {
+  try {
+    const url = new URL(normalizeWebsite(value));
+    return ["http:", "https:"].includes(url.protocol) && url.hostname.includes(".");
+  } catch {
+    return false;
+  }
+}
+
 const initialCriteria = Object.fromEntries(
   LABELLISATION_CRITERIA.map((criterion) => [criterion.id, { status: "", examples: [], detail: "" }]),
 ) as Record<string, CriterionAnswer>;
@@ -57,7 +72,40 @@ export default function CandidaturePage() {
   const [planFile, setPlanFile] = useState<File | null>(null);
   const [photoFiles, setPhotoFiles] = useState<File[]>([]);
   const [form, setForm] = useState(initialForm);
+  const [progressRestored, setProgressRestored] = useState(false);
+  const [showCharterDetails, setShowCharterDetails] = useState(false);
   const update = (patch: Partial<typeof form>) => setForm((current) => ({ ...current, ...patch }));
+
+  useEffect(() => {
+    const timeout = window.setTimeout(() => {
+      const saved = localStorage.getItem("labellisation-form-progress");
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved) as Partial<typeof initialForm>;
+          setForm((current) => ({
+            ...current,
+            ...parsed,
+            criteria: { ...initialCriteria, ...(parsed.criteria || {}) },
+            planFileName: "",
+            photoFileNames: [],
+          }));
+        } catch {
+          localStorage.removeItem("labellisation-form-progress");
+        }
+      }
+      setProgressRestored(true);
+    }, 0);
+    return () => window.clearTimeout(timeout);
+  }, []);
+
+  useEffect(() => {
+    if (progressRestored) localStorage.setItem("labellisation-form-progress", JSON.stringify(form));
+  }, [form, progressRestored]);
+
+  useEffect(() => {
+    const timeout = window.setTimeout(scrollToTopImmediately, 0);
+    return () => window.clearTimeout(timeout);
+  }, [step]);
 
   const setCriterion = (id: string, patch: Partial<CriterionAnswer>) => update({
     criteria: { ...form.criteria, [id]: { ...form.criteria[id], ...patch } },
@@ -83,16 +131,22 @@ export default function CandidaturePage() {
     : null;
   const discountIsParitySafe = parityMaximum === null || Number(form.discountPercent) <= parityMaximum;
   const canContinue = [
-    Boolean(form.establishmentName.trim() && form.address.trim() && form.postalCode.trim() && form.city.trim() && form.contactName.trim() && form.email.includes("@") && /^\d{14}$/.test(form.siret.replace(/\s/g, ""))),
+    Boolean(form.establishmentName.trim() && form.address.trim() && form.postalCode.trim() && form.city.trim() && isValidWebsite(form.website) && form.contactName.trim() && form.email.includes("@") && /^\d{14}$/.test(form.siret.replace(/\s/g, ""))),
     answeredCriteria === LABELLISATION_CRITERIA.length && Boolean(form.planFileName) && form.welcomeMessage.trim().length >= 20,
     form.reservationModes.length > 0 && Number(form.discountPercent) >= 10 && Number(form.discountPercent) <= 20 && discountIsParitySafe && (!form.hasParityClause || parityMaximum !== null),
     Boolean(Number(form.totalPitches) > 0 && photoFiles.length >= 1 && photoFiles.length <= 3 && form.acceptCharter),
   ][step];
 
+  const missingMessage = [
+    "Renseignez le nom, l'adresse, la ville, un site internet valide, le contact, l'email et le SIRET à 14 chiffres.",
+    `Renseignez les ${LABELLISATION_CRITERIA.length} critères, ajoutez le plan et décrivez votre accueil en au moins 20 caractères.`,
+    "Choisissez un mode de réservation et une réduction valide entre 10 % et 20 % compatible avec votre éventuelle clause de parité.",
+    "Indiquez le nombre d'emplacements, ajoutez au moins une photo et acceptez la charte Label Vanlife.",
+  ][step];
+
   const next = () => {
     if (!canContinue) return;
     setStep((current) => Math.min(current + 1, STEPS.length - 1));
-    scrollToTopImmediately();
   };
 
   const handlePreAudit = async () => {
@@ -117,9 +171,21 @@ export default function CandidaturePage() {
       const response = await fetch("/api/labellisation/submit-draft", { method: "POST", body });
       const result = await response.json();
       if (!response.ok) throw new Error(result.error || "Impossible d'envoyer la candidature.");
-      localStorage.setItem("labellisation-draft", JSON.stringify({ ...draft, draftId: result.draftId, attachmentPaths: result.attachmentPaths }));
+      const finalizedDraft = { ...draft, draftId: result.draftId, attachmentPaths: result.attachmentPaths };
+      localStorage.setItem("labellisation-draft", JSON.stringify(finalizedDraft));
+      localStorage.removeItem("labellisation-form-progress");
       sessionStorage.setItem("labellisation-confirmation", JSON.stringify({ establishmentName: form.establishmentName, email: form.email, draftId: result.draftId }));
-      router.push("/labellisation/candidature/confirmee");
+      const checkoutResponse = await fetch("/api/stripe/checkout-labellisation", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(finalizedDraft),
+      });
+      const checkoutResult = await checkoutResponse.json();
+      if (!checkoutResponse.ok || !checkoutResult.url) {
+        router.push("/labellisation/paiement?checkout=retry");
+        return;
+      }
+      window.location.href = checkoutResult.url;
     } catch (error) {
       setSubmitError(error instanceof Error ? error.message : "Impossible d'envoyer la candidature.");
       setLoading(false);
@@ -130,7 +196,7 @@ export default function CandidaturePage() {
   const textareaClass = "mt-2 w-full resize-y rounded-xl border border-neutral-200 bg-white px-4 py-3 text-neutral-900 outline-none transition focus:border-[#c39960] focus:ring-2 focus:ring-[#c39960]/25";
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-[#f7f1e8] to-white px-4 pb-20 pt-24">
+    <main id="candidature-top" className="min-h-screen bg-gradient-to-b from-[#f7f1e8] to-white px-4 pb-20 pt-24">
       <div className="mx-auto max-w-4xl space-y-8">
         <Link href="/labellisation" className="inline-flex items-center gap-2 text-sm text-neutral-500 hover:text-neutral-900"><ArrowLeft className="h-4 w-4" /> Retour à la labellisation</Link>
         <header className="text-center">
@@ -152,21 +218,21 @@ export default function CandidaturePage() {
         <Card className="border-[#c39960]/20 p-6 shadow-lg shadow-[#c39960]/5 sm:p-8">
           {step === 0 && <section className="space-y-5">
             <div><h2 className="text-2xl font-bold text-neutral-900">Vos informations</h2><p className="mt-1 text-sm text-neutral-500">Les champs marqués d'un astérisque sont nécessaires à l'étude du dossier.</p></div>
-            <label className="block text-sm font-medium text-neutral-700">Nom du lieu *<input className={fieldClass} value={form.establishmentName} onChange={(e) => update({ establishmentName: e.target.value })} placeholder="Ex : Camping de la Vallée Verte" /></label>
-            <label className="block text-sm font-medium text-neutral-700">Adresse complète *<input className={fieldClass} value={form.address} onChange={(e) => update({ address: e.target.value })} placeholder="Numéro, rue ou lieu-dit" /></label>
+            <label className="block text-sm font-medium text-neutral-700">Nom du lieu *<input autoComplete="organization" className={fieldClass} value={form.establishmentName} onChange={(e) => update({ establishmentName: e.target.value })} placeholder="Ex : Camping de la Vallée Verte" /></label>
+            <label className="block text-sm font-medium text-neutral-700">Adresse complète *<input autoComplete="street-address" className={fieldClass} value={form.address} onChange={(e) => update({ address: e.target.value })} placeholder="Numéro, rue ou lieu-dit" /></label>
             <div className="grid gap-4 sm:grid-cols-3">
-              <label className="block text-sm font-medium text-neutral-700">Code postal *<input className={fieldClass} inputMode="numeric" value={form.postalCode} onChange={(e) => update({ postalCode: e.target.value })} /></label>
-              <label className="block text-sm font-medium text-neutral-700">Ville *<input className={fieldClass} value={form.city} onChange={(e) => update({ city: e.target.value })} /></label>
-              <label className="block text-sm font-medium text-neutral-700">Région<input className={fieldClass} value={form.region} onChange={(e) => update({ region: e.target.value })} /></label>
+              <label className="block text-sm font-medium text-neutral-700">Code postal *<input autoComplete="postal-code" className={fieldClass} inputMode="numeric" value={form.postalCode} onChange={(e) => update({ postalCode: e.target.value })} /></label>
+              <label className="block text-sm font-medium text-neutral-700">Ville *<input autoComplete="address-level2" className={fieldClass} value={form.city} onChange={(e) => update({ city: e.target.value })} /></label>
+              <label className="block text-sm font-medium text-neutral-700">Région<input autoComplete="address-level1" className={fieldClass} value={form.region} onChange={(e) => update({ region: e.target.value })} /></label>
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
               <label className="block text-sm font-medium text-neutral-700">Type de lieu *<select className={fieldClass} value={form.placeType} onChange={(e) => update({ placeType: e.target.value })}>{PLACE_TYPES.map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label>
-              <label className="block text-sm font-medium text-neutral-700">Site internet<input type="url" className={fieldClass} value={form.website} onChange={(e) => update({ website: e.target.value })} placeholder="https://..." /></label>
+              <label className="block text-sm font-medium text-neutral-700">Site internet *<input type="text" inputMode="url" autoComplete="url" required className={fieldClass} value={form.website} onChange={(e) => update({ website: e.target.value })} onBlur={(e) => update({ website: normalizeWebsite(e.target.value) })} placeholder="www.votrelieu.fr" /></label>
               <label className="block text-sm font-medium text-neutral-700">Page Facebook<input type="url" className={fieldClass} value={form.facebook} onChange={(e) => update({ facebook: e.target.value })} placeholder="https://facebook.com/..." /></label>
-              <label className="block text-sm font-medium text-neutral-700">Prénom et nom *<input className={fieldClass} value={form.contactName} onChange={(e) => update({ contactName: e.target.value })} /></label>
+              <label className="block text-sm font-medium text-neutral-700">Prénom et nom *<input autoComplete="name" className={fieldClass} value={form.contactName} onChange={(e) => update({ contactName: e.target.value })} /></label>
               <label className="block text-sm font-medium text-neutral-700">Poste / Fonction<input className={fieldClass} value={form.jobTitle} onChange={(e) => update({ jobTitle: e.target.value })} /></label>
-              <label className="block text-sm font-medium text-neutral-700">Email *<input type="email" className={fieldClass} value={form.email} onChange={(e) => update({ email: e.target.value })} /></label>
-              <label className="block text-sm font-medium text-neutral-700">Téléphone<input type="tel" className={fieldClass} value={form.phone} onChange={(e) => update({ phone: e.target.value })} /></label>
+              <label className="block text-sm font-medium text-neutral-700">Email *<input type="email" autoComplete="email" className={fieldClass} value={form.email} onChange={(e) => update({ email: e.target.value })} /></label>
+              <label className="block text-sm font-medium text-neutral-700">Téléphone<input type="tel" autoComplete="tel" className={fieldClass} value={form.phone} onChange={(e) => update({ phone: e.target.value })} /></label>
               <label className="block text-sm font-medium text-neutral-700">Numéro SIRET *<input className={fieldClass} inputMode="numeric" maxLength={17} value={form.siret} onChange={(e) => update({ siret: e.target.value })} placeholder="14 chiffres" /></label>
             </div>
             <label className="flex gap-3 rounded-xl border border-neutral-200 p-4 text-sm text-neutral-600"><input type="checkbox" className="mt-0.5 accent-[#c39960]" checked={form.operatingAuthorization} onChange={(e) => update({ operatingAuthorization: e.target.checked })} /> Je confirme disposer des autorisations nécessaires à l'exploitation de mon établissement.</label>
@@ -237,8 +303,8 @@ export default function CandidaturePage() {
             <div><h2 className="text-2xl font-bold text-neutral-900">Votre fiche établissement</h2><p className="mt-1 text-sm text-neutral-500">Ces informations apparaîtront sur votre fiche Label Vanlife.</p></div>
 
             <div className="rounded-2xl border border-neutral-200 p-5 sm:p-6">
-              <div className="flex flex-wrap items-center gap-2"><h3 className="font-bold text-neutral-900">Photos vanlife</h3><span className="rounded-full bg-[#f7f1e8] px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-[#8b673d]">Recommandé</span></div>
-              <p className="mt-2 text-sm text-neutral-500">Emplacements, vue, ambiance — montrez votre lieu tel qu'il est vécu. Min. 1, max. 3 photos.</p>
+              <div className="flex flex-wrap items-center gap-2"><h3 className="font-bold text-neutral-900">Photos vanlife</h3><span className="rounded-full bg-red-50 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-red-700">Obligatoire</span></div>
+              <p className="mt-2 text-sm text-neutral-500">Emplacements, vue, ambiance — au moins 1 photo est obligatoire, avec un maximum de 3 photos.</p>
               <label className="mt-4 block"><span className="flex min-h-32 cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-[#c39960]/40 bg-[#f7f1e8]/50 p-5 text-center text-[#8b673d]"><Upload className="h-6 w-6" /><strong>Glissez ou cliquez pour sélectionner 1 à 3 photos</strong><small>JPG, PNG — chaque photo est téléchargée une par une · max. 3 photos</small></span><input className="sr-only" type="file" accept="image/jpeg,image/png" onChange={(e) => { const file = e.target.files?.[0]; e.target.value = ""; if (!file) return; if (file.size > 10 * 1024 * 1024) { setSubmitError("Chaque photo doit faire moins de 10MB."); return; } setSubmitError(""); setPhotoFiles((current) => current.length >= 3 ? current : [...current, file]); update({ photoFileNames: photoFiles.length >= 3 ? form.photoFileNames : [...form.photoFileNames, file.name] }); }} /></label>
               {photoFiles.length > 0 && <div className="mt-3 space-y-2">{photoFiles.map((file, index) => <div key={`${file.name}-${index}`} className="flex items-center justify-between rounded-lg bg-neutral-50 px-3 py-2 text-sm text-neutral-600"><span className="truncate">{index + 1}. {file.name}</span><button type="button" aria-label={`Supprimer ${file.name}`} onClick={() => { setPhotoFiles((current) => current.filter((_, itemIndex) => itemIndex !== index)); update({ photoFileNames: form.photoFileNames.filter((_, itemIndex) => itemIndex !== index) }); }} className="ml-3 rounded-full p-1 text-neutral-400 hover:bg-red-50 hover:text-red-600"><X className="h-4 w-4" /></button></div>)}</div>}
             </div>
@@ -262,17 +328,26 @@ export default function CandidaturePage() {
               <label className="block text-sm font-bold text-neutral-900">Autres infos pratiques<textarea rows={4} className={textareaClass} value={form.practicalInfo} onChange={(e) => update({ practicalInfo: e.target.value })} placeholder="Animaux acceptés en laisse · Wifi dans le bloc sanitaire · Électricité 10A disponible · Accueil jusqu'à 22h en été · English spoken…" /></label>
             </div>
 
-            <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-neutral-200 p-4"><input type="checkbox" className="mt-1 accent-[#c39960]" checked={form.acceptCharter} onChange={(e) => update({ acceptCharter: e.target.checked })} /><span className="text-sm text-neutral-600">Je m'engage à respecter la charte Label Vanlife et les conditions d'accueil annoncées. *</span></label>
+            <div className="rounded-xl border border-neutral-200 p-4">
+              <div className="flex items-start gap-3">
+                <input id="accept-charter" type="checkbox" className="mt-1 accent-[#c39960]" checked={form.acceptCharter} onChange={(e) => update({ acceptCharter: e.target.checked })} />
+                <div className="text-sm text-neutral-600">
+                  <label htmlFor="accept-charter">Je m'engage à respecter </label>
+                  <button type="button" aria-expanded={showCharterDetails} onClick={() => setShowCharterDetails((current) => !current)} className="font-semibold text-[#8b673d] underline decoration-[#c39960]/60 underline-offset-2">la charte Label Vanlife et les conditions d'accueil annoncées</button>. *
+                </div>
+              </div>
+              {showCharterDetails && <div className="mt-4 rounded-xl bg-[#f7f1e8]/70 p-4 text-sm leading-relaxed text-neutral-700"><p className="font-bold text-neutral-900">Ce que cet engagement implique</p><ul className="mt-3 list-disc space-y-2 pl-5"><li>Fournir des informations sincères et tenir à jour les tarifs, horaires, équipements et conditions d'accueil publiés.</li><li>Accueillir les vanlifers avec respect, sans discrimination, dans le respect des règles de sécurité, d'hygiène, de l'environnement et de la réglementation locale.</li><li>Appliquer la réduction annoncée de 10 à 20 % après vérification d'une carte membre Label Vanlife en cours de validité.</li><li>Prévenir Label Vanlife de tout changement important, incident ou indisponibilité affectant l'accueil.</li><li>Accepter que Label Vanlife demande des justificatifs ou contrôle la conformité du lieu et puisse suspendre ou retirer le label en cas de manquement.</li><li>Protéger les données et codes membres communiqués. Le label ne garantit aucun volume de réservation.</li></ul></div>}
+            </div>
 
             <div className="rounded-2xl border border-[#c39960]/30 bg-[#f7f1e8]/60 p-5 sm:p-6"><h3 className="font-bold text-neutral-900">Récapitulatif de votre candidature</h3><div className="mt-4 space-y-2 text-sm text-neutral-700"><p><strong className="text-lg text-[#8b673d]">{answeredCriteria}</strong> critères remplis</p><p>Réduction : <strong>{form.discountPercent}%</strong></p><p><strong>{form.establishmentName || "Votre établissement"}</strong> · {form.address || "Adresse"}, {form.postalCode || "Code postal"} {form.city || "Ville"}</p><p>{form.contactName || "Contact"} · {form.email || "Email"}</p></div><div className="mt-5 border-t border-[#c39960]/20 pt-4"><p className="font-bold text-neutral-900">📨 Votre candidature sera envoyée automatiquement avec toutes les pièces jointes</p><p className="mt-1 text-sm text-neutral-600">{photoFiles.length} photo{photoFiles.length > 1 ? "s" : ""} et plan inclus · Confirmation envoyée à {form.email || "votre adresse email"}</p></div></div>
             {submitError && <p role="alert" className="rounded-xl bg-red-50 p-4 text-sm font-medium text-red-700">{submitError}</p>}
           </section>}
 
           <div className="mt-8 flex flex-col-reverse gap-3 border-t border-neutral-100 pt-6 sm:flex-row sm:justify-between">
-            <Button variant="ghost" onClick={() => { setStep((current) => Math.max(0, current - 1)); scrollToTopImmediately(); }} disabled={step === 0 || loading}><ArrowLeft className="h-4 w-4" /> Étape précédente</Button>
+            <Button variant="ghost" onClick={() => setStep((current) => Math.max(0, current - 1))} disabled={step === 0 || loading}><ArrowLeft className="h-4 w-4" /> Étape précédente</Button>
             {step < STEPS.length - 1 ? <Button variant="cta" onClick={next} disabled={!canContinue}>Continuer <ArrowRight className="h-4 w-4" /></Button> : <Button variant="cta" onClick={handlePreAudit} disabled={!canContinue || loading}>{loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <ArrowRight className="h-4 w-4" />} Envoyer ma candidature</Button>}
           </div>
-          {!canContinue && <p className="mt-3 text-center text-xs text-neutral-400">Complétez les champs obligatoires de cette étape pour continuer.</p>}
+          {!canContinue && <p className="mt-3 text-center text-xs text-neutral-500">{missingMessage}</p>}
         </Card>
         <div className="grid gap-3 text-center text-xs text-neutral-500 sm:grid-cols-3"><p>✓ Aucune commission</p><p>✓ Dossier enregistré avant paiement</p><p>✓ Offre 2026 : 110 € au lieu de 220 €</p></div>
       </div>

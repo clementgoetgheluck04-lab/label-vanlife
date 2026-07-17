@@ -176,6 +176,22 @@ html {
   }
 }
 
+@keyframes stagger-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes gentle-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
 .animate-confetti {
   animation: confetti 3s ease-out forwards;
 }
@@ -198,4 +214,34 @@ html {
 
 .animate-slide-down {
   animation: slide-down 0.3s ease-out forwards;
+}
+
+.animate-stagger-in {
+  opacity: 0;
+  animation: stagger-in 0.45s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.micro-card {
+  transition: transform 240ms ease, box-shadow 240ms ease, border-color 240ms ease;
+}
+
+.micro-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 14px 34px rgb(26 26 26 / 0.08);
+  border-color: rgb(16 185 129 / 0.3);
+}
+
+.micro-card:hover .micro-icon {
+  animation: gentle-float 1.2s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+  .animate-stagger-in { opacity: 1; }
 }

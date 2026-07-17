@@ -88,9 +88,9 @@ export function parseLabellisationPayload(value: unknown): LabellisationPayload 
   const contactName = parseText(input.contactName, { min: 2, max: 120, required: true });
   const email = parseEmail(input.email);
   const phone = parseText(input.phone, { max: 30 });
-  const website = parseText(input.website, { max: 300 });
+  const website = parseText(input.website, { min: 3, max: 300, required: true });
   const city = parseText(input.city, { min: 2, max: 120, required: true });
-  const address = parseText(input.address, { max: 200 });
+  const address = parseText(input.address, { min: 2, max: 200, required: true });
   const postalCode = parseText(input.postalCode, { min: 2, max: 20, required: true });
   const region = parseText(input.region, { max: 120 });
   const description = parseText(input.description, { min: 20, max: 2_000, required: true });
@@ -104,8 +104,8 @@ export function parseLabellisationPayload(value: unknown): LabellisationPayload 
   const acceptCharter = input.acceptCharter === true;
 
   if (
-    !establishmentName || !contactName || !email || phone === null || website === null ||
-    address === null || !postalCode || !city || region === null ||
+    !establishmentName || !contactName || !email || phone === null || !website ||
+    !address || !postalCode || !city || region === null ||
     !Number.isInteger(capacity) || capacity < 1 || capacity > 10_000 ||
     (!Number.isInteger(discountPercent) || discountPercent < 10 || discountPercent > 20) || !acceptCharter ||
     !description || !motivation || !PLACE_TYPES.has(placeType)
@@ -116,8 +116,9 @@ export function parseLabellisationPayload(value: unknown): LabellisationPayload 
     if (text === null) return null;
     if (!text) return "";
     try {
-      const url = new URL(text);
-      return ['http:', 'https:'].includes(url.protocol) ? text : null;
+      const normalized = /^[a-z][a-z0-9+.-]*:\/\//i.test(text) ? text : `https://${text}`;
+      const url = new URL(normalized);
+      return ['http:', 'https:'].includes(url.protocol) && url.hostname.includes(".") ? url.toString() : null;
     } catch {
       return null;
     }
@@ -166,6 +167,7 @@ export function parseLabellisationPayload(value: unknown): LabellisationPayload 
   const photoFileNames = Array.isArray(input.photoFileNames)
     ? input.photoFileNames.filter((item): item is string => typeof item === "string" && item.length <= 255).slice(0, 3)
     : [];
+  if (photoFileNames.length < 1) return null;
   const draftId = typeof input.draftId === "string" && /^[0-9a-f-]{36}$/i.test(input.draftId) ? input.draftId : "";
   const attachmentPaths = Array.isArray(input.attachmentPaths)
     ? input.attachmentPaths.filter((item): item is string => typeof item === "string" && /^pending\/[0-9a-f-]{36}\/[a-z0-9.-]+$/i.test(item)).slice(0, 5)

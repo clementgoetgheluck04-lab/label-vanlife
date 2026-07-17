@@ -68,7 +68,7 @@ async function sendMembershipActivation(orderId: string): Promise<void> {
     where: { id: orderId },
     include: { user: { include: { profile: true, memberCard: true, membership: true } } },
   });
-  if (!order || order.product !== "MEMBERSHIP") return;
+  if (!order || order.product !== "MEMBERSHIP" || !order.user) return;
 
   const payload = order.payload && typeof order.payload === "object" && !Array.isArray(order.payload)
     ? { ...(order.payload as Record<string, unknown>) }
@@ -156,7 +156,7 @@ async function activatePaidOrder(session: Stripe.Checkout.Session): Promise<void
   await prisma.$transaction(async (tx) => {
     const order = await tx.checkoutOrder.findUnique({ where: { id: orderId } });
     if (!order) throw new Error(`Unknown checkout order ${orderId}`);
-    if (order.userId !== session.metadata?.userId) throw new Error("Checkout user mismatch");
+    if (order.product === "MEMBERSHIP" && order.userId !== session.metadata?.userId) throw new Error("Checkout user mismatch");
     if (order.product !== session.metadata?.product) throw new Error("Checkout product mismatch");
     if (session.amount_total !== order.amount || session.currency !== order.currency) {
       throw new Error("Checkout amount or currency mismatch");
@@ -195,6 +195,7 @@ async function activatePaidOrder(session: Stripe.Checkout.Session): Promise<void
     });
 
     if (order.product === "MEMBERSHIP") {
+      if (!order.userId) throw new Error("Membership checkout is missing userId");
       const current = await tx.membership.findUnique({ where: { userId: order.userId } });
       const now = new Date();
       const base = current?.expiresAt && current.expiresAt > now ? current.expiresAt : now;
@@ -249,7 +250,7 @@ async function refundOrder(charge: Stripe.Charge): Promise<void> {
 
     await tx.checkoutOrder.update({ where: { id: order.id }, data: { status: "REFUNDED" } });
     await tx.payment.updateMany({ where: { orderId: order.id }, data: { status: "REFUNDED" } });
-    if (order.product === "MEMBERSHIP") {
+    if (order.product === "MEMBERSHIP" && order.userId) {
       await tx.membership.updateMany({
         where: { userId: order.userId },
         data: { status: "CANCELED", canceledAt: new Date() },

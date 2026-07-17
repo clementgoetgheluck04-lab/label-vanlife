@@ -97,7 +97,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Dossier invalide" }, { status: 400 });
     }
     const payload = parseLabellisationPayload(JSON.parse(rawPayload));
-    if (!payload) return NextResponse.json({ error: "Dossier incomplet" }, { status: 400 });
+    if (!payload) return NextResponse.json({
+      error: "Dossier incomplet : vérifiez le site internet, le SIRET, les 22 critères, le plan, la photo obligatoire, la réduction, le mode de réservation et la charte.",
+    }, { status: 400 });
 
     const plan = formData.get("plan");
     const photos = formData.getAll("photos").filter((value): value is File => value instanceof File && value.size > 0);
@@ -152,13 +154,12 @@ export async function POST(request: NextRequest) {
     const mediaLinks = (signedMedia || []).map((item, index) => `${index === 0 ? "Plan" : `Photo ${index}`} : ${item.signedUrl}`);
     const fullApplication = formatApplication(payload, draftId, mediaLinks);
     const resend = new Resend(requireServerEnv("RESEND_API_KEY"));
-    const summary = `${payload.establishmentName} · ${payload.address}, ${payload.postalCode} ${payload.city}\nContact : ${payload.contactName} · ${payload.email}\nRéduction membres : ${payload.discountPercent}%\nRéférence : ${draftId}`;
     const [{ error: applicantEmailError }, { error: adminEmailError }] = await Promise.all([
       resend.emails.send({
         from: "Label Vanlife <contact@labelvanlife.com>",
         to: payload.email,
         subject: "Votre candidature Label Vanlife a bien été enregistrée",
-        text: `Bonjour ${payload.contactName},\n\nVotre candidature et ses pièces jointes ont bien été enregistrées.\n\n${summary}\n\nOffre 2026 : 110 € au lieu de 220 € jusqu'au 31 décembre 2026. Si le dossier est déclaré non conforme après étude, le paiement est remboursé intégralement.\n\nFinaliser le paiement depuis l'appareil utilisé pour la candidature : ${getAppUrl()}/labellisation/paiement\n\nL'équipe Label Vanlife`,
+        text: `Bonjour ${payload.contactName},\n\nVotre candidature et ses pièces jointes ont bien été enregistrées. Voici le récapitulatif complet des informations transmises :\n\n${fullApplication}\n\nOffre 2026 : 110 € au lieu de 220 € jusqu'au 31 décembre 2026. Si le dossier est déclaré non conforme après étude, le paiement est remboursé intégralement.\n\nLe paiement sécurisé va s'ouvrir automatiquement. Si nécessaire, vous pouvez le reprendre ici : ${getAppUrl()}/labellisation/paiement\n\nL'équipe Label Vanlife`,
       }),
       resend.emails.send({
         from: "Label Vanlife <contact@labelvanlife.com>",
