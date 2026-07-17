@@ -60,6 +60,7 @@ export default function Footer() {
                 alt="Label Vanlife"
                 width={936}
                 height={532}
+                unoptimized
                 className="h-auto w-64 object-contain object-left"
               />
             </Link>
