@@ -293,20 +293,23 @@ export default function Home() {
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {[
-              { icon: "🚐", title: "Guide Vanlife France", desc: "Tout ce qu'il faut savoir pour se lancer dans la vanlife en France." },
-              { icon: "👨‍👩‍👧‍👦", title: "Vanlife en famille", desc: "Voyager en van avec des enfants : conseils, itinéraires, lieux adaptés." },
-              { icon: "🏕️", title: "Campings van-friendly", desc: "Les critères d'un bon camping pour vanlifers et notre sélection labellisée." },
-              { icon: "🌿", title: "Slow travel & vanlife", desc: "Voyager moins vite pour profiter davantage — la philosophie du slow travel." },
-              { icon: "🗺️", title: "Road trips en van", desc: "Les meilleurs itinéraires van à travers toute la France." },
-              { icon: "🌙", title: "Dormir en van en France", desc: "Où dormir légalement, les aires, campings et spots les plus beaux." },
-              { icon: "🧭", title: "Vanlife solo", desc: "Voyager seul(e) en van : sécurité, choix du van, communauté et itinéraires." },
-              { icon: "🌊", title: "Vanlife par région", desc: "Bretagne, Provence, Ardèche, Pyrénées, Landes, Alpes — nos guides régionaux." },
+              { icon: "🚐", title: "Guide Vanlife France", desc: "Tout ce qu'il faut savoir pour se lancer dans la vanlife en France.", href: "/vanlife" },
+              { icon: "👨‍👩‍👧‍👦", title: "Vanlife en famille", desc: "Voyager en van avec des enfants : conseils, itinéraires, lieux adaptés.", href: "/vanlife#commencer" },
+              { icon: "🏕️", title: "Campings van-friendly", desc: "Les critères d'un bon camping pour vanlifers et notre sélection labellisée.", href: "/explorer" },
+              { icon: "🌿", title: "Slow travel & vanlife", desc: "Voyager moins vite pour profiter davantage — la philosophie du slow travel.", href: "/vanlife#responsable" },
+              { icon: "🗺️", title: "Road trips en van", desc: "Les meilleurs itinéraires van à travers toute la France.", href: "/road-trips" },
+              { icon: "🌙", title: "Dormir en van en France", desc: "Règles, aires, campings et lieux d'accueil pour préparer chaque nuit.", href: "/vanlife#dormir" },
+              { icon: "🧭", title: "Vanlife solo", desc: "Voyager seul(e) en van : sécurité, choix du van, communauté et itinéraires.", href: "/vanlife#equipement" },
+              { icon: "🌊", title: "Vanlife par région", desc: "Bretagne, Provence, Ardèche, Pyrénées, Landes, Alpes — nos guides régionaux.", href: "/road-trips" },
             ].map((guide) => (
-              <Card key={guide.title} variant="interactive" className="p-4 space-y-2">
-                <span className="text-2xl block">{guide.icon}</span>
-                <h3 className="text-sm font-bold text-neutral-900">{guide.title}</h3>
-                <p className="text-xs text-neutral-500 line-clamp-2">{guide.desc}</p>
-              </Card>
+              <Link key={guide.title} href={guide.href} className="group block">
+                <Card variant="interactive" className="micro-card h-full p-4 space-y-2">
+                  <span className="micro-icon text-2xl block">{guide.icon}</span>
+                  <h3 className="text-sm font-bold text-neutral-900 group-hover:text-emerald-700">{guide.title}</h3>
+                  <p className="text-xs text-neutral-500 line-clamp-2">{guide.desc}</p>
+                  <span className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-700">Découvrir <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" /></span>
+                </Card>
+              </Link>
             ))}
           </div>
         </div>
