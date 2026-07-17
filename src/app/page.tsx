@@ -296,9 +296,9 @@ export default function Home() {
               { icon: "🚐", title: "Guide Vanlife France", desc: "Tout ce qu'il faut savoir pour se lancer dans la vanlife en France.", href: "/vanlife" },
               { icon: "👨‍👩‍👧‍👦", title: "Vanlife en famille", desc: "Voyager en van avec des enfants : conseils, itinéraires, lieux adaptés.", href: "/vanlife-famille" },
               { icon: "🏕️", title: "Campings van-friendly", desc: "Les critères d'un bon camping pour vanlifers et notre sélection labellisée.", href: "/campings-van-friendly" },
-              { icon: "🌿", title: "Slow travel & vanlife", desc: "Voyager moins vite pour profiter davantage — la philosophie du slow travel.", href: "/vanlife#responsable" },
+              { icon: "🌿", title: "Slow travel & vanlife", desc: "Voyager moins vite pour profiter davantage — la philosophie du slow travel.", href: "/slow-travel-vanlife" },
               { icon: "🗺️", title: "Road trips en van", desc: "Les meilleurs itinéraires van à travers toute la France.", href: "/road-trips" },
-              { icon: "🌙", title: "Dormir en van en France", desc: "Règles, aires, campings et lieux d'accueil pour préparer chaque nuit.", href: "/vanlife#dormir" },
+              { icon: "🌙", title: "Dormir en van en France", desc: "Règles, aires, campings et lieux d'accueil pour préparer chaque nuit.", href: "/dormir-en-van" },
               { icon: "🧭", title: "Vanlife solo", desc: "Voyager seul(e) en van : sécurité, choix du van, communauté et itinéraires.", href: "/vanlife#equipement" },
               { icon: "🌊", title: "Vanlife par région", desc: "Bretagne, Provence, Ardèche, Pyrénées, Landes, Alpes — nos guides régionaux.", href: "/road-trips" },
             ].map((guide) => (
