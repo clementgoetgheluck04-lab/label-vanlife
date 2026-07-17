@@ -294,7 +294,7 @@ export default function Home() {
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {[
               { icon: "🚐", title: "Guide Vanlife France", desc: "Tout ce qu'il faut savoir pour se lancer dans la vanlife en France.", href: "/vanlife" },
-              { icon: "👨‍👩‍👧‍👦", title: "Vanlife en famille", desc: "Voyager en van avec des enfants : conseils, itinéraires, lieux adaptés.", href: "/vanlife#commencer" },
+              { icon: "👨‍👩‍👧‍👦", title: "Vanlife en famille", desc: "Voyager en van avec des enfants : conseils, itinéraires, lieux adaptés.", href: "/vanlife-famille" },
               { icon: "🏕️", title: "Campings van-friendly", desc: "Les critères d'un bon camping pour vanlifers et notre sélection labellisée.", href: "/explorer" },
               { icon: "🌿", title: "Slow travel & vanlife", desc: "Voyager moins vite pour profiter davantage — la philosophie du slow travel.", href: "/vanlife#responsable" },
               { icon: "🗺️", title: "Road trips en van", desc: "Les meilleurs itinéraires van à travers toute la France.", href: "/road-trips" },
