@@ -7,7 +7,7 @@ import { ArrowLeft, ArrowRight, Building2, Check, ClipboardCheck, FileText, Load
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { LABELLISATION_CRITERIA } from "@/config/labellisation-criteria";
-import { getSpottedPlace } from "@/data/spotted-places";
+import { getSpottedPlace, normalizeExternalWebsite } from "@/data/spotted-places";
 
 const STEPS = [
   { title: "Contact", icon: Building2 },
@@ -97,7 +97,7 @@ export default function CandidaturePage() {
         postalCode: claimedPlace.postalCode,
         city: claimedPlace.city,
         region: claimedPlace.region,
-        website: claimedPlace.website || "",
+        website: normalizeExternalWebsite(claimedPlace.website) || "",
       } : {};
       if (claimedPlace) setClaimedPlaceName(claimedPlace.name);
       setForm((current) => ({

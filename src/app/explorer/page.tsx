@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Search, MapPin, ChevronLeft, Sparkles, Building2, ArrowRight, ShieldQuestion } from "lucide-react";
@@ -13,6 +13,21 @@ export default function ExplorerPage() {
   const [search, setSearch] = useState("");
   const [tab, setTab] = useState<FilterTab>("tous");
   const [visibleSpottedPlaces, setVisibleSpottedPlaces] = useState(12);
+  const [mainMenuVisible, setMainMenuVisible] = useState(true);
+  const lastScrollY = useRef(0);
+
+  useEffect(() => {
+    const updatePosition = () => {
+      const currentY = Math.max(0, window.scrollY);
+      if (currentY < 40) setMainMenuVisible(true);
+      else if (currentY > lastScrollY.current + 6) setMainMenuVisible(false);
+      else if (currentY < lastScrollY.current - 6) setMainMenuVisible(true);
+      lastScrollY.current = currentY;
+    };
+    updatePosition();
+    window.addEventListener("scroll", updatePosition, { passive: true });
+    return () => window.removeEventListener("scroll", updatePosition);
+  }, []);
 
   const ALL_LIEUX = ENRICHED_LIEUX.filter((lieu) => lieu.status === "actif");
 
@@ -32,7 +47,7 @@ export default function ExplorerPage() {
   return (
     <div className="min-h-screen bg-neutral-50 pt-16 pb-24">
       {/* Top Bar */}
-      <div className="fixed left-0 right-0 top-16 z-30 bg-white/95 backdrop-blur-md border-b border-neutral-200 shadow-sm">
+      <div className={`fixed left-0 right-0 z-40 border-b border-neutral-200 bg-white/95 shadow-sm backdrop-blur-md transition-[top] duration-300 ${mainMenuVisible ? "top-16" : "top-0"}`}>
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="flex items-center gap-3 py-3">
             <Link href="/" className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full hover:bg-neutral-100" aria-label="Retour à l'accueil">
@@ -178,24 +193,25 @@ export default function ExplorerPage() {
           </div>
         )}
 
-        <section className="space-y-6 border-t border-neutral-200 pt-10" aria-labelledby="spotted-places-title">
-          <div className="overflow-hidden rounded-3xl border border-[#c39960]/35 bg-gradient-to-br from-[#fbf7f0] via-white to-[#f4efe7] p-6 shadow-sm sm:p-8">
+        <section className="relative left-1/2 w-screen -translate-x-1/2 bg-[#174936] px-4 py-14 sm:px-6" aria-labelledby="spotted-places-title">
+          <div className="mx-auto max-w-6xl space-y-6">
+          <div className="overflow-hidden rounded-3xl border border-white/15 bg-white/10 p-6 shadow-sm backdrop-blur-sm sm:p-8">
             <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
               <div className="max-w-3xl">
-                <div className="flex items-center gap-2 text-[#8b673d]">
+                <div className="flex items-center gap-2 text-[#e5c79f]">
                   <ShieldQuestion className="h-5 w-5" />
                   <span className="text-xs font-bold uppercase tracking-[0.14em]">Réseau en construction</span>
                 </div>
-                <h2 id="spotted-places-title" className="mt-3 text-2xl font-bold text-neutral-900 sm:text-3xl">
+                <h2 id="spotted-places-title" className="mt-3 text-2xl font-bold text-white sm:text-3xl">
                   Lieux repérés, mais pas encore labellisés : on a besoin de vous
                 </h2>
-                <p className="mt-3 max-w-2xl text-sm leading-6 text-neutral-600 sm:text-base">
+                <p className="mt-3 max-w-2xl text-sm leading-6 text-emerald-50/80 sm:text-base">
                   Ces établissements ont été repérés dans des réseaux d&apos;accueil van et camping. Ils ne sont pas encore partenaires de Label Vanlife : leurs informations restent à confirmer et aucun avantage membre n&apos;est garanti.
                 </p>
               </div>
-              <div className="shrink-0 rounded-2xl bg-white px-5 py-4 text-center shadow-sm ring-1 ring-[#c39960]/20">
+              <div className="shrink-0 rounded-2xl bg-white/95 px-5 py-4 text-center shadow-sm ring-1 ring-white/30">
                 <strong className="block text-3xl text-[#8b673d]">{SPOTTED_PLACES.length}</strong>
-                <span className="text-xs font-medium text-neutral-500">lieux à vérifier</span>
+                <span className="text-xs font-medium text-neutral-600">lieux à vérifier</span>
               </div>
             </div>
           </div>
@@ -247,6 +263,7 @@ export default function ExplorerPage() {
               </button>
             </div>
           )}
+          </div>
         </section>
       </div>
     </div>

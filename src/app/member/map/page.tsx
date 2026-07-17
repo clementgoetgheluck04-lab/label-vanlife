@@ -89,7 +89,7 @@ export default function MemberMapPage() {
             <div>
               <h1 className="text-lg font-bold text-neutral-900">MAP des lieux</h1>
               <p className="text-xs text-neutral-500">
-                {filteredLieux.length} lieux labellisés · {memberOnlyPlaces.length} adresses membres
+                {filteredLieux.length} lieux labellisés · {memberOnlyPlaces.length} lieux repérés
               </p>
             </div>
           </div>
@@ -161,8 +161,8 @@ export default function MemberMapPage() {
           >
             <span className="h-4 w-4 shrink-0 rounded-full bg-[#c39960] ring-4 ring-white shadow" />
             <span>
-              <span className="flex items-center gap-1.5 font-bold text-neutral-900"><TentTree className="h-4 w-4 text-[#9a7547]" /> Adresses membres</span>
-              <span className="text-xs text-neutral-600">Réseaux externes utiles, non labellisés</span>
+              <span className="flex items-center gap-1.5 font-bold text-neutral-900"><TentTree className="h-4 w-4 text-[#9a7547]" /> Lieux repérés</span>
+              <span className="text-xs text-neutral-600">Non labellisés · site visible pour réserver directement</span>
             </span>
           </button>
         </div>

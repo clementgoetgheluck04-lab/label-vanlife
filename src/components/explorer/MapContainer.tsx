@@ -36,6 +36,18 @@ function escapeHtml(value: string): string {
     .replaceAll("'", "&#039;");
 }
 
+function normalizeExternalWebsite(value: string | null | undefined): string | null {
+  const website = value?.trim();
+  if (!website) return null;
+  const normalized = /^https?:\/\//i.test(website) ? website : `https://${website}`;
+  try {
+    const url = new URL(normalized);
+    return ["http:", "https:"].includes(url.protocol) ? url.href : null;
+  } catch {
+    return null;
+  }
+}
+
 export default function MapContainer({
   lieux,
   memberOnlyPlaces = [],
@@ -150,9 +162,10 @@ export default function MapContainer({
 
       memberOnlyPlaces.forEach((place) => {
         const marker = L.marker([place.lat, place.lng], { icon: networkIcon });
-        const website = place.website
-          ? `<a class="popup-link" href="${escapeHtml(place.website)}" target="_blank" rel="noreferrer">Voir le site</a>`
-          : "";
+        const websiteUrl = normalizeExternalWebsite(place.website);
+        const website = websiteUrl
+          ? `<a class="popup-link" href="${escapeHtml(websiteUrl)}" target="_blank" rel="noreferrer nofollow">Réserver ou visiter le site</a>`
+          : '<p class="popup-no-website">Site internet non renseigné</p>';
         marker.bindPopup(`
           <div class="map-popup">
             <span class="popup-status popup-status-network">Adresse membre</span>
@@ -197,6 +210,7 @@ export default function MapContainer({
         .map-popup .popup-benefit { margin-top: 9px; color: #166534; }
         .map-popup .popup-network { margin-top: 8px; color: #795a31; }
         .map-popup .popup-warning { margin-top: 8px; font-size: 10px; color: #737373; }
+        .map-popup .popup-no-website { margin-top: 9px; font-size: 10px; font-style: italic; color: #a3a3a3; }
         .popup-cta, .popup-link { display: block; width: 100%; margin-top: 10px; padding: 8px 12px; border: 0; border-radius: 8px; background: #2f855a; color: #fff !important; text-align: center; font-size: 12px; font-weight: 700; cursor: pointer; text-decoration: none; box-sizing: border-box; }
         .popup-link { background: #c39960; }
         .leaflet-control-zoom { border: none !important; border-radius: 12px !important; overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,.12) !important; }

@@ -10,7 +10,7 @@ export type SpottedPlace = {
   region: string;
   lat: number;
   lng: number;
-  website: string;
+  website: string | null;
   source: string;
 };
 
@@ -18,6 +18,12 @@ export const SPOTTED_PLACES = places as SpottedPlace[];
 
 export function getSpottedPlace(id: string) {
   return SPOTTED_PLACES.find((place) => place.id === id);
+}
+
+export function normalizeExternalWebsite(value: string | null | undefined) {
+  const website = value?.trim();
+  if (!website) return null;
+  return /^https?:\/\//i.test(website) ? website : `https://${website}`;
 }
 
 export function buildClaimHref(place: SpottedPlace) {
@@ -29,7 +35,8 @@ export function buildClaimHref(place: SpottedPlace) {
     city: place.city,
     region: place.region,
   });
-  if (place.website) params.set("website", place.website);
+  const website = normalizeExternalWebsite(place.website);
+  if (website) params.set("website", website);
   return `/labellisation/candidature?${params.toString()}`;
 }
 

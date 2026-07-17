@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, Building2, CircleAlert, ExternalLink, Mail, MapPin, ShieldCheck } from "lucide-react";
-import { buildClaimHref, buildRemovalMailto, getSpottedPlace, SPOTTED_PLACES } from "@/data/spotted-places";
+import { buildClaimHref, buildRemovalMailto, getSpottedPlace, normalizeExternalWebsite, SPOTTED_PLACES } from "@/data/spotted-places";
 
 type PageProps = { params: Promise<{ id: string }> };
 
@@ -23,6 +23,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function SpottedPlacePage({ params }: PageProps) {
   const place = getSpottedPlace((await params).id);
   if (!place) notFound();
+  const website = normalizeExternalWebsite(place.website);
 
   return (
     <main className="min-h-screen bg-neutral-50 pb-20 pt-24">
@@ -60,9 +61,9 @@ export default async function SpottedPlacePage({ params }: PageProps) {
                 <div className="rounded-2xl bg-neutral-50 p-4"><dt className="text-xs font-bold uppercase tracking-wider text-neutral-400">Réseau dans lequel le lieu a été repéré</dt><dd className="mt-1 font-semibold text-neutral-800">{place.network}</dd></div>
                 <div className="rounded-2xl bg-neutral-50 p-4"><dt className="text-xs font-bold uppercase tracking-wider text-neutral-400">Localisation</dt><dd className="mt-1 font-semibold text-neutral-800">{place.city} · {place.region}</dd></div>
               </dl>
-              {place.website && (
-                <a href={place.website} target="_blank" rel="noreferrer nofollow" className="mt-5 inline-flex min-h-11 items-center gap-2 text-sm font-bold text-[#8b673d] hover:underline">
-                  Consulter le site indiqué <ExternalLink className="h-4 w-4" />
+              {website && (
+                <a href={website} target="_blank" rel="noreferrer nofollow" className="mt-5 inline-flex min-h-12 items-center gap-2 rounded-xl bg-emerald-700 px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-emerald-800">
+                  Réserver ou visiter le site de l&apos;établissement <ExternalLink className="h-4 w-4" />
                 </a>
               )}
               <div className="mt-6 rounded-2xl border border-amber-200 bg-amber-50 p-5 text-sm leading-6 text-amber-950">
