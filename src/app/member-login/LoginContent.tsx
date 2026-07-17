@@ -158,7 +158,7 @@ export function LoginContent() {
                   <KeyRound className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
                   <input
                     value={accessCode}
-                    onChange={(event) => setAccessCode(event.target.value.toUpperCase().replace(/[^A-Z0-9-]/g, "").slice(0, 21))}
+                    onChange={(event) => setAccessCode(event.target.value.toUpperCase().replace(/[^A-Z0-9-]/g, "").slice(0, 22))}
                     placeholder="LV-XXXX-XXXX-XXXX-XXXX"
                     className="h-14 w-full rounded-xl border border-neutral-200 pl-10 pr-4 text-center text-base font-semibold tracking-[0.12em] focus:ring-2 focus:ring-emerald-500"
                     required
@@ -213,6 +213,9 @@ export function LoginContent() {
                     {recoveryLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Renvoyer mon code"}
                   </Button>
                   {recoveryMessage && <p className="text-xs leading-relaxed text-neutral-500" role="status">{recoveryMessage}</p>}
+                  <p className="text-[11px] leading-relaxed text-neutral-400">
+                    Le renvoi concerne uniquement une carte membre payée et encore active. Pensez à vérifier les dossiers indésirables et l&apos;adresse utilisée lors de l&apos;adhésion.
+                  </p>
                 </form>
               )}
             </>

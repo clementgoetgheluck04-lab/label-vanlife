@@ -45,6 +45,17 @@ export async function POST(request: NextRequest) {
       : {};
     const expiresAt = user.membership?.expiresAt ?? new Date(Date.now() + 365 * 24 * 60 * 60 * 1_000);
 
+    const resend = new Resend(requireServerEnv("RESEND_API_KEY"));
+    const { error } = await resend.emails.send({
+      from: "Label Vanlife <contact@labelvanlife.com>",
+      to: email,
+      subject: "Votre nouveau code d’accès Label Vanlife",
+      text: `Bonjour ${user.profile?.firstName || ""},\n\nVoici votre nouveau code d'accès personnel : ${code}\n\nIl remplace le précédent et reste valable pendant toute la durée de votre carte membre.\n\nConnexion : ${getAppUrl()}/member-login\n\nL'équipe Label Vanlife`,
+    });
+    if (error) throw new Error("Member access code email failed");
+
+    // Le code précédent reste valide tant que l'email n'a pas été accepté par
+    // le prestataire. Cela évite de bloquer un membre si Resend est indisponible.
     await prisma.checkoutOrder.update({
       where: { id: order.id },
       data: {
@@ -57,15 +68,6 @@ export async function POST(request: NextRequest) {
         } as Prisma.InputJsonObject,
       },
     });
-
-    const resend = new Resend(requireServerEnv("RESEND_API_KEY"));
-    const { error } = await resend.emails.send({
-      from: "Label Vanlife <contact@labelvanlife.com>",
-      to: email,
-      subject: "Votre nouveau code d’accès Label Vanlife",
-      text: `Bonjour ${user.profile?.firstName || ""},\n\nVoici votre nouveau code d'accès personnel : ${code}\n\nIl remplace le précédent et reste valable pendant toute la durée de votre carte membre.\n\nConnexion : ${getAppUrl()}/member-login\n\nL'équipe Label Vanlife`,
-    });
-    if (error) throw new Error("Member access code email failed");
 
     return NextResponse.json({ success: true, message: GENERIC_MESSAGE });
   } catch (error) {

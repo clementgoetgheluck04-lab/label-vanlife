@@ -11,6 +11,8 @@
 | `STRIPE_SECRET_KEY` | Serveur secret | API Stripe |
 | `STRIPE_WEBHOOK_SECRET` | Serveur secret | Signature webhook |
 | `MEMBER_ACCESS_CODE_SECRET` | Serveur secret | Sel secret utilisé pour hacher les codes d'accès membre à usage unique |
+| `ADMIN_PREVIEW_CODE_HASH` | Serveur secret | Empreinte SHA-256 du code privé de prévisualisation membre |
+| `ADMIN_PREVIEW_COOKIE_SECRET` | Serveur secret | Signature du cookie temporaire de prévisualisation (recommandé en production) |
 | `STRIPE_MEMBERSHIP_PRICE_ID` | Serveur | Prix catalogue membre |
 | `RESEND_API_KEY` | Serveur secret | Envoi email |
 

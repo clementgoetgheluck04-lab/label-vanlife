@@ -4,7 +4,7 @@ import { ADMIN_PREVIEW_COOKIE, isAdminPreviewCookie } from "@/server/admin-previ
 
 const PUBLIC_ROUTES = [
   "/", "/explorer", "/le-label", "/labellisation", "/devenir-membre",
-  "/member-login", "/membre", "/lieux", "/mentions-legales",
+  "/member-login", "/membre", "/lieux", "/lieux-reperes", "/mentions-legales",
   "/politique-confidentialite", "/blog", "/evenements", "/marketplace",
   "/road-trips", "/offline",
 ];

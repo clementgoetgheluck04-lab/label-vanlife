@@ -7,6 +7,7 @@ import { ArrowLeft, ArrowRight, Building2, Check, ClipboardCheck, FileText, Load
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { LABELLISATION_CRITERIA } from "@/config/labellisation-criteria";
+import { getSpottedPlace } from "@/data/spotted-places";
 
 const STEPS = [
   { title: "Contact", icon: Building2 },
@@ -74,25 +75,39 @@ export default function CandidaturePage() {
   const [form, setForm] = useState(initialForm);
   const [progressRestored, setProgressRestored] = useState(false);
   const [showCharterDetails, setShowCharterDetails] = useState(false);
+  const [claimedPlaceName, setClaimedPlaceName] = useState("");
   const update = (patch: Partial<typeof form>) => setForm((current) => ({ ...current, ...patch }));
 
   useEffect(() => {
     const timeout = window.setTimeout(() => {
       const saved = localStorage.getItem("labellisation-form-progress");
+      let restored: Partial<typeof initialForm> = {};
       if (saved) {
         try {
-          const parsed = JSON.parse(saved) as Partial<typeof initialForm>;
-          setForm((current) => ({
-            ...current,
-            ...parsed,
-            criteria: { ...initialCriteria, ...(parsed.criteria || {}) },
-            planFileName: "",
-            photoFileNames: [],
-          }));
+          restored = JSON.parse(saved) as Partial<typeof initialForm>;
         } catch {
           localStorage.removeItem("labellisation-form-progress");
         }
       }
+      const claimId = new URLSearchParams(window.location.search).get("claim");
+      const claimedPlace = claimId ? getSpottedPlace(claimId) : undefined;
+      const claimPrefill: Partial<typeof initialForm> = claimedPlace ? {
+        establishmentName: claimedPlace.name,
+        address: claimedPlace.address,
+        postalCode: claimedPlace.postalCode,
+        city: claimedPlace.city,
+        region: claimedPlace.region,
+        website: claimedPlace.website || "",
+      } : {};
+      if (claimedPlace) setClaimedPlaceName(claimedPlace.name);
+      setForm((current) => ({
+        ...current,
+        ...restored,
+        ...claimPrefill,
+        criteria: { ...initialCriteria, ...(restored.criteria || {}) },
+        planFileName: "",
+        photoFileNames: [],
+      }));
       setProgressRestored(true);
     }, 0);
     return () => window.clearTimeout(timeout);
@@ -198,6 +213,11 @@ export default function CandidaturePage() {
   return (
     <main id="candidature-top" className="min-h-screen bg-gradient-to-b from-[#f7f1e8] to-white px-4 pb-20 pt-24">
       <div className="mx-auto max-w-4xl space-y-8">
+        {claimedPlaceName && (
+          <div className="rounded-2xl border border-[#c39960]/35 bg-[#f7f1e8] p-4 text-sm text-neutral-700">
+            <strong className="text-neutral-950">Revendication de fiche :</strong> les informations connues pour « {claimedPlaceName} » ont été préremplies. Vérifiez-les avant de continuer.
+          </div>
+        )}
         <Link href="/labellisation" className="inline-flex items-center gap-2 text-sm text-neutral-500 hover:text-neutral-900"><ArrowLeft className="h-4 w-4" /> Retour à la labellisation</Link>
         <header className="text-center">
           <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#9a7445]">Candidature partenaire</p>

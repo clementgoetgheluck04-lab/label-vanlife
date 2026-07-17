@@ -1,19 +1,18 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { Search, MapPin, ChevronLeft, Sparkles, X, Building2 } from "lucide-react";
+import { Search, MapPin, ChevronLeft, Sparkles, Building2, ArrowRight, ShieldQuestion } from "lucide-react";
 import { ENRICHED_LIEUX } from "@/data/enriched-lieux";
+import { SPOTTED_PLACES } from "@/data/spotted-places";
 
 type FilterTab = "tous" | "camping" | "etape_nature" | "hebergement_insolite";
 
 export default function ExplorerPage() {
-  const router = useRouter();
   const [search, setSearch] = useState("");
   const [tab, setTab] = useState<FilterTab>("tous");
-  const [claimModal, setClaimModal] = useState<{ nom: string; id: string } | null>(null);
+  const [visibleSpottedPlaces, setVisibleSpottedPlaces] = useState(12);
 
   const ALL_LIEUX = ENRICHED_LIEUX.filter((lieu) => lieu.status === "actif");
 
@@ -21,6 +20,13 @@ export default function ExplorerPage() {
     if (tab !== "tous" && lieu.type !== tab) return false;
     if (search && !lieu.nom.toLowerCase().includes(search.toLowerCase()) && !lieu.ville.toLowerCase().includes(search.toLowerCase())) return false;
     return true;
+  });
+
+  const normalizedSearch = search.trim().toLocaleLowerCase("fr");
+  const spottedPlaces = SPOTTED_PLACES.filter((place) => {
+    if (!normalizedSearch) return true;
+    return [place.name, place.city, place.region, place.network]
+      .some((value) => value.toLocaleLowerCase("fr").includes(normalizedSearch));
   });
 
   return (
@@ -165,40 +171,84 @@ export default function ExplorerPage() {
                                         })}
                                       </div>
 
-                                      {lieuxFiltres.length === 0 && (
+        {lieuxFiltres.length === 0 && (
           <div className="text-center py-20">
             <MapPin className="h-12 w-12 text-neutral-300 mx-auto mb-4" />
             <p className="text-neutral-500">Aucun lieu trouvé</p>
           </div>
         )}
-      </div>
 
-      {/* Claim modal */}
-      {claimModal && (
-        <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4" onClick={() => setClaimModal(null)}>
-          <div className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-xl space-y-4" onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Building2 className="h-5 w-5 text-emerald-500" />
-                <h3 className="text-sm font-bold text-neutral-900 line-clamp-1">{claimModal.nom}</h3>
+        <section className="space-y-6 border-t border-neutral-200 pt-10" aria-labelledby="spotted-places-title">
+          <div className="overflow-hidden rounded-3xl border border-[#c39960]/35 bg-gradient-to-br from-[#fbf7f0] via-white to-[#f4efe7] p-6 shadow-sm sm:p-8">
+            <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
+              <div className="max-w-3xl">
+                <div className="flex items-center gap-2 text-[#8b673d]">
+                  <ShieldQuestion className="h-5 w-5" />
+                  <span className="text-xs font-bold uppercase tracking-[0.14em]">Réseau en construction</span>
+                </div>
+                <h2 id="spotted-places-title" className="mt-3 text-2xl font-bold text-neutral-900 sm:text-3xl">
+                  Lieux repérés, mais pas encore labellisés : on a besoin de vous
+                </h2>
+                <p className="mt-3 max-w-2xl text-sm leading-6 text-neutral-600 sm:text-base">
+                  Ces établissements ont été repérés dans des réseaux d&apos;accueil van et camping. Ils ne sont pas encore partenaires de Label Vanlife : leurs informations restent à confirmer et aucun avantage membre n&apos;est garanti.
+                </p>
               </div>
-              <button onClick={() => setClaimModal(null)} className="flex h-11 w-11 items-center justify-center rounded-lg hover:bg-neutral-100" aria-label="Fermer"><X className="h-4 w-4" /></button>
+              <div className="shrink-0 rounded-2xl bg-white px-5 py-4 text-center shadow-sm ring-1 ring-[#c39960]/20">
+                <strong className="block text-3xl text-[#8b673d]">{SPOTTED_PLACES.length}</strong>
+                <span className="text-xs font-medium text-neutral-500">lieux à vérifier</span>
+              </div>
             </div>
-            <p className="text-xs text-neutral-500">C&apos;est mon établissement. Je souhaite :</p>
-            <div className="space-y-2">
-              <button onClick={() => { setClaimModal(null); router.push("/labellisation/candidature"); }}
-                className="w-full p-3 rounded-xl bg-emerald-50 text-emerald-700 font-semibold text-sm hover:bg-emerald-100 transition-colors text-left">
-                Demander la labellisation 📋
-              </button>
-              <button onClick={() => { setClaimModal(null); alert("Merci, nous allons examiner votre demande de suppression."); }}
-                className="w-full p-3 rounded-xl bg-red-50 text-red-600 font-semibold text-sm hover:bg-red-100 transition-colors text-left">
-                Faire supprimer ce lieu 🗑️
-              </button>
-            </div>
-            <p className="text-[10px] text-neutral-400 text-center">Nous vous recontacterons sous 48h par email.</p>
           </div>
-        </div>
-      )}
+
+          {spottedPlaces.length > 0 ? (
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {spottedPlaces.slice(0, visibleSpottedPlaces).map((place, index) => (
+                <Link
+                  href={`/lieux-reperes/${place.id}`}
+                  key={place.id}
+                  className="group animate-stagger-in flex min-h-56 flex-col rounded-2xl border border-[#c39960]/30 bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-[#c39960] hover:shadow-elevated"
+                  style={{ animationDelay: `${Math.min(index, 9) * 40}ms` }}
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#f7f1e8] text-[#8b673d]">
+                      <Building2 className="h-5 w-5" />
+                    </div>
+                    <span className="rounded-full bg-amber-50 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-amber-800">
+                      Non labellisé
+                    </span>
+                  </div>
+                  <h3 className="mt-4 line-clamp-2 text-base font-bold text-neutral-900">{place.name}</h3>
+                  <p className="mt-2 flex items-start gap-1.5 text-sm text-neutral-500">
+                    <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-[#c39960]" />
+                    <span>{place.city}{place.region ? ` · ${place.region}` : ""}</span>
+                  </p>
+                  <p className="mt-3 text-xs text-neutral-400">Repéré via {place.network}</p>
+                  <span className="mt-auto flex items-center gap-2 pt-5 text-sm font-bold text-[#8b673d]">
+                    Voir et revendiquer la fiche <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                  </span>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <div className="rounded-2xl border border-dashed border-neutral-300 bg-white py-12 text-center">
+              <Building2 className="mx-auto h-10 w-10 text-neutral-300" />
+              <p className="mt-3 text-sm text-neutral-500">Aucun lieu repéré ne correspond à cette recherche.</p>
+            </div>
+          )}
+
+          {visibleSpottedPlaces < spottedPlaces.length && (
+            <div className="text-center">
+              <button
+                type="button"
+                onClick={() => setVisibleSpottedPlaces((current) => current + 24)}
+                className="min-h-12 rounded-full border border-[#c39960] bg-white px-6 py-3 text-sm font-bold text-[#8b673d] transition-colors hover:bg-[#f7f1e8]"
+              >
+                Afficher plus de lieux ({spottedPlaces.length - visibleSpottedPlaces} restants)
+              </button>
+            </div>
+          )}
+        </section>
+      </div>
     </div>
   );
 }
