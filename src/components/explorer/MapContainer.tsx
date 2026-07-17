@@ -113,7 +113,7 @@ export default function MapContainer({
 
       if (markersRef.current) currentMap.removeLayer(markersRef.current);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const cluster = (L as any).markerClusterGroup({
+      const labelledCluster = (L as any).markerClusterGroup({
         chunkedLoading: true,
         maxClusterRadius: 48,
         spiderfyOnMaxZoom: true,
@@ -125,6 +125,21 @@ export default function MapContainer({
             html: `<div class="cluster-icon"><span>${group.getChildCount()}</span></div>`,
             className: "marker-cluster-custom",
             iconSize: L.point(44, 44),
+          }),
+      });
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const networkCluster = (L as any).markerClusterGroup({
+        chunkedLoading: true,
+        maxClusterRadius: 42,
+        spiderfyOnMaxZoom: true,
+        showCoverageOnHover: false,
+        zoomToBoundsOnClick: true,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        iconCreateFunction: (group: any) =>
+          L.divIcon({
+            html: `<div class="cluster-icon cluster-icon-network"><span>${group.getChildCount()}</span></div>`,
+            className: "marker-cluster-custom",
+            iconSize: L.point(36, 36),
           }),
       });
 
@@ -157,7 +172,7 @@ export default function MapContainer({
           document.querySelector(`.popup-cta[data-id="${CSS.escape(lieu.id)}"]`)?.addEventListener("click", () => onSelectLieu(lieu.id));
         });
         marker.on("click", () => onSelectLieu(lieu.id));
-        cluster.addLayer(marker);
+        labelledCluster.addLayer(marker);
       });
 
       memberOnlyPlaces.forEach((place) => {
@@ -168,18 +183,19 @@ export default function MapContainer({
           : '<p class="popup-no-website">Site internet non renseigné</p>';
         marker.bindPopup(`
           <div class="map-popup">
-            <span class="popup-status popup-status-network">Adresse membre</span>
+            <span class="popup-status popup-status-network">Lieu repéré · non labellisé</span>
             <h3>${escapeHtml(place.name)}</h3>
             <p>${escapeHtml(place.address || `${place.postalCode} ${place.city}`)}</p>
             <p class="popup-network">Réseau : <strong>${escapeHtml(place.network)}</strong></p>
             <p class="popup-warning">Adresse utile non labellisée Label Vanlife. Vérifiez les conditions avant votre venue.</p>
             ${website}
           </div>`);
-        cluster.addLayer(marker);
+        networkCluster.addLayer(marker);
       });
 
-      currentMap.addLayer(cluster);
-      markersRef.current = cluster;
+      const layers = L.layerGroup([labelledCluster, networkCluster]);
+      currentMap.addLayer(layers);
+      markersRef.current = layers;
     }
 
     void updateMarkers();
@@ -196,9 +212,10 @@ export default function MapContainer({
         .map-pin { display: block; position: relative; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); box-shadow: 0 3px 9px rgba(0,0,0,.28); border: 2px solid #fff; }
         .map-pin > span { position: absolute; width: 8px; height: 8px; background: #fff; border-radius: 999px; top: 8px; left: 8px; }
         .map-pin-labelled { width: 28px; height: 28px; background: #2f855a; }
-        .map-pin-network { width: 24px; height: 24px; background: #c39960; }
+        .map-pin-network { width: 22px; height: 22px; background: #94a3b8; opacity: .58; box-shadow: 0 2px 6px rgba(0,0,0,.16); }
         .map-pin-network > span { width: 7px; height: 7px; top: 7px; left: 7px; }
         .cluster-icon { width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: #2f855a; border: 3px solid rgba(255,255,255,.9); color: #fff; font-size: 13px; font-weight: 800; box-shadow: 0 3px 12px rgba(0,0,0,.24); }
+        .cluster-icon-network { width: 36px; height: 36px; background: #94a3b8; border-width: 2px; font-size: 11px; opacity: .7; box-shadow: 0 2px 8px rgba(0,0,0,.14); }
         .leaflet-popup-content { margin: 0 !important; min-width: 230px; }
         .leaflet-popup-content-wrapper { border-radius: 14px !important; overflow: hidden; }
         .map-popup { padding: 14px; }
