@@ -72,12 +72,12 @@ export default function LabellisationPage() {
         <section className="py-8 border-y border-neutral-100">
           <div className="grid grid-cols-3 gap-8 text-center max-w-lg mx-auto">
             <div>
-              <p className="text-3xl sm:text-4xl font-bold text-neutral-900">27</p>
+              <p className="text-3xl sm:text-4xl font-bold text-neutral-900">26</p>
               <p className="text-xs text-neutral-500 mt-1">Lieux labellisés</p>
             </div>
             <div>
-              <p className="text-3xl sm:text-4xl font-bold text-neutral-900">150</p>
-              <p className="text-xs text-neutral-500 mt-1">Lieux en cours</p>
+              <p className="text-3xl sm:text-4xl font-bold text-neutral-900">220</p>
+              <p className="text-xs text-neutral-500 mt-1">Lieux repérés</p>
             </div>
             <div>
               <p className="text-3xl sm:text-4xl font-bold text-emerald-600">+30%</p>
