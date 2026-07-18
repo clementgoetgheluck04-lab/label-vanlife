@@ -15,14 +15,23 @@ export interface MemberCampingPoint {
   lat: number;
   lng: number;
   website?: string | null;
+  description?: string | null;
+  contactName?: string | null;
+  phone?: string | null;
+  phones?: string[];
+  emails?: string[];
+  images?: string[];
+  details?: string[];
+  activities?: string[];
+  capacity?: string | null;
+  openingHours?: string | null;
+  memberOffer?: string | null;
   source: string;
 }
 
 interface MapContainerProps {
   lieux: Lieu[];
   memberOnlyPlaces?: MemberCampingPoint[];
-  selectedId?: string | null;
-  onSelectLieu: (id: string) => void;
   className?: string;
   children?: ReactNode;
 }
@@ -48,10 +57,17 @@ function normalizeExternalWebsite(value: string | null | undefined): string | nu
   }
 }
 
+function navigationLinks(lat: number, lng: number) {
+  const destination = encodeURIComponent(`${lat},${lng}`);
+  return {
+    maps: `https://www.google.com/maps/dir/?api=1&destination=${destination}`,
+    waze: `https://waze.com/ul?ll=${destination}&navigate=yes`,
+  };
+}
+
 export default function MapContainer({
   lieux,
   memberOnlyPlaces = [],
-  onSelectLieu,
   className,
   children,
 }: MapContainerProps) {
@@ -160,23 +176,25 @@ export default function MapContainer({
 
       lieux.forEach((lieu) => {
         const marker = L.marker([lieu.coordonnees.lat, lieu.coordonnees.lng], { icon: labelledIcon });
+        const navigation = navigationLinks(lieu.coordonnees.lat, lieu.coordonnees.lng);
         marker.bindPopup(`
           <div class="map-popup">
             <span class="popup-status popup-status-labelled">Lieu labellisé</span>
             <h3>${escapeHtml(lieu.nom)}</h3>
             <p>${escapeHtml(lieu.ville)}, ${escapeHtml(lieu.region)}</p>
             <p class="popup-benefit">${lieu.discountPercent > 0 ? `Avantage membre : <strong>-${lieu.discountPercent}%</strong>` : escapeHtml(lieu.priceHighlight || "Accueil Label Vanlife")}</p>
-            <button class="popup-cta" data-id="${escapeHtml(lieu.id)}">Voir la fiche</button>
+            <a class="popup-cta" href="/lieux/${encodeURIComponent(lieu.id)}">Voir la fiche complète</a>
+            <div class="popup-navigation">
+              <a href="${escapeHtml(navigation.maps)}" target="_blank" rel="noreferrer" aria-label="Ouvrir l'itinéraire dans Google Maps">Google Maps</a>
+              <a href="${escapeHtml(navigation.waze)}" target="_blank" rel="noreferrer" aria-label="Ouvrir l'itinéraire dans Waze">Waze</a>
+            </div>
           </div>`);
-        marker.on("popupopen", () => {
-          document.querySelector(`.popup-cta[data-id="${CSS.escape(lieu.id)}"]`)?.addEventListener("click", () => onSelectLieu(lieu.id));
-        });
-        marker.on("click", () => onSelectLieu(lieu.id));
         labelledCluster.addLayer(marker);
       });
 
       memberOnlyPlaces.forEach((place) => {
         const marker = L.marker([place.lat, place.lng], { icon: networkIcon });
+        const navigation = navigationLinks(place.lat, place.lng);
         const websiteUrl = normalizeExternalWebsite(place.website);
         const website = websiteUrl
           ? `<a class="popup-link" href="${escapeHtml(websiteUrl)}" target="_blank" rel="noreferrer nofollow">Réserver ou visiter le site</a>`
@@ -188,7 +206,12 @@ export default function MapContainer({
             <p>${escapeHtml(place.address || `${place.postalCode} ${place.city}`)}</p>
             <p class="popup-network">Réseau : <strong>${escapeHtml(place.network)}</strong></p>
             <p class="popup-warning">Adresse utile non labellisée Label Vanlife. Vérifiez les conditions avant votre venue.</p>
+            <a class="popup-cta popup-cta-network" href="/lieux-reperes/${encodeURIComponent(place.id)}">Voir la fiche complète</a>
             ${website}
+            <div class="popup-navigation">
+              <a href="${escapeHtml(navigation.maps)}" target="_blank" rel="noreferrer" aria-label="Ouvrir l'itinéraire dans Google Maps">Google Maps</a>
+              <a href="${escapeHtml(navigation.waze)}" target="_blank" rel="noreferrer" aria-label="Ouvrir l'itinéraire dans Waze">Waze</a>
+            </div>
           </div>`);
         networkCluster.addLayer(marker);
       });
@@ -202,7 +225,7 @@ export default function MapContainer({
     return () => {
       cancelled = true;
     };
-  }, [lieux, mapReady, memberOnlyPlaces, onSelectLieu]);
+  }, [lieux, mapReady, memberOnlyPlaces]);
 
   return (
     <div className={cn("relative h-full min-h-[400px] w-full", className)}>
@@ -229,7 +252,12 @@ export default function MapContainer({
         .map-popup .popup-warning { margin-top: 8px; font-size: 10px; color: #737373; }
         .map-popup .popup-no-website { margin-top: 9px; font-size: 10px; font-style: italic; color: #a3a3a3; }
         .popup-cta, .popup-link { display: block; width: 100%; margin-top: 10px; padding: 8px 12px; border: 0; border-radius: 8px; background: #2f855a; color: #fff !important; text-align: center; font-size: 12px; font-weight: 700; cursor: pointer; text-decoration: none; box-sizing: border-box; }
+        .popup-cta-network { background: #475569; }
         .popup-link { background: #c39960; }
+        .popup-navigation { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; margin-top: 8px; }
+        .popup-navigation a { display: flex; min-height: 36px; align-items: center; justify-content: center; border-radius: 8px; background: #f5f5f5; color: #262626 !important; font-size: 11px; font-weight: 750; text-align: center; text-decoration: none; }
+        .popup-navigation a:first-child { background: #e8f3ec; color: #166534 !important; }
+        .popup-navigation a:last-child { background: #eaf1ff; color: #1d4ed8 !important; }
         .leaflet-control-zoom { border: none !important; border-radius: 12px !important; overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,.12) !important; }
       `}</style>
       {children}

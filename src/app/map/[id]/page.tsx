@@ -384,21 +384,15 @@ export default function LieuDetailPage() {
                 )}
               </div>
 
-              {/* Itinerary button */}
-              <a
-                href={`https://www.google.com/maps/dir/?api=1&destination=${lieu.coordonnees.lat},${lieu.coordonnees.lng}`}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <Button
-                  variant="secondary-dark"
-                  className="w-full"
-                  size="sm"
-                >
-                  <Navigation className="h-4 w-4" />
-                  Itin\u00e9raire
-                </Button>
-              </a>
+              {/* GPS buttons */}
+              <div className="grid grid-cols-2 gap-2">
+                <a href={`https://www.google.com/maps/dir/?api=1&destination=${lieu.coordonnees.lat},${lieu.coordonnees.lng}`} target="_blank" rel="noopener noreferrer">
+                  <Button variant="secondary-dark" className="w-full" size="sm"><Navigation className="h-4 w-4" /> Google Maps</Button>
+                </a>
+                <a href={`https://waze.com/ul?ll=${lieu.coordonnees.lat}%2C${lieu.coordonnees.lng}&navigate=yes`} target="_blank" rel="noopener noreferrer">
+                  <Button variant="secondary-dark" className="w-full border-blue-500 text-blue-600 hover:bg-blue-50" size="sm"><Navigation className="h-4 w-4" /> Waze</Button>
+                </a>
+              </div>
             </div>
 
             {/* Nearby lieux */}

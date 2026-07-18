@@ -14,6 +14,7 @@ import zipfile
 from pathlib import Path
 
 import openpyxl
+from lxml import html as lxml_html
 from pypdf import PdfReader
 
 
@@ -52,6 +53,19 @@ def extract(pattern: str, source: str, default: str = "") -> str:
     return html.unescape(decode_json_string(match.group(1)))
 
 
+def compact_text(value: str) -> str:
+    return " ".join(html.unescape(value).split())
+
+
+def unique_text(values: list[str]) -> list[str]:
+    result: list[str] = []
+    for value in values:
+        cleaned = compact_text(value)
+        if cleaned and cleaned not in result:
+            result.append(cleaned)
+    return result
+
+
 def extract_bienvenue_points() -> list[dict[str, object]]:
     points: list[dict[str, object]] = []
     workbook = openpyxl.load_workbook(BIENVENUE_XLSX, read_only=True, data_only=True)
@@ -68,6 +82,7 @@ def extract_bienvenue_points() -> list[dict[str, object]]:
     with zipfile.ZipFile(BIENVENUE_ZIP) as archive:
         for filename in archive.namelist():
             source = archive.read(filename).decode("utf-8", "ignore")
+            document = lxml_html.fromstring(source)
             coordinates = re.search(
                 r'\\?"coordinates\\?":\{\\?"lat\\?":(-?\d+(?:\.\d+)?),'
                 r'\\?"lon\\?":(-?\d+(?:\.\d+)?)\}',
@@ -99,6 +114,26 @@ def extract_bienvenue_points() -> list[dict[str, object]]:
                     address = ", ".join(part for part in (address, locality, embedded_code, city) if part)
             postal_match = re.search(r"\b(\d{5})\b", address)
             postal_code = postal_match.group(1) if postal_match else ""
+            description_nodes = document.xpath('//*[contains(concat(" ", normalize-space(@class), " "), " Description-text ")]')
+            description = compact_text(description_nodes[0].text_content()) if description_nodes else ""
+            contact_nodes = document.xpath('//*[contains(concat(" ", normalize-space(@class), " "), " Description-contacts ")]')
+            contact_name = compact_text(contact_nodes[0].text_content()) if contact_nodes else ""
+            phones = unique_text([
+                value.removeprefix("tel:")
+                for value in document.xpath('//a[starts-with(@href, "tel:")]/@href')
+            ])
+            emails = unique_text([
+                value.removeprefix("mailto:").split("?", 1)[0]
+                for value in document.xpath('//a[starts-with(@href, "mailto:")]/@href')
+            ])
+            images = unique_text(document.xpath(
+                '//section[@id="description-slider"]//img/@src | '
+                '//*[contains(@class, "ServiceLayout-description")]/following::img/@src'
+            ))[:10]
+            service_descriptions = unique_text([
+                node.text_content()
+                for node in document.xpath('//*[contains(@class, "ServiceLayout-description")]')
+            ])
 
             points.append(
                 {
@@ -112,6 +147,12 @@ def extract_bienvenue_points() -> list[dict[str, object]]:
                     "lat": latitude,
                     "lng": longitude,
                     "website": website or None,
+                    "description": description or None,
+                    "contactName": contact_name or None,
+                    "phones": phones,
+                    "emails": emails,
+                    "images": images,
+                    "details": service_descriptions,
                     "source": "Fiches Bienvenue à la ferme fournies par Label Vanlife",
                 }
             )
@@ -200,6 +241,11 @@ def extract_papa_points() -> list[dict[str, object]]:
         postal_match = re.search(r"\b(\d{5})\b", address)
         website_match = re.search(r"https?://\S+|www\.\S+", text)
         offer_match = re.search(r"Offre\s*:?(.*?)(?:Date d’ouverture|Services|$)", text, re.IGNORECASE)
+        phone_match = re.search(r"\uf028\s*(.*?)(?=https?://|www\.|Loisirs|Hébergements|Accueil|$)", text)
+        activities_match = re.search(r"Loisirs\s*&\s*activités\s*(.*?)(?=Hébergements\s*&\s*emplacements|Accueil|$)", text, re.IGNORECASE)
+        capacity_match = re.search(r"Hébergements\s*&\s*emplacements\s*:?\s*(.*?)(?=Accueil|Date d’ouverture|Offre|$)", text, re.IGNORECASE)
+        opening_match = re.search(r"Date d’ouverture\s*:\s*(.*?)(?=Offre|$)", text, re.IGNORECASE)
+        activities = unique_text(re.split(r"\s*•\s*", activities_match.group(1))) if activities_match else []
         points.append({
             "id": f"papa-rtenaires-{slugify(name)}",
             "name": name,
@@ -212,6 +258,10 @@ def extract_papa_points() -> list[dict[str, object]]:
             "lng": coordinates["lng"],
             "website": website_match.group(0).rstrip(".,)") if website_match else None,
             "memberOffer": offer_match.group(1).strip() if offer_match else "Voir les conditions du réseau",
+            "phone": compact_text(phone_match.group(1)) if phone_match else None,
+            "activities": activities,
+            "capacity": compact_text(capacity_match.group(1)) if capacity_match else None,
+            "openingHours": compact_text(opening_match.group(1)) if opening_match else None,
             "source": f"Guide Papa’rtenaires juillet 2026, page {page_number}",
         })
     return points

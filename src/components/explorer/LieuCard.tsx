@@ -17,7 +17,7 @@ export default function LieuCard({ lieu, className }: LieuCardProps) {
 
   return (
     <Link
-      href={`/map/${lieu.id}`}
+      href={`/lieux/${lieu.id}`}
       className={cn(
         "group block bg-white rounded-2xl border border-border/50 overflow-hidden",
         "hover:shadow-lg hover:-translate-y-1 transition-all duration-300",

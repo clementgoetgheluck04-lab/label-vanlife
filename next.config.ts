@@ -40,6 +40,14 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "api.bienvenue-a-la-ferme.com",
+      },
+    ],
+  },
   async headers() {
     return [
       {
@@ -68,6 +76,11 @@ const nextConfig: NextConfig = {
       {
         source: "/map",
         destination: "/explorer",
+        permanent: true,
+      },
+      {
+        source: "/map/:id",
+        destination: "/lieux/:id",
         permanent: true,
       },
       {

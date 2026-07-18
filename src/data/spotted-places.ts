@@ -11,6 +11,17 @@ export type SpottedPlace = {
   lat: number;
   lng: number;
   website: string | null;
+  description?: string | null;
+  contactName?: string | null;
+  phone?: string | null;
+  phones?: string[];
+  emails?: string[];
+  images?: string[];
+  details?: string[];
+  activities?: string[];
+  capacity?: string | null;
+  openingHours?: string | null;
+  memberOffer?: string | null;
   source: string;
 };
 

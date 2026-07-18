@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/browser";
-import { X, Filter, MapPin, Percent, ArrowLeft, BadgeCheck, TentTree, Building2, ExternalLink } from "lucide-react";
+import { X, Filter, MapPin, Percent, ArrowLeft, BadgeCheck, TentTree, Building2, ExternalLink, Navigation } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ENRICHED_LIEUX } from "@/data/enriched-lieux";
 import Filters, { type FilterValues } from "@/components/explorer/Filters";
@@ -42,7 +42,6 @@ export default function MemberMapPage() {
   }, [router]);
 
   const [filters, setFilters] = useState<FilterValues>(DEFAULT_FILTERS);
-  const [selectedId, setSelectedId] = useState<string | null>(null);
   const [showFilters, setShowFilters] = useState(false);
   const [showLabelled, setShowLabelled] = useState(true);
   const [showMemberAddresses, setShowMemberAddresses] = useState(false);
@@ -216,8 +215,6 @@ export default function MemberMapPage() {
           <MapContainer
             lieux={showLabelled ? filteredLieux : []}
             memberOnlyPlaces={showMemberAddresses ? filteredMemberPlaces : []}
-            selectedId={selectedId}
-            onSelectLieu={setSelectedId}
           />
         </div>
 
@@ -270,6 +267,10 @@ export default function MemberMapPage() {
                       <div className="mt-auto flex flex-col gap-2 pt-5">
                         <Link href={`/lieux-reperes/${place.id}`} className="flex min-h-11 items-center justify-center rounded-xl border border-neutral-300 bg-white px-3 py-2 text-center text-xs font-bold text-neutral-700 hover:border-neutral-400">Voir la fiche</Link>
                         {website && <a href={website} target="_blank" rel="noreferrer nofollow" className="flex min-h-11 items-center justify-center gap-1.5 rounded-xl bg-[#c39960] px-3 py-2 text-center text-xs font-bold text-white hover:bg-[#ad8250]">Réserver sur le site <ExternalLink className="h-3.5 w-3.5" /></a>}
+                        <div className="grid grid-cols-2 gap-2">
+                          <a href={`https://www.google.com/maps/dir/?api=1&destination=${place.lat},${place.lng}`} target="_blank" rel="noreferrer" className="flex min-h-11 items-center justify-center gap-1 rounded-xl bg-emerald-50 px-2 text-xs font-bold text-emerald-800 hover:bg-emerald-100"><Navigation className="h-3.5 w-3.5" /> Maps</a>
+                          <a href={`https://waze.com/ul?ll=${place.lat}%2C${place.lng}&navigate=yes`} target="_blank" rel="noreferrer" className="flex min-h-11 items-center justify-center gap-1 rounded-xl bg-blue-50 px-2 text-xs font-bold text-blue-700 hover:bg-blue-100"><Navigation className="h-3.5 w-3.5" /> Waze</a>
+                        </div>
                       </div>
                     </article>
                   );

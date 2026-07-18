@@ -14,6 +14,7 @@ import {
   Globe2,
   Mail,
   MapPin,
+  Navigation,
   PawPrint,
   Phone,
   PlugZap,
@@ -161,7 +162,7 @@ export default function LieuDetailPage({ params }: { params: Promise<{ id: strin
           </section>
         )}
 
-        {(phone || email || website || lieu.horaires) && (
+        {(phone || email || website || lieu.horaires || lieu.address) && (
           <section>
             <h2 className="mb-4 text-xl font-bold text-neutral-900">Informations pratiques</h2>
             <div className="grid gap-3 sm:grid-cols-2">
@@ -173,6 +174,14 @@ export default function LieuDetailPage({ params }: { params: Promise<{ id: strin
             </div>
           </section>
         )}
+
+        <section>
+          <h2 className="mb-4 text-xl font-bold text-neutral-900">S’y rendre</h2>
+          <div className="grid grid-cols-2 gap-3 sm:max-w-xl">
+            <a href={`https://www.google.com/maps/dir/?api=1&destination=${lieu.coordonnees.lat},${lieu.coordonnees.lng}`} target="_blank" rel="noreferrer" className="flex min-h-12 items-center justify-center gap-2 rounded-xl bg-emerald-50 px-4 py-3 text-sm font-bold text-emerald-800 transition hover:bg-emerald-100"><Navigation className="h-4 w-4" /> Google Maps</a>
+            <a href={`https://waze.com/ul?ll=${lieu.coordonnees.lat}%2C${lieu.coordonnees.lng}&navigate=yes`} target="_blank" rel="noreferrer" className="flex min-h-12 items-center justify-center gap-2 rounded-xl bg-blue-50 px-4 py-3 text-sm font-bold text-blue-700 transition hover:bg-blue-100"><Navigation className="h-4 w-4" /> Waze</a>
+          </div>
+        </section>
 
         {media.photos.length > 0 && (
           <section>
