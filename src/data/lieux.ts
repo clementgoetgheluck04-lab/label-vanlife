@@ -276,7 +276,7 @@ export function getAllRegions(): string[] {
 
 // Stats
 export const STATS = {
-  totalIdentifies: 697,
+  totalIdentifies: 220,
   enCandidature: 670,
   labellises: 18,
 };

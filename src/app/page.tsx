@@ -221,7 +221,9 @@ export default function Home() {
               <Button variant="secondary-dark" size="lg" className="gap-2">Découvrir tous les lieux <ArrowRight className="h-4 w-4" /></Button>
             </Link>
           </div>
-          <p className="text-center text-xs text-neutral-400 mt-3">{SPOTTED_PLACES.length} lieux supplémentaires repérés à travers la France, pas encore labellisés</p>
+          <p className="text-center text-xs text-neutral-400 mt-3">
+            {SPOTTED_PLACES.length} lieux repérés à travers la France, pas encore labellisés et disponibles sur notre MAP
+          </p>
         </div>
       </section>
 

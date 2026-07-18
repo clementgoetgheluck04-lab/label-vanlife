@@ -582,7 +582,7 @@ export function getLieuById(id: string): Lieu | undefined {
 
 // Stats
 export const STATS = {
-  totalIdentifies: 697,
+  totalIdentifies: 220,
   enCandidature: 670,
   labellises: LIEUX_LABELLISES.length,
   regions: getAllRegions().length,
