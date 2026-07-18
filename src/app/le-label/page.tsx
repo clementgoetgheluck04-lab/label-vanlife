@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, Sparkles, Shield, Leaf, Heart, X, Check } from "lucide-react";
+import { ArrowRight, Shield, Leaf, Heart, X, Check } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 
@@ -21,11 +21,6 @@ export default function LeLabelPage() {
             Face à l&apos;explosion du voyage en van, quelque chose s&apos;est perdu en chemin. Voici pourquoi nous avons tout repensé.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <a href="#manifeste">
-              <Button variant="primary" size="lg" className="gap-2 text-base px-8">
-                Lire notre manifeste <ArrowRight className="w-5 h-5" />
-              </Button>
-            </a>
             <Link href="/devenir-membre">
               <Button variant="cta" size="lg" className="text-base px-8">Rejoindre le mouvement</Button>
             </Link>
