@@ -76,7 +76,7 @@ export default function LabellisationPage() {
               <p className="text-xs text-neutral-500 mt-1">Lieux labellisés</p>
             </div>
             <div>
-              <p className="text-3xl sm:text-4xl font-bold text-neutral-900">220</p>
+              <p className="text-3xl sm:text-4xl font-bold text-neutral-900">216</p>
               <p className="text-xs text-neutral-500 mt-1">Lieux repérés</p>
             </div>
             <div>

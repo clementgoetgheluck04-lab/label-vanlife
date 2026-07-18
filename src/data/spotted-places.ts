@@ -1,4 +1,5 @@
 import places from "./member-camping-network.json";
+import { isSpottedDuplicateOfLabelled } from "./place-deduplication";
 import { getVerifiedSpottedGps } from "./verified-spotted-gps";
 
 export type SpottedPlace = {
@@ -41,29 +42,31 @@ export const PLACE_UNIVERSE_LABELS: Record<PlaceUniverse, string> = {
   autre: "Autres",
 };
 
-export const SPOTTED_PLACES = (places as SpottedPlace[]).map((place) => {
-  const verified = getVerifiedSpottedGps(place.id);
-  if (verified) {
+export const SPOTTED_PLACES = (places as SpottedPlace[])
+  .filter((place) => !isSpottedDuplicateOfLabelled(place.id))
+  .map((place) => {
+    const verified = getVerifiedSpottedGps(place.id);
+    if (verified) {
+      return {
+        ...place,
+        address: verified.address,
+        lat: verified.lat,
+        lng: verified.lng,
+        googleMapsUrl: verified.googleMapsUrl,
+        gpsSource: verified.source,
+        gpsVerifiedAt: verified.verifiedAt,
+      };
+    }
+
+    // Les fiches Bienvenue à la ferme contiennent leurs coordonnées officielles.
     return {
       ...place,
-      address: verified.address,
-      lat: verified.lat,
-      lng: verified.lng,
-      googleMapsUrl: verified.googleMapsUrl,
-      gpsSource: verified.source,
-      gpsVerifiedAt: verified.verifiedAt,
+      gpsSource: place.network.includes("Bienvenue")
+        ? "Coordonnées officielles de la fiche Bienvenue à la ferme"
+        : "Adresse du document source",
+      gpsVerifiedAt: "2026-07-18",
     };
-  }
-
-  // Les fiches Bienvenue à la ferme contiennent leurs coordonnées officielles.
-  return {
-    ...place,
-    gpsSource: place.network.includes("Bienvenue")
-      ? "Coordonnées officielles de la fiche Bienvenue à la ferme"
-      : "Adresse du document source",
-    gpsVerifiedAt: "2026-07-18",
-  };
-});
+  });
 
 export function getSpottedPlace(id: string) {
   return SPOTTED_PLACES.find((place) => place.id === id);

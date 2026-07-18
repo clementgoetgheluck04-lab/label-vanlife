@@ -4,8 +4,10 @@ import { use } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
+  Activity,
   ArrowLeft,
   ArrowRight,
+  CalendarDays,
   Clock3,
   Droplets,
   ExternalLink,
@@ -21,6 +23,7 @@ import {
   ShowerHead,
   Star,
   Utensils,
+  Users,
   Waves,
   Wifi,
 } from "lucide-react";
@@ -30,6 +33,7 @@ import { Button } from "@/components/ui/Button";
 import { ENRICHED_LIEUX } from "@/data/enriched-lieux";
 import { getPlaceContact } from "@/data/place-contacts";
 import { getPlaceMedia } from "@/data/place-media";
+import { cleanSourceActivities, cleanSourceCapacity, cleanSourceOpeningHours, getLabelledSourceDetails } from "@/data/labelled-source-details";
 import { getVerifiedPlaceGps } from "@/data/verified-place-gps";
 
 const SERVICE_ICONS: Record<string, { icon: LucideIcon; label: string }> = {
@@ -72,10 +76,20 @@ export default function LieuDetailPage({ params }: { params: Promise<{ id: strin
 
   const media = getPlaceMedia(lieu.id);
   const verifiedContact = getPlaceContact(lieu.id);
-  const phone = verifiedContact.phone || lieu.telephone;
-  const email = verifiedContact.email || lieu.email;
-  const website = verifiedContact.website || lieu.siteWeb;
+  const sourceDetails = getLabelledSourceDetails(lieu.id);
+  const phones = [...new Set([verifiedContact.phone, lieu.telephone, ...sourceDetails.flatMap((source) => source.phones ?? [])].filter((value): value is string => Boolean(value)))];
+  const emails = [...new Set([verifiedContact.email, lieu.email, ...sourceDetails.flatMap((source) => source.emails ?? [])].filter((value): value is string => Boolean(value)))];
+  const contactNames = [...new Set(sourceDetails.map((source) => source.contactName).filter((value): value is string => Boolean(value)))];
+  const website = verifiedContact.website || lieu.siteWeb || sourceDetails.find((source) => source.website)?.website;
   const verifiedGps = getVerifiedPlaceGps(lieu.id);
+  const supplementaryDescriptions = sourceDetails
+    .map((source) => source.description?.trim())
+    .filter((description): description is string => Boolean(description && !lieu.description.includes(description)));
+  const capacities = [...new Set(sourceDetails.map((source) => cleanSourceCapacity(source.capacity)).filter((value): value is string => Boolean(value)))];
+  const openingHours = [...new Set(sourceDetails.map((source) => cleanSourceOpeningHours(source.openingHours)).filter((value): value is string => Boolean(value)))];
+  const practicalDetails = [...new Set(sourceDetails.flatMap((source) => source.details ?? []))];
+  const activities = cleanSourceActivities(sourceDetails.flatMap((source) => source.activities ?? []));
+  const allPhotos = [...new Set([...media.photos, ...sourceDetails.flatMap((source) => source.images ?? [])])];
 
   return (
     <main className="min-h-screen bg-white pb-24">
@@ -144,6 +158,9 @@ export default function LieuDetailPage({ params }: { params: Promise<{ id: strin
         <section>
           <h2 className="mb-3 text-xl font-bold text-neutral-900">À propos du lieu</h2>
           <p className="max-w-4xl leading-7 text-neutral-600">{lieu.description}</p>
+          {supplementaryDescriptions.map((description) => (
+            <p key={description} className="mt-4 max-w-4xl leading-7 text-neutral-600">{description}</p>
+          ))}
         </section>
 
         {lieu.services.length > 0 && (
@@ -164,12 +181,49 @@ export default function LieuDetailPage({ params }: { params: Promise<{ id: strin
           </section>
         )}
 
-        {(phone || email || website || lieu.horaires || lieu.address) && (
+        {(capacities.length > 0 || openingHours.length > 0 || practicalDetails.length > 0) && (
+          <section>
+            <h2 className="mb-4 text-xl font-bold text-neutral-900">Accueil et informations détaillées</h2>
+            <div className="grid gap-3 sm:grid-cols-2">
+              {capacities.map((capacity) => (
+                <div key={capacity} className="rounded-xl border border-neutral-200 bg-neutral-50 p-4">
+                  <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-neutral-400"><Users className="h-4 w-4" /> Capacité</p>
+                  <p className="mt-2 text-sm font-semibold text-neutral-800">{capacity}</p>
+                </div>
+              ))}
+              {openingHours.map((hours) => (
+                <div key={hours} className="rounded-xl border border-neutral-200 bg-neutral-50 p-4">
+                  <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-neutral-400"><CalendarDays className="h-4 w-4" /> Période d’ouverture</p>
+                  <p className="mt-2 text-sm font-semibold text-neutral-800">{hours}</p>
+                </div>
+              ))}
+              {practicalDetails.map((detail) => (
+                <div key={detail} className="rounded-xl border border-emerald-100 bg-emerald-50 p-4 sm:col-span-2">
+                  <p className="text-sm leading-6 text-emerald-950">{detail}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {activities.length > 0 && (
+          <section>
+            <h2 className="mb-4 flex items-center gap-2 text-xl font-bold text-neutral-900"><Activity className="h-5 w-5 text-emerald-700" /> Loisirs et activités</h2>
+            <div className="flex flex-wrap gap-2">
+              {activities.map((activity) => (
+                <span key={activity} className="rounded-full border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs font-semibold text-emerald-900">{activity}</span>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {(phones.length > 0 || emails.length > 0 || contactNames.length > 0 || website || lieu.horaires || lieu.address) && (
           <section>
             <h2 className="mb-4 text-xl font-bold text-neutral-900">Informations pratiques</h2>
             <div className="grid gap-3 sm:grid-cols-2">
-              {phone && <a href={`tel:${phone}`} className="flex items-center gap-3 rounded-xl border border-neutral-200 p-4 transition hover:border-emerald-300"><Phone className="h-5 w-5 text-emerald-700" /><span>{phone}</span></a>}
-              {email && <a href={`mailto:${email}`} className="flex items-center gap-3 rounded-xl border border-neutral-200 p-4 transition hover:border-emerald-300"><Mail className="h-5 w-5 text-emerald-700" /><span className="truncate">{email}</span></a>}
+              {contactNames.map((contactName) => <div key={contactName} className="flex items-center gap-3 rounded-xl border border-neutral-200 p-4"><Users className="h-5 w-5 text-emerald-700" /><span><span className="block text-xs text-neutral-400">Contact sur place</span>{contactName}</span></div>)}
+              {phones.map((phone) => <a key={phone} href={`tel:${phone}`} className="flex items-center gap-3 rounded-xl border border-neutral-200 p-4 transition hover:border-emerald-300"><Phone className="h-5 w-5 text-emerald-700" /><span>{phone}</span></a>)}
+              {emails.map((email) => <a key={email} href={`mailto:${email}`} className="flex items-center gap-3 rounded-xl border border-neutral-200 p-4 transition hover:border-emerald-300"><Mail className="h-5 w-5 text-emerald-700" /><span className="truncate">{email}</span></a>)}
               {website && <a href={website} target="_blank" rel="noreferrer" className="flex items-center gap-3 rounded-xl border border-neutral-200 p-4 transition hover:border-emerald-300"><Globe2 className="h-5 w-5 text-emerald-700" /><span>Site officiel</span><ExternalLink className="ml-auto h-4 w-4" /></a>}
               {lieu.horaires && <div className="flex items-center gap-3 rounded-xl border border-neutral-200 p-4"><Clock3 className="h-5 w-5 text-emerald-700" /><span>{lieu.horaires}</span></div>}
               {lieu.address && <div className="flex items-center gap-3 rounded-xl border border-neutral-200 p-4"><MapPin className="h-5 w-5 text-emerald-700" /><span>{lieu.address}</span></div>}
@@ -186,19 +240,19 @@ export default function LieuDetailPage({ params }: { params: Promise<{ id: strin
           {verifiedGps && <p className="mt-3 text-xs text-neutral-500">Point GPS exact de l&apos;établissement vérifié sur Google Maps le 18 juillet 2026 · {lieu.coordonnees.lat}, {lieu.coordonnees.lng}.</p>}
         </section>
 
-        {media.photos.length > 0 && (
+        {allPhotos.length > 0 && (
           <section>
             <div className="mb-4 flex items-end justify-between gap-4">
               <div>
                 <h2 className="text-xl font-bold text-neutral-900">Photos du lieu</h2>
-                <p className="mt-1 text-sm text-neutral-500">{media.photos.length} visuel{media.photos.length > 1 ? "s" : ""} transmis par l’établissement.</p>
+                <p className="mt-1 text-sm text-neutral-500">{allPhotos.length} visuel{allPhotos.length > 1 ? "s" : ""} disponible{allPhotos.length > 1 ? "s" : ""} pour préparer votre séjour.</p>
               </div>
             </div>
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-              {media.photos.map((photo, index) => (
+              {allPhotos.map((photo, index) => (
                 <a key={photo} href={photo} target="_blank" rel="noreferrer" className={`group relative overflow-hidden rounded-2xl bg-neutral-100 ${index === 0 ? "col-span-2 row-span-2" : ""}`}>
                   <div className="relative aspect-[4/3]">
-                    <Image src={photo} alt={`${lieu.nom} — photo ${index + 1}`} fill sizes={index === 0 ? "(max-width: 640px) 100vw, 66vw" : "(max-width: 640px) 50vw, 33vw"} className="object-cover transition duration-300 group-hover:scale-[1.03]" />
+                    <Image src={photo} alt={`${lieu.nom} — photo ${index + 1}`} fill unoptimized={photo.startsWith("http")} sizes={index === 0 ? "(max-width: 640px) 100vw, 66vw" : "(max-width: 640px) 50vw, 33vw"} className="object-cover transition duration-300 group-hover:scale-[1.03]" />
                   </div>
                 </a>
               ))}
