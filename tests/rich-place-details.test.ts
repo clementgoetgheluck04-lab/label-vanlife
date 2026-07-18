@@ -43,3 +43,16 @@ test("la fiche enrichie du Clos de la Lère contient la réduction et les servic
   assert.ok(details.swimming?.includes("juin à septembre"));
   assert.ok(details.dining?.includes("Snack"));
 });
+
+test("la fiche enrichie du Camping de l'Aix contient le gérant et les informations van", () => {
+  const details = getRichPlaceDetails("camping-de-laix");
+  assert.ok(details);
+  assert.equal(details.labelYear, 2026);
+  assert.match(details.contactName ?? "", /Olivier Bakanyi/);
+  assert.equal(details.openingMonths?.length, 6);
+  assert.equal(details.activities?.length, 5);
+  assert.deepEqual(details.bookingMethods, ["Par email", "Par téléphone", "Sur place"]);
+  assert.ok(details.vanSpecifics?.includes("120 m²"));
+  assert.ok(details.swimming?.includes("240 m²"));
+  assert.ok(details.otherInfo?.[0].includes("animaux non acceptés"));
+});

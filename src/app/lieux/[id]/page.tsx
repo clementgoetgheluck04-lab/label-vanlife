@@ -82,7 +82,7 @@ export default function LieuDetailPage({ params }: { params: Promise<{ id: strin
   const sourceDetails = getLabelledSourceDetails(lieu.id);
   const phones = [...new Set([verifiedContact.phone, lieu.telephone, ...sourceDetails.flatMap((source) => source.phones ?? [])].filter((value): value is string => Boolean(value)))];
   const emails = [...new Set([verifiedContact.email, lieu.email, ...sourceDetails.flatMap((source) => source.emails ?? [])].filter((value): value is string => Boolean(value)))];
-  const contactNames = [...new Set(sourceDetails.map((source) => source.contactName).filter((value): value is string => Boolean(value)))];
+  const contactNames = [...new Set([richDetails?.contactName, ...sourceDetails.map((source) => source.contactName)].filter((value): value is string => Boolean(value)))];
   const website = verifiedContact.website || lieu.siteWeb || sourceDetails.find((source) => source.website)?.website;
   const verifiedGps = getVerifiedPlaceGps(lieu.id);
   const supplementaryDescriptions = sourceDetails

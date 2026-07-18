@@ -1,6 +1,7 @@
 export type RichPlaceDetails = {
   labelYear: number;
   displayAddress?: string;
+  contactName?: string;
   facebookUrl?: string;
   promoCode?: string;
   discountInstructions?: string[];
@@ -93,6 +94,32 @@ const RICH_PLACE_DETAILS: Record<string, RichPlaceDetails> = {
     otherInfo: ["Animaux acceptés · WiFi gratuit sur tout le camping · électricité 10 ampères · piscine de juin à septembre, de 10h à 21h."],
     bookingMethods: ["En ligne", "Par email", "Par téléphone", "Sur place"],
     reservationUrl: "https://www.camping-leclosdelalere.com/",
+    regionLink: { label: "Découvrir les autres lieux vanlife de la région", href: "/explorer" },
+  },
+  "camping-de-laix": {
+    labelYear: 2026,
+    displayAddress: "364 route du Camping, 42260 Pommiers-en-Forez",
+    contactName: "Olivier Bakanyi — propriétaire / gérant",
+    facebookUrl: "https://www.facebook.com/CampingDeLAix",
+    discountInstructions: [
+      "Par téléphone ou par email : mentionnez votre adhésion Label Vanlife.",
+      "Sur place : présentez votre carte membre à l’accueil dès votre arrivée.",
+    ],
+    venueQuote: "Chez nous, les vanlifers ne sont pas des clients comme les autres — ils font partie de l’ambiance. Amenez votre combi, installez-vous sous les arbres, profitez de la piscine et du Tiky Snack. Bienvenue à Pommiers !",
+    vanliferExperience: [
+      "Le Forez est l’un de ces territoires que les vanlifers traversent parfois sans s’y arrêter en filant vers Lyon ou les Alpes. Depuis le Camping de l’Aix, vous êtes pourtant entre plaine et montagne, dans un calme qui contraste avec l’agitation des régions voisines.",
+      "Les Monts du Lyonnais sont à portée de route : forêts, villages de caractère et panoramas sur la plaine du Forez. Ambert et son musée de la fourme d’Ambert se trouvent à environ 45 minutes au sud, au cœur d’un territoire fromager emblématique de l’Auvergne.",
+      "Thiers, capitale française de la coutellerie, mérite une demi-journée pour ses maisons à colombages au-dessus des gorges de la Durolle et ses ateliers encore actifs. Clermont-Ferrand et le Puy-de-Dôme sont également accessibles pour une journée dans le parc des volcans d’Auvergne.",
+      "Au camping, la piscine de 240 m², le Tiky Snack — ou le food truck lorsqu’il prend le relais — et l’ambiance conviviale invitent à s’installer plutôt qu’à simplement passer.",
+    ],
+    vanSpecifics: "Grands emplacements de 120 m² · piscine de 240 m² avec plages · Tiky Snack et food truck · réservation par email, téléphone ou sur place.",
+    opening: "Ouvert d’avril à septembre.",
+    openingMonths: ["Avr", "Mai", "Juin", "Juil", "Août", "Sep"],
+    swimming: "Espace de détente et de baignade de 240 m² avec plages. Accès sous la responsabilité des utilisateurs et présence d’un parent obligatoire pour les enfants. Caleçon ou slip de bain obligatoire, shorts non autorisés. Ouverture selon la saison et non garantie en septembre.",
+    dining: "Tiky Snack sur place, avec priorité aux clients du camping. Un food truck prend le relais lorsque le snack est fermé.",
+    activities: ["Randonnée dans les Monts du Lyonnais", "Monts du Lyonnais", "Thiers et les gorges de la Durolle", "Ambert et la fourme d’Ambert", "Clermont-Ferrand et le Puy-de-Dôme"],
+    otherInfo: ["Emplacements de 120 m² · animaux non acceptés · piscine ouverte selon la saison · réservation par email, téléphone ou sur place."],
+    bookingMethods: ["Par email", "Par téléphone", "Sur place"],
     regionLink: { label: "Découvrir les autres lieux vanlife de la région", href: "/explorer" },
   },
 };
