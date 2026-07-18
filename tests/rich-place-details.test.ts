@@ -17,3 +17,16 @@ test("la fiche enrichie du Camping Le Verger contient toutes les informations va
   assert.match(details.reservationUrl ?? "", /^https:\/\//);
   assert.match(details.tourismUrl ?? "", /^https:\/\//);
 });
+
+test("la fiche enrichie de La Porte d'Autan contient l'offre et les informations de séjour", () => {
+  const details = getRichPlaceDetails("eco-camping-la-porte-dautan");
+  assert.ok(details);
+  assert.equal(details.labelYear, 2026);
+  assert.equal(details.promoCode, "labelvanlife");
+  assert.equal(details.discountInstructions?.length, 3);
+  assert.equal(details.openingMonths?.length, 7);
+  assert.equal(details.activities?.length, 8);
+  assert.deepEqual(details.bookingMethods, ["En ligne", "Par email", "Par téléphone"]);
+  assert.ok(details.venueQuote);
+  assert.ok(details.otherInfo?.[0].includes("Éco-camping engagé"));
+});

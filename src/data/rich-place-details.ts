@@ -2,12 +2,17 @@ export type RichPlaceDetails = {
   labelYear: number;
   displayAddress?: string;
   facebookUrl?: string;
+  promoCode?: string;
   discountInstructions?: string[];
   venueQuote?: string;
   vanliferExperience?: string[];
   vanSpecifics?: string;
   opening?: string;
+  openingMonths?: string[];
   dining?: string;
+  activities?: string[];
+  otherInfo?: string[];
+  bookingMethods?: string[];
   reservationUrl?: string;
   tourismUrl?: string;
   regionLink?: { label: string; href: string };
@@ -37,6 +42,30 @@ const RICH_PLACE_DETAILS: Record<string, RichPlaceDetails> = {
     dining: "Un foodtruck différent est présent chaque soir. Le menu du jour est publié sur les réseaux sociaux du camping.",
     reservationUrl: "https://www.campingleverger17.com/tarifs-camping-la-rochelle.html,1,24,0,0,0?cle=tarifs&ids=1,24,0,0,0",
     tourismUrl: "https://www.campingleverger17.com/a-voira-visiter-la-rochelle.html,9,25,0,0,0?cle=a-voir-a-visiter&ids=9,25,0,0,0",
+    regionLink: { label: "Découvrir les autres lieux vanlife de la région", href: "/explorer" },
+  },
+  "eco-camping-la-porte-dautan": {
+    labelYear: 2026,
+    displayAddress: "1 rue Boris Vian, 11310 Saissac",
+    promoCode: "labelvanlife",
+    discountInstructions: [
+      "Réservation en ligne : utilisez le code « labelvanlife » lors de votre réservation.",
+      "Par téléphone ou par email : mentionnez votre adhésion Label Vanlife.",
+      "Sur place : présentez votre carte membre à l’accueil dès votre arrivée.",
+    ],
+    venueQuote: "Ici, on accueille les vanlifers comme des amis : un emplacement au calme, un cadre nature préservé, des équipements soignés et une équipe à l’écoute. La Porte d’Autan, c’est votre base dans la Montagne Noire — à portée de Carcassonne, des gorges et du Canal du Midi. Bienvenue chez nous !",
+    vanliferExperience: [
+      "Imaginez : vous ouvrez les portes de votre van au réveil et, face à vous, la chaîne des Pyrénées s’étire jusqu’à l’horizon. À 30 minutes de Carcassonne et de ses ruelles médiévales, vous profitez de la carte postale historique le temps d’une après-midi, puis vous revenez dormir dans votre chez-vous, sur un terrain qui vous ressemble.",
+      "La Montagne Noire est un terrain de jeu immense et encore préservé : le Canal du Midi débute ici, les gorges de l’Orbiel et le lac de la Galaube sont à portée de roue, et les crêtes offrent des balades sans foule. En juillet et août, lorsque le littoral catalan est très fréquenté, le calme reste ici particulièrement appréciable.",
+      "L’accueil est à l’image du lieu : simple, chaleureux et sincère. Le soir, les conversations s’installent naturellement sous un ciel propice à l’observation des étoiles, avant de reprendre la route vers les vignes du Minervois.",
+    ],
+    vanSpecifics: "Emplacements spacieux adaptés aux vans et camping-cars · électricité disponible · réservation en ligne avec le code promotionnel labelvanlife.",
+    opening: "Ouvert d’avril à octobre.",
+    openingMonths: ["Avr", "Mai", "Juin", "Juil", "Août", "Sep", "Oct"],
+    activities: ["Randonnée", "VTT", "Baignade au lac de la Galaube", "Canal du Midi", "Carcassonne (30 min)", "Gorges de l’Orbiel", "Lac de la Galaube", "Minervois"],
+    otherInfo: ["Éco-camping engagé : gestion responsable des déchets, énergie solaire et produits locaux."],
+    bookingMethods: ["En ligne", "Par email", "Par téléphone"],
+    reservationUrl: "https://www.laportedautan.fr/",
     regionLink: { label: "Découvrir les autres lieux vanlife de la région", href: "/explorer" },
   },
 };

@@ -91,7 +91,10 @@ export default function LieuDetailPage({ params }: { params: Promise<{ id: strin
   const capacities = [...new Set(sourceDetails.map((source) => cleanSourceCapacity(source.capacity)).filter((value): value is string => Boolean(value)))];
   const openingHours = [...new Set(sourceDetails.map((source) => cleanSourceOpeningHours(source.openingHours)).filter((value): value is string => Boolean(value)))];
   const practicalDetails = [...new Set(sourceDetails.flatMap((source) => source.details ?? []))];
-  const activities = cleanSourceActivities(sourceDetails.flatMap((source) => source.activities ?? []));
+  const activities = [...new Set([
+    ...cleanSourceActivities(sourceDetails.flatMap((source) => source.activities ?? [])),
+    ...(richDetails?.activities ?? []),
+  ])];
   const allPhotos = [...new Set([...media.photos, ...sourceDetails.flatMap((source) => source.images ?? [])])];
   const displayAddress = richDetails?.displayAddress || lieu.address;
 
@@ -168,6 +171,7 @@ export default function LieuDetailPage({ params }: { params: Promise<{ id: strin
               </div>
               <div className="space-y-3">
                 <h2 className="text-xl font-bold text-neutral-900">Comment profiter de l’avantage</h2>
+                {richDetails.promoCode && <p className="inline-flex rounded-xl border border-[#c39960]/40 bg-white px-4 py-2 text-sm text-neutral-700">Code de réservation : <strong className="ml-2 font-mono text-neutral-950">{richDetails.promoCode}</strong></p>}
                 {richDetails.discountInstructions.map((instruction) => (
                   <p key={instruction} className="flex gap-3 text-sm leading-6 text-neutral-700"><span className="font-bold text-[#8b673d]">→</span><span>{instruction}</span></p>
                 ))}
@@ -260,9 +264,16 @@ export default function LieuDetailPage({ params }: { params: Promise<{ id: strin
             <h2 className="mb-4 text-xl font-bold text-neutral-900">Préparer votre séjour</h2>
             <div className="grid gap-4 md:grid-cols-3">
               {richDetails.vanSpecifics && <div className="rounded-2xl border border-neutral-200 bg-neutral-50 p-5"><MapPin className="h-5 w-5 text-emerald-700" /><h3 className="mt-3 font-bold text-neutral-900">Spécificités van</h3><p className="mt-2 text-sm leading-6 text-neutral-600">{richDetails.vanSpecifics}</p></div>}
-              {richDetails.opening && <div className="rounded-2xl border border-neutral-200 bg-neutral-50 p-5"><Clock3 className="h-5 w-5 text-emerald-700" /><h3 className="mt-3 font-bold text-neutral-900">Ouverture et horaires</h3><p className="mt-2 text-sm leading-6 text-neutral-600">{richDetails.opening}</p></div>}
+              {richDetails.opening && <div className="rounded-2xl border border-neutral-200 bg-neutral-50 p-5"><Clock3 className="h-5 w-5 text-emerald-700" /><h3 className="mt-3 font-bold text-neutral-900">Ouverture et horaires</h3><p className="mt-2 text-sm leading-6 text-neutral-600">{richDetails.opening}</p>{richDetails.openingMonths && <div className="mt-3 flex flex-wrap gap-1.5">{richDetails.openingMonths.map((month) => <span key={month} className="rounded-full bg-white px-2.5 py-1 text-[11px] font-bold text-emerald-800 shadow-sm">{month}</span>)}</div>}</div>}
               {richDetails.dining && <div className="rounded-2xl border border-neutral-200 bg-neutral-50 p-5"><Utensils className="h-5 w-5 text-emerald-700" /><h3 className="mt-3 font-bold text-neutral-900">Restauration</h3><p className="mt-2 text-sm leading-6 text-neutral-600">{richDetails.dining}</p></div>}
             </div>
+          </section>
+        )}
+
+        {richDetails?.otherInfo && richDetails.otherInfo.length > 0 && (
+          <section className="rounded-3xl border border-emerald-100 bg-emerald-50 p-6 sm:p-8">
+            <h2 className="text-xl font-bold text-emerald-950">Autres informations</h2>
+            <div className="mt-3 space-y-2">{richDetails.otherInfo.map((info) => <p key={info} className="text-sm leading-6 text-emerald-900">{info}</p>)}</div>
           </section>
         )}
 
@@ -298,6 +309,7 @@ export default function LieuDetailPage({ params }: { params: Promise<{ id: strin
               {richDetails.tourismUrl && <a href={richDetails.tourismUrl} target="_blank" rel="noreferrer" className="flex min-h-14 items-center justify-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-5 py-3 text-center text-sm font-bold text-emerald-800 transition hover:bg-emerald-100"><Activity className="h-4 w-4" /> Activités et tourisme <ExternalLink className="h-4 w-4" /></a>}
               {richDetails.regionLink && <Link href={richDetails.regionLink.href} className="flex min-h-14 items-center justify-center gap-2 rounded-xl border border-neutral-200 bg-white px-5 py-3 text-center text-sm font-bold text-neutral-700 transition hover:border-emerald-300"><MapPin className="h-4 w-4" /> {richDetails.regionLink.label} <ArrowRight className="h-4 w-4" /></Link>}
             </div>
+            {richDetails.bookingMethods && <p className="mt-4 text-sm text-neutral-500">Réservation possible : <strong className="font-semibold text-neutral-700">{richDetails.bookingMethods.join(" · ")}</strong></p>}
           </section>
         )}
 

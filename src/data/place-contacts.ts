@@ -30,7 +30,7 @@ const CONTACTS: Record<string, PlaceContact> = {
   "camping-les-terrasses": { website: "https://www.camping-les-terrasses.com/", email: "campinglesterrasses34@gmail.com", phone: "+33467253506" },
   "camping-saint-lambert": { website: "https://www.camping-millau-riviere.fr/fr-fr/accueil", email: "contact@campingsaintlambert.fr", phone: "+33565600712" },
   "domaine-de-mepillat": { website: "https://www.camping-mepillat.fr/", email: "contact@camping-mepillat.fr", phone: "+33970770121" },
-  "eco-camping-la-porte-dautan": { website: "https://www.laportedautan.fr/", email: "contact@laportedautan.fr", phone: "+33468763608" },
+  "eco-camping-la-porte-dautan": { website: "https://www.laportedautan.fr/", email: "contact@laportedautan.fr", phone: "+33630766221" },
   "ferme-pedagogique-solidor": { website: "https://fermedesolidor.fr/" },
   "mas-de-bouzou": { website: "https://www.masdebouzou.net/", email: "kompostelle@yahoo.com", phone: "+33666500628" },
 };
