@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
-import memberCampingNetwork from "@/data/member-camping-network.json";
+import { SPOTTED_PLACES } from "@/data/spotted-places";
 import { createClient } from "@/lib/supabase/server";
 import { ADMIN_PREVIEW_COOKIE, isAdminPreviewCookie } from "@/server/admin-preview";
 
@@ -17,7 +17,7 @@ export async function GET() {
     });
   }
 
-  return NextResponse.json({ places: memberCampingNetwork }, {
+  return NextResponse.json({ places: SPOTTED_PLACES }, {
     headers: { "Cache-Control": "private, no-store" },
   });
 }

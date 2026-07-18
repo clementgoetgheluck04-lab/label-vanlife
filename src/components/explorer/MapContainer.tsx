@@ -27,6 +27,9 @@ export interface MemberCampingPoint {
   openingHours?: string | null;
   memberOffer?: string | null;
   source: string;
+  gpsSource?: string;
+  gpsVerifiedAt?: string;
+  googleMapsUrl?: string;
 }
 
 interface MapContainerProps {
@@ -60,7 +63,7 @@ function normalizeExternalWebsite(value: string | null | undefined): string | nu
 function navigationLinks(lat: number, lng: number) {
   const destination = encodeURIComponent(`${lat},${lng}`);
   return {
-    maps: `https://www.google.com/maps/dir/?api=1&destination=${destination}`,
+    maps: `https://www.google.com/maps/dir/?api=1&destination=${destination}&travelmode=driving`,
     waze: `https://waze.com/ul?ll=${destination}&navigate=yes`,
   };
 }

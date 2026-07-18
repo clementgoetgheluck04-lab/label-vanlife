@@ -6,6 +6,7 @@ import { ArrowRight, Star, Shield, Heart, Moon, Quote, Compass, ChevronDown, Map
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { ENRICHED_LIEUX } from "@/data/enriched-lieux";
+import { SPOTTED_PLACES } from "@/data/spotted-places";
 
 function getTypeLabel(type: string): string {
   const labels: Record<string, string> = {
@@ -53,7 +54,7 @@ export default function Home() {
               </Link>
               <Link href="/explorer">
                 <Button variant="primary" className="bg-white/10 backdrop-blur-sm text-white border border-white/30 hover:bg-white/20 text-base px-8 rounded-xl">
-                  Découvrir la map
+                  Découvrir les lieux
                 </Button>
               </Link>
             </div>
@@ -80,7 +81,7 @@ export default function Home() {
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
             {[
-              { icon: MapPin, value: "26", title: "lieux déjà labellisés", text: "Des fiches complètes avec photos, services et informations pratiques." },
+              { icon: MapPin, value: String(labelledPlaces.length), title: "lieux déjà labellisés", text: `Des fiches complètes avec photos, services et informations pratiques. Et nous avons repéré ${SPOTTED_PLACES.length} lieux pas encore labellisés, disponibles aussi sur notre MAP.` },
               { icon: Percent, value: "10 à 20%", title: "d'avantage membre", text: "Le pourcentage est public ; le code éventuel reste dans votre espace privé." },
               { icon: Shield, value: "Vérifiés", title: "selon une vraie charte", text: "Accueil, environnement, confort et tranquillité sont évalués." },
               { icon: Smartphone, value: "Partout", title: "sur internet puis prochainement en application mobile", text: "Votre carte numérique et la map vous suivent partout sur votre téléphone." },
@@ -220,7 +221,7 @@ export default function Home() {
               <Button variant="secondary-dark" size="lg" className="gap-2">Découvrir tous les lieux <ArrowRight className="h-4 w-4" /></Button>
             </Link>
           </div>
-          <p className="text-center text-xs text-neutral-400 mt-3">697 lieux identifiés à travers la France</p>
+          <p className="text-center text-xs text-neutral-400 mt-3">{SPOTTED_PLACES.length} lieux supplémentaires repérés à travers la France, pas encore labellisés</p>
         </div>
       </section>
 

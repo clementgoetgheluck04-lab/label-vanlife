@@ -128,14 +128,14 @@ export default async function SpottedPlacePage({ params }: PageProps) {
                 </a>
               )}
               <div className="mt-4 grid grid-cols-2 gap-3">
-                <a href={`https://www.google.com/maps/dir/?api=1&destination=${place.lat},${place.lng}`} target="_blank" rel="noreferrer" className="flex min-h-12 items-center justify-center gap-2 rounded-xl bg-emerald-50 px-3 py-3 text-center text-sm font-bold text-emerald-800 hover:bg-emerald-100"><Navigation className="h-4 w-4" /> Google Maps</a>
+                <a href={`https://www.google.com/maps/dir/?api=1&destination=${place.lat},${place.lng}&travelmode=driving`} target="_blank" rel="noreferrer" className="flex min-h-12 items-center justify-center gap-2 rounded-xl bg-emerald-50 px-3 py-3 text-center text-sm font-bold text-emerald-800 hover:bg-emerald-100"><Navigation className="h-4 w-4" /> Y aller avec Maps</a>
                 <a href={`https://waze.com/ul?ll=${place.lat}%2C${place.lng}&navigate=yes`} target="_blank" rel="noreferrer" className="flex min-h-12 items-center justify-center gap-2 rounded-xl bg-blue-50 px-3 py-3 text-center text-sm font-bold text-blue-700 hover:bg-blue-100"><Navigation className="h-4 w-4" /> Waze</a>
               </div>
               <div className="mt-6 rounded-2xl border border-amber-200 bg-amber-50 p-5 text-sm leading-6 text-amber-950">
                 <strong>Aucun partenariat ni avantage membre n&apos;est garanti.</strong>
                 <p className="mt-1">Label Vanlife n&apos;a pas encore audité cet établissement. La présence de cette fiche ne vaut ni labellisation, ni recommandation commerciale.</p>
               </div>
-              <p className="mt-4 text-xs leading-5 text-neutral-400">Source des informations : {place.source}. Coordonnées GPS : {place.lat}, {place.lng}.</p>
+              <p className="mt-4 text-xs leading-5 text-neutral-400">Source des informations : {place.source}. Point GPS : {place.lat}, {place.lng} · vérifié le 18 juillet 2026 d&apos;après {place.gpsSource ?? "la fiche source"}.</p>
             </div>
 
             <aside className="rounded-3xl bg-neutral-950 p-6 text-white sm:p-7">

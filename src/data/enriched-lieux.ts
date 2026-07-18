@@ -4,10 +4,11 @@
 // `lieux-labellises.ts` ou `extracted_lieux.json` sans réconciliation manuelle.
 
 import type { Lieu } from "@/lib/types";
+import { getVerifiedPlaceGps } from "@/data/verified-place-gps";
 
 const IMG = "/images/lieux";
 
-export const ENRICHED_LIEUX: Lieu[] = [
+const ENRICHED_LIEUX_RAW: Lieu[] = [
   // ===== BRETAGNE =====
   {
     id: "camping-de-pont-augan",
@@ -591,3 +592,13 @@ export const ENRICHED_LIEUX: Lieu[] = [
     created_at: "2024-09-01",
   },
 ];
+
+export const ENRICHED_LIEUX: Lieu[] = ENRICHED_LIEUX_RAW.map((place) => {
+  const gps = getVerifiedPlaceGps(place.id);
+  if (!gps) return place;
+  return {
+    ...place,
+    address: gps.address,
+    coordonnees: { lat: gps.lat, lng: gps.lng },
+  };
+});
