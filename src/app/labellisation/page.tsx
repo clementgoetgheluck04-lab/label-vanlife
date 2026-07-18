@@ -1,11 +1,12 @@
 "use client";
 
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import {
-  ArrowRight, Sparkles, Building2, MapPin, BadgeCheck, BarChart3, Percent, Camera, MousePointerClick, HelpCircle, ChevronRight, Shield, Check, Star, Heart, Users, TreePine, Warehouse, Home, Store, Wine, Wrench
+  ArrowRight, Sparkles, MapPin, BadgeCheck, Percent, Shield, Check, Star, Heart, Users, TreePine, Warehouse, Home
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
-import { Card, CardContent, CardTitle, CardDescription } from "@/components/ui/Card";
+import { Card } from "@/components/ui/Card";
 
 export default function LabellisationPage() {
   const router = useRouter();
@@ -30,6 +31,39 @@ export default function LabellisationPage() {
               <Button variant="primary" size="lg" className="gap-2 text-base px-8" onClick={() => router.push("/labellisation/candidature")}>
                 Candidater au Label <ArrowRight className="w-5 h-5" />
               </Button>
+            </div>
+          </div>
+        </section>
+
+        {/* ===== EXPÉRIENCE DU FONDATEUR ===== */}
+        <section className="pb-10 sm:pb-14">
+          <div className="relative overflow-hidden rounded-3xl border border-emerald-100 bg-white p-6 shadow-sm sm:p-8">
+            <div className="absolute -right-16 -top-20 h-52 w-52 rounded-full bg-emerald-50" aria-hidden="true" />
+            <div className="relative grid items-center gap-6 md:grid-cols-[auto_1fr] md:gap-8">
+              <div className="mx-auto md:mx-0">
+                <Image
+                  src="/images/people/clement-goetgheluck.jpg"
+                  alt="Clément Goetgheluck, fondateur de Label Vanlife et ancien directeur de camping"
+                  width={112}
+                  height={112}
+                  className="h-28 w-28 rounded-2xl border-4 border-white object-cover shadow-lg"
+                />
+              </div>
+              <div className="text-center md:text-left">
+                <span className="text-xs font-bold uppercase tracking-[0.18em] text-emerald-600">Une expertise de terrain</span>
+                <h2 className="mt-2 text-2xl font-bold text-neutral-900 sm:text-3xl" style={{ fontFamily: "Outfit, sans-serif" }}>
+                  Pensé par un vanlifer, avec l’expérience d’un directeur de camping
+                </h2>
+                <p className="mt-4 text-sm leading-relaxed text-neutral-600 sm:text-base">
+                  J’ai dirigé un camping et je voyage en van depuis plus de 15 ans. Je connais vos réalités : la saisonnalité, les réservations, l’accueil, les imprévus et la nécessité de préserver la tranquillité de votre établissement. Label Vanlife est né pour créer une relation simple et équilibrée entre des lieux de qualité et des voyageurs respectueux.
+                </p>
+                <div className="mt-5 flex flex-wrap justify-center gap-2 md:justify-start">
+                  <span className="rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700">Ancien directeur de camping</span>
+                  <span className="rounded-full bg-[#f7f1e8] px-3 py-1.5 text-xs font-semibold text-[#8b673d]">Vanlifer depuis plus de 15 ans</span>
+                  <span className="rounded-full bg-neutral-100 px-3 py-1.5 text-xs font-semibold text-neutral-700">Vision terrain & établissement</span>
+                </div>
+                <p className="mt-5 text-sm font-bold text-neutral-900">Clément Goetgheluck <span className="font-normal text-neutral-500">· Fondateur de Label Vanlife</span></p>
+              </div>
             </div>
           </div>
         </section>
