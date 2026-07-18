@@ -80,7 +80,7 @@ export default function MemberMapPage() {
     if (filters.region && place.region !== filters.region) return false;
     if (filters.search) {
       const query = filters.search.toLocaleLowerCase("fr");
-      if (![place.name, place.city, place.region, place.network].some((value) => value.toLocaleLowerCase("fr").includes(query))) return false;
+      if (![place.name, place.city, place.region].some((value) => value.toLocaleLowerCase("fr").includes(query))) return false;
     }
     return true;
   }), [filters.region, filters.search, memberOnlyPlaces, universe]);
@@ -263,7 +263,7 @@ export default function MemberMapPage() {
                       </div>
                       <h4 className="mt-4 line-clamp-2 font-bold text-neutral-800">{place.name}</h4>
                       <p className="mt-2 flex items-start gap-1.5 text-sm text-neutral-500"><MapPin className="mt-0.5 h-4 w-4 shrink-0" />{place.city} · {place.region}</p>
-                      <p className="mt-2 text-xs text-neutral-400">{PLACE_UNIVERSE_LABELS[classifySpottedPlace(place)]} · {place.network}</p>
+                      <p className="mt-2 text-xs text-neutral-400">{PLACE_UNIVERSE_LABELS[classifySpottedPlace(place)]} · Repéré par Label Vanlife</p>
                       <div className="mt-auto flex flex-col gap-2 pt-5">
                         <Link href={`/lieux-reperes/${place.id}`} className="flex min-h-11 items-center justify-center rounded-xl border border-neutral-300 bg-white px-3 py-2 text-center text-xs font-bold text-neutral-700 hover:border-neutral-400">Voir la fiche</Link>
                         {website && <a href={website} target="_blank" rel="noreferrer nofollow" className="flex min-h-11 items-center justify-center gap-1.5 rounded-xl bg-[#c39960] px-3 py-2 text-center text-xs font-bold text-white hover:bg-[#ad8250]">Réserver sur le site <ExternalLink className="h-3.5 w-3.5" /></a>}

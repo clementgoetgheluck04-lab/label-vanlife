@@ -82,7 +82,7 @@ export default async function SpottedPlacePage({ params }: PageProps) {
 
               <h2 className="text-xl font-bold text-neutral-900">Ce que nous savons</h2>
               <dl className="mt-5 grid gap-4 text-sm sm:grid-cols-2">
-                <div className="rounded-2xl bg-neutral-50 p-4"><dt className="text-xs font-bold uppercase tracking-wider text-neutral-400">Réseau dans lequel le lieu a été repéré</dt><dd className="mt-1 font-semibold text-neutral-800">{place.network}</dd></div>
+                <div className="rounded-2xl bg-neutral-50 p-4"><dt className="text-xs font-bold uppercase tracking-wider text-neutral-400">Statut</dt><dd className="mt-1 font-semibold text-neutral-800">Lieu repéré par Label Vanlife</dd></div>
                 <div className="rounded-2xl bg-neutral-50 p-4"><dt className="text-xs font-bold uppercase tracking-wider text-neutral-400">Type de lieu</dt><dd className="mt-1 font-semibold text-neutral-800">{category}</dd></div>
                 <div className="rounded-2xl bg-neutral-50 p-4"><dt className="text-xs font-bold uppercase tracking-wider text-neutral-400">Localisation</dt><dd className="mt-1 font-semibold text-neutral-800">{place.city} · {place.region}</dd></div>
                 {place.contactName && <div className="rounded-2xl bg-neutral-50 p-4"><dt className="text-xs font-bold uppercase tracking-wider text-neutral-400">Contact indiqué</dt><dd className="mt-1 font-semibold text-neutral-800">{place.contactName}</dd></div>}
@@ -115,13 +115,6 @@ export default async function SpottedPlacePage({ params }: PageProps) {
                 </section>
               )}
 
-              {place.memberOffer && (
-                <div className="mt-8 rounded-2xl border border-[#c39960]/40 bg-[#f7f1e8] p-5 text-sm leading-6 text-neutral-800">
-                  <strong>Information publiée par le réseau {place.network}</strong>
-                  <p className="mt-1">{place.memberOffer}</p>
-                  <p className="mt-2 text-xs text-neutral-500">Cette condition provient du document source et doit être vérifiée directement auprès du lieu. Ce n’est pas un avantage membre Label Vanlife.</p>
-                </div>
-              )}
               {website && (
                 <a href={website} target="_blank" rel="noreferrer nofollow" className="mt-5 inline-flex min-h-12 items-center gap-2 rounded-xl bg-emerald-700 px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-emerald-800">
                   Réserver ou visiter le site de l&apos;établissement <ExternalLink className="h-4 w-4" />
@@ -135,7 +128,7 @@ export default async function SpottedPlacePage({ params }: PageProps) {
                 <strong>Aucun partenariat ni avantage membre n&apos;est garanti.</strong>
                 <p className="mt-1">Label Vanlife n&apos;a pas encore audité cet établissement. La présence de cette fiche ne vaut ni labellisation, ni recommandation commerciale.</p>
               </div>
-              <p className="mt-4 text-xs leading-5 text-neutral-400">Source des informations : {place.source}. Point GPS : {place.lat}, {place.lng} · vérifié le 18 juillet 2026 d&apos;après {place.gpsSource ?? "la fiche source"}.</p>
+              <p className="mt-4 text-xs leading-5 text-neutral-400">Lieu repéré par Label Vanlife. Informations publiques à vérifier directement auprès de l&apos;établissement. Point GPS : {place.lat}, {place.lng} · vérifié le 18 juillet 2026.</p>
             </div>
 
             <aside className="rounded-3xl bg-neutral-950 p-6 text-white sm:p-7">

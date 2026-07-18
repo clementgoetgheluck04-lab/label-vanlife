@@ -207,7 +207,6 @@ export default function MapContainer({
             <span class="popup-status popup-status-network">Lieu repéré · non labellisé</span>
             <h3>${escapeHtml(place.name)}</h3>
             <p>${escapeHtml(place.address || `${place.postalCode} ${place.city}`)}</p>
-            <p class="popup-network">Réseau : <strong>${escapeHtml(place.network)}</strong></p>
             <p class="popup-warning">Adresse utile non labellisée Label Vanlife. Vérifiez les conditions avant votre venue.</p>
             <a class="popup-cta popup-cta-network" href="/lieux-reperes/${encodeURIComponent(place.id)}">Voir la fiche complète</a>
             ${website}
@@ -251,7 +250,6 @@ export default function MapContainer({
         .popup-status-labelled { background: #dcfce7; color: #166534; }
         .popup-status-network { background: #f5eadc; color: #795a31; }
         .map-popup .popup-benefit { margin-top: 9px; color: #166534; }
-        .map-popup .popup-network { margin-top: 8px; color: #795a31; }
         .map-popup .popup-warning { margin-top: 8px; font-size: 10px; color: #737373; }
         .map-popup .popup-no-website { margin-top: 9px; font-size: 10px; font-style: italic; color: #a3a3a3; }
         .popup-cta, .popup-link { display: block; width: 100%; margin-top: 10px; padding: 8px 12px; border: 0; border-radius: 8px; background: #2f855a; color: #fff !important; text-align: center; font-size: 12px; font-weight: 700; cursor: pointer; text-decoration: none; box-sizing: border-box; }

@@ -40,7 +40,7 @@ export default function ExplorerPage() {
   const normalizedSearch = search.trim().toLocaleLowerCase("fr");
   const spottedPlaces = SPOTTED_PLACES.filter((place) => {
     if (!normalizedSearch) return true;
-    return [place.name, place.city, place.region, place.network]
+    return [place.name, place.city, place.region]
       .some((value) => value.toLocaleLowerCase("fr").includes(normalizedSearch));
   });
 
@@ -238,7 +238,7 @@ export default function ExplorerPage() {
                     <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-[#c39960]" />
                     <span>{place.city}{place.region ? ` · ${place.region}` : ""}</span>
                   </p>
-                  <p className="mt-3 text-xs text-neutral-400">Repéré via {place.network}</p>
+                  <p className="mt-3 text-xs font-medium text-neutral-400">Lieu repéré par Label Vanlife</p>
                   <span className="mt-auto flex items-center gap-2 pt-5 text-sm font-bold text-[#8b673d]">
                     Voir et revendiquer la fiche <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                   </span>
