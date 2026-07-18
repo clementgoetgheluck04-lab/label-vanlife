@@ -34,6 +34,7 @@ import { ENRICHED_LIEUX } from "@/data/enriched-lieux";
 import { getPlaceContact } from "@/data/place-contacts";
 import { getPlaceMedia } from "@/data/place-media";
 import { cleanSourceActivities, cleanSourceCapacity, cleanSourceOpeningHours, getLabelledSourceDetails } from "@/data/labelled-source-details";
+import { getRichPlaceDetails } from "@/data/rich-place-details";
 import { getVerifiedPlaceGps } from "@/data/verified-place-gps";
 
 const SERVICE_ICONS: Record<string, { icon: LucideIcon; label: string }> = {
@@ -44,6 +45,7 @@ const SERVICE_ICONS: Record<string, { icon: LucideIcon; label: string }> = {
   vidange: { icon: Gauge, label: "Aire de vidange" },
   piscine: { icon: Waves, label: "Piscine" },
   restaurant: { icon: Utensils, label: "Restauration" },
+  parking: { icon: MapPin, label: "Aire camping-car H24" },
   animaux: { icon: PawPrint, label: "Animaux acceptés" },
   animal_accepted: { icon: PawPrint, label: "Animaux acceptés" },
   plage: { icon: Waves, label: "Accès plage" },
@@ -76,6 +78,7 @@ export default function LieuDetailPage({ params }: { params: Promise<{ id: strin
 
   const media = getPlaceMedia(lieu.id);
   const verifiedContact = getPlaceContact(lieu.id);
+  const richDetails = getRichPlaceDetails(lieu.id);
   const sourceDetails = getLabelledSourceDetails(lieu.id);
   const phones = [...new Set([verifiedContact.phone, lieu.telephone, ...sourceDetails.flatMap((source) => source.phones ?? [])].filter((value): value is string => Boolean(value)))];
   const emails = [...new Set([verifiedContact.email, lieu.email, ...sourceDetails.flatMap((source) => source.emails ?? [])].filter((value): value is string => Boolean(value)))];
@@ -90,6 +93,7 @@ export default function LieuDetailPage({ params }: { params: Promise<{ id: strin
   const practicalDetails = [...new Set(sourceDetails.flatMap((source) => source.details ?? []))];
   const activities = cleanSourceActivities(sourceDetails.flatMap((source) => source.activities ?? []));
   const allPhotos = [...new Set([...media.photos, ...sourceDetails.flatMap((source) => source.images ?? [])])];
+  const displayAddress = richDetails?.displayAddress || lieu.address;
 
   return (
     <main className="min-h-screen bg-white pb-24">
@@ -145,7 +149,7 @@ export default function LieuDetailPage({ params }: { params: Promise<{ id: strin
           <div className="flex-1">
             <div className="flex flex-wrap items-center gap-2">
               <h2 className="text-2xl font-bold text-neutral-900">{lieu.nom}</h2>
-              <span className="rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-[11px] font-bold tracking-wide text-emerald-700">LABELLISÉ LABEL VANLIFE</span>
+              <span className="rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-[11px] font-bold tracking-wide text-emerald-700">LABELLISÉ LABEL VANLIFE{richDetails?.labelYear ? ` · ${richDetails.labelYear}` : ""}</span>
             </div>
             <div className="mt-2 flex items-center gap-1 text-sm text-neutral-500">
               <Star className="h-4 w-4 fill-[#c39960] text-[#c39960]" />
@@ -155,6 +159,23 @@ export default function LieuDetailPage({ params }: { params: Promise<{ id: strin
           </div>
         </section>
 
+        {richDetails?.discountInstructions && richDetails.discountInstructions.length > 0 && (
+          <section className="overflow-hidden rounded-3xl border border-[#c39960]/35 bg-[#f7f1e8]">
+            <div className="grid gap-6 p-6 sm:grid-cols-[180px_1fr] sm:p-8">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#8b673d]">Réduction membres</p>
+                <p className="mt-2 text-5xl font-black text-neutral-950">−{lieu.discountPercent}%</p>
+              </div>
+              <div className="space-y-3">
+                <h2 className="text-xl font-bold text-neutral-900">Comment profiter de l’avantage</h2>
+                {richDetails.discountInstructions.map((instruction) => (
+                  <p key={instruction} className="flex gap-3 text-sm leading-6 text-neutral-700"><span className="font-bold text-[#8b673d]">→</span><span>{instruction}</span></p>
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
+
         <section>
           <h2 className="mb-3 text-xl font-bold text-neutral-900">À propos du lieu</h2>
           <p className="max-w-4xl leading-7 text-neutral-600">{lieu.description}</p>
@@ -162,6 +183,23 @@ export default function LieuDetailPage({ params }: { params: Promise<{ id: strin
             <p key={description} className="mt-4 max-w-4xl leading-7 text-neutral-600">{description}</p>
           ))}
         </section>
+
+        {richDetails?.venueQuote && (
+          <section className="rounded-3xl bg-neutral-950 p-7 text-white sm:p-9">
+            <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#dfc59f]">Le mot du lieu</p>
+            <blockquote className="mt-4 max-w-4xl text-xl font-medium italic leading-8 text-white/90">« {richDetails.venueQuote} »</blockquote>
+          </section>
+        )}
+
+        {richDetails?.vanliferExperience && richDetails.vanliferExperience.length > 0 && (
+          <section>
+            <span className="text-xs font-bold uppercase tracking-[0.18em] text-emerald-700">Destination</span>
+            <h2 className="mt-2 text-2xl font-bold text-neutral-900">L’expérience vanlifer</h2>
+            <div className="mt-5 max-w-4xl space-y-4">
+              {richDetails.vanliferExperience.map((paragraph) => <p key={paragraph} className="leading-7 text-neutral-600">{paragraph}</p>)}
+            </div>
+          </section>
+        )}
 
         {lieu.services.length > 0 && (
           <section>
@@ -217,7 +255,18 @@ export default function LieuDetailPage({ params }: { params: Promise<{ id: strin
           </section>
         )}
 
-        {(phones.length > 0 || emails.length > 0 || contactNames.length > 0 || website || lieu.horaires || lieu.address) && (
+        {(richDetails?.vanSpecifics || richDetails?.opening || richDetails?.dining) && (
+          <section>
+            <h2 className="mb-4 text-xl font-bold text-neutral-900">Préparer votre séjour</h2>
+            <div className="grid gap-4 md:grid-cols-3">
+              {richDetails.vanSpecifics && <div className="rounded-2xl border border-neutral-200 bg-neutral-50 p-5"><MapPin className="h-5 w-5 text-emerald-700" /><h3 className="mt-3 font-bold text-neutral-900">Spécificités van</h3><p className="mt-2 text-sm leading-6 text-neutral-600">{richDetails.vanSpecifics}</p></div>}
+              {richDetails.opening && <div className="rounded-2xl border border-neutral-200 bg-neutral-50 p-5"><Clock3 className="h-5 w-5 text-emerald-700" /><h3 className="mt-3 font-bold text-neutral-900">Ouverture et horaires</h3><p className="mt-2 text-sm leading-6 text-neutral-600">{richDetails.opening}</p></div>}
+              {richDetails.dining && <div className="rounded-2xl border border-neutral-200 bg-neutral-50 p-5"><Utensils className="h-5 w-5 text-emerald-700" /><h3 className="mt-3 font-bold text-neutral-900">Restauration</h3><p className="mt-2 text-sm leading-6 text-neutral-600">{richDetails.dining}</p></div>}
+            </div>
+          </section>
+        )}
+
+        {(phones.length > 0 || emails.length > 0 || contactNames.length > 0 || website || richDetails?.facebookUrl || lieu.horaires || displayAddress) && (
           <section>
             <h2 className="mb-4 text-xl font-bold text-neutral-900">Informations pratiques</h2>
             <div className="grid gap-3 sm:grid-cols-2">
@@ -225,8 +274,9 @@ export default function LieuDetailPage({ params }: { params: Promise<{ id: strin
               {phones.map((phone) => <a key={phone} href={`tel:${phone}`} className="flex items-center gap-3 rounded-xl border border-neutral-200 p-4 transition hover:border-emerald-300"><Phone className="h-5 w-5 text-emerald-700" /><span>{phone}</span></a>)}
               {emails.map((email) => <a key={email} href={`mailto:${email}`} className="flex items-center gap-3 rounded-xl border border-neutral-200 p-4 transition hover:border-emerald-300"><Mail className="h-5 w-5 text-emerald-700" /><span className="truncate">{email}</span></a>)}
               {website && <a href={website} target="_blank" rel="noreferrer" className="flex items-center gap-3 rounded-xl border border-neutral-200 p-4 transition hover:border-emerald-300"><Globe2 className="h-5 w-5 text-emerald-700" /><span>Site officiel</span><ExternalLink className="ml-auto h-4 w-4" /></a>}
+              {richDetails?.facebookUrl && <a href={richDetails.facebookUrl} target="_blank" rel="noreferrer" className="flex items-center gap-3 rounded-xl border border-neutral-200 p-4 transition hover:border-emerald-300"><ExternalLink className="h-5 w-5 text-emerald-700" /><span>Page Facebook</span><ExternalLink className="ml-auto h-4 w-4" /></a>}
               {lieu.horaires && <div className="flex items-center gap-3 rounded-xl border border-neutral-200 p-4"><Clock3 className="h-5 w-5 text-emerald-700" /><span>{lieu.horaires}</span></div>}
-              {lieu.address && <div className="flex items-center gap-3 rounded-xl border border-neutral-200 p-4"><MapPin className="h-5 w-5 text-emerald-700" /><span>{lieu.address}</span></div>}
+              {displayAddress && <div className="flex items-center gap-3 rounded-xl border border-neutral-200 p-4"><MapPin className="h-5 w-5 text-emerald-700" /><span>{displayAddress}</span></div>}
             </div>
           </section>
         )}
@@ -239,6 +289,17 @@ export default function LieuDetailPage({ params }: { params: Promise<{ id: strin
           </div>
           {verifiedGps && <p className="mt-3 text-xs text-neutral-500">Point GPS exact de l&apos;établissement vérifié sur Google Maps le 18 juillet 2026 · {lieu.coordonnees.lat}, {lieu.coordonnees.lng}.</p>}
         </section>
+
+        {(richDetails?.reservationUrl || richDetails?.tourismUrl || richDetails?.regionLink) && (
+          <section>
+            <h2 className="mb-4 text-xl font-bold text-neutral-900">Réservation et activités aux alentours</h2>
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {richDetails.reservationUrl && <a href={richDetails.reservationUrl} target="_blank" rel="noreferrer" className="flex min-h-14 items-center justify-center gap-2 rounded-xl bg-[#c39960] px-5 py-3 text-center text-sm font-bold text-white transition hover:bg-[#ad8250]"><CalendarDays className="h-4 w-4" /> Réserver un emplacement <ExternalLink className="h-4 w-4" /></a>}
+              {richDetails.tourismUrl && <a href={richDetails.tourismUrl} target="_blank" rel="noreferrer" className="flex min-h-14 items-center justify-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-5 py-3 text-center text-sm font-bold text-emerald-800 transition hover:bg-emerald-100"><Activity className="h-4 w-4" /> Activités et tourisme <ExternalLink className="h-4 w-4" /></a>}
+              {richDetails.regionLink && <Link href={richDetails.regionLink.href} className="flex min-h-14 items-center justify-center gap-2 rounded-xl border border-neutral-200 bg-white px-5 py-3 text-center text-sm font-bold text-neutral-700 transition hover:border-emerald-300"><MapPin className="h-4 w-4" /> {richDetails.regionLink.label} <ArrowRight className="h-4 w-4" /></Link>}
+            </div>
+          </section>
+        )}
 
         {allPhotos.length > 0 && (
           <section>
