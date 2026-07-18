@@ -9,6 +9,7 @@ export type RichPlaceDetails = {
   vanSpecifics?: string;
   opening?: string;
   openingMonths?: string[];
+  swimming?: string;
   dining?: string;
   activities?: string[];
   otherInfo?: string[];
@@ -66,6 +67,32 @@ const RICH_PLACE_DETAILS: Record<string, RichPlaceDetails> = {
     otherInfo: ["Éco-camping engagé : gestion responsable des déchets, énergie solaire et produits locaux."],
     bookingMethods: ["En ligne", "Par email", "Par téléphone"],
     reservationUrl: "https://www.laportedautan.fr/",
+    regionLink: { label: "Découvrir les autres lieux vanlife de la région", href: "/explorer" },
+  },
+  "camping-le-clos-de-la-lere": {
+    labelYear: 2026,
+    displayAddress: "230 route de Septfonds, 82240 Cayriech",
+    facebookUrl: "https://www.facebook.com/campingleclosdelalere/",
+    discountInstructions: [
+      "Par téléphone ou par email : mentionnez votre adhésion Label Vanlife.",
+      "Sur place : présentez votre carte membre à l’accueil dès votre arrivée.",
+    ],
+    venueQuote: "Le Clos de la Lère, c’est un camping familial au cœur du Quercy Blanc. On vous accueille dans un cadre verdoyant, avec piscine, snack, bar et boulangerie du 1er mars au 30 novembre — et une réduction de 20% pour tous les membres Label Vanlife. Bienvenue chez Cindy et l’équipe !",
+    vanliferExperience: [
+      "Le Quercy Blanc est une région de calcaire blond, de causses et de vallées encaissées qui n’a rien à envier au Lot voisin, avec l’avantage d’être encore peu fréquentée. Depuis Le Clos de la Lère, le terrain de jeu est immense et varié.",
+      "Les gorges de l’Aveyron s’ouvrent à quelques kilomètres : Bruniquel et son château au-dessus du confluent, Saint-Antonin-Noble-Val et son marché du dimanche matin dans les ruelles médiévales, puis Penne et ses ruines sur leur piton rocheux. Une descente en canoë permet de découvrir ces paysages depuis l’eau.",
+      "La grotte du Bosc, à environ 10 minutes, propose des visites à taille humaine au milieu de concrétions préservées. Montauban, à environ 30 minutes, mérite également une soirée pour son centre historique en brique toulousaine et sa cuisine du terroir.",
+      "L’ouverture de mars à novembre permet de découvrir la région hors saison : cerisiers en fleurs au printemps, rivières encore fraîches et villages paisibles.",
+    ],
+    vanSpecifics: "Emplacements spacieux · électricité 10A · WiFi gratuit sur tout le camping · animaux acceptés · piscine de juin à septembre · réservation en ligne, par email, téléphone ou sur place.",
+    opening: "Ouvert du 1er mars au 30 novembre. Accueil de 8h30 à 10h30 et de 15h30 à 19h.",
+    openingMonths: ["Mar", "Avr", "Mai", "Juin", "Juil", "Août", "Sep", "Oct", "Nov"],
+    swimming: "Piscine ouverte de juin à septembre, de 10h à 21h, sous réserve des conditions climatiques.",
+    dining: "Snack au camping de mai à octobre. Bar et boulangerie de mars à novembre. Restaurant Le Causse à Puylaroque, à environ 3 km.",
+    activities: ["Canoë sur l’Aveyron", "Escalade", "Vélo", "Randonnée", "Château de Penne", "Château de Bruniquel", "Grotte du Bosc", "Gorges de l’Aveyron", "Villages médiévaux du Quercy"],
+    otherInfo: ["Animaux acceptés · WiFi gratuit sur tout le camping · électricité 10 ampères · piscine de juin à septembre, de 10h à 21h."],
+    bookingMethods: ["En ligne", "Par email", "Par téléphone", "Sur place"],
+    reservationUrl: "https://www.camping-leclosdelalere.com/",
     regionLink: { label: "Découvrir les autres lieux vanlife de la région", href: "/explorer" },
   },
 };

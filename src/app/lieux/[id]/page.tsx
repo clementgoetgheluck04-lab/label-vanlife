@@ -259,12 +259,13 @@ export default function LieuDetailPage({ params }: { params: Promise<{ id: strin
           </section>
         )}
 
-        {(richDetails?.vanSpecifics || richDetails?.opening || richDetails?.dining) && (
+        {(richDetails?.vanSpecifics || richDetails?.opening || richDetails?.swimming || richDetails?.dining) && (
           <section>
             <h2 className="mb-4 text-xl font-bold text-neutral-900">Préparer votre séjour</h2>
             <div className="grid gap-4 md:grid-cols-3">
               {richDetails.vanSpecifics && <div className="rounded-2xl border border-neutral-200 bg-neutral-50 p-5"><MapPin className="h-5 w-5 text-emerald-700" /><h3 className="mt-3 font-bold text-neutral-900">Spécificités van</h3><p className="mt-2 text-sm leading-6 text-neutral-600">{richDetails.vanSpecifics}</p></div>}
               {richDetails.opening && <div className="rounded-2xl border border-neutral-200 bg-neutral-50 p-5"><Clock3 className="h-5 w-5 text-emerald-700" /><h3 className="mt-3 font-bold text-neutral-900">Ouverture et horaires</h3><p className="mt-2 text-sm leading-6 text-neutral-600">{richDetails.opening}</p>{richDetails.openingMonths && <div className="mt-3 flex flex-wrap gap-1.5">{richDetails.openingMonths.map((month) => <span key={month} className="rounded-full bg-white px-2.5 py-1 text-[11px] font-bold text-emerald-800 shadow-sm">{month}</span>)}</div>}</div>}
+              {richDetails.swimming && <div className="rounded-2xl border border-neutral-200 bg-neutral-50 p-5"><Waves className="h-5 w-5 text-emerald-700" /><h3 className="mt-3 font-bold text-neutral-900">Piscine et baignade</h3><p className="mt-2 text-sm leading-6 text-neutral-600">{richDetails.swimming}</p></div>}
               {richDetails.dining && <div className="rounded-2xl border border-neutral-200 bg-neutral-50 p-5"><Utensils className="h-5 w-5 text-emerald-700" /><h3 className="mt-3 font-bold text-neutral-900">Restauration</h3><p className="mt-2 text-sm leading-6 text-neutral-600">{richDetails.dining}</p></div>}
             </div>
           </section>

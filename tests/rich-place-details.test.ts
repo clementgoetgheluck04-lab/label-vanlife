@@ -30,3 +30,16 @@ test("la fiche enrichie de La Porte d'Autan contient l'offre et les informations
   assert.ok(details.venueQuote);
   assert.ok(details.otherInfo?.[0].includes("Éco-camping engagé"));
 });
+
+test("la fiche enrichie du Clos de la Lère contient la réduction et les services saisonniers", () => {
+  const details = getRichPlaceDetails("camping-le-clos-de-la-lere");
+  assert.ok(details);
+  assert.equal(details.labelYear, 2026);
+  assert.equal(details.discountInstructions?.length, 2);
+  assert.equal(details.openingMonths?.length, 9);
+  assert.equal(details.activities?.length, 9);
+  assert.equal(details.bookingMethods?.length, 4);
+  assert.match(details.facebookUrl ?? "", /^https:\/\/www\.facebook\.com\//);
+  assert.ok(details.swimming?.includes("juin à septembre"));
+  assert.ok(details.dining?.includes("Snack"));
+});
