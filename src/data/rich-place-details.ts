@@ -122,6 +122,29 @@ const RICH_PLACE_DETAILS: Record<string, RichPlaceDetails> = {
     bookingMethods: ["Par email", "Par téléphone", "Sur place"],
     regionLink: { label: "Découvrir les autres lieux vanlife de la région", href: "/explorer" },
   },
+  "camping-les-drouihedes": {
+    labelYear: 2026,
+    displayAddress: "100 allée du Camping, 30160 Peyremale",
+    discountInstructions: [
+      "Par téléphone ou par email : mentionnez votre adhésion Label Vanlife.",
+      "Sur place : présentez votre carte membre à l’accueil dès votre arrivée.",
+    ],
+    venueQuote: "Aux Drouilhèdes, on accueille les vanlifers comme des amis de passage. Ici, le rythme est celui de la rivière — lent, naturel, sincère. La Cèze est devant vous, les Cévennes derrière, et on fait tout pour que votre séjour ressemble à exactement ce que vous en espériez. Bienvenue chez nous !",
+    vanliferExperience: [
+      "Peyremale est l’un de ces villages des Cévennes encore préservés. La Cèze y coule dans un fond de vallée encaissé, entre chênes verts et falaises calcaires, avec une eau claire et fraîche et des plages naturelles propices aux journées sans programme.",
+      "Les Drouilhèdes sont à l’opposé du camping de masse. La démarche Refuge LPO se traduit concrètement par une gestion attentive de la végétation, des déchets et des produits utilisés. L’ambiance suit le même rythme : les échanges sont paisibles, les enfants jouent dans la rivière et les vans s’installent à l’ombre des arbres.",
+      "Les gorges de l’Ardèche sont accessibles en environ 30 minutes pour découvrir le Pont d’Arc, le canoë et les paysages calcaires. Beaucoup de voyageurs choisissent toutefois de rester au camping : l’accès direct à la Cèze et sa plage privée suffisent à ralentir vraiment.",
+    ],
+    vanSpecifics: "Emplacements spacieux sur terrain plat et arboré · accès direct à la Cèze · plage privée · philosophie slow tourisme · labels environnementaux.",
+    opening: "Ouvert d’avril à septembre.",
+    openingMonths: ["Avr", "Mai", "Juin", "Juil", "Août", "Sep"],
+    swimming: "Accès direct à la rivière La Cèze et à la plage privée du camping. Baignade en milieu naturel sous la responsabilité des utilisateurs.",
+    activities: ["Baignade sur la plage privée de la Cèze", "Canoë-kayak sur la Cèze", "Randonnée dans les Cévennes", "Gorges de l’Ardèche et Pont d’Arc", "Vallon-Pont-d’Arc", "Alès", "Villages cévenols"],
+    otherInfo: ["Camping éco-responsable labellisé Refuge LPO, Via Natura et Destination Excellence · philosophie slow tourisme · animaux acceptés."],
+    bookingMethods: ["En ligne", "Par email", "Par téléphone"],
+    reservationUrl: "https://www.campingcevennes.com/",
+    regionLink: { label: "Découvrir les autres lieux vanlife de la région", href: "/explorer" },
+  },
 };
 
 export function getRichPlaceDetails(placeId: string): RichPlaceDetails | undefined {

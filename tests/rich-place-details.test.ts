@@ -56,3 +56,15 @@ test("la fiche enrichie du Camping de l'Aix contient le gérant et les informati
   assert.ok(details.swimming?.includes("240 m²"));
   assert.ok(details.otherInfo?.[0].includes("animaux non acceptés"));
 });
+
+test("la fiche enrichie des Drouilhèdes contient la rivière et les labels environnementaux", () => {
+  const details = getRichPlaceDetails("camping-les-drouihedes");
+  assert.ok(details);
+  assert.equal(details.labelYear, 2026);
+  assert.equal(details.openingMonths?.length, 6);
+  assert.equal(details.activities?.length, 7);
+  assert.deepEqual(details.bookingMethods, ["En ligne", "Par email", "Par téléphone"]);
+  assert.ok(details.vanSpecifics?.includes("plage privée"));
+  assert.ok(details.swimming?.includes("La Cèze"));
+  assert.ok(details.otherInfo?.[0].includes("Refuge LPO"));
+});
