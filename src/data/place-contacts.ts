@@ -16,7 +16,7 @@ const CONTACTS: Record<string, PlaceContact> = {
   "camping-de-lann-hoedic": { website: "https://www.camping-lannhoedic.fr/", email: "contact@camping-lannhoedic.fr", phone: "+33297480173" },
   "camping-de-pont-augan": { website: "https://camping-pontaugan.fr/", email: "camping.pontaugan@gmail.com", phone: "+33230859066" },
   "camping-des-bains": { website: "https://www.campinglesbains.com/", email: "info@campingdesbains.com", phone: "+33636364273" },
-  "camping-des-lacs": { website: "https://www.campingdeslacs.fr/", email: "info@campingdeslacs.fr", phone: "+33545318903" },
+  "camping-des-lacs": { website: "https://www.campingdeslacs.fr/", email: "info@campingdeslacs.fr", phone: "+33677417344" },
   "camping-la-communnion": { email: "lacommunion@orange.fr", phone: "+33652884252" },
   "camping-la-pindiere": { website: "https://www.camping-la-pindiere.com/", email: "contact@camping-la-pindiere.com", phone: "+33240576541" },
   "camping-la-plage": { website: "https://www.campinglaplage-gard.fr/", email: "info@campinglaplage-gard.com", phone: "+33685642517" },
@@ -31,7 +31,7 @@ const CONTACTS: Record<string, PlaceContact> = {
   "camping-saint-lambert": { website: "https://www.camping-millau-riviere.fr/fr-fr/accueil", email: "contact@campingsaintlambert.fr", phone: "+33565600712" },
   "domaine-de-mepillat": { website: "https://www.camping-mepillat.fr/", email: "contact@camping-mepillat.fr", phone: "+33970770121" },
   "eco-camping-la-porte-dautan": { website: "https://www.laportedautan.fr/", email: "contact@laportedautan.fr", phone: "+33630766221" },
-  "ferme-pedagogique-solidor": { website: "https://fermedesolidor.fr/" },
+  "ferme-pedagogique-solidor": { website: "https://fermedesolidor.fr/", email: "contact@fermedesolidor.fr" },
   "mas-de-bouzou": { website: "https://www.masdebouzou.net/", email: "kompostelle@yahoo.com", phone: "+33666500628" },
 };
 

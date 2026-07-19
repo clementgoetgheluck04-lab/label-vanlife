@@ -1,5 +1,6 @@
 export type RichPlaceDetails = {
   labelYear: number;
+  displayType?: string;
   displayAddress?: string;
   contactName?: string;
   facebookUrl?: string;
@@ -15,6 +16,7 @@ export type RichPlaceDetails = {
   activities?: string[];
   otherInfo?: string[];
   bookingMethods?: string[];
+  reservationLabel?: string;
   reservationUrl?: string;
   tourismUrl?: string;
   regionLink?: { label: string; href: string };
@@ -143,6 +145,72 @@ const RICH_PLACE_DETAILS: Record<string, RichPlaceDetails> = {
     otherInfo: ["Camping éco-responsable labellisé Refuge LPO, Via Natura et Destination Excellence · philosophie slow tourisme · animaux acceptés."],
     bookingMethods: ["En ligne", "Par email", "Par téléphone"],
     reservationUrl: "https://www.campingcevennes.com/",
+    regionLink: { label: "Découvrir les autres lieux vanlife de la région", href: "/explorer" },
+  },
+  "ferme-pedagogique-solidor": {
+    labelYear: 2026,
+    displayType: "Site de visite",
+    displayAddress: "La Ville Biard, 35400 Saint-Malo",
+    discountInstructions: [
+      "Par téléphone ou par email : mentionnez votre adhésion Label Vanlife.",
+      "Sur place : présentez votre carte membre à l’accueil dès votre arrivée.",
+    ],
+    venueQuote: "Bienvenue à la Ferme de Solidor ! Notre ferme pédagogique vous invite à vivre une expérience unique au cœur de Saint-Malo : rencontrer nos animaux, participer à leurs soins et redécouvrir les gestes simples de la vie à la ferme. Nous accueillons familles, enfants et groupes avec passion. Réservation obligatoire par email à contact@fermedesolidor.fr.",
+    vanliferExperience: [
+      "Saint-Malo est l’une des villes les plus chargées d’histoire de France : les corsaires, Jacques Cartier, Chateaubriand et les remparts racontent plusieurs siècles d’aventures. En haute saison, les ruelles intra-muros et les remparts peuvent cependant être très fréquentés.",
+      "La Ferme Solidor offre une vraie respiration. Pendant environ deux heures, les enfants rencontrent les animaux et renouent avec des gestes essentiels, dans un cadre simple et sans artifice. L’équipe, notamment Mélanie, est reconnue pour sa patience et sa bienveillance avec les plus jeunes.",
+      "Depuis Saint-Malo, le Cap Fréhel et ses falaises sont accessibles en environ 35 minutes. Le Mont-Saint-Michel se trouve à environ 45 minutes vers l’est et Cancale, capitale de l’huître plate, à environ 15 minutes.",
+    ],
+    vanSpecifics: "Lieu de visite à la journée : aucun hébergement van n’est proposé sur place. Parking voitures disponible à proximité. Réservation obligatoire au moins 24 heures à l’avance.",
+    opening: "Activités proposées toute l’année, uniquement sur réservation et selon le calendrier du lieu.",
+    openingMonths: ["Jan", "Fév", "Mar", "Avr", "Mai", "Juin", "Juil", "Août", "Sep", "Oct", "Nov", "Déc"],
+    activities: [
+      "Visite pédagogique d’1 h : rencontre avec les poules, lapins, chèvres, cochons et chevaux — 7,50 € par personne",
+      "Stage Petit Fermier de 2 h : soins aux animaux et entretien de la ferme — 12,50 € par enfant et 7,50 € par adulte accompagnant",
+      "Après-midi à la ferme de 2 h pendant les vacances scolaires, de 14 h 30 à 16 h 30 — 20 € par enfant",
+      "Anniversaires à la ferme le samedi, de 14 h 30 à 17 h — parcours, activité, décor et collation à partir de 150 €",
+      "Visites de groupes scolaires et d’EHPAD — sur devis",
+      "Chasse aux œufs de Pâques et animations saisonnières",
+    ],
+    otherInfo: ["Réservation obligatoire par email au moins 24 heures avant la visite. Le lieu accueille les familles, les enfants et les groupes, mais ne propose pas de nuitée van."],
+    bookingMethods: ["Par email, au moins 24 h à l’avance"],
+    reservationLabel: "Réserver une visite",
+    reservationUrl: "mailto:contact@fermedesolidor.fr?subject=Réservation%20Ferme%20pédagogique%20Solidor",
+    regionLink: { label: "Découvrir les autres lieux vanlife de la région", href: "/explorer" },
+  },
+  "camping-des-lacs": {
+    labelYear: 2026,
+    displayType: "Camping 4 étoiles",
+    displayAddress: "1 plage de la Guerlie, 16150 Pressignac",
+    discountInstructions: [
+      "Par téléphone ou par email : mentionnez votre adhésion Label Vanlife.",
+      "Sur place : présentez votre carte membre à l’accueil dès votre arrivée.",
+    ],
+    venueQuote: "Bienvenue au Flower Camping des Lacs ! Nathalie et son équipe vous accueillent au bord du lac de Lavaud, dans un cadre naturel exceptionnel. Notre camping 4 étoiles vous propose une expérience alliant nature, détente et convivialité. Profitez de notre plage privée, de nos trois piscines et de la richesse du territoire charentais. Réservation en ligne sur campingdeslacs.fr — 10 % de réduction pour les membres Label Vanlife.",
+    vanliferExperience: [
+      "La Charente est une région que l’on traverse parfois sans s’y arrêter. Le lac de Lavaud invite pourtant à ralentir : calme, préservé et entouré de forêts. Le Camping des Lacs en tire le meilleur parti avec sa plage privée, ses activités nautiques et sa piscine couverte chauffée pour les soirées plus fraîches.",
+      "Depuis Pressignac, Angoulême et son patrimoine consacré à la bande dessinée se trouvent à environ 50 minutes. Limoges est accessible dans un temps comparable vers le nord-est, tandis que les gorges de la Vienne et du Taurion offrent de belles possibilités de randonnée.",
+      "Le camping constitue aussi une étape pratique sur la route du Pays basque ou de l’Atlantique, loin de la forte fréquentation du littoral en été.",
+    ],
+    vanSpecifics: "56 emplacements dédiés aux camping-cars et vans, grands et spacieux · accès direct à la plage privée du lac de Lavaud · nouveauté 2026 : certains emplacements disposent d’un sanitaire privatif.",
+    opening: "Ouvert d’avril à octobre.",
+    openingMonths: ["Avr", "Mai", "Juin", "Juil", "Août", "Sep", "Oct"],
+    swimming: "Trois bassins complémentaires : piscine couverte chauffée à 28 °C, piscine extérieure et pataugeoire pour les enfants. L’espace aquatique est accessible aux personnes à mobilité réduite. Plage privée au bord du lac avec baignade surveillée en juillet et août.",
+    dining: "Bar près de la piscine avec animations en soirée. Épicerie, pain et viennoiseries disponibles chaque matin. Des restaurants servant notamment du bœuf limousin se trouvent à proximité.",
+    activities: [
+      "Baignade surveillée dans le lac en juillet et août",
+      "Canoë, paddle et pédalos",
+      "Pêche, avec permis en vente à la réception",
+      "Pétanque",
+      "Salle de jeux avec billard et jeux d’arcade",
+      "Animations saisonnières pour les enfants",
+      "Randonnées et pistes cyclables au départ du camping",
+      "Barbecue collectif",
+      "Salle de réception pour événements, mariages et séminaires",
+    ],
+    otherInfo: ["166 emplacements au total, dont 56 dédiés aux camping-cars et vans · camping certifié Qualidog · chiens et chats bienvenus · ambiance calme et familiale."],
+    bookingMethods: ["En ligne sur campingdeslacs.fr"],
+    reservationUrl: "https://www.campingdeslacs.fr/",
     regionLink: { label: "Découvrir les autres lieux vanlife de la région", href: "/explorer" },
   },
 };

@@ -68,3 +68,28 @@ test("la fiche enrichie des Drouilhèdes contient la rivière et les labels envi
   assert.ok(details.swimming?.includes("La Cèze"));
   assert.ok(details.otherInfo?.[0].includes("Refuge LPO"));
 });
+
+test("la fiche enrichie de la Ferme Solidor précise qu'il s'agit d'un site de visite", () => {
+  const details = getRichPlaceDetails("ferme-pedagogique-solidor");
+  assert.ok(details);
+  assert.equal(details.labelYear, 2026);
+  assert.equal(details.displayType, "Site de visite");
+  assert.equal(details.openingMonths?.length, 12);
+  assert.equal(details.activities?.length, 6);
+  assert.ok(details.vanSpecifics?.includes("aucun hébergement van"));
+  assert.equal(details.reservationLabel, "Réserver une visite");
+  assert.match(details.reservationUrl ?? "", /^mailto:contact@fermedesolidor\.fr/);
+});
+
+test("la fiche enrichie du Flower Camping des Lacs contient les équipements du lac", () => {
+  const details = getRichPlaceDetails("camping-des-lacs");
+  assert.ok(details);
+  assert.equal(details.labelYear, 2026);
+  assert.equal(details.displayType, "Camping 4 étoiles");
+  assert.equal(details.openingMonths?.length, 7);
+  assert.equal(details.activities?.length, 9);
+  assert.deepEqual(details.bookingMethods, ["En ligne sur campingdeslacs.fr"]);
+  assert.ok(details.vanSpecifics?.includes("56 emplacements"));
+  assert.ok(details.swimming?.includes("28 °C"));
+  assert.ok(details.otherInfo?.[0].includes("Qualidog"));
+});

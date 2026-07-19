@@ -120,7 +120,7 @@ export default function LieuDetailPage({ params }: { params: Promise<{ id: strin
         <div className="absolute inset-x-0 bottom-0 mx-auto flex max-w-5xl items-end justify-between gap-4 px-4 pb-6 sm:px-6">
           <div>
             <span className="mb-2 inline-block rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-emerald-800 shadow-sm backdrop-blur-sm">
-              {TYPE_LABELS[lieu.type] || lieu.type}
+              {richDetails?.displayType || TYPE_LABELS[lieu.type] || lieu.type}
             </span>
             <h1 className="text-3xl font-bold text-white drop-shadow-lg sm:text-4xl">{lieu.nom}</h1>
             <p className="mt-1 flex items-center gap-1 text-sm text-white/85">
@@ -306,7 +306,7 @@ export default function LieuDetailPage({ params }: { params: Promise<{ id: strin
           <section>
             <h2 className="mb-4 text-xl font-bold text-neutral-900">Réservation et activités aux alentours</h2>
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-              {richDetails.reservationUrl && <a href={richDetails.reservationUrl} target="_blank" rel="noreferrer" className="flex min-h-14 items-center justify-center gap-2 rounded-xl bg-[#c39960] px-5 py-3 text-center text-sm font-bold text-white transition hover:bg-[#ad8250]"><CalendarDays className="h-4 w-4" /> Réserver un emplacement <ExternalLink className="h-4 w-4" /></a>}
+              {richDetails.reservationUrl && <a href={richDetails.reservationUrl} target="_blank" rel="noreferrer" className="flex min-h-14 items-center justify-center gap-2 rounded-xl bg-[#c39960] px-5 py-3 text-center text-sm font-bold text-white transition hover:bg-[#ad8250]"><CalendarDays className="h-4 w-4" /> {richDetails.reservationLabel || "Réserver un emplacement"} <ExternalLink className="h-4 w-4" /></a>}
               {richDetails.tourismUrl && <a href={richDetails.tourismUrl} target="_blank" rel="noreferrer" className="flex min-h-14 items-center justify-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-5 py-3 text-center text-sm font-bold text-emerald-800 transition hover:bg-emerald-100"><Activity className="h-4 w-4" /> Activités et tourisme <ExternalLink className="h-4 w-4" /></a>}
               {richDetails.regionLink && <Link href={richDetails.regionLink.href} className="flex min-h-14 items-center justify-center gap-2 rounded-xl border border-neutral-200 bg-white px-5 py-3 text-center text-sm font-bold text-neutral-700 transition hover:border-emerald-300"><MapPin className="h-4 w-4" /> {richDetails.regionLink.label} <ArrowRight className="h-4 w-4" /></Link>}
             </div>
