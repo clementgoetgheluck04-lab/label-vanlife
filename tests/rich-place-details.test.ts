@@ -2,6 +2,21 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { getRichPlaceDetails } from "../src/data/rich-place-details.ts";
 
+test("la fiche enrichie du Camping de Pont Augan contient l’accueil de Cathy et Céline", () => {
+  const details = getRichPlaceDetails("camping-de-pont-augan");
+  assert.ok(details);
+  assert.equal(details.labelYear, 2026);
+  assert.ok(details.contactName?.includes("Cathy & Céline"));
+  assert.equal(details.openingMonths?.length, 7);
+  assert.equal(details.activities?.length, 8);
+  assert.equal(details.bookingMethods?.length, 3);
+  assert.ok(details.vanSpecifics?.includes("32 emplacements"));
+  assert.ok(details.opening?.includes("1er avril au 11 octobre"));
+  assert.match(details.facebookUrl ?? "", /^https:\/\/www\.facebook\.com\//);
+  assert.equal(details.reservationUrl, "https://online.resa-booking.com/front/list.php?id_est=1617&lang=fr");
+  assert.equal(details.tourismUrl, "https://camping-pontaugan.fr/tourisme/");
+});
+
 test("la fiche enrichie du Camping Le Verger contient toutes les informations validées", () => {
   const details = getRichPlaceDetails("camping-le-verger");
   assert.ok(details);

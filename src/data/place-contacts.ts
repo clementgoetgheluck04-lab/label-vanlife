@@ -14,7 +14,7 @@ const CONTACTS: Record<string, PlaceContact> = {
   "camping-de-laix": { website: "https://camping-pommiers.fr/", email: "camping.depommiers@orange.fr", phone: "+33649009700" },
   "camping-de-la-torche": { website: "https://www.campingdelatorche.fr/", email: "info@campingdelatorche.fr", phone: "+33614799614" },
   "camping-de-lann-hoedic": { website: "https://www.camping-lannhoedic.fr/", email: "contact@camping-lannhoedic.fr", phone: "+33297480173" },
-  "camping-de-pont-augan": { website: "https://camping-pontaugan.fr/", email: "camping.pontaugan@gmail.com", phone: "+33230859066" },
+  "camping-de-pont-augan": { website: "https://camping-pontaugan.fr/", email: "camping.pontaugan@gmail.com", phone: "+33743462435" },
   "camping-des-bains": { website: "https://www.campinglesbains.com/", email: "info@campingdesbains.com", phone: "+33636364273" },
   "camping-des-lacs": { website: "https://www.campingdeslacs.fr/", email: "info@campingdeslacs.fr", phone: "+33677417344" },
   "camping-la-communnion": { email: "lacommunion@orange.fr", phone: "+33652884252" },

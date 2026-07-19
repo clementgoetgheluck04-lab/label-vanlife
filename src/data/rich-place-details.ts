@@ -27,6 +27,47 @@ export type RichPlaceDetails = {
 // Cette source complète les informations techniques, contacts, médias et GPS
 // sans les dupliquer dans le composant d'affichage.
 const RICH_PLACE_DETAILS: Record<string, RichPlaceDetails> = {
+  "camping-de-pont-augan": {
+    labelYear: 2026,
+    displayType: "Camping",
+    displayAddress: "Camping de Pont Augan N°6, 56150 Baud",
+    contactName: "Cathy & Céline — gérantes et vanlifers",
+    facebookUrl: "https://www.facebook.com/profile.php?id=61576336404563",
+    discountInstructions: [
+      "Mentionnez Label Vanlife à votre arrivée, par téléphone ou lors de votre réservation.",
+      "Offre non cumulable, valable dès une nuit sur présentation d’une carte membre en cours de validité.",
+    ],
+    venueQuote: "Nous, c’est Cathy et Céline, adeptes de randonnées, de nature et de vacances en van. En 2025, nous avons posé nos valises dans ce lieu et aimerions que vous y passiez des séjours simples et ressourçants. Nous souhaitons partager avec vous un moment de calme et de sérénité, et vous faire découvrir tous les attraits de la vallée du Blavet.",
+    vanliferExperience: [
+      "La vallée du Blavet dévoile une Bretagne intérieure faite de canaux, de landes et de forêts. Depuis Pont Augan, le chemin de halage longe l’eau sur des dizaines de kilomètres et se parcourt à pied, à vélo ou en canoë.",
+      "Le camping dispose d’une sortie directe sur le chemin de halage. Les itinéraires GR38 et GR341, la voie cyclable V8 et les écluses du Blavet en font une étape particulièrement adaptée aux voyageurs itinérants.",
+      "Le village de Poul-Fetan, à environ quinze minutes, fait revivre les gestes de la Bretagne rurale : fabrication du beurre et du pain, artisanat et habitat traditionnel. Le Musée de la carte postale de Baud et le Village de l’An Mil à Melrand complètent les découvertes culturelles.",
+      "La base nautique voisine permet de louer canoës et kayaks en juillet et août, et sur réservation hors saison. Pontivy, Lorient et les plages du Golfe du Morbihan peuvent également être rejoints depuis le camping.",
+    ],
+    vanSpecifics: "32 emplacements d’environ 80 m² sur pelouse · quatre gîtes · accès direct au canal du Blavet et au chemin de halage · étape GR38, GR341 et voie cyclable V8 · canoë et kayak à proximité · camping tenu par deux vanlifers.",
+    opening: "Camping ouvert du 1er avril au 11 octobre, tous les jours de 8h à 19h30. Pour une arrivée tardive, contacter Cathy et Céline au 07 43 46 24 35. Les gîtes sont ouverts toute l’année.",
+    openingMonths: ["Avr", "Mai", "Juin", "Juil", "Août", "Sep", "Oct"],
+    dining: "Épicerie sur place. Petit-déjeuner avec pain, viennoiseries et pancakes maison sur commande la veille. Restaurants recommandés à Baud, Quistinic et Languidic.",
+    activities: [
+      "Chemin de halage du canal du Blavet directement accessible depuis le camping",
+      "Balades à pied et à vélo sur le GR38, le GR341 et la voie cyclable V8",
+      "Location de canoës et kayaks à la base nautique voisine",
+      "Village historique de Poul-Fetan à environ quinze minutes",
+      "Musée de la carte postale Le Carton Voyageur à Baud",
+      "Village de l’An Mil à Melrand",
+      "Vallée du Blavet, ses écluses et ses villages",
+      "Pontivy, Lorient et plages du Golfe du Morbihan",
+    ],
+    otherInfo: [
+      "Préau partagé avec micro-ondes, réfrigérateur, congélateur et vaisselle · barbecue commun · table de pique-nique.",
+      "Wi-Fi disponible · animaux acceptés · location de vélos classiques et électriques · label Accueil Vélo.",
+    ],
+    bookingMethods: ["En ligne", "Par téléphone", "Sur place"],
+    reservationLabel: "Réserver en ligne",
+    reservationUrl: "https://online.resa-booking.com/front/list.php?id_est=1617&lang=fr",
+    tourismUrl: "https://camping-pontaugan.fr/tourisme/",
+    regionLink: { label: "Découvrir les autres lieux vanlife de la région", href: "/explorer" },
+  },
   "camping-le-verger": {
     labelYear: 2026,
     displayAddress: "27 Rue Jean-Pierre Pigot - Bellecroix, 17139 Dompierre-sur-Mer",
