@@ -255,3 +255,18 @@ test("la fiche enrichie du Camping Les Terrasses conserve la certification 20 su
   assert.match(details.facebookUrl ?? "", /^https:\/\/www\.facebook\.com\//);
   assert.equal(details.tourismUrl, "https://www.camping-les-terrasses.com/tourisme-herault/");
 });
+
+test("la fiche enrichie du Mas de Bouzou précise les contraintes de l’accueil paysan", () => {
+  const details = getRichPlaceDetails("mas-de-bouzou");
+  assert.ok(details);
+  assert.equal(details.labelYear, 2026);
+  assert.equal(details.displayType, "Accueil paysan");
+  assert.equal(details.contactName, "Thierry Hoareau — propriétaire");
+  assert.equal(details.openingMonths?.length, 7);
+  assert.equal(details.activities?.length, 8);
+  assert.equal(details.bookingMethods?.length, 2);
+  assert.ok(details.vanSpecifics?.includes("aucune alimentation électrique"));
+  assert.ok(details.vanSpecifics?.includes("animaux non acceptés"));
+  assert.ok(details.swimming?.includes("Piscine privée"));
+  assert.match(details.facebookUrl ?? "", /^https:\/\/www\.facebook\.com\//);
+});

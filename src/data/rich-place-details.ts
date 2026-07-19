@@ -669,6 +669,45 @@ const RICH_PLACE_DETAILS: Record<string, RichPlaceDetails> = {
     tourismUrl: "https://www.camping-les-terrasses.com/tourisme-herault/",
     regionLink: { label: "Découvrir les autres lieux vanlife de la région", href: "/explorer" },
   },
+  "mas-de-bouzou": {
+    labelYear: 2026,
+    displayType: "Accueil paysan",
+    displayAddress: "Mas de Bouzou, 46320 Grèzes",
+    contactName: "Thierry Hoareau — propriétaire",
+    facebookUrl: "https://www.facebook.com/profile.php?id=100092610104931",
+    discountInstructions: [
+      "Par téléphone ou par email, mentionnez votre adhésion Label Vanlife.",
+      "Sur place, présentez votre carte membre à l’accueil dès votre arrivée.",
+    ],
+    venueQuote: "Ici, le temps s’arrête. Installez votre van à l’ombre des chênes, plongez dans la piscine et partez explorer les trésors du Lot : Saint-Cirq-Lapopie, la vallée du Célé et la grotte de Pech Merle. Bienvenue chez nous.",
+    vanliferExperience: [
+      "Le Mas de Bouzou est un mas quercynois en pierre entouré de nature, à quelques kilomètres de Figeac. Son mini-camping constitue une alternative intimiste aux grands établissements touristiques.",
+      "Saint-Cirq-Lapopie, classé parmi les Plus Beaux Villages de France, domine la vallée du Lot depuis son promontoire médiéval. La grotte de Pech Merle permet d’observer des peintures préhistoriques vieilles de plusieurs millénaires.",
+      "La vallée du Célé se découvre à pied ou à vélo entre falaises calcaires et villages de caractère. À Figeac, le musée Champollion, la place des Écritures et les ruelles médiévales complètent le séjour.",
+      "Au retour, la piscine et les pierres dorées du mas offrent un cadre particulièrement paisible. Les emplacements van ne disposent pas d’électricité et les animaux ne sont pas acceptés.",
+    ],
+    vanSpecifics: "Emplacements de plein air adaptés aux vans · piscine privée · bloc sanitaire récent · environnement très calme · aucune alimentation électrique sur les emplacements · animaux non acceptés.",
+    opening: "Accueil vanlife annoncé d’avril à octobre. Réservation préalable recommandée directement auprès de Thierry Hoareau.",
+    openingMonths: ["Avr", "Mai", "Juin", "Juil", "Août", "Sep", "Oct"],
+    swimming: "Piscine privée et sécurisée du mas, accessible aux vanlifers séjournant sur place. Cadre face aux tours et aux bâtiments en pierre de la propriété.",
+    dining: "Mini-supérette sur place. Restaurant situé à environ 7 km.",
+    activities: [
+      "Saint-Cirq-Lapopie et son village médiéval",
+      "Grotte préhistorique de Pech Merle",
+      "Randonnées et balades à vélo dans la vallée du Célé",
+      "Figeac et le musée Champollion",
+      "Place des Écritures et centre médiéval de Figeac",
+      "Vallée du Lot et villages du Quercy",
+      "Terrain de pétanque sur la propriété",
+      "Piscine et détente dans le cadre historique du mas",
+    ],
+    otherInfo: [
+      "Pas d’électricité sur les emplacements van · animaux non admis, sauf condition particulière liée à une privatisation complète du domaine.",
+      "Mini-camping, gîtes, chambres d’hôtes et hébergements insolites disponibles sur la propriété.",
+    ],
+    bookingMethods: ["Par email", "Par téléphone"],
+    regionLink: { label: "Découvrir les autres lieux vanlife de la région", href: "/explorer" },
+  },
 };
 
 export function getRichPlaceDetails(placeId: string): RichPlaceDetails | undefined {
