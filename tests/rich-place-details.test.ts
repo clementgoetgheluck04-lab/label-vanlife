@@ -134,3 +134,17 @@ test("la fiche enrichie d'Au Tylo Soleil contient le code et les périodes promo
   assert.ok(details.swimming?.includes("AquaFun"));
   assert.ok(details.opening?.includes("10 avril au 30 septembre 2026"));
 });
+
+test("la fiche enrichie de Lann Hoëdic contient les labels et services de la presqu'île", () => {
+  const details = getRichPlaceDetails("camping-de-lann-hoedic");
+  assert.ok(details);
+  assert.equal(details.labelYear, 2026);
+  assert.equal(details.openingMonths?.length, 6);
+  assert.equal(details.activities?.length, 9);
+  assert.equal(details.bookingMethods?.length, 3);
+  assert.ok(details.vanSpecifics?.includes("119 emplacements"));
+  assert.ok(details.dining?.includes("Ty Break"));
+  assert.ok(details.otherInfo?.[0].includes("Green Key"));
+  assert.ok(details.otherInfo?.[0].includes("Refuge LPO"));
+  assert.ok(details.otherInfo?.[0].includes("Accueil Vélo"));
+});

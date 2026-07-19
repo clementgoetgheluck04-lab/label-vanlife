@@ -316,6 +316,40 @@ const RICH_PLACE_DETAILS: Record<string, RichPlaceDetails> = {
     reservationUrl: "https://autylosoleil.fr/",
     regionLink: { label: "Découvrir les autres lieux vanlife de la région", href: "/explorer" },
   },
+  "camping-de-lann-hoedic": {
+    labelYear: 2026,
+    displayType: "Camping 3 étoiles",
+    displayAddress: "Rue Jean de la Fontaine, 56370 Sarzeau",
+    discountInstructions: [
+      "Par téléphone ou par email : mentionnez votre adhésion Label Vanlife.",
+      "Sur place : présentez votre carte membre à l’accueil dès votre arrivée.",
+    ],
+    venueQuote: "Accueillir des vanlifers, c’est prolonger l’ADN du lieu : un espace simple, accueillant et connecté à la nature, idéal pour celles et ceux qui voyagent autrement. Labellisé Green Key depuis 14 ans, parce que respecter l’environnement, c’est aussi notre façon de voyager.",
+    vanliferExperience: [
+      "La presqu’île de Rhuys donne accès à deux visages de la Bretagne : l’Atlantique, ses plages et son horizon ouvert d’un côté, puis le golfe du Morbihan, mer intérieure parsemée d’îles et parcourue par de puissants courants, de l’autre.",
+      "Le golfe se découvre en kayak ou en bateau au départ des ports environnants, avec des loueurs notamment à Sarzeau et Arzon. L’île aux Moines et l’île d’Arz permettent de prolonger l’expérience le temps d’une journée.",
+      "Les alignements mégalithiques de Carnac constituent une excursion incontournable dans le Morbihan. À Sarzeau, restaurants de poissons et de crustacés, ports et lumières de fin de journée complètent naturellement le séjour.",
+    ],
+    vanSpecifics: "119 emplacements semi-ombragés ou ensoleillés, spacieux et délimités par des haies paysagées · certification Accueil Vélo · location de vélos classiques et électriques sur place · plages et sentiers côtiers à proximité.",
+    opening: "Ouvert d’avril à septembre.",
+    openingMonths: ["Avr", "Mai", "Juin", "Juil", "Août", "Sep"],
+    dining: "Restaurant-café Ty Break sur place, avec une épicerie, une petite boutique et une bibliothèque.",
+    activities: [
+      "Sauna, massages, réflexologie, yoga et coiffure dans l’espace bien-être",
+      "Location de vélos classiques et électriques",
+      "Mini-ferme avec animaux pour les enfants",
+      "Pétanque et ping-pong",
+      "Randonnées et sentiers cyclables au départ du camping",
+      "Observation de la nature dans le Refuge LPO",
+      "Golfe du Morbihan en kayak ou en bateau",
+      "Île aux Moines et île d’Arz",
+      "Carnac et ses alignements mégalithiques",
+    ],
+    otherInfo: ["Camping de 3,6 hectares et 119 emplacements · labellisé Green Key depuis 14 années consécutives · Refuge LPO · certifié Accueil Vélo · animaux acceptés."],
+    bookingMethods: ["En ligne sur camping-lannhoedic.fr", "Par email", "Par téléphone"],
+    reservationUrl: "https://www.camping-lannhoedic.fr/",
+    regionLink: { label: "Découvrir les autres lieux vanlife de la région", href: "/explorer" },
+  },
 };
 
 export function getRichPlaceDetails(placeId: string): RichPlaceDetails | undefined {
