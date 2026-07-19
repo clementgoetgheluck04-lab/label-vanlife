@@ -209,3 +209,18 @@ test("la fiche enrichie du Coin Charmant contient les périodes membres et le li
   assert.match(details.facebookUrl ?? "", /^https:\/\/www\.facebook\.com\//);
   assert.equal(details.reservationUrl, "https://reservation.secureholiday.net/fr/5193/");
 });
+
+test("la fiche enrichie du Camping Bon Séjour contient l’accueil Camargue et la réservation membre", () => {
+  const details = getRichPlaceDetails("camping-bon-sejour");
+  assert.ok(details);
+  assert.equal(details.labelYear, 2026);
+  assert.equal(details.openingMonths?.length, 6);
+  assert.equal(details.activities?.length, 8);
+  assert.equal(details.bookingMethods?.length, 4);
+  assert.ok(details.vanSpecifics?.includes("365 emplacements"));
+  assert.ok(details.opening?.includes("1er avril au 30 septembre"));
+  assert.ok(details.discountInstructions?.[0].includes("MEMBRE LABEL VANLIFE"));
+  assert.match(details.facebookUrl ?? "", /^https:\/\/www\.facebook\.com\//);
+  assert.equal(details.reservationUrl, "https://reservation.secureholiday.net/fr/17464/search/product-list?filterStatus=showPeriod");
+  assert.equal(details.tourismUrl, "https://camping-bonsejour.fr/activite-visite-tourisme/");
+});

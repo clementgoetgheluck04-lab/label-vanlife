@@ -501,6 +501,45 @@ const RICH_PLACE_DETAILS: Record<string, RichPlaceDetails> = {
     reservationUrl: "https://reservation.secureholiday.net/fr/5193/",
     regionLink: { label: "Découvrir les autres lieux vanlife de la région", href: "/explorer" },
   },
+  "camping-bon-sejour": {
+    labelYear: 2026,
+    displayType: "Camping",
+    displayAddress: "1730 route de l’Espiguette, 30240 Le Grau-du-Roi",
+    facebookUrl: "https://www.facebook.com/campinglebonsejour",
+    discountInstructions: [
+      "Pour une réservation en ligne, indiquez « MEMBRE LABEL VANLIFE » dans le champ commentaire.",
+      "Par téléphone ou par email, mentionnez votre adhésion Label Vanlife. Sur place, présentez votre carte membre à l’accueil.",
+    ],
+    venueQuote: "Vous recherchez un camping calme et familial au Grau-du-Roi ? Le Bon Séjour est l’endroit idéal pour vos vacances en camping-car, caravane ou sous la tente, à deux pas de la plage de l’Espiguette. Notre camping à taille humaine dispose de 365 emplacements spacieux, entourés de nature et propices au repos. Sur place : aire de jeux, trois blocs sanitaires, bar-restaurant avec soirées dansantes, épicerie et laverie. Les animaux sont acceptés, hors catégories 1 et 2, et doivent être tenus en laisse. Nous nous engageons également dans une démarche écologique avec des bornes de tri sélectif à l’entrée.",
+    vanliferExperience: [
+      "Le Grau-du-Roi offre une autre facette de la Camargue, tournée vers la mer. La plage de l’Espiguette déroule environ 18 km de sable et de dunes dans un environnement encore largement préservé.",
+      "Depuis le Camping Bon Séjour, la plage est accessible en environ cinq minutes à vélo. Le matin, les dunes sont particulièrement calmes et les étangs environnants permettent régulièrement d’observer les flamants roses.",
+      "Aigues-Mortes et ses remparts se trouvent à environ dix minutes en van. Montpellier est accessible en une quarantaine de minutes et Nîmes en environ trente-cinq minutes.",
+    ],
+    vanSpecifics: "365 emplacements spacieux pour vans, camping-cars, caravanes et tentes · cadre naturel calme près de l’étang du Salonique · location de vélos sur place · plage de l’Espiguette à environ cinq minutes à vélo.",
+    opening: "Ouvert du 1er avril au 30 septembre. Accueil tous les jours de 9h à 12h et de 14h à 19h. Emplacements : arrivée de 14h à 21h, départ de 9h à 12h. Locations : arrivée de 16h à 20h, départ de 9h à 10h.",
+    openingMonths: ["Avr", "Mai", "Juin", "Juil", "Août", "Sep"],
+    dining: "Bar-restaurant sur place avec soirées à thème et soirées dansantes. Épicerie d’appoint au camping ; marchés, commerces et restaurants dans le village du Grau-du-Roi.",
+    activities: [
+      "Plage sauvage de l’Espiguette à environ cinq minutes à vélo",
+      "Location de vélos sur place pour explorer la Camargue",
+      "Soirées à thème et soirées dansantes au bar-restaurant",
+      "Observation des flamants roses et des chevaux de Camargue",
+      "Promenades autour de l’étang du Salonique",
+      "Aigues-Mortes et sa cité fortifiée à environ dix minutes",
+      "Montpellier à environ quarante minutes et Nîmes à environ trente-cinq minutes",
+      "Marais salants et paysages de Camargue",
+    ],
+    otherInfo: [
+      "Wi-Fi gratuit · aire de jeux · trois blocs sanitaires avec eau chaude · épicerie d’appoint · machines à laver et sèche-linge · accès PMR.",
+      "Animaux acceptés, hors catégories 1 et 2, tenus en laisse · bornes de tri sélectif disponibles à l’entrée.",
+    ],
+    bookingMethods: ["En ligne", "Par email", "Par téléphone", "Sur place"],
+    reservationLabel: "Réserver en ligne et indiquer MEMBRE LABEL VANLIFE en commentaire",
+    reservationUrl: "https://reservation.secureholiday.net/fr/17464/search/product-list?filterStatus=showPeriod",
+    tourismUrl: "https://camping-bonsejour.fr/activite-visite-tourisme/",
+    regionLink: { label: "Découvrir les autres lieux vanlife de la région", href: "/explorer" },
+  },
 };
 
 export function getRichPlaceDetails(placeId: string): RichPlaceDetails | undefined {
