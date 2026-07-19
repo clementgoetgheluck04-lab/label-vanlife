@@ -540,6 +540,94 @@ const RICH_PLACE_DETAILS: Record<string, RichPlaceDetails> = {
     tourismUrl: "https://camping-bonsejour.fr/activite-visite-tourisme/",
     regionLink: { label: "Découvrir les autres lieux vanlife de la région", href: "/explorer" },
   },
+  "camping-les-terrasses": {
+    labelYear: 2026,
+    displayType: "Camping",
+    displayAddress: "65 chemin des Cigales, 34360 Saint-Chinian",
+    contactName: "Mylène & Stéphane — gérants",
+    facebookUrl: "https://www.facebook.com/campinglesterrasses",
+    discountInstructions: [
+      "Par téléphone ou par email, mentionnez votre adhésion Label Vanlife.",
+      "Sur place, présentez votre carte membre à l’accueil dès votre arrivée.",
+    ],
+    venueQuote: "Camping nature et familial au cœur des vignes de l’Hérault, où vous serez accueillis chaleureusement par Stéphane et Mylène. Calme assuré, rivière à proximité, animaux acceptés, électricité, point d’eau et Wi-Fi.",
+    vanliferExperience: [
+      "Le Camping Les Terrasses est aménagé dans une pinède au cœur du vignoble de Saint-Chinian. Son relief en terrasses ouvre des vues sur les vignes et les collines, dans une atmosphère calme et familiale.",
+      "La rivière se trouve à environ 200 mètres et le village à près d’un kilomètre. Les marchés de Saint-Chinian ont lieu le jeudi et le dimanche, avec de nombreux producteurs et domaines viticoles à découvrir dans les environs.",
+      "La voie verte permet de rejoindre le Canal du Midi, tandis que les chemins autour du camping se prêtent aux randonnées pédestres et aux sorties VTT. La base nautique de Réals se trouve à environ quinze minutes.",
+    ],
+    vanSpecifics: "Emplacements pour vans et camping-cars au cœur d’un parc arboré et entouré de vignes · électricité 10A avec prise européenne type E · eau potable · borne de vidange des eaux grises · rivière à environ 200 mètres · Wi-Fi disponible sur l’ensemble du camping.",
+    opening: "Ouvert du 28 mars au 11 novembre 2026. Haute saison : accueil tous les jours de 8h30 à 12h et de 14h30 à 19h. Basse et moyenne saison : de 9h à 12h et de 14h30 à 18h.",
+    openingMonths: ["Mar", "Avr", "Mai", "Juin", "Juil", "Août", "Sep", "Oct", "Nov"],
+    swimming: "Piscine extérieure de 11 × 5 mètres, ouverte de juin à septembre de 10h à 20h. Baignade non surveillée ; les enfants de moins de 16 ans doivent être accompagnés. Eau analysée chaque matin et contrôlée mensuellement par l’ARS.",
+    dining: "Snack proposant burgers, paninis, frites, saucisses et wraps. Épicerie de dépannage, petit-déjeuner et produits locaux sur place. Restaurant à moins de 2 km.",
+    activities: [
+      "Marchés de Saint-Chinian chaque jeudi et dimanche",
+      "Rivière à environ 200 mètres du camping",
+      "Base nautique de Réals à environ quinze minutes",
+      "Dégustation de vins dans les domaines de Saint-Chinian",
+      "Voie verte en direction du Canal du Midi",
+      "Randonnées pédestres et circuits VTT au départ des environs",
+      "Dégustation avec des producteurs locaux chaque mercredi en juillet et août",
+      "Village et commerces de Saint-Chinian à environ un kilomètre",
+    ],
+    otherInfo: [
+      "Certification Label Vanlife 2026 : 20 critères remplis sur 22 · 2 critères non applicables.",
+      "Animaux acceptés, sauf chiens de catégories 1 et 2 · calme demandé après 22h · Wi-Fi payant avec couverture sur l’ensemble du camping.",
+    ],
+    detailSections: [
+      {
+        title: "Accueil chaleureux — 4/4",
+        items: [
+          "Pot ou produit de bienvenue : carte manuscrite avec les bons plans locaux",
+          "Informations utiles : panneau d’affichage et livret d’accueil",
+          "Horaires flexibles : arrivée possible après 20h et départ avant 8h accepté",
+          "Animaux acceptés en laisse, hors chiens de catégories 1 et 2",
+        ],
+      },
+      {
+        title: "Respect de l’environnement — 4/4",
+        items: [
+          "Réducteurs de débit, récupération de l’eau de pluie et affichage de sensibilisation",
+          "Tri séparé du verre, du plastique et du carton, composteur collectif et zone de dépôt des eaux grises",
+          "Éclairage LED et détecteurs de présence",
+          "Producteurs locaux, marchés et AMAP recommandés aux voyageurs",
+        ],
+      },
+      {
+        title: "Qualité et confort — 7/8",
+        items: [
+          "Sanitaires nettoyés quotidiennement avec eau chaude garantie",
+          "Borne de vidange des eaux grises et point de remplissage d’eau potable",
+          "Électricité 10A avec prise européenne type E",
+          "Wi-Fi payant avec bonne couverture sur tout le camping",
+          "Snack, épicerie, petit-déjeuner, produits locaux et restaurant à moins de 2 km",
+          "Piscine extérieure ouverte en saison",
+          "Dégustation de vins avec des producteurs locaux chaque mercredi en juillet et août",
+          "Animations et espace zen : critère non applicable",
+        ],
+      },
+      {
+        title: "Sécurité et tranquillité — 3/3",
+        items: [
+          "Silence demandé après 22h avec affichage des règles",
+          "Balisage des chemins et lampadaires solaires",
+          "Règlement affiché à l’entrée, rappelé par email et intégré au livret d’accueil",
+        ],
+      },
+      {
+        title: "Esprit communautaire — 2/3",
+        items: [
+          "Table de pique-nique partagée",
+          "Invitation à laisser un avis et prise en compte des retours",
+          "Propriétaire ou gérant vanlifer : critère non applicable",
+        ],
+      },
+    ],
+    bookingMethods: ["Par email", "Par téléphone", "Sur place"],
+    tourismUrl: "https://www.camping-les-terrasses.com/tourisme-herault/",
+    regionLink: { label: "Découvrir les autres lieux vanlife de la région", href: "/explorer" },
+  },
 };
 
 export function getRichPlaceDetails(placeId: string): RichPlaceDetails | undefined {

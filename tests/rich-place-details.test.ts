@@ -224,3 +224,19 @@ test("la fiche enrichie du Camping Bon Séjour contient l’accueil Camargue et 
   assert.equal(details.reservationUrl, "https://reservation.secureholiday.net/fr/17464/search/product-list?filterStatus=showPeriod");
   assert.equal(details.tourismUrl, "https://camping-bonsejour.fr/activite-visite-tourisme/");
 });
+
+test("la fiche enrichie du Camping Les Terrasses conserve la certification 20 sur 22", () => {
+  const details = getRichPlaceDetails("camping-les-terrasses");
+  assert.ok(details);
+  assert.equal(details.labelYear, 2026);
+  assert.equal(details.contactName, "Mylène & Stéphane — gérants");
+  assert.equal(details.openingMonths?.length, 9);
+  assert.equal(details.activities?.length, 8);
+  assert.equal(details.detailSections?.length, 5);
+  assert.equal(details.detailSections?.reduce((count, section) => count + section.items.length, 0), 22);
+  assert.ok(details.otherInfo?.[0].includes("20 critères remplis sur 22"));
+  assert.ok(details.swimming?.includes("11 × 5 mètres"));
+  assert.ok(details.opening?.includes("28 mars au 11 novembre 2026"));
+  assert.match(details.facebookUrl ?? "", /^https:\/\/www\.facebook\.com\//);
+  assert.equal(details.tourismUrl, "https://www.camping-les-terrasses.com/tourisme-herault/");
+});
