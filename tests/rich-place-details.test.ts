@@ -107,3 +107,16 @@ test("la fiche enrichie du Moulin du Bel-Air contient l'accueil van et VANLOT", 
   assert.ok(details.activities?.[0].includes("VANLOT"));
   assert.ok(details.otherInfo?.[0].includes("Tourisme Zéro Déchet"));
 });
+
+test("la fiche enrichie du Camping des Bains contient les services thermaux", () => {
+  const details = getRichPlaceDetails("camping-des-bains");
+  assert.ok(details);
+  assert.equal(details.labelYear, 2026);
+  assert.match(details.contactName ?? "", /Stéphane/);
+  assert.equal(details.activities?.length, 7);
+  assert.equal(details.bookingMethods?.length, 3);
+  assert.ok(details.vanSpecifics?.includes("250 mètres"));
+  assert.ok(details.swimming?.includes("toboggans"));
+  assert.ok(details.dining?.includes("massage"));
+  assert.ok(details.otherInfo?.[0].includes("sous conditions"));
+});

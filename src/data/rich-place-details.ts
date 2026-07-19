@@ -247,6 +247,38 @@ const RICH_PLACE_DETAILS: Record<string, RichPlaceDetails> = {
     reservationUrl: "https://www.lot-camping.com/",
     regionLink: { label: "Découvrir les autres lieux vanlife de la région", href: "/explorer" },
   },
+  "camping-des-bains": {
+    labelYear: 2026,
+    displayType: "Camping 3 étoiles",
+    displayAddress: "15 Avenue Jean Mermoz, 58360 Saint-Honoré-les-Bains",
+    contactName: "Stéphane — gérant",
+    discountInstructions: [
+      "Par téléphone ou par email : mentionnez votre adhésion Label Vanlife.",
+      "Sur place : présentez votre carte membre à l’accueil dès votre arrivée.",
+    ],
+    venueQuote: "Ce qui rend notre lieu spécial, c’est avant tout son atmosphère : un camping à taille humaine, paisible et accueillant, situé à Saint-Honoré-les-Bains, à seulement 250 mètres des thermes. Nos visiteurs apprécient le calme, la verdure, la simplicité du lieu et la proximité immédiate des services de la station thermale. Le Camping des Bains est idéal pour se reposer, se ressourcer et profiter d’un séjour nature, pour une étape vanlife comme pour quelques jours de déconnexion.",
+    vanliferExperience: [
+      "Le Morvan offre une nature généreuse et encore secrète : lacs, forêts de sapins et de feuillus, cascades et sentiers serpentant entre les hêtres. Ses routes paisibles invitent naturellement à ralentir.",
+      "Le camping reste volontairement à taille humaine, loin des grands villages de vacances. Les nuits sont calmes et les thermes sont accessibles à pied en environ cinq minutes. Le lieu peut ainsi servir de point fixe pour une cure thermale ou pour explorer le Morvan sur plusieurs jours.",
+      "Le lac des Settons permet de pratiquer la baignade, le pédalo et le kayak. Vézelay et sa basilique classée au patrimoine mondial de l’UNESCO se trouvent à environ 45 minutes. Bibracte, son oppidum gaulois et son musée au cœur de la forêt sont également accessibles pour une excursion.",
+    ],
+    vanSpecifics: "Emplacements traditionnels pour vans et camping-cars · réservation en ligne · thermes accessibles à pied à environ 250 mètres · situation adaptée à une cure ou à une étape ressourçante dans le Morvan.",
+    swimming: "Piscine avec toboggans et animations aquatiques pendant la saison.",
+    dining: "Restaurant sur place avec menu du jour. Des prestations de massage et de spa sont également proposées.",
+    activities: [
+      "Thermes de Saint-Honoré-les-Bains à environ 250 mètres",
+      "Massage et spa sur place",
+      "Animations pour adultes et enfants pendant la saison 2026",
+      "Randonnées dans le Morvan au départ du camping",
+      "Lac des Settons : baignade, pédalo et kayak",
+      "Bibracte : oppidum gaulois, musée et site archéologique en forêt",
+      "Vézelay et sa basilique classée au patrimoine mondial de l’UNESCO",
+    ],
+    otherInfo: ["Les cures thermales conventionnées peuvent faire l’objet d’une prise en charge selon prescription médicale et sous conditions. Il est recommandé de vérifier son dossier auprès des thermes, de l’Assurance Maladie et de sa mutuelle avant le séjour."],
+    bookingMethods: ["En ligne sur campinglesbains.com", "Par email", "Par téléphone"],
+    reservationUrl: "https://www.campinglesbains.com/",
+    regionLink: { label: "Découvrir les autres lieux vanlife de la région", href: "/explorer" },
+  },
 };
 
 export function getRichPlaceDetails(placeId: string): RichPlaceDetails | undefined {
