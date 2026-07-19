@@ -213,6 +213,40 @@ const RICH_PLACE_DETAILS: Record<string, RichPlaceDetails> = {
     reservationUrl: "https://www.campingdeslacs.fr/",
     regionLink: { label: "Découvrir les autres lieux vanlife de la région", href: "/explorer" },
   },
+  "camping-le-moulin-du-bel-air": {
+    labelYear: 2026,
+    displayType: "Camping 3 étoiles",
+    displayAddress: "685 Route du Céou, Claux de Bouyssole, 46310 Saint-Germain-du-Bel-Air",
+    discountInstructions: [
+      "Par téléphone ou par email : mentionnez votre adhésion Label Vanlife.",
+      "Sur place : présentez votre carte membre à l’accueil dès votre arrivée.",
+    ],
+    venueQuote: "Bienvenue au Moulin du Bel-Air ! Ouvert du 3 avril au 26 septembre 2026. Piscine du 15 mai au 15 septembre. Arrivée à partir de 14 h et départ avant 12 h, avec une grande souplesse. Bar-brasserie guinguette, piscine chauffée, électricité 10A ou 16A, eau, vidange des eaux noires et grises, Wi-Fi gratuit, pain frais dès 8 h 30 et produits locaux. Emplacements plats et herbeux d’au moins 120 m², avec options Grand Espace, sanitaire privatif ou Belle Vue. Les membres Label Vanlife bénéficient de 10 % de réduction.",
+    vanliferExperience: [
+      "Le Lot est l’une des destinations vanlife les plus cohérentes de France : les routes sont belles, les villages sont préservés et les sites remarquables se succèdent sur des distances raisonnables.",
+      "Saint-Cirq-Lapopie, classé parmi les Plus Beaux Villages de France, se trouve à environ 30 minutes. Cahors et son pont Valentré sont accessibles en environ 35 minutes, Rocamadour en 45 minutes et Sarlat en moins d’une heure.",
+      "Le Moulin du Bel-Air permet ainsi de rayonner dans toute la région sans chercher un nouveau point de chute chaque soir. Le camping est lui-même à l’origine du rassemblement VANLOT : ici, la vanlife fait pleinement partie de l’identité du lieu.",
+    ],
+    vanSpecifics: "Emplacements plats et herbeux d’au moins 120 m², conçus pour les vans et camping-cars · options Grand Espace de plus de 150 m², sanitaire privatif ou Belle Vue sur la vallée · vidange des eaux noires et grises · électricité 10A ou 16A incluse.",
+    opening: "Ouvert du 3 avril au 26 septembre 2026. Arrivée à partir de 14 h et départ avant 12 h, avec une grande souplesse annoncée par le camping.",
+    openingMonths: ["Avr", "Mai", "Juin", "Juil", "Août", "Sep"],
+    swimming: "Grande piscine extérieure chauffée, avec transats et parasols, ouverte du 15 mai au 15 septembre.",
+    dining: "Bar-brasserie guinguette proposant des spécialités régionales du Lot. Pain frais disponible chaque matin dès 8 h 30 et vente de produits locaux à la réception.",
+    activities: [
+      "Rassemblement vanlife VANLOT, événement annuel créé par le camping",
+      "Randonnée et vélo au départ du camping dans les vallées du Céou et du Lot",
+      "Petits animaux de la ferme sur place : poules et chèvres",
+      "Animations en soirée à la guinguette",
+      "Saint-Cirq-Lapopie",
+      "Cahors et le pont Valentré",
+      "Rocamadour",
+      "Sarlat et la vallée de la Dordogne",
+    ],
+    otherInfo: ["Camping labellisé Tourisme Zéro Déchet depuis 2019 · Wi-Fi gratuit · animaux acceptés · eau et vidange sur place · produits locaux disponibles à la réception."],
+    bookingMethods: ["En ligne sur lot-camping.com", "Par email", "Par téléphone"],
+    reservationUrl: "https://www.lot-camping.com/",
+    regionLink: { label: "Découvrir les autres lieux vanlife de la région", href: "/explorer" },
+  },
 };
 
 export function getRichPlaceDetails(placeId: string): RichPlaceDetails | undefined {

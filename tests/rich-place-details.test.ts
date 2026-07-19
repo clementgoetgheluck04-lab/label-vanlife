@@ -93,3 +93,17 @@ test("la fiche enrichie du Flower Camping des Lacs contient les équipements du 
   assert.ok(details.swimming?.includes("28 °C"));
   assert.ok(details.otherInfo?.[0].includes("Qualidog"));
 });
+
+test("la fiche enrichie du Moulin du Bel-Air contient l'accueil van et VANLOT", () => {
+  const details = getRichPlaceDetails("camping-le-moulin-du-bel-air");
+  assert.ok(details);
+  assert.equal(details.labelYear, 2026);
+  assert.equal(details.displayType, "Camping 3 étoiles");
+  assert.equal(details.openingMonths?.length, 6);
+  assert.equal(details.activities?.length, 8);
+  assert.equal(details.bookingMethods?.length, 3);
+  assert.ok(details.vanSpecifics?.includes("120 m²"));
+  assert.ok(details.swimming?.includes("15 mai au 15 septembre"));
+  assert.ok(details.activities?.[0].includes("VANLOT"));
+  assert.ok(details.otherInfo?.[0].includes("Tourisme Zéro Déchet"));
+});
