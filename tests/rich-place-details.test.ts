@@ -162,3 +162,16 @@ test("la fiche enrichie du Domaine de Mépillat contient le slow tourisme et le 
   assert.ok(details.otherInfo?.[0].includes("Refuge LPO"));
   assert.ok(details.otherInfo?.[0].includes("slow tourisme"));
 });
+
+test("la fiche enrichie du Camping de Fontenoy contient la Voie Bleue et l'accueil multilingue", () => {
+  const details = getRichPlaceDetails("camping-de-fontenoy");
+  assert.ok(details);
+  assert.equal(details.labelYear, 2026);
+  assert.equal(details.openingMonths?.length, 7);
+  assert.equal(details.activities?.length, 8);
+  assert.equal(details.bookingMethods?.length, 3);
+  assert.ok(details.vanSpecifics?.includes("53 emplacements"));
+  assert.ok(details.vanSpecifics?.includes("Voie Bleue"));
+  assert.ok(details.dining?.includes("plusieurs langues"));
+  assert.ok(details.otherInfo?.[0].includes("Personnel multilingue"));
+});

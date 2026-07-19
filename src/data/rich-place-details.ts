@@ -386,6 +386,38 @@ const RICH_PLACE_DETAILS: Record<string, RichPlaceDetails> = {
     reservationUrl: "https://www.camping-mepillat.fr/",
     regionLink: { label: "Découvrir les autres lieux vanlife de la région", href: "/explorer" },
   },
+  "camping-de-fontenoy": {
+    labelYear: 2026,
+    displayAddress: "11 Route de Saint-Loup, 88240 Fontenoy-le-Château",
+    discountInstructions: [
+      "Par téléphone ou par email : mentionnez votre adhésion Label Vanlife.",
+      "Sur place : présentez votre carte membre à l’accueil dès votre arrivée.",
+    ],
+    venueQuote: "Un camping calme et spacieux au cœur des Vosges du Sud, où les vanlifers trouvent tout ce qu’il faut pour se ressourcer : ombre, espace et nature. La Voie Bleue passe directement ici, un rêve pour les amateurs de vélo et de randonnée. Notre équipe multilingue est là pour vous accueillir.",
+    vanliferExperience: [
+      "La Voie Bleue relie Apach, à la frontière luxembourgeoise, à Lyon sur environ 680 km de véloroute au fil de la Moselle et de la Saône. Depuis Fontenoy, elle traverse un secteur particulièrement paisible entre forêts vosgiennes, villages et vallées.",
+      "Plombières-les-Bains est accessible en environ 20 minutes. Cette station thermale Belle Époque conserve ses thermes, ses villas ornementées et les traces du passage de Napoléon III.",
+      "Le Ballon d’Alsace, culminant à 1 247 mètres, offre des panoramas sur les Vosges, le Jura et parfois les Alpes. La Route des Crêtes permet de prolonger l’exploration du massif, tandis qu’Épinal et son imagerie historique constituent une excursion culturelle accessible.",
+    ],
+    vanSpecifics: "53 emplacements spacieux, majoritairement ombragés, pour camping-cars et vans · raccordements à l’électricité et à l’eau · accès direct à la Voie Bleue, véloroute Moselle-Saône · cadre boisé et calme.",
+    opening: "Ouvert d’avril à octobre.",
+    openingMonths: ["Avr", "Mai", "Juin", "Juil", "Août", "Sep", "Oct"],
+    dining: "Restaurant sur place. L’équipe du camping accueille les visiteurs en plusieurs langues.",
+    activities: [
+      "Voie Bleue, véloroute Moselle-Saône de 680 km passant directement au camping",
+      "Randonnées dans les Vosges du Sud au départ de Fontenoy",
+      "Village médiéval de Fontenoy-le-Château à découvrir à pied",
+      "Quatre cabanes contemporaines en bois créées par des étudiants d’une école nationale",
+      "Plombières-les-Bains, station thermale Belle Époque, à environ 20 minutes",
+      "Ballon d’Alsace, à 1 247 mètres d’altitude, à environ 45 minutes",
+      "Route des Crêtes des Vosges",
+      "Épinal et son imagerie historique à environ 35 minutes",
+    ],
+    otherInfo: ["Personnel multilingue · Wi-Fi disponible · animaux acceptés · 53 emplacements majoritairement ombragés · restaurant sur place."],
+    bookingMethods: ["En ligne sur campingfontenoy.com", "Par email", "Par téléphone"],
+    reservationUrl: "https://www.campingfontenoy.com/",
+    regionLink: { label: "Découvrir les autres lieux vanlife de la région", href: "/explorer" },
+  },
 };
 
 export function getRichPlaceDetails(placeId: string): RichPlaceDetails | undefined {
