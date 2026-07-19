@@ -175,3 +175,21 @@ test("la fiche enrichie du Camping de Fontenoy contient la Voie Bleue et l'accue
   assert.ok(details.dining?.includes("plusieurs langues"));
   assert.ok(details.otherInfo?.[0].includes("Personnel multilingue"));
 });
+
+test("la fiche enrichie du Camping de la Torche conserve tous les engagements détaillés", () => {
+  const details = getRichPlaceDetails("camping-de-la-torche");
+  assert.ok(details);
+  assert.equal(details.labelYear, 2026);
+  assert.match(details.contactName ?? "", /Mathilde Thouzeau/);
+  assert.equal(details.promoCode, "VANLIFE2026");
+  assert.equal(details.openingMonths?.length, 6);
+  assert.equal(details.activities?.length, 10);
+  assert.equal(details.detailSections?.length, 5);
+  assert.equal(details.detailSections?.[0].items.length, 8);
+  assert.equal(details.detailSections?.[1].items.length, 12);
+  assert.equal(details.bookingMethods?.length, 3);
+  assert.ok(details.vanSpecifics?.includes("80 à 100 m²"));
+  assert.ok(details.swimming?.includes("couverte et chauffée"));
+  assert.match(details.facebookUrl ?? "", /^https:\/\/www\.facebook\.com\//);
+  assert.match(details.reservationUrl ?? "", /^https:\/\/reservation\.secureholiday\.net\//);
+});

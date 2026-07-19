@@ -49,6 +49,7 @@ const SERVICE_ICONS: Record<string, { icon: LucideIcon; label: string }> = {
   animaux: { icon: PawPrint, label: "Animaux acceptés" },
   animal_accepted: { icon: PawPrint, label: "Animaux acceptés" },
   plage: { icon: Waves, label: "Accès plage" },
+  "borne-electrique": { icon: PlugZap, label: "Recharge véhicule électrique" },
 };
 
 const TYPE_LABELS: Record<string, string> = {
@@ -275,6 +276,27 @@ export default function LieuDetailPage({ params }: { params: Promise<{ id: strin
           <section className="rounded-3xl border border-emerald-100 bg-emerald-50 p-6 sm:p-8">
             <h2 className="text-xl font-bold text-emerald-950">Autres informations</h2>
             <div className="mt-3 space-y-2">{richDetails.otherInfo.map((info) => <p key={info} className="text-sm leading-6 text-emerald-900">{info}</p>)}</div>
+          </section>
+        )}
+
+        {richDetails?.detailSections && richDetails.detailSections.length > 0 && (
+          <section>
+            <h2 className="mb-4 text-xl font-bold text-neutral-900">Engagements et qualité d’accueil</h2>
+            <div className="grid gap-4 md:grid-cols-2">
+              {richDetails.detailSections.map((section) => (
+                <article key={section.title} className="rounded-2xl border border-neutral-200 bg-neutral-50 p-5 sm:p-6">
+                  <h3 className="font-bold text-neutral-950">{section.title}</h3>
+                  <ul className="mt-4 space-y-2.5">
+                    {section.items.map((item) => (
+                      <li key={item} className="flex gap-2.5 text-sm leading-6 text-neutral-600">
+                        <span aria-hidden="true" className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-600" />
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </article>
+              ))}
+            </div>
           </section>
         )}
 

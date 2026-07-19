@@ -15,6 +15,7 @@ export type RichPlaceDetails = {
   dining?: string;
   activities?: string[];
   otherInfo?: string[];
+  detailSections?: { title: string; items: string[] }[];
   bookingMethods?: string[];
   reservationLabel?: string;
   reservationUrl?: string;
@@ -416,6 +417,53 @@ const RICH_PLACE_DETAILS: Record<string, RichPlaceDetails> = {
     otherInfo: ["Personnel multilingue · Wi-Fi disponible · animaux acceptés · 53 emplacements majoritairement ombragés · restaurant sur place."],
     bookingMethods: ["En ligne sur campingfontenoy.com", "Par email", "Par téléphone"],
     reservationUrl: "https://www.campingfontenoy.com/",
+    regionLink: { label: "Découvrir les autres lieux vanlife de la région", href: "/explorer" },
+  },
+  "camping-de-la-torche": {
+    labelYear: 2026,
+    displayType: "Camping Sites & Paysages",
+    displayAddress: "4 Roz an Tremen, 29120 Plomeur",
+    contactName: "Mathilde Thouzeau — gérante",
+    facebookUrl: "https://www.facebook.com/CampingLaTorche",
+    promoCode: "VANLIFE2026",
+    discountInstructions: [
+      "Réservation en ligne : utilisez le code VANLIFE2026 sur campingdelatorche.fr.",
+      "Offre non cumulable, valable dès une nuit du 3 avril au 27 septembre 2026.",
+    ],
+    venueQuote: "Le Camping de La Torche accueille les vanlifers en leur offrant une halte simple, naturelle et conviviale. Plus qu’un emplacement, c’est un lieu pour se poser, se ressourcer et partager. Les vanlifers apprécieront nos valeurs d’authenticité et de respect de l’environnement. Situé à deux pas de l’océan et des spots de surf, le camping offre un cadre sauvage unique, des services adaptés aux vans et une ambiance chaleureuse propice aux rencontres. Une pause idéale pour se reconnecter avant de reprendre la route.",
+    vanliferExperience: [
+      "La Pointe de la Torche est une adresse historique pour les surfeurs et les vanlifers : un cap exposé aux vents de l’Atlantique, des vagues régulières et de vastes dunes qui donnent à la baie d’Audierne son caractère sauvage.",
+      "La plage est accessible à pied en environ 500 mètres. Le soir, les braseros et concerts facilitent les rencontres. L’équipe pratique elle-même la vanlife et son dernier road trip l’a menée en Islande.",
+      "Les emplacements de 80 à 100 m², la piscine couverte chauffée, les équipements de production d’énergie et les animations de bien-être composent un séjour confortable sans effacer l’esprit naturel du site. L’électricité 6A, le Wi-Fi gratuit, la couverture 4G/5G et la borne de recharge facilitent aussi les séjours connectés.",
+      "Les arrivées après 20 h sont possibles grâce à l’enregistrement en ligne et à la lecture automatique des plaques à l’entrée.",
+    ],
+    vanSpecifics: "Emplacements de 80 à 100 m² · électricité 6A · Wi-Fi gratuit et couverture 4G/5G · piscine couverte · borne de recharge · canidouche, toutou bar et terrain d’agility · arrivées tardives · enregistrement en ligne · point d’eau potable · plage et surf à 500 mètres.",
+    opening: "Ouvert du 3 avril au 27 septembre 2026.",
+    openingMonths: ["Avr", "Mai", "Juin", "Juil", "Août", "Sep"],
+    swimming: "Piscine couverte et chauffée, ouverte pendant la saison. La plage de la Pointe de la Torche se trouve à environ 500 mètres.",
+    dining: "Snack-bar, pizzas et plats à emporter, épicerie, food trucks d’artisans locaux en juillet et août, barbecues en libre accès et petit-déjeuner à base de produits locaux. Restaurants à moins de 2 km, notamment à Plomeur et Pont-l’Abbé.",
+    activities: [
+      "Concerts, karaoké, soirées thématiques, jeux et soirées brasero",
+      "Yoga, réflexologie et massages en juillet et août selon le programme",
+      "Espace zen et détente",
+      "Surf, planche à voile et kitesurf à la Pointe de la Torche",
+      "Randonnée sur le GR34 côtier",
+      "Pont-l’Abbé à environ 8 km",
+      "Quimper à environ 25 km",
+      "Bénodet",
+      "Cap Sizun et Pointe du Raz à environ 40 km",
+      "Presqu’île de Crozon à environ une heure",
+    ],
+    detailSections: [
+      { title: "Accueil vanlife", items: ["Carte manuscrite de bienvenue avec les bons plans locaux", "Cadeau de bienvenue pour les propriétaires de chien", "Cadeaux pour les longs séjours et les clients fidèles", "Arrivées possibles après 20 h grâce à la lecture automatique des plaques", "Enregistrement en ligne disponible", "QR code regroupant les informations pratiques", "Panneau d’affichage sur place", "Livret d’accueil complet"] },
+      { title: "Éco-responsabilité", items: ["Panneaux solaires et éolienne sur le site", "Borne de recharge pour véhicules électriques", "Éclairage LED avec détecteurs de présence", "Réducteurs de débit sur les robinets et minuteries sur les douches", "Récupération de l’eau de pluie", "Affichage de sensibilisation à l’environnement", "Tri sélectif du verre, du plastique et du carton", "Composteur collectif", "Food trucks d’artisans locaux en juillet et août", "Vente de produits fermiers et locaux", "Recommandation de producteurs locaux et signalement des marchés et AMAP proches", "Petit-déjeuner composé de produits locaux"] },
+      { title: "Bien-être et détente", items: ["Espace zen et détente", "Yoga et réflexologie en juillet et août selon le programme", "Séances de massage", "Piscine couverte chauffée"] },
+      { title: "Sécurité et tranquillité", items: ["Silence demandé de 22 h à 8 h", "Règlement intérieur affiché à l’entrée et dans le livret d’accueil", "Email de bienvenue rappelant les règles", "Lampadaires solaires et balisage nocturne des chemins", "Éclairage des sanitaires 24 h/24", "Lecture automatique des plaques à l’entrée"] },
+      { title: "Esprit communautaire", items: ["Barbecue commun et terrasse partagée", "Soirées conviviales autour du brasero", "Équipe elle-même vanlifer, avec un dernier road trip en Islande", "Invitation à partager son avis et suivi des retours clients"] },
+    ],
+    otherInfo: ["Canidouche, toutou bar et terrain d’agility · point de remplissage d’eau potable · arrivées tardives après 20 h · Wi-Fi gratuit · animaux acceptés · piscine couverte chauffée."],
+    bookingMethods: ["En ligne avec le code VANLIFE2026", "Par email", "Par téléphone"],
+    reservationUrl: "https://reservation.secureholiday.net/fr/3190/",
     regionLink: { label: "Découvrir les autres lieux vanlife de la région", href: "/explorer" },
   },
 };
