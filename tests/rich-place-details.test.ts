@@ -120,3 +120,17 @@ test("la fiche enrichie du Camping des Bains contient les services thermaux", ()
   assert.ok(details.dining?.includes("massage"));
   assert.ok(details.otherInfo?.[0].includes("sous conditions"));
 });
+
+test("la fiche enrichie d'Au Tylo Soleil contient le code et les périodes promotionnelles", () => {
+  const details = getRichPlaceDetails("camping-au-tylo-soleil");
+  assert.ok(details);
+  assert.equal(details.labelYear, 2026);
+  assert.equal(details.promoCode, "LABELVANLIFE2026");
+  assert.equal(details.discountInstructions?.length, 4);
+  assert.equal(details.openingMonths?.length, 6);
+  assert.equal(details.activities?.length, 9);
+  assert.deepEqual(details.bookingMethods, ["En ligne sur autylosoleil.fr"]);
+  assert.ok(details.swimming?.includes("AquaZen"));
+  assert.ok(details.swimming?.includes("AquaFun"));
+  assert.ok(details.opening?.includes("10 avril au 30 septembre 2026"));
+});

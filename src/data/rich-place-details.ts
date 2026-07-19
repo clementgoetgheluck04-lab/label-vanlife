@@ -279,6 +279,43 @@ const RICH_PLACE_DETAILS: Record<string, RichPlaceDetails> = {
     reservationUrl: "https://www.campinglesbains.com/",
     regionLink: { label: "Découvrir les autres lieux vanlife de la région", href: "/explorer" },
   },
+  "camping-au-tylo-soleil": {
+    labelYear: 2026,
+    displayType: "Camping 3 étoiles",
+    displayAddress: "627 Route des Encontres - RD13, 04300 Dauphin",
+    promoCode: "LABELVANLIFE2026",
+    discountInstructions: [
+      "Réservation en ligne : utilisez le code LABELVANLIFE2026 sur autylosoleil.fr.",
+      "Offre valable dès une nuit et non cumulable avec une autre promotion.",
+      "Le camping est ouvert du 10 avril au 30 septembre 2026.",
+      "Périodes promotionnelles communiquées : du 4 au 8 mai, du 11 au 14 mai, du 18 mai au 30 juin et du 1er au 30 septembre 2026.",
+    ],
+    vanliferExperience: [
+      "Le camping se trouve au cœur de la Haute-Provence, à l’écart des principaux flux touristiques du Luberon. Les emplacements herbeux et les arbres apportent de l’espace et de l’ombre, dans un vallon propice aux séjours de plusieurs nuits.",
+      "Forcalquier est accessible en environ 10 minutes, avec son marché du lundi, ses ruelles et ses producteurs locaux. La montagne de Lure offre des itinéraires vers les crêtes, à près de 1 800 mètres d’altitude, et des panoramas sur les Alpes du Sud.",
+      "Le plateau de Valensole et ses champs de lavande se trouvent à moins de 30 minutes, particulièrement spectaculaires en juin et juillet. Les gorges du Verdon sont accessibles en environ 45 minutes, tandis que Gordes permet une excursion vers le Luberon.",
+    ],
+    vanSpecifics: "Emplacements pour vans, camping-cars et caravanes sur terrain herbeux et ombragé · réservation en ligne sur autylosoleil.fr · code promotionnel LABELVANLIFE2026 pour obtenir 10 % de réduction pendant les périodes éligibles.",
+    opening: "Ouvert du 10 avril au 30 septembre 2026. Réception ouverte de 9 h à 12 h 15 et de 17 h à 19 h. En juillet et août : de 8 h à 12 h 30 et de 15 h à 18 h 30.",
+    openingMonths: ["Avr", "Mai", "Juin", "Juil", "Août", "Sep"],
+    swimming: "Double espace aquatique : AquaZen pour la détente et les bains relaxants, AquaFun avec toboggans et jeux d’eau. Une piscine couverte et chauffée est également disponible. L’accès est inclus dans le séjour.",
+    dining: "Restaurant-brasserie sur place proposant notamment des spécialités régionales et des poke bowls. Location de draps et de serviettes disponible.",
+    activities: [
+      "Mini-club pour les enfants de moins de 12 ans et club ado à partir de 12 ans",
+      "City Park : football, volley-ball, basket-ball, ping-pong et mini-golf",
+      "Tyrolienne sur place",
+      "Zone bien-être avec massages et spa",
+      "Soirées en juillet et août : bingo, barbecues, tournois de pétanque et concerts",
+      "Location de vélos sur place",
+      "Forcalquier et son marché du lundi à environ 10 minutes",
+      "Plateau de Valensole et champs de lavande à moins de 30 minutes",
+      "Gorges du Verdon à environ 45 minutes",
+    ],
+    otherInfo: ["Animaux acceptés · Wi-Fi disponible · piscine couverte chauffée · location de draps et de serviettes · animations renforcées en juillet et août."],
+    bookingMethods: ["En ligne sur autylosoleil.fr"],
+    reservationUrl: "https://autylosoleil.fr/",
+    regionLink: { label: "Découvrir les autres lieux vanlife de la région", href: "/explorer" },
+  },
 };
 
 export function getRichPlaceDetails(placeId: string): RichPlaceDetails | undefined {
