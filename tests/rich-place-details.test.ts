@@ -193,3 +193,19 @@ test("la fiche enrichie du Camping de la Torche conserve tous les engagements d�
   assert.match(details.facebookUrl ?? "", /^https:\/\/www\.facebook\.com\//);
   assert.match(details.reservationUrl ?? "", /^https:\/\/reservation\.secureholiday\.net\//);
 });
+
+test("la fiche enrichie du Coin Charmant contient les périodes membres et le lien validé", () => {
+  const details = getRichPlaceDetails("camping-le-coin-charmant");
+  assert.ok(details);
+  assert.equal(details.labelYear, 2026);
+  assert.equal(details.discountInstructions?.length, 2);
+  assert.equal(details.openingMonths?.length, 6);
+  assert.equal(details.activities?.length, 7);
+  assert.equal(details.bookingMethods?.length, 4);
+  assert.ok(details.discountInstructions?.[1].includes("10 avril au 4 juillet"));
+  assert.ok(details.discountInstructions?.[1].includes("30 août au 20 septembre"));
+  assert.ok(details.vanSpecifics?.includes("80 à 250 m²"));
+  assert.ok(details.swimming?.includes("10 avril au 20 septembre"));
+  assert.match(details.facebookUrl ?? "", /^https:\/\/www\.facebook\.com\//);
+  assert.equal(details.reservationUrl, "https://reservation.secureholiday.net/fr/5193/");
+});

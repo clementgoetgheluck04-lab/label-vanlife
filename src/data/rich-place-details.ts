@@ -466,6 +466,41 @@ const RICH_PLACE_DETAILS: Record<string, RichPlaceDetails> = {
     reservationUrl: "https://reservation.secureholiday.net/fr/3190/",
     regionLink: { label: "Découvrir les autres lieux vanlife de la région", href: "/explorer" },
   },
+  "camping-le-coin-charmant": {
+    labelYear: 2026,
+    displayType: "Camping 3 étoiles",
+    displayAddress: "1050 chemin des Digues, 07120 Chauzon",
+    facebookUrl: "https://www.facebook.com/campinglecoincharmant",
+    discountInstructions: [
+      "Mentionnez Label Vanlife à votre arrivée, par téléphone ou lors de votre demande de réservation.",
+      "Offre non cumulable, valable dès une nuit du 10 avril au 4 juillet et du 30 août au 20 septembre 2026.",
+    ],
+    venueQuote: "Nous sommes d’anciens voyageurs. Au Coin Charmant, nous accueillons les vanlifers avec la même simplicité et la même chaleur que celles que nous aurions aimé trouver sur la route. Vous êtes ici au bord de l’Ardèche, dans un cadre calme et préservé. Les emplacements sont spacieux, ombragés, et la rivière est à deux pas. Bienvenue chez nous !",
+    vanliferExperience: [
+      "Chauzon permet de découvrir une Ardèche authentique, entre garrigues, falaises dorées et rivière. Depuis Le Coin Charmant, le territoire se parcourt facilement sans changer de point de chute chaque soir.",
+      "Balazuc, classé parmi les Plus Beaux Villages de France, se trouve à environ 3 km. Ses ruelles en pierre, son château et ses points de vue sur l’Ardèche méritent une visite, notamment en fin de journée.",
+      "Les gorges de l’Ardèche sont accessibles depuis Vallon-Pont-d’Arc pour une descente en canoë, à la journée ou sur deux jours avec bivouac autorisé. Le Pont d’Arc, arche naturelle haute d’environ 60 mètres, constitue l’un des paysages emblématiques du secteur.",
+      "Vogüé, le marché d’Aubenas, les vignobles du sud de l’Ardèche et les châtaigneraies complètent les possibilités de découverte du terroir.",
+    ],
+    vanSpecifics: "46 emplacements ombragés de 80 à 250 m² · électricité 10A · bord de rivière · piscine ouverte pendant toute la saison · douches chaudes incluses.",
+    opening: "Ouvert d’avril à septembre. La piscine est annoncée ouverte du 10 avril au 20 septembre.",
+    openingMonths: ["Avr", "Mai", "Juin", "Juil", "Août", "Sep"],
+    swimming: "Piscine ouverte pendant toute la saison, du 10 avril au 20 septembre. Accès inclus dans le séjour. Le camping se trouve également au bord de la rivière Ardèche.",
+    dining: "Snack-restaurant sur place. Pain maison artisanal et produits locaux proposés chaque matin.",
+    activities: [
+      "Location de canoës sur place",
+      "Baignade et détente au bord de l’Ardèche",
+      "Balazuc, village médiéval, à environ 3 km",
+      "Descente des gorges de l’Ardèche en canoë",
+      "Pont d’Arc et Vallon-Pont-d’Arc",
+      "Vogüé et ses quais au bord de l’eau",
+      "Marché d’Aubenas, vignobles et châtaigneraies",
+    ],
+    otherInfo: ["Animaux acceptés · Wi-Fi disponible · douches chaudes incluses · piscine ouverte pendant toute la saison · snack-restaurant et pain maison."],
+    bookingMethods: ["En ligne", "Par email", "Par téléphone", "Sur place"],
+    reservationUrl: "https://reservation.secureholiday.net/fr/5193/",
+    regionLink: { label: "Découvrir les autres lieux vanlife de la région", href: "/explorer" },
+  },
 };
 
 export function getRichPlaceDetails(placeId: string): RichPlaceDetails | undefined {
