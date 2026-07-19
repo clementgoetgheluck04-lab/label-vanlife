@@ -148,3 +148,17 @@ test("la fiche enrichie de Lann Hoëdic contient les labels et services de la pr
   assert.ok(details.otherInfo?.[0].includes("Refuge LPO"));
   assert.ok(details.otherInfo?.[0].includes("Accueil Vélo"));
 });
+
+test("la fiche enrichie du Domaine de Mépillat contient le slow tourisme et le Refuge LPO", () => {
+  const details = getRichPlaceDetails("domaine-de-mepillat");
+  assert.ok(details);
+  assert.equal(details.labelYear, 2026);
+  assert.equal(details.openingMonths?.length, 6);
+  assert.equal(details.activities?.length, 10);
+  assert.equal(details.bookingMethods?.length, 3);
+  assert.ok(details.vanSpecifics?.includes("bornes de recharge"));
+  assert.ok(details.opening?.includes("25 avril au 14 septembre 2026"));
+  assert.ok(details.swimming?.includes("rénovée en 2024"));
+  assert.ok(details.otherInfo?.[0].includes("Refuge LPO"));
+  assert.ok(details.otherInfo?.[0].includes("slow tourisme"));
+});

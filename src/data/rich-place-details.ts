@@ -350,6 +350,42 @@ const RICH_PLACE_DETAILS: Record<string, RichPlaceDetails> = {
     reservationUrl: "https://www.camping-lannhoedic.fr/",
     regionLink: { label: "Découvrir les autres lieux vanlife de la région", href: "/explorer" },
   },
+  "domaine-de-mepillat": {
+    labelYear: 2026,
+    displayType: "Camping 3 étoiles",
+    displayAddress: "70 Grange Maigre, 01560 Saint-Nizier-le-Bouchoux",
+    discountInstructions: [
+      "Par téléphone ou par email : mentionnez votre adhésion Label Vanlife.",
+      "Sur place : présentez votre carte membre à l’accueil dès votre arrivée.",
+    ],
+    venueQuote: "Le Domaine de Mépillat, c’est un coin de nature préservé où chaque vanlifer trouve sa place : grands emplacements ombragés, piscine chauffée, pain frais le matin et une équipe passionnée qui comprend le voyage autrement. Ici, on prend le temps : c’est le principe même du slow tourisme.",
+    vanliferExperience: [
+      "L’Ain est souvent traversé rapidement par les voyageurs qui rejoignent les Alpes ou la Provence. Depuis Mépillat, le lac de Nantua est accessible en environ 30 minutes, dans un paysage spectaculaire encadré par de hautes falaises calcaires.",
+      "Bourg-en-Bresse et son marché permettent de découvrir les volailles de Bresse et les producteurs locaux. La Bresse elle-même, avec ses étangs et ses fermes traditionnelles, offre de nombreuses occasions de manger local et de voyager lentement.",
+      "Les reculées du Jura, notamment Baume-les-Messieurs, se trouvent à environ 45 minutes. Falaises semi-circulaires, cascades et abbaye composent une excursion particulièrement adaptée à une journée depuis le domaine.",
+    ],
+    vanSpecifics: "Emplacements spacieux, calmes, ombragés et délimités naturellement · bornes de recharge pour véhicules électriques · arrivée à partir de 14 h et départ avant 12 h pour les emplacements.",
+    opening: "Ouvert du 25 avril au 14 septembre 2026. Réception de 9 h à 12 h et de 14 h à 19 h. Arrivée à partir de 14 h pour les emplacements et de 16 h à 19 h pour les hébergements. Départ avant 12 h pour les emplacements et avant 10 h pour les hébergements.",
+    openingMonths: ["Avr", "Mai", "Juin", "Juil", "Août", "Sep"],
+    swimming: "Piscine chauffée rénovée en 2024, avec un espace de détente équipé de bains de soleil.",
+    dining: "Snack-bar sur place, pain frais et viennoiseries chaque matin, ainsi qu’une épicerie de dépannage.",
+    activities: [
+      "Étang de pêche privé adjacent au camping",
+      "Sentiers de randonnée et promenades au départ du domaine",
+      "Cinéma en plein air",
+      "Jeux gonflables et espace fitness",
+      "Jeux de société dans l’esprit slow tourisme",
+      "Compostage et tri sélectif",
+      "Observation de la faune du Refuge LPO : hérons, aigles, écureuils et hérissons",
+      "Bornes de recharge pour véhicules électriques",
+      "Lac de Nantua à environ 30 minutes",
+      "Baume-les-Messieurs et les reculées du Jura à environ 45 minutes",
+    ],
+    otherInfo: ["Domaine éco-responsable et Refuge LPO · compostage et tri sélectif · animaux acceptés · Wi-Fi disponible · philosophie slow tourisme."],
+    bookingMethods: ["En ligne sur camping-mepillat.fr", "Par email", "Par téléphone"],
+    reservationUrl: "https://www.camping-mepillat.fr/",
+    regionLink: { label: "Découvrir les autres lieux vanlife de la région", href: "/explorer" },
+  },
 };
 
 export function getRichPlaceDetails(placeId: string): RichPlaceDetails | undefined {
