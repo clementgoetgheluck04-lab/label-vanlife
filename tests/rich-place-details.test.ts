@@ -322,6 +322,25 @@ test("la fiche enrichie du Camping Saint Lambert contient les informations offic
   assert.equal(details.reservationUrl, "https://bookingpremium.secureholiday.net/fr/674/");
 });
 
+test("la fiche enrichie du Camping La Pindière conserve la certification 18 sur 22", () => {
+  const details = getRichPlaceDetails("camping-la-pindiere");
+  assert.ok(details);
+  assert.equal(details.labelYear, 2026);
+  assert.equal(details.contactName, "Anne Rauturier — gérante");
+  assert.equal(details.openingMonths?.length, 12);
+  assert.equal(details.activities?.length, 8);
+  assert.equal(details.detailSections?.length, 5);
+  assert.equal(details.detailSections?.reduce((count, section) => count + section.items.length, 0), 22);
+  assert.equal(details.bookingMethods?.length, 4);
+  assert.ok(details.otherInfo?.[0].includes("18 critères remplis sur 22"));
+  assert.ok(details.vanSpecifics?.includes("80 m²"));
+  assert.ok(details.vanSpecifics?.includes("6A ou 10A"));
+  assert.ok(details.opening?.includes("toute l’année"));
+  assert.ok(details.swimming?.includes("1er mai au 30 septembre"));
+  assert.match(details.facebookUrl ?? "", /^https:\/\/www\.facebook\.com\//);
+  assert.equal(details.reservationUrl, "https://reservation.secureholiday.net/fr/2742/");
+});
+
 test("la fiche enrichie du Pâtis affiche les mini-tarifs sans fausse réduction", () => {
   const details = getRichPlaceDetails("camping-le-patis");
   assert.ok(details);
