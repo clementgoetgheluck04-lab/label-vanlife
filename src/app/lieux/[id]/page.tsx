@@ -356,10 +356,17 @@ export default function LieuDetailPage({ params }: { params: Promise<{ id: strin
           </section>
         )}
 
-        {media.documents.length > 0 && (
+        {(media.documents.length > 0 || richDetails?.planUrl) && (
           <section>
             <h2 className="mb-4 text-xl font-bold text-neutral-900">Plans et documents utiles</h2>
             <div className="grid gap-3 sm:grid-cols-2">
+              {richDetails?.planUrl && (
+                <a href={richDetails.planUrl} target="_blank" rel="noreferrer" className="flex items-center gap-3 rounded-xl border border-neutral-200 bg-neutral-50 p-4 font-medium text-neutral-800 transition hover:border-[#c39960] hover:bg-white">
+                  <FileText className="h-6 w-6 text-[#c39960]" />
+                  <span>Plan officiel du camping</span>
+                  <ExternalLink className="ml-auto h-4 w-4 text-neutral-400" />
+                </a>
+              )}
               {media.documents.map((document) => (
                 <a key={document.url} href={document.url} target="_blank" rel="noreferrer" className="flex items-center gap-3 rounded-xl border border-neutral-200 bg-neutral-50 p-4 font-medium text-neutral-800 transition hover:border-[#c39960] hover:bg-white">
                   <FileText className="h-6 w-6 text-[#c39960]" />

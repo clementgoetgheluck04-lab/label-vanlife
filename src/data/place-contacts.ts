@@ -28,7 +28,7 @@ const CONTACTS: Record<string, PlaceContact> = {
   "camping-les-amarines": { website: "https://www.campinglesamarines.com/", email: "les.amarines@orange.fr", phone: "+33466822492" },
   "camping-les-drouihedes": { website: "https://www.campingcevennes.com/", email: "info@campingcevennes.com", phone: "+33466250480" },
   "camping-les-terrasses": { website: "https://www.camping-les-terrasses.com/", email: "campinglesterrasses34@gmail.com", phone: "+33467253506" },
-  "camping-saint-lambert": { website: "https://www.camping-millau-riviere.fr/fr-fr/accueil", email: "contact@campingsaintlambert.fr", phone: "+33565600712" },
+  "camping-saint-lambert": { website: "https://www.camping-millau-riviere.fr/fr-fr", email: "contact@campingsaintlambert.fr", phone: "+33565600048" },
   "domaine-de-mepillat": { website: "https://www.camping-mepillat.fr/", email: "contact@camping-mepillat.fr", phone: "+33970770121" },
   "eco-camping-la-porte-dautan": { website: "https://www.laportedautan.fr/", email: "contact@laportedautan.fr", phone: "+33630766221" },
   "ferme-pedagogique-solidor": { website: "https://fermedesolidor.fr/", email: "contact@fermedesolidor.fr" },

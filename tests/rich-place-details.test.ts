@@ -305,6 +305,23 @@ test("la fiche enrichie du Camping La Plage contient le code et les services au 
   assert.equal(details.reservationUrl, "https://online.resa-booking.com/front/list.php?id_est=1574");
 });
 
+test("la fiche enrichie du Camping Saint Lambert contient les informations officielles 2026", () => {
+  const details = getRichPlaceDetails("camping-saint-lambert");
+  assert.ok(details);
+  assert.equal(details.labelYear, 2026);
+  assert.equal(details.openingMonths?.length, 7);
+  assert.equal(details.activities?.length, 9);
+  assert.equal(details.bookingMethods?.length, 3);
+  assert.ok(details.displayAddress?.includes("2050 avenue de l’Aigoual"));
+  assert.ok(details.opening?.includes("25 avril au 19 octobre 2026"));
+  assert.ok(details.vanSpecifics?.includes("133 emplacements"));
+  assert.ok(details.vanSpecifics?.includes("155 à 200 m²"));
+  assert.ok(details.vanSpecifics?.includes("électrique 10A"));
+  assert.ok(details.swimming?.includes("plage privée de la Dourbie"));
+  assert.match(details.planUrl ?? "", /^https:\/\//);
+  assert.equal(details.reservationUrl, "https://bookingpremium.secureholiday.net/fr/674/");
+});
+
 test("la fiche enrichie du Pâtis affiche les mini-tarifs sans fausse réduction", () => {
   const details = getRichPlaceDetails("camping-le-patis");
   assert.ok(details);

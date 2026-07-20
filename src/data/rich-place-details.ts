@@ -19,6 +19,7 @@ export type RichPlaceDetails = {
   bookingMethods?: string[];
   reservationLabel?: string;
   reservationUrl?: string;
+  planUrl?: string;
   tourismUrl?: string;
   regionLink?: { label: string; href: string };
 };
@@ -707,6 +708,49 @@ const RICH_PLACE_DETAILS: Record<string, RichPlaceDetails> = {
       "Mini-camping, gîtes, chambres d’hôtes et hébergements insolites disponibles sur la propriété.",
     ],
     bookingMethods: ["Par email", "Par téléphone"],
+    regionLink: { label: "Découvrir les autres lieux vanlife de la région", href: "/explorer" },
+  },
+  "camping-saint-lambert": {
+    labelYear: 2026,
+    displayType: "Camping Flower 3 étoiles",
+    displayAddress: "2050 avenue de l’Aigoual, 12100 Millau",
+    discountInstructions: [
+      "Par téléphone ou par email, mentionnez votre adhésion Label Vanlife.",
+      "Sur place, présentez votre carte membre à l’accueil dès votre arrivée.",
+    ],
+    venueQuote: "Bienvenue dans notre camping familial au cœur de l’Aveyron ! Nous sommes ravis d’accueillir les vanlifers et de leur faire découvrir la beauté des gorges du Tarn et des causses. Notre philosophie : un accueil simple et chaleureux dans un cadre naturel préservé.",
+    vanliferExperience: [
+      "Le Camping Saint Lambert s’étend sur 3,5 hectares arborés le long des eaux claires de la Dourbie. À seulement 2,5 km du centre de Millau, il permet de profiter d’un environnement calme entre falaises sans renoncer aux commerces et aux services de la ville.",
+      "Le viaduc de Millau, les gorges du Tarn, de la Dourbie et de la Jonte ainsi que les plateaux calcaires des Grands Causses composent un terrain d’aventure exceptionnel. Randonnée, canoë, kayak, rafting, escalade, via ferrata, VTT, spéléologie et parapente sont accessibles à proximité.",
+      "Le camping donne directement accès à une grande plage privée sur la Dourbie. La rivière comporte des secteurs profonds, des zones peu profondes adaptées aux enfants, des parties avec courant et des espaces plus calmes pour se rafraîchir.",
+      "Le Chaos de Montpellier-le-Vieux, les caves de Roquefort-sur-Soulzon, les villages de Peyre, Compeyre et Peyreleau ainsi que le marché de Millau complètent les découvertes. Le classement Refuge LPO souligne l’attention portée à la biodiversité du site.",
+    ],
+    vanSpecifics: "133 emplacements, dont 32 privilégiés en bord de rivière · parcelles Nature et rivière d’environ 100 à 120 m² · emplacements XXL de 155 à 200 m² · formule Freecamp avec sanitaire privatif · branchement électrique 10A · aire de services pour camping-cars · arrivée à partir de 14h, départ avant 12h.",
+    opening: "Ouvert du 25 avril au 19 octobre 2026. Réception ouverte tous les jours pendant la saison.",
+    openingMonths: ["Avr", "Mai", "Juin", "Juil", "Août", "Sep", "Oct"],
+    swimming: "Piscine extérieure chauffée avec espace adapté aux familles. Accès direct à la plage privée de la Dourbie : zone profonde pour nager, secteur peu profond pour les enfants, partie avec courant et zone calme. La rivière est également adaptée à la pêche.",
+    dining: "Snack-bar avec terrasse, glaces, pizzas et plats à emporter, ouvert du 1er juillet au 25 août. Épicerie de dépannage et dépôt de pain frais chaque matin en haute saison. Location de barbecues à charbon ou à gaz.",
+    activities: [
+      "Viaduc de Millau et ses points de vue",
+      "Gorges du Tarn, de la Dourbie et de la Jonte",
+      "Canoë-kayak, rafting et pêche depuis les rivières voisines",
+      "Randonnée, VTT, escalade, via ferrata et parapente dans les Grands Causses",
+      "Chaos de Montpellier-le-Vieux à environ 15 km",
+      "Roquefort-sur-Soulzon et ses caves à environ 25 km",
+      "Causse Noir, dolmens et villages de Peyre, Compeyre et Peyreleau",
+      "Marché de Millau les mercredis et vendredis",
+      "Musée de Millau et sites paléontologiques",
+    ],
+    otherInfo: [
+      "Piscine chauffée · plage privée · Wi-Fi gratuit dans la salle de jeux et accès illimité payant sur les emplacements · électricité 10A · aire de vidange et remplissage · trois blocs sanitaires, dont un accessible PMR.",
+      "Pataugeoire et aire de jeux · espace sportif · terrain de pétanque · barbecue collectif · salle de bain bébé · laverie · location de réfrigérateurs · informations touristiques.",
+      "Animaux acceptés ; les chiens sont gratuits sur les emplacements. Chèques-Vacances ANCV et paiement par carte bancaire acceptés.",
+    ],
+    bookingMethods: ["En ligne", "Par téléphone", "Par email"],
+    reservationLabel: "Réserver un emplacement",
+    reservationUrl: "https://bookingpremium.secureholiday.net/fr/674/",
+    planUrl: "https://i.ibb.co/xKGz3SCz/Plan-2025.jpg",
+    tourismUrl: "https://www.camping-millau-riviere.fr/fr-fr/tourisme-et-loisirs",
     regionLink: { label: "Découvrir les autres lieux vanlife de la région", href: "/explorer" },
   },
   "camping-la-plage": {
