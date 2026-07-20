@@ -12,7 +12,7 @@ export type VerifiedPlaceGps = {
 // Les coordonnées ne sont volontairement pas arrondies : elles servent aux
 // marqueurs de la MAP et aux boutons Google Maps / Waze.
 const VERIFIED_PLACE_GPS: Record<string, VerifiedPlaceGps> = {
-  "camping-de-pont-augan": { address: "Camping De Pont Augan N°6, 56150 Baud", lat: 47.8827125, lng: -3.1070201, googleMapsUrl: "https://maps.app.goo.gl/1Dpk6wUuh2URpBno7", verifiedAt: "2026-07-18", source: "Google Maps" },
+  "camping-de-pont-augan": { address: "6 Pont Augan, 56150 Baud", lat: 47.8827125, lng: -3.1070201, googleMapsUrl: "https://maps.app.goo.gl/1Dpk6wUuh2URpBno7", verifiedAt: "2026-07-18", source: "Google Maps" },
   "camping-de-lann-hoedic": { address: "Rue Jean de la Fontaine Lann Hoedic, 56370 Sarzeau", lat: 47.5074329, lng: -2.7609594, googleMapsUrl: "https://maps.app.goo.gl/LXfUAz3fQyEUHqwk7", verifiedAt: "2026-07-18", source: "Google Maps" },
   "camping-de-la-torche": { address: "4 Roz an Tremen, 29120 Plomeur", lat: 47.8327074, lng: -4.3268287, googleMapsUrl: "https://maps.app.goo.gl/QP2nckXxDaQFHq1u6", verifiedAt: "2026-07-18", source: "Google Maps" },
   "camping-le-verger": { address: "27 Rue Jean-Pierre Pigot - Bellecroix, 17139 Dompierre-sur-Mer", lat: 46.1777366, lng: -1.0544302, googleMapsUrl: "https://maps.app.goo.gl/N63o1o3WjACZqUjb8", verifiedAt: "2026-07-18", source: "Google Maps" },
@@ -25,7 +25,7 @@ const VERIFIED_PLACE_GPS: Record<string, VerifiedPlaceGps> = {
   "camping-les-terrasses": { address: "65 Chemin des Cigales, 34360 Saint-Chinian", lat: 43.421221, lng: 2.933939, googleMapsUrl: "https://maps.app.goo.gl/ezD4JiTvWD6wdrAS7", verifiedAt: "2026-07-18", source: "Google Maps" },
   "camping-la-plage": { address: "85 Le Courau, 30630 Saint-André-de-Roquepertuis", lat: 44.2458888, lng: 4.4508187, googleMapsUrl: "https://maps.app.goo.gl/6bcChEWTvjL1jJ3z5", verifiedAt: "2026-07-18", source: "Google Maps" },
   "camping-les-drouihedes": { address: "100 Allée du Camping, 30160 Peyremale", lat: 44.2911619, lng: 4.0670651, googleMapsUrl: "https://maps.app.goo.gl/uoVdrWZT2YjRWFqE6", verifiedAt: "2026-07-18", source: "Google Maps" },
-  "camping-les-amarines": { address: "D23, 30630 Cornillon", lat: 44.2198737, lng: 4.4801014, googleMapsUrl: "https://maps.app.goo.gl/sDoJkt8n1zcwqmq96", verifiedAt: "2026-07-18", source: "Google Maps" },
+  "camping-les-amarines": { address: "181 Route de Goudargues, 30630 Cornillon", lat: 44.2198737, lng: 4.4801014, googleMapsUrl: "https://maps.app.goo.gl/sDoJkt8n1zcwqmq96", verifiedAt: "2026-07-18", source: "Google Maps" },
   "camping-le-coin-charmant": { address: "1050 Chemin des Digues, 07120 Chauzon", lat: 44.4858796, lng: 4.3732603, googleMapsUrl: "https://maps.app.goo.gl/jqaHmA2tUYwQ3ymv9", verifiedAt: "2026-07-18", source: "Google Maps" },
   "camping-au-tylo-soleil": { address: "627 Route des Encontres, 04300 Dauphin", lat: 43.9110218, lng: 5.7820187, googleMapsUrl: "https://maps.app.goo.gl/rZoXSq3o3Lef9TYGA", verifiedAt: "2026-07-18", source: "Google Maps" },
   "camping-de-laix": { address: "364 Route du Camping, 42260 Pommiers-en-Forez", lat: 45.8241306, lng: 4.0679327, googleMapsUrl: "https://maps.app.goo.gl/TeHxn5Tqy72Ly9436", verifiedAt: "2026-07-18", source: "Google Maps" },

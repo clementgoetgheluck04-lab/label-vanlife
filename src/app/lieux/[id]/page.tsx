@@ -167,11 +167,11 @@ export default function LieuDetailPage({ params }: { params: Promise<{ id: strin
           <section className="overflow-hidden rounded-3xl border border-[#c39960]/35 bg-[#f7f1e8]">
             <div className="grid gap-6 p-6 sm:grid-cols-[180px_1fr] sm:p-8">
               <div>
-                <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#8b673d]">Réduction membres</p>
-                <p className="mt-2 text-5xl font-black text-neutral-950">−{lieu.discountPercent}%</p>
+                <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#8b673d]">{lieu.discountPercent > 0 ? "Réduction membres" : "Tarif public accessible"}</p>
+                <p className={`${lieu.discountPercent > 0 ? "text-5xl" : "text-2xl leading-tight"} mt-2 font-black text-neutral-950`}>{lieu.discountPercent > 0 ? `−${lieu.discountPercent}%` : lieu.priceHighlight}</p>
               </div>
               <div className="space-y-3">
-                <h2 className="text-xl font-bold text-neutral-900">Comment profiter de l’avantage</h2>
+                <h2 className="text-xl font-bold text-neutral-900">{lieu.discountPercent > 0 ? "Comment profiter de l’avantage" : "Conditions et tarifs"}</h2>
                 {richDetails.promoCode && <p className="inline-flex rounded-xl border border-[#c39960]/40 bg-white px-4 py-2 text-sm text-neutral-700">Code de réservation : <strong className="ml-2 font-mono text-neutral-950">{richDetails.promoCode}</strong></p>}
                 {richDetails.discountInstructions.map((instruction) => (
                   <p key={instruction} className="flex gap-3 text-sm leading-6 text-neutral-700"><span className="font-bold text-[#8b673d]">→</span><span>{instruction}</span></p>

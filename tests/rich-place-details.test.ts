@@ -2,15 +2,17 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { getRichPlaceDetails } from "../src/data/rich-place-details.ts";
 
-test("la fiche enrichie du Camping de Pont Augan contient l’accueil de Cathy et Céline", () => {
+test("la fiche enrichie du Camping de Pont Augan contient les informations actualisées", () => {
   const details = getRichPlaceDetails("camping-de-pont-augan");
   assert.ok(details);
   assert.equal(details.labelYear, 2026);
-  assert.ok(details.contactName?.includes("Cathy & Céline"));
+  assert.equal(details.contactName, "Cathy Léon — propriétaire");
   assert.equal(details.openingMonths?.length, 7);
   assert.equal(details.activities?.length, 8);
   assert.equal(details.bookingMethods?.length, 3);
   assert.ok(details.vanSpecifics?.includes("32 emplacements"));
+  assert.ok(details.vanSpecifics?.includes("électricité 10A"));
+  assert.ok(details.venueQuote?.includes("Irlande"));
   assert.ok(details.opening?.includes("1er avril au 11 octobre"));
   assert.match(details.facebookUrl ?? "", /^https:\/\/www\.facebook\.com\//);
   assert.equal(details.reservationUrl, "https://online.resa-booking.com/front/list.php?id_est=1617&lang=fr");
@@ -269,4 +271,31 @@ test("la fiche enrichie du Mas de Bouzou précise les contraintes de l’accueil
   assert.ok(details.vanSpecifics?.includes("animaux non acceptés"));
   assert.ok(details.swimming?.includes("Piscine privée"));
   assert.match(details.facebookUrl ?? "", /^https:\/\/www\.facebook\.com\//);
+});
+
+test("la fiche enrichie des Amarines contient le code et les services van", () => {
+  const details = getRichPlaceDetails("camping-les-amarines");
+  assert.ok(details);
+  assert.equal(details.labelYear, 2026);
+  assert.equal(details.promoCode, "AMAVANLIFE10");
+  assert.equal(details.openingMonths?.length, 6);
+  assert.equal(details.activities?.length, 8);
+  assert.equal(details.bookingMethods?.length, 4);
+  assert.ok(details.vanSpecifics?.includes("15 emplacements"));
+  assert.ok(details.vanSpecifics?.includes("90 à 180 m²"));
+  assert.ok(details.swimming?.includes("mi-avril à mi-septembre"));
+  assert.equal(details.reservationUrl, "https://reservation.secureholiday.net/fr/10063/");
+});
+
+test("la fiche enrichie du Pâtis affiche les mini-tarifs sans fausse réduction", () => {
+  const details = getRichPlaceDetails("camping-le-patis");
+  assert.ok(details);
+  assert.equal(details.labelYear, 2026);
+  assert.equal(details.displayType, "Camping associatif");
+  assert.equal(details.discountInstructions?.length, 4);
+  assert.equal(details.bookingMethods?.length, 3);
+  assert.ok(details.discountInstructions?.[0].includes("mini-tarifs publics"));
+  assert.ok(details.discountInstructions?.[1].includes("13 €"));
+  assert.ok(details.vanSpecifics?.includes("six personnes maximum"));
+  assert.ok(details.opening?.includes("13 mars 2026"));
 });
