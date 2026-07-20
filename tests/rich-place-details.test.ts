@@ -287,6 +287,24 @@ test("la fiche enrichie des Amarines contient le code et les services van", () =
   assert.equal(details.reservationUrl, "https://reservation.secureholiday.net/fr/10063/");
 });
 
+test("la fiche enrichie du Camping La Plage contient le code et les services au bord de la Cèze", () => {
+  const details = getRichPlaceDetails("camping-la-plage");
+  assert.ok(details);
+  assert.equal(details.labelYear, 2026);
+  assert.equal(details.contactName, "Fabien Dugué — gérant");
+  assert.equal(details.promoCode, "LABELVANLIFE10");
+  assert.equal(details.openingMonths?.length, 6);
+  assert.equal(details.activities?.length, 9);
+  assert.equal(details.bookingMethods?.length, 4);
+  assert.ok(details.vanSpecifics?.includes("150 à 450 m²"));
+  assert.ok(details.vanSpecifics?.includes("électricité 10A"));
+  assert.ok(details.swimming?.includes("plus de 50 cm"));
+  assert.ok(details.swimming?.includes("moins de 50 cm"));
+  assert.ok(details.opening?.includes("30 avril au 12 septembre 2026"));
+  assert.match(details.facebookUrl ?? "", /^https:\/\/www\.facebook\.com\//);
+  assert.equal(details.reservationUrl, "https://online.resa-booking.com/front/list.php?id_est=1574");
+});
+
 test("la fiche enrichie du Pâtis affiche les mini-tarifs sans fausse réduction", () => {
   const details = getRichPlaceDetails("camping-le-patis");
   assert.ok(details);
