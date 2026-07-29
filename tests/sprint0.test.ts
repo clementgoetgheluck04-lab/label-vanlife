@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { PRODUCTS, getLabellisationProduct } from "../src/config/products.ts";
 import { isSafeRedirectPath } from "../src/lib/urls.ts";
-import { parseEmail, parseLabellisationPayload, parseText } from "../src/server/validation.ts";
+import { parseEmail, parseLabellisationPayload, parseMemberSignupPayload, parseText } from "../src/server/validation.ts";
 import { ECOSYSTEM_PRODUCTS } from "../src/config/ecosystem.ts";
 import { generateMemberAccessCode, hashMemberAccessCode, memberAccessCodeMatches } from "../src/server/member-access.ts";
 
@@ -37,6 +37,27 @@ test("email and text validation reject malformed or oversized input", () => {
   assert.equal(parseEmail("invalid"), null);
   assert.equal(parseText(" hello ", { min: 2, max: 10, required: true }), "hello");
   assert.equal(parseText("x".repeat(11), { max: 10 }), null);
+});
+
+test("member signup validates the holder and every covered companion", () => {
+  const signup = parseMemberSignupPayload({
+    email: "FAMILLE@example.com",
+    password: "une-phrase-secrete-solide",
+    firstName: "Marie",
+    lastName: "Martin",
+    phone: "0612345678",
+    age: 38,
+    companions: [
+      { firstName: "Alex", lastName: "Martin", age: 40 },
+      { firstName: "Léa", lastName: "Martin", age: 7 },
+    ],
+  });
+  assert.ok(signup);
+  assert.equal(signup.email, "famille@example.com");
+  assert.deepEqual(signup.companions.map(({ age }) => age), [40, 7]);
+  assert.equal(parseMemberSignupPayload({ ...signup, age: 17 }), null);
+  assert.equal(parseMemberSignupPayload({ ...signup, companions: [{ firstName: "Léa", lastName: "Martin", age: -1 }] }), null);
+  assert.equal(parseMemberSignupPayload({ ...signup, companions: Array.from({ length: 8 }, () => ({ firstName: "Test", lastName: "Membre", age: 20 })) }), null);
 });
 
 test("member access codes are strong, normalized and never stored in clear text", () => {

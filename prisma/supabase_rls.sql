@@ -38,6 +38,7 @@ create trigger on_auth_user_created
 
 alter table public.users enable row level security;
 alter table public.profiles enable row level security;
+alter table public.member_companions enable row level security;
 alter table public.memberships enable row level security;
 alter table public.member_cards enable row level security;
 alter table public.establishment_profiles enable row level security;
@@ -69,6 +70,10 @@ drop policy if exists "profiles_own" on public.profiles;
 create policy "profiles_own" on public.profiles for all to authenticated
 using ("userId" = (select auth.uid())::text or (select public.is_admin()))
 with check ("userId" = (select auth.uid())::text or (select public.is_admin()));
+
+drop policy if exists "member_companions_read_own_or_admin" on public.member_companions;
+create policy "member_companions_read_own_or_admin" on public.member_companions for select to authenticated
+using ("userId" = (select auth.uid())::text or (select public.is_admin()));
 
 drop policy if exists "memberships_read_own_or_admin" on public.memberships;
 create policy "memberships_read_own_or_admin" on public.memberships for select to authenticated

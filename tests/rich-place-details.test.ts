@@ -1,6 +1,25 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { getRichPlaceDetails } from "../src/data/rich-place-details.ts";
+import { getPublicRichPlaceDetails, getRichPlaceDetails } from "../src/data/rich-place-details.ts";
+
+test("les codes promotionnels ne sont jamais exposés dans les données publiques", () => {
+  const protectedPlaces = [
+    ["eco-camping-la-porte-dautan", "labelvanlife"],
+    ["camping-au-tylo-soleil", "LABELVANLIFE2026"],
+    ["camping-de-la-torche", "VANLIFE2026"],
+    ["camping-la-plage", "LABELVANLIFE10"],
+    ["camping-les-amarines", "AMAVANLIFE10"],
+  ] as const;
+
+  for (const [placeId, promoCode] of protectedPlaces) {
+    const privateDetails = getRichPlaceDetails(placeId);
+    const publicDetails = getPublicRichPlaceDetails(placeId);
+
+    assert.equal(privateDetails?.promoCode, promoCode);
+    assert.equal(publicDetails?.promoCode, undefined);
+    assert.equal(JSON.stringify(publicDetails).toLowerCase().includes(promoCode.toLowerCase()), false);
+  }
+});
 
 test("la fiche enrichie du Camping de Pont Augan contient les informations actualisées", () => {
   const details = getRichPlaceDetails("camping-de-pont-augan");

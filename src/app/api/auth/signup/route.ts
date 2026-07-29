@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getPrisma } from "@/lib/prisma";
 import { getAppUrl } from "@/server/env";
 import { apiError } from "@/server/http";
-import { parseEmail, parseText } from "@/server/validation";
+import { parseMemberSignupPayload } from "@/server/validation";
 import { assertSameOrigin, enforceRateLimit } from "@/server/request-security";
 
 export async function POST(request: NextRequest) {
@@ -11,39 +11,54 @@ export async function POST(request: NextRequest) {
     assertSameOrigin(request);
     enforceRateLimit(request, "signup", 5, 60 * 60 * 1_000);
     const body = await request.json();
-    const email = parseEmail(body.email);
-    const password = typeof body.password === "string" ? body.password : "";
-    const firstName = parseText(body.firstName, { min: 2, max: 80, required: true });
-    const lastName = parseText(body.lastName, { min: 2, max: 100, required: true });
-    const phone = parseText(body.phone, { min: 6, max: 30, required: true });
-    if (!email || !firstName || !lastName || !phone || password.length < 12 || password.length > 128) {
+    const signup = parseMemberSignupPayload(body);
+    if (!signup) {
       return NextResponse.json(
-        { error: "Use a valid email and a password of at least 12 characters" },
+        { error: "Vérifiez vos coordonnées, votre âge et les informations des accompagnants." },
         { status: 400 },
       );
     }
+    const { email, password, firstName, lastName, phone, age, companions } = signup;
 
     const supabase = await createClient();
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        emailRedirectTo: `${getAppUrl()}/auth/callback?next=/devenir-membre`,
+        emailRedirectTo: `${getAppUrl()}/auth/callback?next=${encodeURIComponent("/devenir-membre?checkout=ready")}`,
         data: { firstName, lastName, phone },
       },
     });
-    if (error) console.warn("[signup] Supabase rejected the request", error.code);
-    if (!error && data.user) {
+    if (error) {
+      const duplicate = ["user_already_exists", "email_exists", "user_already_registered"].includes(error.code || "");
+      if (!duplicate) {
+        console.warn("[signup] Supabase rejected the request", error.code);
+        return NextResponse.json(
+          { error: "Impossible de créer le compte pour le moment. Réessayez dans quelques minutes." },
+          { status: 503 },
+        );
+      }
+    }
+    const createdUser = data.user;
+    if (createdUser && createdUser.identities?.length !== 0) {
       const prisma = getPrisma();
-      await prisma.user.upsert({
-        where: { id: data.user.id },
-        create: { id: data.user.id, email },
-        update: { email },
-      });
-      await prisma.profile.upsert({
-        where: { userId: data.user.id },
-        create: { userId: data.user.id, firstName, lastName, phone },
-        update: { firstName, lastName, phone },
+      await prisma.$transaction(async (tx) => {
+        await tx.user.upsert({
+          where: { id: createdUser.id },
+          create: { id: createdUser.id, email },
+          update: { email },
+        });
+        await tx.profile.upsert({
+          where: { userId: createdUser.id },
+          create: { userId: createdUser.id, firstName, lastName, phone, age },
+          update: { firstName, lastName, phone, age },
+        });
+        await tx.memberCompanion.deleteMany({ where: { userId: createdUser.id } });
+        if (companions.length > 0) {
+          await tx.memberCompanion.createMany({
+            data: companions.map((companion) => ({ ...companion, userId: createdUser.id })),
+          });
+        }
       });
     }
 

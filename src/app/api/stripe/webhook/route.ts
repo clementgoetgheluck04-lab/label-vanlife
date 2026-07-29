@@ -66,7 +66,7 @@ async function sendMembershipActivation(orderId: string): Promise<void> {
   const prisma = getPrisma();
   const order = await prisma.checkoutOrder.findUnique({
     where: { id: orderId },
-    include: { user: { include: { profile: true, memberCard: true, membership: true } } },
+    include: { user: { include: { profile: true, memberCard: true, membership: true, memberCompanions: true } } },
   });
   if (!order || order.product !== "MEMBERSHIP" || !order.user) return;
 
@@ -88,6 +88,10 @@ async function sendMembershipActivation(orderId: string): Promise<void> {
   const codeExpiresAt = order.user.membership?.expiresAt ?? new Date(Date.now() + 365 * 24 * 60 * 60 * 1_000);
   const profile = order.user.profile;
   const fullName = [profile?.firstName, profile?.lastName].filter(Boolean).join(" ") || "Nouveau membre";
+  const coveredPeople = [
+    `${fullName}${profile?.age ? ` (${profile.age} ans)` : ""} — titulaire`,
+    ...order.user.memberCompanions.map((companion) => `${companion.firstName} ${companion.lastName} (${companion.age} ans) — accompagnant`),
+  ].join("\n");
   const cardNumber = order.user.memberCard?.cardNumber || "en cours de création";
   const resend = new Resend(requireServerEnv("RESEND_API_KEY"));
   const { error: adminEmailError } = await resend.emails.send({
@@ -95,7 +99,7 @@ async function sendMembershipActivation(orderId: string): Promise<void> {
     to: "contact@labelvanlife.com",
     replyTo: order.user.email,
     subject: `Nouveau membre payé — ${fullName}`,
-    text: `Un nouveau membre vient de finaliser son paiement.\n\nNom : ${fullName}\nEmail : ${order.user.email}\nTéléphone : ${profile?.phone || "Non renseigné"}\nMontant : ${formatEuro(order.amount)}\nCarte membre : ${cardNumber}\nCommande : ${order.id}`,
+    text: `Un nouveau membre vient de finaliser son paiement.\n\nPersonnes couvertes :\n${coveredPeople}\n\nEmail : ${order.user.email}\nTéléphone : ${profile?.phone || "Non renseigné"}\nMontant : ${formatEuro(order.amount)}\nCarte membre : ${cardNumber}\nCommande : ${order.id}`,
   });
   if (adminEmailError) throw new Error("Membership admin notification failed");
   const { error: memberEmailError } = await resend.emails.send({

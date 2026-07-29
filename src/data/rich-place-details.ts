@@ -957,3 +957,38 @@ const RICH_PLACE_DETAILS: Record<string, RichPlaceDetails> = {
 export function getRichPlaceDetails(placeId: string): RichPlaceDetails | undefined {
   return RICH_PLACE_DETAILS[placeId];
 }
+
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+export function getPublicRichPlaceDetails(placeId: string): RichPlaceDetails | undefined {
+  const details = getRichPlaceDetails(placeId);
+  if (!details) return undefined;
+
+  const promoCode = details.promoCode?.trim();
+  if (!promoCode) return { ...details, promoCode: undefined };
+
+  const promoCodePattern = new RegExp(escapeRegExp(promoCode), "gi");
+  const redact = (value: string): string => value.replace(promoCodePattern, "code réservé aux membres");
+
+  return {
+    ...details,
+    promoCode: undefined,
+    discountInstructions: details.discountInstructions?.map(redact),
+    venueQuote: details.venueQuote ? redact(details.venueQuote) : undefined,
+    vanliferExperience: details.vanliferExperience?.map(redact),
+    vanSpecifics: details.vanSpecifics ? redact(details.vanSpecifics) : undefined,
+    opening: details.opening ? redact(details.opening) : undefined,
+    swimming: details.swimming ? redact(details.swimming) : undefined,
+    dining: details.dining ? redact(details.dining) : undefined,
+    activities: details.activities?.map(redact),
+    otherInfo: details.otherInfo?.map(redact),
+    detailSections: details.detailSections?.map((section) => ({
+      title: redact(section.title),
+      items: section.items.map(redact),
+    })),
+    bookingMethods: details.bookingMethods?.map(redact),
+    reservationLabel: details.reservationLabel ? redact(details.reservationLabel) : undefined,
+  };
+}

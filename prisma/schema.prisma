@@ -50,6 +50,7 @@ model User {
   updatedAt DateTime @updatedAt
 
   profile        Profile?
+  memberCompanions MemberCompanion[]
   membership     Membership?
   memberCard     MemberCard?
   favorites      Favorite[]
@@ -84,6 +85,7 @@ model Profile {
   lastName  String?
   avatarUrl String?
   phone     String?
+  age       Int?
   points    Int     @default(0)
   level     String  @default("EXPLORATEUR")
   bio       String?
@@ -94,6 +96,22 @@ model Profile {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("profiles")
+}
+
+model MemberCompanion {
+  id        String @id @default(cuid())
+  userId    String
+  firstName String
+  lastName  String
+  age       Int
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("member_companions")
 }
 
 // ─── ABONNEMENT MEMBRE ────────────────────────────────────

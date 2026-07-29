@@ -19,6 +19,56 @@ export function parseText(
   return text;
 }
 
+export type MemberCompanionPayload = {
+  firstName: string;
+  lastName: string;
+  age: number;
+};
+
+export type MemberSignupPayload = {
+  email: string;
+  password: string;
+  firstName: string;
+  lastName: string;
+  phone: string;
+  age: number;
+  companions: MemberCompanionPayload[];
+};
+
+function parseIntegerInRange(value: unknown, min: number, max: number): number | null {
+  const parsed = typeof value === "number" ? value : Number(value);
+  return Number.isInteger(parsed) && parsed >= min && parsed <= max ? parsed : null;
+}
+
+export function parseMemberSignupPayload(value: unknown): MemberSignupPayload | null {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return null;
+  const input = value as Record<string, unknown>;
+  const email = parseEmail(input.email);
+  const password = typeof input.password === "string" ? input.password : "";
+  const firstName = parseText(input.firstName, { min: 2, max: 80, required: true });
+  const lastName = parseText(input.lastName, { min: 2, max: 100, required: true });
+  const phone = parseText(input.phone, { min: 6, max: 30, required: true });
+  const age = parseIntegerInRange(input.age, 18, 120);
+  const rawCompanions = Array.isArray(input.companions) ? input.companions : [];
+
+  if (!email || !firstName || !lastName || !phone || age === null || password.length < 12 || password.length > 128 || rawCompanions.length > 7) {
+    return null;
+  }
+
+  const companions: MemberCompanionPayload[] = [];
+  for (const raw of rawCompanions) {
+    if (!raw || typeof raw !== "object" || Array.isArray(raw)) return null;
+    const companion = raw as Record<string, unknown>;
+    const companionFirstName = parseText(companion.firstName, { min: 2, max: 80, required: true });
+    const companionLastName = parseText(companion.lastName, { min: 2, max: 100, required: true });
+    const companionAge = parseIntegerInRange(companion.age, 0, 120);
+    if (!companionFirstName || !companionLastName || companionAge === null) return null;
+    companions.push({ firstName: companionFirstName, lastName: companionLastName, age: companionAge });
+  }
+
+  return { email, password, firstName, lastName, phone, age, companions };
+}
+
 export type LabellisationPayload = {
   establishmentName: string;
   contactName: string;

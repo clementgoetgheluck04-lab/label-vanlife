@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, ArrowRight, Building2, Check, ClipboardCheck, FileText, Loader2, Percent, Upload, X } from "lucide-react";
@@ -66,6 +66,7 @@ const initialForm = {
 
 export default function CandidaturePage() {
   const router = useRouter();
+  const stepTopRef = useRef<HTMLElement>(null);
   const [step, setStep] = useState(0);
   const [loading, setLoading] = useState(false);
   const [planError, setPlanError] = useState("");
@@ -118,8 +119,17 @@ export default function CandidaturePage() {
   }, [form, progressRestored]);
 
   useEffect(() => {
-    const timeout = window.setTimeout(scrollToTopImmediately, 0);
-    return () => window.clearTimeout(timeout);
+    let secondFrame = 0;
+    const firstFrame = window.requestAnimationFrame(() => {
+      secondFrame = window.requestAnimationFrame(() => {
+        stepTopRef.current?.focus({ preventScroll: true });
+        scrollToTopImmediately();
+      });
+    });
+    return () => {
+      window.cancelAnimationFrame(firstFrame);
+      if (secondFrame) window.cancelAnimationFrame(secondFrame);
+    };
   }, [step]);
 
   const setCriterion = (id: string, patch: Partial<CriterionAnswer>) => update({
@@ -211,7 +221,7 @@ export default function CandidaturePage() {
   const textareaClass = "mt-2 w-full resize-y rounded-xl border border-neutral-200 bg-white px-4 py-3 text-neutral-900 outline-none transition focus:border-[#c39960] focus:ring-2 focus:ring-[#c39960]/25";
 
   return (
-    <main id="candidature-top" className="min-h-screen bg-gradient-to-b from-[#f7f1e8] to-white px-4 pb-20 pt-24">
+    <main ref={stepTopRef} tabIndex={-1} id="candidature-top" className="min-h-screen bg-gradient-to-b from-[#f7f1e8] to-white px-4 pb-20 pt-24 outline-none" style={{ overflowAnchor: "none" }}>
       <div className="mx-auto max-w-4xl space-y-8">
         {claimedPlaceName && (
           <div className="rounded-2xl border border-[#c39960]/35 bg-[#f7f1e8] p-4 text-sm text-neutral-700">

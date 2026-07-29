@@ -54,7 +54,7 @@ export default function MemberLieuxPage() {
         ) : (
           <div className="space-y-3">
             {favoris.map((lieu) => (
-              <Link key={lieu.id} href={`/map/${lieu.id}`}>
+              <Link key={lieu.id} href={`/lieux/${lieu.id}`}>
                 <Card variant="interactive" className="flex items-center gap-4 p-4">
                   <div className="h-14 w-14 rounded-xl bg-sage/10 flex items-center justify-center shrink-0 overflow-hidden">
                     <MapPin className="h-6 w-6 text-sage" />

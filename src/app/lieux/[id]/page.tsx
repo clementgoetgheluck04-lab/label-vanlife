@@ -1,6 +1,3 @@
-"use client";
-
-import { use } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -34,8 +31,9 @@ import { ENRICHED_LIEUX } from "@/data/enriched-lieux";
 import { getPlaceContact } from "@/data/place-contacts";
 import { getPlaceMedia } from "@/data/place-media";
 import { cleanSourceActivities, cleanSourceCapacity, cleanSourceOpeningHours, getLabelledSourceDetails } from "@/data/labelled-source-details";
-import { getRichPlaceDetails } from "@/data/rich-place-details";
+import { getPublicRichPlaceDetails, getRichPlaceDetails } from "@/data/rich-place-details";
 import { getVerifiedPlaceGps } from "@/data/verified-place-gps";
+import { hasActiveMemberAccess } from "@/server/auth";
 
 const SERVICE_ICONS: Record<string, { icon: LucideIcon; label: string }> = {
   wifi: { icon: Wifi, label: "Wi-Fi" },
@@ -61,8 +59,8 @@ const TYPE_LABELS: Record<string, string> = {
   activite: "Activité",
 };
 
-export default function LieuDetailPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = use(params);
+export default async function LieuDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const lieu = ENRICHED_LIEUX.find((item) => item.id === id);
 
   if (!lieu) {
@@ -79,7 +77,10 @@ export default function LieuDetailPage({ params }: { params: Promise<{ id: strin
 
   const media = getPlaceMedia(lieu.id);
   const verifiedContact = getPlaceContact(lieu.id);
-  const richDetails = getRichPlaceDetails(lieu.id);
+  const memberHasAccess = await hasActiveMemberAccess();
+  const richDetails = memberHasAccess
+    ? getRichPlaceDetails(lieu.id)
+    : getPublicRichPlaceDetails(lieu.id);
   const sourceDetails = getLabelledSourceDetails(lieu.id);
   const phones = [...new Set([verifiedContact.phone, lieu.telephone, ...sourceDetails.flatMap((source) => source.phones ?? [])].filter((value): value is string => Boolean(value)))];
   const emails = [...new Set([verifiedContact.email, lieu.email, ...sourceDetails.flatMap((source) => source.emails ?? [])].filter((value): value is string => Boolean(value)))];
@@ -172,7 +173,14 @@ export default function LieuDetailPage({ params }: { params: Promise<{ id: strin
               </div>
               <div className="space-y-3">
                 <h2 className="text-xl font-bold text-neutral-900">{lieu.discountPercent > 0 ? "Comment profiter de l’avantage" : "Conditions et tarifs"}</h2>
-                {richDetails.promoCode && <p className="inline-flex rounded-xl border border-[#c39960]/40 bg-white px-4 py-2 text-sm text-neutral-700">Code de réservation : <strong className="ml-2 font-mono text-neutral-950">{richDetails.promoCode}</strong></p>}
+                {memberHasAccess && richDetails.promoCode && <p className="inline-flex rounded-xl border border-[#c39960]/40 bg-white px-4 py-2 text-sm text-neutral-700">Code de réservation : <strong className="ml-2 font-mono text-neutral-950">{richDetails.promoCode}</strong></p>}
+                {!memberHasAccess && lieu.discountPercent > 0 && (
+                  <div className="rounded-xl border border-emerald-200 bg-white px-4 py-3 text-sm text-neutral-700">
+                    <p className="font-semibold text-emerald-800">Modalités réservées aux membres</p>
+                    <p className="mt-1 text-neutral-500">Connectez-vous à votre espace membre pour consulter le code ou les modalités privées de réservation.</p>
+                    <Link href="/member-login" className="mt-3 inline-flex font-bold text-emerald-700 underline underline-offset-2">Connexion membre</Link>
+                  </div>
+                )}
                 {richDetails.discountInstructions.map((instruction) => (
                   <p key={instruction} className="flex gap-3 text-sm leading-6 text-neutral-700"><span className="font-bold text-[#8b673d]">→</span><span>{instruction}</span></p>
                 ))}
@@ -383,7 +391,7 @@ export default function LieuDetailPage({ params }: { params: Promise<{ id: strin
           {lieu.tags.map((tag) => <span key={tag} className="rounded-full border border-neutral-200 bg-neutral-50 px-3 py-1.5 text-xs capitalize text-neutral-600"># {tag}</span>)}
         </section>
 
-        <section className="rounded-3xl bg-gradient-to-r from-emerald-700 to-emerald-600 p-7 text-center shadow-lg sm:p-10">
+        {!memberHasAccess && <section className="rounded-3xl bg-gradient-to-r from-emerald-700 to-emerald-600 p-7 text-center shadow-lg sm:p-10">
           <div className="flex items-baseline justify-center gap-2 text-white">
             <span className="text-xl text-emerald-200 line-through">39€</span>
             <span className="text-4xl font-bold">29€</span>
@@ -397,7 +405,7 @@ export default function LieuDetailPage({ params }: { params: Promise<{ id: strin
           <Link href="/devenir-membre" className="mt-5 inline-block">
             <Button variant="primary" className="gap-2 bg-white px-8 text-emerald-800 hover:bg-emerald-50">Obtenir ma carte membre — 29€ <ArrowRight className="h-4 w-4" /></Button>
           </Link>
-        </section>
+        </section>}
 
         <div className="text-center">
           <Link href="/explorer"><Button variant="ghost" className="gap-1 text-neutral-500"><ArrowLeft className="h-4 w-4" /> Retour à la liste</Button></Link>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/browser";
@@ -28,7 +28,7 @@ type MemberCardView = {
 
 export default function MemberCardPage() {
   const router = useRouter();
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
   const [member, setMember] = useState<MemberCardView | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -58,9 +58,14 @@ export default function MemberCardPage() {
 
       const { data: profile } = await supabase
         .from("profiles")
-        .select("firstName, lastName, phone, level, points")
+        .select("firstName, lastName, phone, age, level, points")
         .eq("userId", user.id)
         .single();
+      const { data: companions } = await supabase
+        .from("member_companions")
+        .select("id, firstName, lastName, age, createdAt")
+        .eq("userId", user.id)
+        .order("createdAt", { ascending: true });
       const { data: card } = await supabase
         .from("member_cards")
         .select("cardNumber")
@@ -91,12 +96,18 @@ export default function MemberCardPage() {
         people: [{
           firstName: profile?.firstName || String(user.user_metadata?.firstName || user.email?.split("@")[0] || "Membre"),
           lastName: profile?.lastName || String(user.user_metadata?.lastName || ""),
+          age: typeof profile?.age === "number" ? profile.age : undefined,
           memberNumber: `${card.cardNumber}-01`,
-        }],
+        }, ...(companions || []).map((companion, index) => ({
+          firstName: companion.firstName,
+          lastName: companion.lastName,
+          age: companion.age,
+          memberNumber: `${card.cardNumber}-${String(index + 2).padStart(2, "0")}`,
+        }))],
       });
       setLoading(false);
     });
-  }, []);
+  }, [router, supabase]);
 
   if (loading) {
     return (

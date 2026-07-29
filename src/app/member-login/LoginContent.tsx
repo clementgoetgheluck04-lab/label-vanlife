@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { AlertCircle, ArrowRight, Check, Download, KeyRound, Loader2, Lock, Mail, Phone, UserRound } from "lucide-react";
+import { AlertCircle, ArrowRight, Check, Download, KeyRound, Loader2, Lock, Mail, Phone, Plus, UserRound, Users, X } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { MembershipJourneyNav } from "@/components/MembershipWelcome";
@@ -15,6 +15,8 @@ export function LoginContent() {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [phone, setPhone] = useState("");
+  const [age, setAge] = useState("");
+  const [companions, setCompanions] = useState<Array<{ firstName: string; lastName: string; age: string }>>([]);
   const [accessCode, setAccessCode] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -23,6 +25,31 @@ export function LoginContent() {
   const [recoveryEmail, setRecoveryEmail] = useState("");
   const [recoveryMessage, setRecoveryMessage] = useState("");
   const [recoveryLoading, setRecoveryLoading] = useState(false);
+  const [confirmationMessage, setConfirmationMessage] = useState("");
+  const [confirmationLoading, setConfirmationLoading] = useState(false);
+
+  const updateCompanion = (index: number, patch: Partial<(typeof companions)[number]>) => {
+    setCompanions((current) => current.map((companion, companionIndex) => companionIndex === index ? { ...companion, ...patch } : companion));
+  };
+
+  const handleConfirmationResend = async () => {
+    setConfirmationLoading(true);
+    setConfirmationMessage("");
+    try {
+      const response = await fetch("/api/auth/resend-confirmation", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || "Envoi impossible");
+      setConfirmationMessage(result.message);
+    } catch (caughtError: unknown) {
+      setConfirmationMessage(caughtError instanceof Error ? caughtError.message : "Envoi impossible");
+    } finally {
+      setConfirmationLoading(false);
+    }
+  };
 
   const handleCodeRecovery = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -54,7 +81,15 @@ export function LoginContent() {
         const response = await fetch("/api/auth/signup", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, password, firstName, lastName, phone }),
+          body: JSON.stringify({
+            email,
+            password,
+            firstName,
+            lastName,
+            phone,
+            age: Number(age),
+            companions: companions.map((companion) => ({ ...companion, age: Number(companion.age) })),
+          }),
         });
         const result = await response.json();
         if (!response.ok || result.error) throw new Error(result.error || "Erreur lors de l'inscription");
@@ -80,14 +115,27 @@ export function LoginContent() {
   if (success) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-white px-6 pt-20">
-        <div className="max-w-lg space-y-4 text-center">
+        <div className="w-full max-w-lg space-y-6 text-center">
           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-emerald-50">
             <Check className="h-8 w-8 text-emerald-500" />
           </div>
           <h1 className="text-2xl font-bold text-neutral-900">Inscription réussie</h1>
-          <p className="text-neutral-500">
-            Confirmez votre adresse email, puis poursuivez vers le paiement pour activer votre carte membre.
-          </p>
+          <p className="text-neutral-500">Un email vient d’être envoyé à <strong className="text-neutral-800">{email}</strong>.</p>
+          <ol className="grid gap-3 text-left sm:grid-cols-3">
+            {["Confirmez votre email", "Le paiement Stripe s’ouvre", "Votre carte est activée"].map((label, index) => (
+              <li key={label} className="rounded-2xl border border-neutral-200 bg-neutral-50 p-4 text-sm font-medium text-neutral-700">
+                <span className="mb-2 grid h-7 w-7 place-items-center rounded-full bg-emerald-600 text-xs font-bold text-white">{index + 1}</span>
+                {label}
+              </li>
+            ))}
+          </ol>
+          <p className="text-sm leading-relaxed text-neutral-500">Cliquez sur le lien reçu : vous reviendrez automatiquement vers le paiement sécurisé.</p>
+          <Button type="button" variant="secondary-dark" className="w-full" onClick={handleConfirmationResend} disabled={confirmationLoading}>
+            {confirmationLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Mail className="h-4 w-4" />}
+            Renvoyer l’email de confirmation
+          </Button>
+          {confirmationMessage && <p className="text-xs text-neutral-500" role="status">{confirmationMessage}</p>}
+          <p className="text-xs text-neutral-400">Pensez à vérifier vos courriers indésirables.</p>
         </div>
       </div>
     );
@@ -137,6 +185,30 @@ export function LoginContent() {
                   </span>
                 </label>
                 <label className="space-y-2 text-sm font-medium text-neutral-600">
+                  <span>Âge du titulaire</span>
+                  <input type="number" min={18} max={120} value={age} onChange={(event) => setAge(event.target.value)} className="h-12 w-full rounded-xl border border-neutral-200 px-4 focus:ring-2 focus:ring-emerald-500" required inputMode="numeric" autoComplete="off" />
+                </label>
+                <div className="space-y-3 rounded-2xl border border-neutral-200 bg-neutral-50 p-4">
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      <p className="flex items-center gap-2 text-sm font-semibold text-neutral-800"><Users className="h-4 w-4 text-emerald-600" /> Accompagnants</p>
+                      <p className="mt-1 text-xs leading-relaxed text-neutral-500">Ajoutez toutes les personnes qui apparaîtront sur la carte membre.</p>
+                    </div>
+                    <button type="button" onClick={() => setCompanions((current) => current.length < 7 ? [...current, { firstName: "", lastName: "", age: "" }] : current)} disabled={companions.length >= 7} className="inline-flex min-h-10 shrink-0 items-center gap-1 rounded-xl border border-emerald-200 bg-white px-3 text-xs font-semibold text-emerald-700 disabled:opacity-40">
+                      <Plus className="h-4 w-4" /> Ajouter
+                    </button>
+                  </div>
+                  {companions.length === 0 && <p className="rounded-xl bg-white p-3 text-xs text-neutral-400">Aucun accompagnant — la carte couvrira uniquement le titulaire.</p>}
+                  {companions.map((companion, index) => (
+                    <div key={index} className="relative grid gap-3 rounded-xl border border-neutral-200 bg-white p-4 sm:grid-cols-[1fr_1fr_90px]">
+                      <button type="button" onClick={() => setCompanions((current) => current.filter((_, companionIndex) => companionIndex !== index))} aria-label={`Supprimer l’accompagnant ${index + 1}`} className="absolute -right-2 -top-2 grid h-8 w-8 place-items-center rounded-full border border-neutral-200 bg-white text-neutral-500 shadow-sm"><X className="h-4 w-4" /></button>
+                      <label className="space-y-1 text-xs font-medium text-neutral-600"><span>Prénom</span><input value={companion.firstName} onChange={(event) => updateCompanion(index, { firstName: event.target.value })} className="h-11 w-full rounded-lg border border-neutral-200 px-3" required minLength={2} /></label>
+                      <label className="space-y-1 text-xs font-medium text-neutral-600"><span>Nom</span><input value={companion.lastName} onChange={(event) => updateCompanion(index, { lastName: event.target.value })} className="h-11 w-full rounded-lg border border-neutral-200 px-3" required minLength={2} /></label>
+                      <label className="space-y-1 text-xs font-medium text-neutral-600"><span>Âge</span><input type="number" min={0} max={120} value={companion.age} onChange={(event) => updateCompanion(index, { age: event.target.value })} className="h-11 w-full rounded-lg border border-neutral-200 px-3" required inputMode="numeric" /></label>
+                    </div>
+                  ))}
+                </div>
+                <label className="space-y-2 text-sm font-medium text-neutral-600">
                   <span>Téléphone</span>
                   <span className="relative block">
                     <Phone className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
@@ -181,7 +253,7 @@ export function LoginContent() {
               variant="cta"
               size="lg"
               className="w-full gap-2 text-base"
-              disabled={loading || (isRegister ? !email || !password || !firstName || !lastName || !phone : accessCode.replace(/[^A-Z0-9]/g, "").length < 14)}
+              disabled={loading || (isRegister ? !email || !password || !firstName || !lastName || !phone || !age || companions.some((companion) => !companion.firstName || !companion.lastName || !companion.age) : accessCode.replace(/[^A-Z0-9]/g, "").length < 14)}
             >
               {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : <ArrowRight className="h-5 w-5" />}
               {isRegister ? "Créer mon compte" : "Accéder à mon espace"}

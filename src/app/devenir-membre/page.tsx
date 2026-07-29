@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/browser";
@@ -81,19 +81,37 @@ const ETAPES_ROAD_TRIP = [
 
 export default function DevenirMembrePage() {
   const router = useRouter();
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
   const [loading, setLoading] = useState(false);
+  const [checkoutError, setCheckoutError] = useState("");
+  const autoCheckoutStarted = useRef(false);
 
-  const handleCheckout = async () => {
+  const handleCheckout = useCallback(async () => {
     setLoading(true);
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) { router.push("/member-login?mode=register&redirect=/devenir-membre"); return; }
+    setCheckoutError("");
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        router.push("/member-login?mode=register&redirect=/devenir-membre");
+        return;
+      }
 
-    const res = await fetch("/api/stripe/checkout", { method: "POST" });
-    const data = await res.json();
-    if (data.url) window.location.href = data.url;
-    else setLoading(false);
-  };
+      const res = await fetch("/api/stripe/checkout", { method: "POST" });
+      const data = await res.json();
+      if (!res.ok || !data.url) throw new Error(data.error || "Le paiement ne peut pas être ouvert pour le moment.");
+      window.location.href = data.url;
+    } catch (error) {
+      setCheckoutError(error instanceof Error ? error.message : "Le paiement ne peut pas être ouvert pour le moment.");
+      setLoading(false);
+    }
+  }, [router, supabase]);
+
+  useEffect(() => {
+    if (autoCheckoutStarted.current || new URLSearchParams(window.location.search).get("checkout") !== "ready") return;
+    autoCheckoutStarted.current = true;
+    window.history.replaceState({}, "", "/devenir-membre");
+    void handleCheckout();
+  }, [handleCheckout]);
   return (
     <div className="min-h-dvh bg-white">
       {/* ─── HERO ─── */}
@@ -123,12 +141,10 @@ export default function DevenirMembrePage() {
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link href="/member-login?mode=register&redirect=/devenir-membre">
-                          <Button variant="cta" size="lg" className="text-base px-10 py-4 h-auto shadow-lg shadow-amber-500/20">
-                            Devenir membre — 29€
-                            <ArrowRight className="h-5 w-5 ml-1" />
-                          </Button>
-                        </Link>
+            <Button variant="cta" size="lg" className="text-base px-10 py-4 h-auto shadow-lg shadow-amber-500/20" onClick={handleCheckout} disabled={loading}>
+              {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : <ArrowRight className="h-5 w-5" />}
+              Devenir membre — 29€
+            </Button>
             <Link href="/explorer">
               <Button variant="secondary-dark" size="lg" className="text-base px-8 py-4 h-auto">
                 Explorer les lieux
@@ -140,6 +156,7 @@ export default function DevenirMembrePage() {
             <Shield className="h-4 w-4" />
             <span>Renouvellement non automatique</span>
           </div>
+          {checkoutError && <p className="mt-4 text-sm font-medium text-red-600" role="alert">{checkoutError}</p>}
         </div>
       </section>
 
@@ -154,7 +171,7 @@ export default function DevenirMembrePage() {
         <div className="mx-auto max-w-6xl px-6">
           <div className="mx-auto max-w-2xl text-center"><p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#9a7445]">Imaginez votre prochain road trip</p><h2 className="mt-3 text-3xl font-bold text-neutral-900 sm:text-4xl">En 4 étapes, du canapé à la nuit parfaite.</h2></div>
           <div className="relative mt-14 grid gap-6 lg:grid-cols-4">{ETAPES_ROAD_TRIP.map(({ icon: Icon, eyebrow, title, text }, index) => <article key={title} className="relative rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm"><span className="absolute -top-3 right-5 grid h-7 w-7 place-items-center rounded-full bg-[#c39960] text-xs font-bold text-white">{index + 1}</span><Icon className="h-7 w-7 text-emerald-600" /><p className="mt-5 text-xs font-bold uppercase tracking-wider text-[#9a7445]">{eyebrow}</p><h3 className="mt-2 font-bold text-neutral-900">{title}</h3><p className="mt-3 text-sm leading-relaxed text-neutral-500">{text}</p></article>)}</div>
-          <div className="mt-12 rounded-3xl bg-[#f7f1e8] p-8 text-center sm:p-10"><h3 className="text-2xl font-bold text-neutral-900">Et si votre prochain arrêt vous coûtait 10 à 20 % de moins ?</h3><p className="mt-3 text-neutral-600">C'est exactement ce que fait la carte membre. Dès la première nuit.</p><Link href="/member-login?mode=register&redirect=/devenir-membre"><Button variant="cta" size="lg" className="mt-6">Je renseigne mes informations <ArrowRight className="h-5 w-5" /></Button></Link></div>
+          <div className="mt-12 rounded-3xl bg-[#f7f1e8] p-8 text-center sm:p-10"><h3 className="text-2xl font-bold text-neutral-900">Et si votre prochain arrêt vous coûtait 10 à 20 % de moins ?</h3><p className="mt-3 text-neutral-600">C'est exactement ce que fait la carte membre. Dès la première nuit.</p><Button variant="cta" size="lg" className="mt-6" onClick={handleCheckout} disabled={loading}>Je renseigne mes informations <ArrowRight className="h-5 w-5" /></Button></div>
         </div>
       </section>
 
@@ -303,12 +320,10 @@ export default function DevenirMembrePage() {
           <p className="text-lg text-white/70 mb-8 max-w-md mx-auto">
             Offre de cette année : 29 € au lieu de 39 € pour voyager plus simplement et profiter des avantages du réseau.
           </p>
-          <Link href="/member-login?mode=register&redirect=/devenir-membre">
-                      <Button variant="cta" size="lg" className="text-base px-10 shadow-xl shadow-amber-500/25">
-                        Je deviens membre — 29€ →
-                        <ArrowRight className="h-5 w-5 ml-1" />
-                      </Button>
-                    </Link>
+          <Button variant="cta" size="lg" className="text-base px-10 shadow-xl shadow-amber-500/25" onClick={handleCheckout} disabled={loading}>
+            Je deviens membre — 29€
+            <ArrowRight className="h-5 w-5 ml-1" />
+          </Button>
         </div>
       </section>
     </div>

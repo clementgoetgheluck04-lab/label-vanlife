@@ -2,17 +2,16 @@
 
 ## État actuel
 
-Le schéma Prisma couvre utilisateurs, profils, adhésions, cartes, établissements, lieux, candidatures, avis, favoris, road trips, badges, passeport, paiements, blog, support et notifications. Il est syntaxiquement valide mais ne possède aucun `@@index` non unique. Les SQL présents ne constituent pas un historique Prisma standard et ne définissent pas de RLS.
+Le schéma Prisma couvre utilisateurs, profils, accompagnants, adhésions, cartes, établissements, lieux, candidatures, avis, favoris, road trips, badges, passeport, paiements, blog, support et notifications. Les migrations sont versionnées et la RLS Supabase protège les données privées par propriétaire ou rôle administrateur.
+
+Le titulaire possède un âge optionnel dans `profiles`. Les personnes couvertes supplémentaires sont stockées dans `member_companions` (`firstName`, `lastName`, `age`, `userId`) afin que la carte membre affiche une identité et un numéro dérivé distincts pour chaque personne, sans placer ces données dans les métadonnées Stripe ou Supabase Auth.
 
 ## Risques de scalabilité
 
-- Requêtes par `userId`, `placeId`, `status`, `createdAt` et `publishedAt` sans index dédié.
+- Certains accès à grand volume nécessiteront encore des index composites guidés par les requêtes réelles.
 - Carte fondée sur deux `Float`, sans index spatial.
 - Tags/services/features en JSON, difficiles à contraindre et indexer proprement.
 - Compteurs dénormalisés sans règle transactionnelle.
-- Numéro de carte basé sur le nombre de lignes.
-- `Payment.applicationId` sans relation.
-- Absence de modèle d'événement Stripe et d'idempotence.
 - Suppression cascade des paiements avec l'utilisateur, problématique pour l'audit comptable.
 
 ## Cible
