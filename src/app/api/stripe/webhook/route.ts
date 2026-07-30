@@ -16,6 +16,15 @@ function stripeId(value: string | { id: string } | null): string | null {
   return typeof value === "string" ? value : value.id;
 }
 
+type ResendEmailResult = Awaited<ReturnType<Resend["emails"]["send"]>>;
+
+function resendEmailErrorMessage(result: PromiseSettledResult<ResendEmailResult>): string | null {
+  if (result.status === "rejected") {
+    return result.reason instanceof Error ? result.reason.message : "Email send failed";
+  }
+  return result.value.error?.message || null;
+}
+
 async function sendLabellisationPaymentConfirmation(orderId: string): Promise<void> {
   const prisma = getPrisma();
   const order = await prisma.checkoutOrder.findUnique({ where: { id: orderId } });
@@ -49,14 +58,19 @@ async function sendLabellisationPaymentConfirmation(orderId: string): Promise<vo
     }));
   }
 
-  const results = await Promise.all(messages);
-  if (results.some(({ error }) => error)) throw new Error("Payment confirmation email failed");
+  const results = await Promise.allSettled(messages);
+  const emailErrors = results
+    .map(resendEmailErrorMessage)
+    .filter((message): message is string => Boolean(message));
   await prisma.checkoutOrder.update({
     where: { id: order.id },
     data: {
       payload: {
         ...payload,
-        paymentConfirmationSentAt: new Date().toISOString(),
+        paymentConfirmationAttemptedAt: new Date().toISOString(),
+        ...(emailErrors.length === 0
+          ? { paymentConfirmationSentAt: new Date().toISOString() }
+          : { paymentConfirmationEmailError: emailErrors.join(" | ").slice(0, 500) }),
       } as Prisma.InputJsonObject,
     },
   });
@@ -94,21 +108,38 @@ async function sendMembershipActivation(orderId: string): Promise<void> {
   ].join("\n");
   const cardNumber = order.user.memberCard?.cardNumber || "en cours de création";
   const resend = new Resend(requireServerEnv("RESEND_API_KEY"));
-  const { error: adminEmailError } = await resend.emails.send({
+  await prisma.checkoutOrder.update({
+    where: { id: order.id },
+    data: {
+      payload: {
+        ...payload,
+        memberAccessCodeHash: codeHash,
+        memberAccessCodeLookupHash: codeLookupHash,
+        memberAccessCodeExpiresAt: codeExpiresAt.toISOString(),
+        memberAccessCodeUsedAt: null,
+        activationEmailAttemptedAt: new Date().toISOString(),
+      } as Prisma.InputJsonObject,
+    },
+  });
+  const [adminEmailResult, memberEmailResult] = await Promise.allSettled([
+    resend.emails.send({
     from: "Label Vanlife <contact@labelvanlife.com>",
     to: "contact@labelvanlife.com",
     replyTo: order.user.email,
     subject: `Nouveau membre payé — ${fullName}`,
     text: `Un nouveau membre vient de finaliser son paiement.\n\nPersonnes couvertes :\n${coveredPeople}\n\nEmail : ${order.user.email}\nTéléphone : ${profile?.phone || "Non renseigné"}\nMontant : ${formatEuro(order.amount)}\nCarte membre : ${cardNumber}\nCommande : ${order.id}`,
-  });
-  if (adminEmailError) throw new Error("Membership admin notification failed");
-  const { error: memberEmailError } = await resend.emails.send({
+    }),
+    resend.emails.send({
     from: "Label Vanlife <contact@labelvanlife.com>",
     to: order.user.email,
     subject: "Votre carte membre Label Vanlife est activée",
     text: `Bonjour ${profile?.firstName || ""},\n\nVotre paiement de ${formatEuro(order.amount)} est confirmé et votre espace membre est actif pendant 12 mois.\n\nVotre code d'accès personnel : ${code}\nConservez-le : il reste valable pendant toute la durée de votre carte membre. Saisissez uniquement ce code sur ${getAppUrl()}/member-login.\n\nNuméro de carte membre : ${cardNumber}\nPrésentez votre carte numérique et ce numéro aux lieux labellisés pour faire vérifier sa validité et bénéficier des avantages membres.\n\nVous avez maintenant accès à la MAP interactive, à votre carte membre et au téléchargement de l'application depuis votre espace en ligne.\n\nL'équipe Label Vanlife`,
-  });
-  if (memberEmailError) throw new Error("Membership activation email failed");
+    }),
+  ]);
+  const emailErrors = [
+    resendEmailErrorMessage(adminEmailResult) && `admin: ${resendEmailErrorMessage(adminEmailResult)}`,
+    resendEmailErrorMessage(memberEmailResult) && `member: ${resendEmailErrorMessage(memberEmailResult)}`,
+  ].filter((message): message is string => Boolean(message));
 
   await prisma.checkoutOrder.update({
     where: { id: order.id },
@@ -119,7 +150,10 @@ async function sendMembershipActivation(orderId: string): Promise<void> {
         memberAccessCodeLookupHash: codeLookupHash,
         memberAccessCodeExpiresAt: codeExpiresAt.toISOString(),
         memberAccessCodeUsedAt: null,
-        activationEmailSentAt: new Date().toISOString(),
+        activationEmailAttemptedAt: new Date().toISOString(),
+        ...(emailErrors.length === 0
+          ? { activationEmailSentAt: new Date().toISOString() }
+          : { activationEmailError: emailErrors.join(" | ").slice(0, 500) }),
       } as Prisma.InputJsonObject,
     },
   });
