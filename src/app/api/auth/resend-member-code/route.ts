@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { Prisma } from "@/generated/prisma/client";
 import { Resend } from "resend";
 import { getPrisma } from "@/lib/prisma";
-import { getAppUrl, requireServerEnv } from "@/server/env";
+import { getAppUrl, getTransactionalEmailFrom, requireServerEnv } from "@/server/env";
 import { apiError } from "@/server/http";
 import { generateMemberAccessCode, hashMemberAccessCode, hashMemberAccessLookupCode } from "@/server/member-access";
 import { assertSameOrigin, enforceRateLimit } from "@/server/request-security";
@@ -47,12 +47,15 @@ export async function POST(request: NextRequest) {
 
     const resend = new Resend(requireServerEnv("RESEND_API_KEY"));
     const { error } = await resend.emails.send({
-      from: "Label Vanlife <contact@labelvanlife.com>",
+      from: getTransactionalEmailFrom(),
       to: email,
       subject: "Votre nouveau code d’accès Label Vanlife",
       text: `Bonjour ${user.profile?.firstName || ""},\n\nVoici votre nouveau code d'accès personnel : ${code}\n\nIl remplace le précédent et reste valable pendant toute la durée de votre carte membre.\n\nConnexion : ${getAppUrl()}/member-login\n\nL'équipe Label Vanlife`,
     });
-    if (error) throw new Error("Member access code email failed");
+    if (error) {
+      console.error("[resend-member-code] email failed", error.message || error.name);
+      throw new Error("Member access code email failed");
+    }
 
     // Le code précédent reste valide tant que l'email n'a pas été accepté par
     // le prestataire. Cela évite de bloquer un membre si Resend est indisponible.

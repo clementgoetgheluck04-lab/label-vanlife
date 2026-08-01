@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
-import { requireServerEnv } from "@/server/env";
+import { getTransactionalEmailFrom, requireServerEnv } from "@/server/env";
 import { apiError } from "@/server/http";
 import { assertSameOrigin, enforceRateLimit } from "@/server/request-security";
 import { parseEmail, parseText } from "@/server/validation";
@@ -20,13 +20,16 @@ export async function POST(request: NextRequest) {
 
     const resend = new Resend(requireServerEnv("RESEND_API_KEY"));
     const { error } = await resend.emails.send({
-      from: "Label Vanlife <contact@labelvanlife.com>",
+      from: getTransactionalEmailFrom(),
       to: "contact@labelvanlife.com",
       replyTo: email,
       subject: subject || "Nouveau message Label Vanlife",
       text: `Nom: ${name || "Non renseigné"}\nEmail: ${email}\n\n${message}`,
     });
-    if (error) throw new Error("Email provider rejected the message");
+    if (error) {
+      console.error("[contact] email failed", error.message || error.name);
+      throw new Error("Email provider rejected the message");
+    }
 
     return NextResponse.json({ success: true });
   } catch (error) {

@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { apiError } from "@/server/http";
-import { getAppUrl, requireServerEnv } from "@/server/env";
+import { getAppUrl, getTransactionalEmailFrom, requireServerEnv } from "@/server/env";
 import { assertSameOrigin, enforceRateLimit } from "@/server/request-security";
 import { parseLabellisationPayload } from "@/server/validation";
 import { LABELLISATION_CRITERIA } from "@/config/labellisation-criteria";
@@ -154,15 +154,16 @@ export async function POST(request: NextRequest) {
     const mediaLinks = (signedMedia || []).map((item, index) => `${index === 0 ? "Plan" : `Photo ${index}`} : ${item.signedUrl}`);
     const fullApplication = formatApplication(payload, draftId, mediaLinks);
     const resend = new Resend(requireServerEnv("RESEND_API_KEY"));
+    const from = getTransactionalEmailFrom();
     const [{ error: applicantEmailError }, { error: adminEmailError }] = await Promise.all([
       resend.emails.send({
-        from: "Label Vanlife <contact@labelvanlife.com>",
+        from,
         to: payload.email,
         subject: "Votre candidature Label Vanlife a bien été enregistrée",
         text: `Bonjour ${payload.contactName},\n\nVotre candidature et ses pièces jointes ont bien été enregistrées. Voici le récapitulatif complet des informations transmises :\n\n${fullApplication}\n\nOffre 2026 : 110 € au lieu de 220 € jusqu'au 31 décembre 2026. Si le dossier est déclaré non conforme après étude, le paiement est remboursé intégralement.\n\nLe paiement sécurisé va s'ouvrir automatiquement. Si nécessaire, vous pouvez le reprendre ici : ${getAppUrl()}/labellisation/paiement\n\nL'équipe Label Vanlife`,
       }),
       resend.emails.send({
-        from: "Label Vanlife <contact@labelvanlife.com>",
+        from,
         to: "contact@labelvanlife.com",
         replyTo: payload.email,
         subject: `Nouvelle candidature — ${payload.establishmentName}`,
@@ -170,7 +171,10 @@ export async function POST(request: NextRequest) {
       }),
     ]);
     if (applicantEmailError || adminEmailError) {
-      await supabase.storage.from(BUCKET).remove(uploaded);
+      console.error("[labellisation-draft] email failed", {
+        applicant: applicantEmailError?.message || applicantEmailError?.name,
+        admin: adminEmailError?.message || adminEmailError?.name,
+      });
       throw new Error("La confirmation email n'a pas pu être envoyée");
     }
 

@@ -5,7 +5,7 @@ import { Resend } from "resend";
 import { Prisma } from "@/generated/prisma/client";
 import { formatEuro } from "@/config/products";
 import { getPrisma } from "@/lib/prisma";
-import { getAppUrl, requireServerEnv } from "@/server/env";
+import { getAppUrl, getTransactionalEmailFrom, requireServerEnv } from "@/server/env";
 import { generateMemberAccessCode, hashMemberAccessCode, hashMemberAccessLookupCode } from "@/server/member-access";
 import { getStripe } from "@/server/stripe";
 
@@ -40,9 +40,10 @@ async function sendLabellisationPaymentConfirmation(orderId: string): Promise<vo
   const establishmentName = typeof payload.establishmentName === "string" ? payload.establishmentName : "l'établissement";
   const amount = formatEuro(order.amount);
   const resend = new Resend(requireServerEnv("RESEND_API_KEY"));
+  const from = getTransactionalEmailFrom();
   const messages = [
     resend.emails.send({
-      from: "Label Vanlife <contact@labelvanlife.com>",
+      from,
       to: "contact@labelvanlife.com",
       replyTo: candidateEmail || undefined,
       subject: `Paiement reçu — ${establishmentName}`,
@@ -51,7 +52,7 @@ async function sendLabellisationPaymentConfirmation(orderId: string): Promise<vo
   ];
   if (candidateEmail) {
     messages.push(resend.emails.send({
-      from: "Label Vanlife <contact@labelvanlife.com>",
+      from,
       to: candidateEmail,
       subject: `Paiement confirmé — ${establishmentName}`,
       text: `Bonjour${candidateName ? ` ${candidateName}` : ""},\n\nNous confirmons la réception de votre paiement de ${amount} pour la candidature de ${establishmentName}. Votre dossier va maintenant être étudié.\n\nS'il est déclaré non conforme aux critères du Label Vanlife, ce paiement sera remboursé intégralement sur le moyen de paiement utilisé.\n\nL'équipe Label Vanlife`,
@@ -108,6 +109,7 @@ async function sendMembershipActivation(orderId: string): Promise<void> {
   ].join("\n");
   const cardNumber = order.user.memberCard?.cardNumber || "en cours de création";
   const resend = new Resend(requireServerEnv("RESEND_API_KEY"));
+  const from = getTransactionalEmailFrom();
   await prisma.checkoutOrder.update({
     where: { id: order.id },
     data: {
@@ -123,14 +125,14 @@ async function sendMembershipActivation(orderId: string): Promise<void> {
   });
   const [adminEmailResult, memberEmailResult] = await Promise.allSettled([
     resend.emails.send({
-    from: "Label Vanlife <contact@labelvanlife.com>",
+    from,
     to: "contact@labelvanlife.com",
     replyTo: order.user.email,
     subject: `Nouveau membre payé — ${fullName}`,
     text: `Un nouveau membre vient de finaliser son paiement.\n\nPersonnes couvertes :\n${coveredPeople}\n\nEmail : ${order.user.email}\nTéléphone : ${profile?.phone || "Non renseigné"}\nMontant : ${formatEuro(order.amount)}\nCarte membre : ${cardNumber}\nCommande : ${order.id}`,
     }),
     resend.emails.send({
-    from: "Label Vanlife <contact@labelvanlife.com>",
+    from,
     to: order.user.email,
     subject: "Votre carte membre Label Vanlife est activée",
     text: `Bonjour ${profile?.firstName || ""},\n\nVotre paiement de ${formatEuro(order.amount)} est confirmé et votre espace membre est actif pendant 12 mois.\n\nVotre code d'accès personnel : ${code}\nConservez-le : il reste valable pendant toute la durée de votre carte membre. Saisissez uniquement ce code sur ${getAppUrl()}/member-login.\n\nNuméro de carte membre : ${cardNumber}\nPrésentez votre carte numérique et ce numéro aux lieux labellisés pour faire vérifier sa validité et bénéficier des avantages membres.\n\nVous avez maintenant accès à la MAP interactive, à votre carte membre et au téléchargement de l'application depuis votre espace en ligne.\n\nL'équipe Label Vanlife`,

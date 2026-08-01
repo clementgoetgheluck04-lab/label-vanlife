@@ -3,7 +3,7 @@ import { Resend } from "resend";
 import { Prisma } from "@/generated/prisma/client";
 import { getPrisma } from "@/lib/prisma";
 import { requireAdminUser } from "@/server/auth";
-import { requireServerEnv } from "@/server/env";
+import { getTransactionalEmailFrom, requireServerEnv } from "@/server/env";
 import { apiError } from "@/server/http";
 import { assertSameOrigin, enforceRateLimit } from "@/server/request-security";
 import { getStripe } from "@/server/stripe";
@@ -67,14 +67,17 @@ export async function POST(request: NextRequest) {
       const accepted = decision === "ACCEPTED";
       const resend = new Resend(requireServerEnv("RESEND_API_KEY"));
       const { error: emailError } = await resend.emails.send({
-        from: "Label Vanlife <contact@labelvanlife.com>",
+        from: getTransactionalEmailFrom(),
         to: candidateEmail,
         subject: accepted ? `Labellisation validée — ${establishmentName}` : `Décision et remboursement — ${establishmentName}`,
         text: accepted
           ? `Bonjour,\n\nVotre candidature pour ${establishmentName} est conforme et validée. Nous revenons vers vous avec votre fiche et votre kit Label Vanlife.\n\nL'équipe Label Vanlife`
           : `Bonjour,\n\nAprès étude, la candidature de ${establishmentName} ne peut pas être validée en l'état.\n\nMotif : ${reason}\n\nLe remboursement intégral du paiement a été déclenché sur le moyen de paiement utilisé. Le délai d'apparition dépend de votre établissement financier.\n\nL'équipe Label Vanlife`,
       });
-      if (emailError) throw new Error("L'email de décision n'a pas pu être envoyé");
+      if (emailError) {
+        console.error("[admin-labellisation-decision] email failed", emailError.message || emailError.name);
+        throw new Error("L'email de décision n'a pas pu être envoyé");
+      }
     }
 
     const reviewedPayload = {

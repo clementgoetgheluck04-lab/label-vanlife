@@ -24,3 +24,7 @@ export function getAppUrl(): string {
   }
   return url.origin;
 }
+
+export function getTransactionalEmailFrom(): string {
+  return process.env.RESEND_FROM_EMAIL || "Label Vanlife <contact@labelvanlife.com>";
+}
