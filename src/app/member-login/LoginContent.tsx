@@ -6,7 +6,6 @@ import { AlertCircle, ArrowRight, Check, Download, KeyRound, Loader2, Lock, Mail
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { MembershipJourneyNav } from "@/components/MembershipWelcome";
-import { createClient } from "@/lib/supabase/browser";
 
 export function LoginContent() {
   const searchParams = useSearchParams();
@@ -28,7 +27,6 @@ export function LoginContent() {
   const [recoveryLoading, setRecoveryLoading] = useState(false);
   const [confirmationMessage, setConfirmationMessage] = useState("");
   const [confirmationLoading, setConfirmationLoading] = useState(false);
-  const supabase = createClient();
 
   const updateCompanion = (index: number, patch: Partial<(typeof companions)[number]>) => {
     setCompanions((current) => current.map((companion, companionIndex) => companionIndex === index ? { ...companion, ...patch } : companion));
@@ -38,14 +36,13 @@ export function LoginContent() {
     setConfirmationLoading(true);
     setConfirmationMessage("");
     try {
-      const { error: resendError } = await supabase.auth.resend({
-        type: "signup",
-        email,
-        options: {
-          emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent("/devenir-membre?checkout=ready")}`,
-        },
+      const response = await fetch("/api/auth/resend-confirmation", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
       });
-      if (resendError) throw resendError;
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || "Envoi impossible");
       setConfirmationMessage("Si cette adresse attend une confirmation, un nouvel email vient d'être envoyé.");
     } catch (caughtError: unknown) {
       setConfirmationMessage(caughtError instanceof Error ? caughtError.message : "Envoi impossible");
@@ -81,24 +78,24 @@ export function LoginContent() {
 
     try {
       if (isRegister) {
-        const { error: signupError } = await supabase.auth.signUp({
-          email,
-          password,
-          options: {
-            emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent("/devenir-membre?checkout=ready")}`,
-            data: {
-              firstName,
-              lastName,
-              phone,
-              age: Number(age),
-              companions: companions.map((companion) => ({
-                ...companion,
-                age: Number(companion.age),
-              })),
-            },
-          },
+        const response = await fetch("/api/auth/signup", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email,
+            password,
+            firstName,
+            lastName,
+            phone,
+            age: Number(age),
+            companions: companions.map((companion) => ({
+              ...companion,
+              age: Number(companion.age),
+            })),
+          }),
         });
-        if (signupError) throw signupError;
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.error || "Impossible de créer le compte pour le moment.");
         setSuccess(true);
         return;
       }
