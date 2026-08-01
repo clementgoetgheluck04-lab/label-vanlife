@@ -72,7 +72,8 @@ export async function POST(request: NextRequest) {
       email: user.email,
       options: { redirectTo: `${getAppUrl()}/auth/callback?next=/member` },
     });
-    if (error || !data.properties?.action_link) throw error || new Error("Access link unavailable");
+    const tokenHash = data.properties?.hashed_token;
+    if (error || !tokenHash) throw error || new Error("Access token unavailable");
 
     await prisma.checkoutOrder.update({
       where: { id: order.id },
@@ -84,7 +85,7 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    return NextResponse.json({ url: data.properties.action_link }, { headers: { "Cache-Control": "no-store" } });
+    return NextResponse.json({ url: `/auth/confirm?token_hash=${encodeURIComponent(tokenHash)}&type=magiclink&next=/member` }, { headers: { "Cache-Control": "no-store" } });
   } catch (error) {
     if (error instanceof SyntaxError) return NextResponse.json({ error: "Données invalides" }, { status: 400 });
     return apiError(error, "verify-member-code");
