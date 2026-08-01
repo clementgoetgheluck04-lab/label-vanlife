@@ -47,7 +47,12 @@ const faqs = [
 
 export default function DormirEnVanPage() {
   const schemas = [
-    { "@context": "https://schema.org", "@type": "Article", headline: title, description, image: "https://www.labelvanlife.fr/images/hero-label-vanlife.png", author: { "@type": "Organization", name: "Label Vanlife" }, publisher: { "@type": "Organization", name: "Label Vanlife" }, mainEntityOfPage: "https://www.labelvanlife.fr/dormir-en-van" },
+    { "@context": "https://schema.org", "@type": "Article", headline: title, description, image: "https://www.labelvanlife.fr/images/hero-label-vanlife.png", author: { "@type": "Organization", name: "Label Vanlife" }, publisher: { "@type": "Organization", name: "Label Vanlife" }, mainEntityOfPage: "https://www.labelvanlife.fr/dormir-en-van", datePublished: "2026-01-01", dateModified: "2026-08-02" },
+    { "@context": "https://schema.org", "@type": "BreadcrumbList", itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Accueil", item: "https://www.labelvanlife.fr" },
+      { "@type": "ListItem", position: 2, name: "Vanlife France", item: "https://www.labelvanlife.fr/vanlife" },
+      { "@type": "ListItem", position: 3, name: "Où dormir en van", item: "https://www.labelvanlife.fr/dormir-en-van" },
+    ] },
     { "@context": "https://schema.org", "@type": "FAQPage", mainEntity: faqs.map((faq) => ({ "@type": "Question", name: faq.question, acceptedAnswer: { "@type": "Answer", text: faq.answer } })) },
   ];
 

@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import { usePathname } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight, Check, Mail } from "lucide-react";
@@ -19,6 +20,14 @@ const OFFERS = [
   { label: "Labelliser mon lieu — offre 2026 à 110€", href: "/labellisation/candidature" },
 ] as const;
 
+const SEO_GUIDES = [
+  { label: "Vanlife France", href: "/vanlife" },
+  { label: "Où dormir en van", href: "/dormir-en-van" },
+  { label: "Campings van friendly", href: "/campings-van-friendly" },
+  { label: "Road trips en van", href: "/road-trips" },
+  { label: "Vanlife par région", href: "/vanlife-regions" },
+] as const;
+
 function FacebookMark({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true" className={className} fill="currentColor">
@@ -28,6 +37,7 @@ function FacebookMark({ className }: { className?: string }) {
 }
 
 export default function Footer() {
+  const pathname = usePathname();
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
 
@@ -49,10 +59,12 @@ export default function Footer() {
     }
   };
 
+  if (pathname.startsWith("/dignamik")) return null;
+
   return (
     <footer className="bg-neutral-950 text-white">
       <div className="mx-auto max-w-7xl px-6 py-14 lg:px-8">
-        <div className="grid gap-12 border-b border-white/10 pb-12 lg:grid-cols-[1.25fr_0.8fr_0.9fr_1.2fr]">
+        <div className="grid gap-12 border-b border-white/10 pb-12 lg:grid-cols-[1.2fr_0.75fr_0.95fr_0.9fr_1.15fr]">
           <div>
             <Link href="/" aria-label="Accueil Label Vanlife" className="inline-block">
               <Image
@@ -81,6 +93,17 @@ export default function Footer() {
           <div>
             <h2 className="text-xs font-semibold uppercase tracking-[0.18em] text-white/45">Navigation</h2>
             <ul className="mt-5 space-y-3">{NAVIGATION.map((item) => <li key={item.href}><Link href={item.href} className="text-sm text-white/65 transition-colors hover:text-white">{item.label}</Link></li>)}</ul>
+          </div>
+
+          <div>
+            <h2 className="text-xs font-semibold uppercase tracking-[0.18em] text-white/45">Guides vanlife</h2>
+            <ul className="mt-5 space-y-3">
+              {SEO_GUIDES.map((item) => (
+                <li key={item.href}>
+                  <Link href={item.href} className="text-sm text-white/65 transition-colors hover:text-white">{item.label}</Link>
+                </li>
+              ))}
+            </ul>
           </div>
 
           <div>

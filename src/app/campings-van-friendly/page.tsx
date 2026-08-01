@@ -56,7 +56,13 @@ const faqs = [
 
 export default function VanFriendlyCampingsPage() {
   const schemas = [
-    { "@context": "https://schema.org", "@type": "Article", headline: title, description, image: "https://www.labelvanlife.fr/images/lieux/camping-le-coin-charmant/photo-1.jpg", author: { "@type": "Organization", name: "Label Vanlife" }, publisher: { "@type": "Organization", name: "Label Vanlife" }, mainEntityOfPage: "https://www.labelvanlife.fr/campings-van-friendly" },
+    { "@context": "https://schema.org", "@type": "Article", headline: title, description, image: "https://www.labelvanlife.fr/images/lieux/camping-le-coin-charmant/photo-1.jpg", author: { "@type": "Organization", name: "Label Vanlife" }, publisher: { "@type": "Organization", name: "Label Vanlife" }, mainEntityOfPage: "https://www.labelvanlife.fr/campings-van-friendly", datePublished: "2026-01-01", dateModified: "2026-08-02" },
+    { "@context": "https://schema.org", "@type": "BreadcrumbList", itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Accueil", item: "https://www.labelvanlife.fr" },
+      { "@type": "ListItem", position: 2, name: "Vanlife France", item: "https://www.labelvanlife.fr/vanlife" },
+      { "@type": "ListItem", position: 3, name: "Campings van friendly", item: "https://www.labelvanlife.fr/campings-van-friendly" },
+    ] },
+    { "@context": "https://schema.org", "@type": "ItemList", name: "Sélection de campings van friendly en France", itemListElement: selectedCampings.map((camping, index) => ({ "@type": "ListItem", position: index + 1, url: `https://www.labelvanlife.fr/lieux/${camping.id}`, name: camping.nom })) },
     { "@context": "https://schema.org", "@type": "FAQPage", mainEntity: faqs.map((faq) => ({ "@type": "Question", name: faq.question, acceptedAnswer: { "@type": "Answer", text: faq.answer } })) },
   ];
 

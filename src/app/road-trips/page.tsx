@@ -31,11 +31,19 @@ const advice: ReadonlyArray<{ icon: typeof ShieldCheck; title: string; text: str
 ] as const;
 
 export default function RoadTripsPage() {
-  const schema = { "@context": "https://schema.org", "@type": "Article", headline: title, description, image: "https://www.labelvanlife.fr/images/hero-label-vanlife.png", author: { "@type": "Organization", name: "Label Vanlife" }, publisher: { "@type": "Organization", name: "Label Vanlife" }, mainEntityOfPage: "https://www.labelvanlife.fr/road-trips" };
+  const schema = { "@context": "https://schema.org", "@type": "Article", headline: title, description, image: "https://www.labelvanlife.fr/images/hero-label-vanlife.png", author: { "@type": "Organization", name: "Label Vanlife" }, publisher: { "@type": "Organization", name: "Label Vanlife" }, mainEntityOfPage: "https://www.labelvanlife.fr/road-trips", datePublished: "2026-01-01", dateModified: "2026-08-02" };
+  const breadcrumbSchema = { "@context": "https://schema.org", "@type": "BreadcrumbList", itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Accueil", item: "https://www.labelvanlife.fr" },
+    { "@type": "ListItem", position: 2, name: "Vanlife France", item: "https://www.labelvanlife.fr/vanlife" },
+    { "@type": "ListItem", position: 3, name: "Road trips en van", item: "https://www.labelvanlife.fr/road-trips" },
+  ] };
+  const itemListSchema = { "@context": "https://schema.org", "@type": "ItemList", name: "Road trips en van en France", itemListElement: trips.map((trip, index) => ({ "@type": "ListItem", position: index + 1, name: `Road trip van ${trip.region}`, url: `https://www.labelvanlife.fr/road-trips#${trip.id}` })) };
 
   return (
     <main className="bg-white pb-24 pt-16 text-neutral-800">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListSchema) }} />
       <div className="mx-auto max-w-6xl px-6 pt-8"><nav aria-label="Fil d’Ariane" className="flex items-center gap-2 text-xs text-neutral-400"><Link href="/" className="hover:text-emerald-700">Accueil</Link><ChevronRight className="h-3.5 w-3.5" /><span className="text-neutral-700">Itinéraires</span></nav></div>
 
       <header className="mx-auto grid max-w-6xl gap-10 px-6 py-12 lg:grid-cols-[.95fr_1.05fr] lg:items-center lg:py-16">
