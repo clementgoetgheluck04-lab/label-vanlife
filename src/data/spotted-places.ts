@@ -58,13 +58,10 @@ export const SPOTTED_PLACES = (places as SpottedPlace[])
       };
     }
 
-    // Les fiches Bienvenue à la ferme contiennent leurs coordonnées officielles.
     return {
       ...place,
-      gpsSource: place.network.includes("Bienvenue")
-        ? "Coordonnées officielles de la fiche Bienvenue à la ferme"
-        : "Adresse du document source",
-      gpsVerifiedAt: "2026-07-18",
+      gpsSource: place.gpsSource ?? "Coordonnées du repérage Label Vanlife",
+      gpsVerifiedAt: place.gpsVerifiedAt ?? "2026-08-01",
     };
   });
 

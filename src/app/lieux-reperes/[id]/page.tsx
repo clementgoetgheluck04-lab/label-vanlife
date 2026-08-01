@@ -62,7 +62,7 @@ export default async function SpottedPlacePage({ params }: PageProps) {
               {place.images && place.images.length > 0 && (
                 <section className="mb-8">
                   <h2 className="text-xl font-bold text-neutral-900">Photos disponibles</h2>
-                  <p className="mt-1 text-xs text-neutral-500">Visuels issus de la fiche source fournie à Label Vanlife.</p>
+                  <p className="mt-1 text-xs text-neutral-500">Visuels publics collectés pour mieux identifier le lieu.</p>
                   <div className="mt-4 grid grid-cols-2 gap-3">
                     {place.images.map((image, index) => (
                       <div key={image} className={`relative overflow-hidden rounded-2xl bg-neutral-100 ${index === 0 ? "col-span-2 aspect-[16/8]" : "aspect-[4/3]"}`}>
@@ -120,6 +120,11 @@ export default async function SpottedPlacePage({ params }: PageProps) {
                   Réserver ou visiter le site de l&apos;établissement <ExternalLink className="h-4 w-4" />
                 </a>
               )}
+              {!website && place.googleMapsUrl && (
+                <a href={place.googleMapsUrl} target="_blank" rel="noreferrer nofollow" className="mt-5 inline-flex min-h-12 items-center gap-2 rounded-xl bg-emerald-700 px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-emerald-800">
+                  Ouvrir la fiche GPS du lieu <ExternalLink className="h-4 w-4" />
+                </a>
+              )}
               <div className="mt-4 grid grid-cols-2 gap-3">
                 <a href={`https://www.google.com/maps/dir/?api=1&destination=${place.lat},${place.lng}&travelmode=driving`} target="_blank" rel="noreferrer" className="flex min-h-12 items-center justify-center gap-2 rounded-xl bg-emerald-50 px-3 py-3 text-center text-sm font-bold text-emerald-800 hover:bg-emerald-100"><Navigation className="h-4 w-4" /> Y aller avec Maps</a>
                 <a href={`https://waze.com/ul?ll=${place.lat}%2C${place.lng}&navigate=yes`} target="_blank" rel="noreferrer" className="flex min-h-12 items-center justify-center gap-2 rounded-xl bg-blue-50 px-3 py-3 text-center text-sm font-bold text-blue-700 hover:bg-blue-100"><Navigation className="h-4 w-4" /> Waze</a>
@@ -128,7 +133,7 @@ export default async function SpottedPlacePage({ params }: PageProps) {
                 <strong>Aucun partenariat ni avantage membre n&apos;est garanti.</strong>
                 <p className="mt-1">Label Vanlife n&apos;a pas encore audité cet établissement. La présence de cette fiche ne vaut ni labellisation, ni recommandation commerciale.</p>
               </div>
-              <p className="mt-4 text-xs leading-5 text-neutral-400">Lieu repéré par Label Vanlife. Informations publiques à vérifier directement auprès de l&apos;établissement. Point GPS : {place.lat}, {place.lng} · vérifié le 18 juillet 2026.</p>
+              <p className="mt-4 text-xs leading-5 text-neutral-400">Lieu repéré par Label Vanlife. Informations publiques à vérifier directement auprès de l&apos;établissement. Point GPS : {place.lat}, {place.lng} · repéré le {place.gpsVerifiedAt ?? "1er août 2026"}.</p>
             </div>
 
             <aside className="rounded-3xl bg-neutral-950 p-6 text-white sm:p-7">

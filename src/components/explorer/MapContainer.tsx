@@ -201,7 +201,9 @@ export default function MapContainer({
         const websiteUrl = normalizeExternalWebsite(place.website);
         const website = websiteUrl
           ? `<a class="popup-link" href="${escapeHtml(websiteUrl)}" target="_blank" rel="noreferrer nofollow">Réserver ou visiter le site</a>`
-          : '<p class="popup-no-website">Site internet non renseigné</p>';
+          : place.googleMapsUrl
+            ? `<a class="popup-link popup-link-muted" href="${escapeHtml(place.googleMapsUrl)}" target="_blank" rel="noreferrer nofollow">Ouvrir la fiche GPS</a>`
+            : '<p class="popup-no-website">Site internet non renseigné</p>';
         marker.bindPopup(`
           <div class="map-popup">
             <span class="popup-status popup-status-network">Lieu repéré · non labellisé</span>

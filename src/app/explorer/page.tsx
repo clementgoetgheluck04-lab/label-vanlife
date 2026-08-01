@@ -206,7 +206,7 @@ export default function ExplorerPage() {
                   Lieux repérés, mais pas encore labellisés : on a besoin de vous
                 </h2>
                 <p className="mt-3 max-w-2xl text-sm leading-6 text-emerald-50/80 sm:text-base">
-                  Ces établissements ont été repérés dans des réseaux d&apos;accueil van et camping. Ils ne sont pas encore partenaires de Label Vanlife : leurs informations restent à confirmer et aucun avantage membre n&apos;est garanti.
+                  Ces établissements ont été repérés par Label Vanlife ou proposés par la communauté. Ils ne sont pas encore partenaires : leurs informations restent à confirmer et aucun avantage membre n&apos;est garanti.
                 </p>
               </div>
               <div className="shrink-0 rounded-2xl bg-white/95 px-5 py-4 text-center shadow-sm ring-1 ring-white/30">
