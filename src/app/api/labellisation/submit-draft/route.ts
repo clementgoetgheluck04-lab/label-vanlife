@@ -175,7 +175,11 @@ export async function POST(request: NextRequest) {
         applicant: applicantEmailError?.message || applicantEmailError?.name,
         admin: adminEmailError?.message || adminEmailError?.name,
       });
-      throw new Error("La confirmation email n'a pas pu être envoyée");
+      return NextResponse.json({
+        draftId,
+        attachmentPaths: uploaded,
+        emailWarning: true,
+      }, { headers: { "Cache-Control": "no-store" } });
     }
 
     return NextResponse.json({ draftId, attachmentPaths: uploaded }, { headers: { "Cache-Control": "no-store" } });
