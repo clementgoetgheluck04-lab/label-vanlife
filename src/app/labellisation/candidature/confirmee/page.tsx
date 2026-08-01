@@ -16,14 +16,14 @@ Nous venons de postuler au Label Vanlife, le 1er réseau de lieux van-friendly l
 
 On vous tient au courant très vite 🤙
 
-🔎 À suivre sur : www.labelvanlife.com
+🔎 À suivre sur : www.labelvanlife.fr
 👍 Notre page Facebook : www.facebook.com/labelvanlife
 
 #LabelVanlife #Vanlife #VanlifeFrance #RoadtripFrance #VoyageEnVan`;
 
 const encodedMessage = encodeURIComponent(SHARE_MESSAGE);
 const shareLinks = {
-  facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent("https://labelvanlife.com")}&quote=${encodedMessage}`,
+  facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent("https://www.labelvanlife.fr")}&quote=${encodedMessage}`,
   whatsapp: `https://wa.me/?text=${encodedMessage}`,
   twitter: `https://twitter.com/intent/tweet?text=${encodedMessage}`,
 };

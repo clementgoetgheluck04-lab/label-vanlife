@@ -28,14 +28,11 @@ export function OrganizationJsonLd() {
     "@context": "https://schema.org",
     "@type": "Organization",
     name: "Label Vanlife",
-    url: "https://label-vanlife-v1.vercel.app",
-    logo: "https://label-vanlife-v1.vercel.app/icons/icon-192.svg",
+    url: "https://www.labelvanlife.fr",
+    logo: "https://www.labelvanlife.fr/icons/icon-192.svg",
     description:
       "Le premier label pour vanlifers. Lieux calmes, respectueux et adaptés à la vanlife.",
-    sameAs: [
-      "https://www.instagram.com/labelvanlife",
-      "https://www.facebook.com/labelvanlife",
-    ],
+    sameAs: ["https://www.facebook.com/labelvanlife"],
     foundingDate: "2024",
     contactPoint: {
       "@type": "ContactPoint",
@@ -56,7 +53,7 @@ export function WebSiteJsonLd() {
     "@context": "https://schema.org",
     "@type": "WebSite",
     name: "Label Vanlife",
-    url: "https://label-vanlife-v1.vercel.app",
+    url: "https://www.labelvanlife.fr",
     description:
       "Le premier label pour vanlifers. Lieux calmes, respectueux et adaptés à la vanlife.",
     inLanguage: "fr-FR",
@@ -65,7 +62,7 @@ export function WebSiteJsonLd() {
       target: {
         "@type": "EntryPoint",
         urlTemplate:
-          "https://label-vanlife-v1.vercel.app/map?search={search_term_string}",
+          "https://www.labelvanlife.fr/map?search={search_term_string}",
       },
       "query-input": "required name=search_term_string",
     },

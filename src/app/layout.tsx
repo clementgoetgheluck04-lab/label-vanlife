@@ -7,7 +7,7 @@ import PwaInstall from "@/components/PwaInstall";
 import { BRAND_ASSETS } from "@/config/brand-assets";
 import RouteScrollToTop from "@/components/RouteScrollToTop";
 
-const BASE_URL = "https://labelvanlife.com";
+const BASE_URL = "https://www.labelvanlife.fr";
 
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
@@ -35,7 +35,7 @@ export const metadata: Metadata = {
     "voyage itinérant",
     "vanlife reduction",
   ],
-  authors: [{ name: "Label Vanlife", url: "https://labelvanlife.com" }],
+  authors: [{ name: "Label Vanlife", url: "https://www.labelvanlife.fr" }],
   creator: "Label Vanlife",
   publisher: "Label Vanlife",
   icons: {

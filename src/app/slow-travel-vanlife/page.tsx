@@ -48,7 +48,7 @@ const faqs = [
 
 export default function SlowTravelVanlifePage() {
   const schemas = [
-    { "@context": "https://schema.org", "@type": "Article", headline: title, description, image: "https://labelvanlife.com/images/hero-label-vanlife.png", author: { "@type": "Organization", name: "Label Vanlife" }, publisher: { "@type": "Organization", name: "Label Vanlife" }, mainEntityOfPage: "https://labelvanlife.com/slow-travel-vanlife" },
+    { "@context": "https://schema.org", "@type": "Article", headline: title, description, image: "https://www.labelvanlife.fr/images/hero-label-vanlife.png", author: { "@type": "Organization", name: "Label Vanlife" }, publisher: { "@type": "Organization", name: "Label Vanlife" }, mainEntityOfPage: "https://www.labelvanlife.fr/slow-travel-vanlife" },
     { "@context": "https://schema.org", "@type": "FAQPage", mainEntity: faqs.map((faq) => ({ "@type": "Question", name: faq.question, acceptedAnswer: { "@type": "Answer", text: faq.answer } })) },
   ];
 

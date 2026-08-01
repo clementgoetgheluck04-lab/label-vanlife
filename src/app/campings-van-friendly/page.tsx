@@ -56,7 +56,7 @@ const faqs = [
 
 export default function VanFriendlyCampingsPage() {
   const schemas = [
-    { "@context": "https://schema.org", "@type": "Article", headline: title, description, image: "https://labelvanlife.com/images/lieux/camping-le-coin-charmant/photo-1.jpg", author: { "@type": "Organization", name: "Label Vanlife" }, publisher: { "@type": "Organization", name: "Label Vanlife" }, mainEntityOfPage: "https://labelvanlife.com/campings-van-friendly" },
+    { "@context": "https://schema.org", "@type": "Article", headline: title, description, image: "https://www.labelvanlife.fr/images/lieux/camping-le-coin-charmant/photo-1.jpg", author: { "@type": "Organization", name: "Label Vanlife" }, publisher: { "@type": "Organization", name: "Label Vanlife" }, mainEntityOfPage: "https://www.labelvanlife.fr/campings-van-friendly" },
     { "@context": "https://schema.org", "@type": "FAQPage", mainEntity: faqs.map((faq) => ({ "@type": "Question", name: faq.question, acceptedAnswer: { "@type": "Answer", text: faq.answer } })) },
   ];
 

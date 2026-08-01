@@ -31,7 +31,7 @@ const advice: ReadonlyArray<{ icon: typeof ShieldCheck; title: string; text: str
 ] as const;
 
 export default function RoadTripsPage() {
-  const schema = { "@context": "https://schema.org", "@type": "Article", headline: title, description, image: "https://labelvanlife.com/images/hero-label-vanlife.png", author: { "@type": "Organization", name: "Label Vanlife" }, publisher: { "@type": "Organization", name: "Label Vanlife" }, mainEntityOfPage: "https://labelvanlife.com/road-trips" };
+  const schema = { "@context": "https://schema.org", "@type": "Article", headline: title, description, image: "https://www.labelvanlife.fr/images/hero-label-vanlife.png", author: { "@type": "Organization", name: "Label Vanlife" }, publisher: { "@type": "Organization", name: "Label Vanlife" }, mainEntityOfPage: "https://www.labelvanlife.fr/road-trips" };
 
   return (
     <main className="bg-white pb-24 pt-16 text-neutral-800">

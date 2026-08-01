@@ -65,10 +65,10 @@ export default function VanlifeGuidePage() {
     "@type": "Article",
     headline: title,
     description,
-    image: "https://labelvanlife.com/images/hero-label-vanlife.png",
+    image: "https://www.labelvanlife.fr/images/hero-label-vanlife.png",
     author: { "@type": "Organization", name: "Label Vanlife" },
     publisher: { "@type": "Organization", name: "Label Vanlife" },
-    mainEntityOfPage: "https://labelvanlife.com/vanlife",
+    mainEntityOfPage: "https://www.labelvanlife.fr/vanlife",
   };
 
   return (

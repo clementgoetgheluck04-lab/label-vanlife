@@ -3,7 +3,7 @@ import { ENRICHED_LIEUX } from "@/data/enriched-lieux";
 import { REGION_GUIDE_SLUGS } from "@/data/region-guides";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = "https://labelvanlife.com";
+  const baseUrl = "https://www.labelvanlife.fr";
 
   const staticPages = [
     { url: baseUrl, lastModified: new Date(), changeFrequency: "weekly" as const, priority: 1.0 },

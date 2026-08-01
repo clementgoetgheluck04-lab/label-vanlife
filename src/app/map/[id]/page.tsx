@@ -103,7 +103,7 @@ export default function LieuDetailPage() {
       <LocalBusinessJsonLd
         name={lieu.nom}
         description={lieu.description}
-        url={`https://label-vanlife-v1.vercel.app/map/${lieu.id}`}
+        url={`https://www.labelvanlife.fr/map/${lieu.id}`}
         image={lieu.photoUrl}
         telephone={lieu.telephone}
         addressCity={lieu.ville}
