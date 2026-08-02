@@ -1,6 +1,7 @@
 /**
  * Service Worker utilities for Label Vanlife PWA
  */
+const isDevelopment = process.env.NODE_ENV !== "production";
 
 /**
  * Register the service worker
@@ -14,7 +15,7 @@ export function register(): Promise<boolean> {
   return navigator.serviceWorker
     .register("/sw.js", { scope: "/" })
     .then((registration) => {
-      console.log("Service Worker registered:", registration.scope);
+      if (isDevelopment) console.log("Service Worker registered:", registration.scope);
 
       registration.addEventListener("updatefound", () => {
         const installingWorker = registration.installing;
@@ -24,7 +25,7 @@ export function register(): Promise<boolean> {
               installingWorker.state === "installed" &&
               navigator.serviceWorker.controller
             ) {
-              console.log("New version available — refresh to update");
+              if (isDevelopment) console.log("New version available — refresh to update");
             }
           });
         }
@@ -54,7 +55,7 @@ export async function unregister(): Promise<boolean> {
       return false;
     }
   }
-  console.log("Service Worker(s) unregistered successfully");
+  if (isDevelopment) console.log("Service Worker(s) unregistered successfully");
   return true;
 }
 
@@ -78,7 +79,7 @@ export async function askPermission(): Promise<NotificationPermission> {
 
   const permission = await Notification.requestPermission();
   if (permission === "granted") {
-    console.log("Notification permission granted");
+    if (isDevelopment) console.log("Notification permission granted");
   } else {
     console.warn("Notification permission denied");
   }
@@ -107,7 +108,7 @@ export async function sendSubscriptionToServer(
       throw new Error(`Server responded with ${response.status}`);
     }
 
-    console.log("Push subscription sent to server successfully");
+    if (isDevelopment) console.log("Push subscription sent to server successfully");
     return true;
   } catch (error) {
     console.error("Failed to send push subscription to server:", error);

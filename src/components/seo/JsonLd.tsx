@@ -62,7 +62,7 @@ export function WebSiteJsonLd() {
       target: {
         "@type": "EntryPoint",
         urlTemplate:
-          "https://www.labelvanlife.fr/map?search={search_term_string}",
+          "https://www.labelvanlife.fr/explorer?search={search_term_string}",
       },
       "query-input": "required name=search_term_string",
     },

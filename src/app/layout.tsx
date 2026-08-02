@@ -6,6 +6,7 @@ import ServiceWorkerInit from "@/components/ServiceWorkerInit";
 import PwaInstall from "@/components/PwaInstall";
 import { BRAND_ASSETS } from "@/config/brand-assets";
 import RouteScrollToTop from "@/components/RouteScrollToTop";
+import { OrganizationJsonLd, WebSiteJsonLd } from "@/components/seo/JsonLd";
 
 const BASE_URL = "https://www.labelvanlife.fr";
 
@@ -109,6 +110,8 @@ export default function RootLayout({
           rel="stylesheet"
         />
         <link rel="alternate" type="application/rss+xml" title="Label Vanlife Blog" href="/blog/feed.xml" />
+        <OrganizationJsonLd />
+        <WebSiteJsonLd />
       </head>
       <body className="min-h-full flex flex-col antialiased">
         <RouteScrollToTop />

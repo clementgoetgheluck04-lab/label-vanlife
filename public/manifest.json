@@ -2,7 +2,7 @@
   "name": "Label Vanlife — La vanlife a enfin son label",
   "short_name": "Label Vanlife",
   "description": "Des lieux calmes, respectueux et vraiment adaptés à la vanlife — sélectionnés et labellisés, avec 10 à 20% de réduction pour nos membres.",
-  "start_url": "/",
+  "start_url": "/member",
   "display": "standalone",
   "background_color": "#FAFAFA",
   "theme_color": "#059669",
@@ -10,7 +10,23 @@
   "lang": "fr-FR",
   "orientation": "portrait-primary",
   "scope": "/",
-  "id": "/",
+  "id": "/member",
+  "shortcuts": [
+    {
+      "name": "Carte membre",
+      "short_name": "Carte",
+      "description": "Ouvrir ma carte membre Label Vanlife",
+      "url": "/member/carte",
+      "icons": [{ "src": "/brand/favicon.png", "sizes": "512x512", "type": "image/png" }]
+    },
+    {
+      "name": "MAP membre",
+      "short_name": "MAP",
+      "description": "Ouvrir la MAP des lieux Label Vanlife",
+      "url": "/member/map",
+      "icons": [{ "src": "/brand/favicon.png", "sizes": "512x512", "type": "image/png" }]
+    }
+  ],
   "icons": [
     { "src": "/brand/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
     { "src": "/brand/favicon.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }

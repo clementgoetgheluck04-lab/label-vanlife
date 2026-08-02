@@ -22,6 +22,8 @@ const securityHeaders = [
     value:
       "camera=(), microphone=(), geolocation=(), interest-cohort=()",
   },
+  { key: "Cross-Origin-Opener-Policy", value: "same-origin-allow-popups" },
+  { key: "Origin-Agent-Cluster", value: "?1" },
   {
     key: "Content-Security-Policy",
     value: [
@@ -30,11 +32,16 @@ const securityHeaders = [
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       "img-src 'self' data: blob: https://*.vercel.app https://*.basemaps.cartocdn.com https://api.bienvenue-a-la-ferme.com",
       "font-src 'self' data: https://fonts.gstatic.com",
-      "connect-src 'self' https://*.vercel.app https://*.supabase.co wss://*.supabase.co",
+      "connect-src 'self' https://*.vercel.app https://*.supabase.co wss://*.supabase.co https://*.stripe.com https://checkout.stripe.com",
+      "frame-src 'self' https://checkout.stripe.com",
+      "object-src 'none'",
+      "media-src 'self'",
+      "worker-src 'self' blob:",
       "frame-ancestors 'none'",
       "form-action 'self'",
       "base-uri 'self'",
       "manifest-src 'self'",
+      ...(process.env.NODE_ENV === "production" ? ["upgrade-insecure-requests"] : []),
     ].join("; "),
   },
 ];
@@ -50,6 +57,36 @@ const nextConfig: NextConfig = {
   },
   async headers() {
     return [
+      {
+        source: "/sw.js",
+        headers: [
+          { key: "Cache-Control", value: "no-cache, no-store, must-revalidate" },
+        ],
+      },
+      {
+        source: "/manifest.json",
+        headers: [
+          { key: "Cache-Control", value: "public, max-age=3600, must-revalidate" },
+        ],
+      },
+      {
+        source: "/images/:path*",
+        headers: [
+          { key: "Cache-Control", value: "public, max-age=31536000, immutable" },
+        ],
+      },
+      {
+        source: "/brand/:path*",
+        headers: [
+          { key: "Cache-Control", value: "public, max-age=31536000, immutable" },
+        ],
+      },
+      {
+        source: "/icons/:path*",
+        headers: [
+          { key: "Cache-Control", value: "public, max-age=31536000, immutable" },
+        ],
+      },
       {
         source: "/(.*)",
         headers: securityHeaders,
