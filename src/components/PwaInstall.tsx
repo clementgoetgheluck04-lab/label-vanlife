@@ -16,35 +16,81 @@ declare global {
   interface WindowEventMap {
     beforeinstallprompt: BeforeInstallPromptEvent;
   }
+
+  interface Navigator {
+    standalone?: boolean;
+    getInstalledRelatedApps?: () => Promise<Array<{ platform?: string; url?: string; id?: string }>>;
+  }
+}
+
+const PWA_INSTALL_STORAGE_KEY = "label-vanlife-pwa-installed";
+
+function isRunningAsInstalledApp() {
+  if (typeof window === "undefined") return false;
+
+  return (
+    window.matchMedia("(display-mode: standalone)").matches ||
+    window.matchMedia("(display-mode: fullscreen)").matches ||
+    window.matchMedia("(display-mode: minimal-ui)").matches ||
+    window.navigator.standalone === true ||
+    window.localStorage.getItem(PWA_INSTALL_STORAGE_KEY) === "true"
+  );
 }
 
 export default function PwaInstall() {
   const pathname = usePathname();
   const [deferredPrompt, setDeferredPrompt] =
     useState<BeforeInstallPromptEvent | null>(null);
-  const [isInstalled, setIsInstalled] = useState(
-    () => typeof window !== "undefined" && window.matchMedia("(display-mode: standalone)").matches
-  );
+  const [isInstalled, setIsInstalled] = useState(() => isRunningAsInstalledApp());
   const [isDismissed, setIsDismissed] = useState(false);
   const [showManualHelp, setShowManualHelp] = useState(false);
 
   const isMemberArea = pathname === "/member" || pathname.startsWith("/member/");
 
   useEffect(() => {
+    const markInstalled = () => {
+      window.localStorage.setItem(PWA_INSTALL_STORAGE_KEY, "true");
+      setIsInstalled(true);
+      setDeferredPrompt(null);
+      setShowManualHelp(false);
+    };
+
+    if (isRunningAsInstalledApp()) {
+      markInstalled();
+      return;
+    }
+
     const handleInstallPrompt = (event: BeforeInstallPromptEvent) => {
       event.preventDefault();
       setDeferredPrompt(event);
     };
-    const handleInstalled = () => {
-      setIsInstalled(true);
-      setDeferredPrompt(null);
+    const handleInstalled = () => markInstalled();
+    const handleDisplayModeChange = () => {
+      if (isRunningAsInstalledApp()) markInstalled();
     };
+
+    const standaloneMedia = window.matchMedia("(display-mode: standalone)");
+    const fullscreenMedia = window.matchMedia("(display-mode: fullscreen)");
+    const minimalUiMedia = window.matchMedia("(display-mode: minimal-ui)");
 
     window.addEventListener("beforeinstallprompt", handleInstallPrompt);
     window.addEventListener("appinstalled", handleInstalled);
+    standaloneMedia.addEventListener?.("change", handleDisplayModeChange);
+    fullscreenMedia.addEventListener?.("change", handleDisplayModeChange);
+    minimalUiMedia.addEventListener?.("change", handleDisplayModeChange);
+
+    window.navigator.getInstalledRelatedApps?.()
+      .then((apps) => {
+        if (apps.length > 0) markInstalled();
+      })
+      .catch(() => undefined);
+
     return () => {
       window.removeEventListener("beforeinstallprompt", handleInstallPrompt);
       window.removeEventListener("appinstalled", handleInstalled);
+      standaloneMedia.removeEventListener?.("change", handleDisplayModeChange);
+      fullscreenMedia.removeEventListener?.("change", handleDisplayModeChange);
+      minimalUiMedia.removeEventListener?.("change", handleDisplayModeChange);
     };
   }, []);
 
@@ -57,6 +103,11 @@ export default function PwaInstall() {
     await deferredPrompt.prompt();
     const { outcome } = await deferredPrompt.userChoice;
     setDeferredPrompt(null);
+    if (outcome === "accepted") {
+      window.localStorage.setItem(PWA_INSTALL_STORAGE_KEY, "true");
+      setIsInstalled(true);
+      setShowManualHelp(false);
+    }
     if (outcome === "dismissed") setIsDismissed(true);
   }, [deferredPrompt]);
 
