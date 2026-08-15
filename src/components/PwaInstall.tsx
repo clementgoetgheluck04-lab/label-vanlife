@@ -25,6 +25,26 @@ declare global {
 
 const PWA_INSTALL_STORAGE_KEY = "label-vanlife-pwa-installed";
 
+function hasInstallStorage() {
+  return typeof window !== "undefined" && typeof window.localStorage !== "undefined";
+}
+
+function readInstallStorage() {
+  try {
+    return hasInstallStorage() && window.localStorage.getItem(PWA_INSTALL_STORAGE_KEY) === "true";
+  } catch {
+    return false;
+  }
+}
+
+function writeInstallStorage() {
+  try {
+    if (hasInstallStorage()) window.localStorage.setItem(PWA_INSTALL_STORAGE_KEY, "true");
+  } catch {
+    // Some browsers can block storage. The current in-memory state still hides the prompt.
+  }
+}
+
 function isRunningAsInstalledApp() {
   if (typeof window === "undefined") return false;
 
@@ -33,7 +53,7 @@ function isRunningAsInstalledApp() {
     window.matchMedia("(display-mode: fullscreen)").matches ||
     window.matchMedia("(display-mode: minimal-ui)").matches ||
     window.navigator.standalone === true ||
-    window.localStorage.getItem(PWA_INSTALL_STORAGE_KEY) === "true"
+    readInstallStorage()
   );
 }
 
@@ -49,7 +69,7 @@ export default function PwaInstall() {
 
   useEffect(() => {
     const markInstalled = () => {
-      window.localStorage.setItem(PWA_INSTALL_STORAGE_KEY, "true");
+      writeInstallStorage();
       setIsInstalled(true);
       setDeferredPrompt(null);
       setShowManualHelp(false);
@@ -104,7 +124,7 @@ export default function PwaInstall() {
     const { outcome } = await deferredPrompt.userChoice;
     setDeferredPrompt(null);
     if (outcome === "accepted") {
-      window.localStorage.setItem(PWA_INSTALL_STORAGE_KEY, "true");
+      writeInstallStorage();
       setIsInstalled(true);
       setShowManualHelp(false);
     }
