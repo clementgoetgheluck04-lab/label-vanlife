@@ -192,6 +192,16 @@ html {
   50% { transform: translateY(-3px); }
 }
 
+@keyframes label-photo-marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+@keyframes label-photo-marquee-reverse {
+  from { transform: translateX(-50%); }
+  to { transform: translateX(0); }
+}
+
 .animate-confetti {
   animation: confetti 3s ease-out forwards;
 }
@@ -235,6 +245,14 @@ html {
   animation: gentle-float 1.2s ease-in-out infinite;
 }
 
+.label-photo-marquee {
+  animation: label-photo-marquee 46s linear infinite;
+}
+
+.label-photo-marquee-reverse {
+  animation: label-photo-marquee-reverse 54s linear infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *, *::before, *::after {
@@ -244,4 +262,8 @@ html {
     transition-duration: 0.01ms !important;
   }
   .animate-stagger-in { opacity: 1; }
+  .label-photo-marquee,
+  .label-photo-marquee-reverse {
+    animation: none !important;
+  }
 }

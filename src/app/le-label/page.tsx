@@ -1,29 +1,113 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, Shield, Leaf, Heart, X, Check } from "lucide-react";
+import { ArrowRight, Shield, Leaf, Heart, X, Check, MapPin, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
+import { ENRICHED_LIEUX } from "@/data/enriched-lieux";
+import { SPOTTED_PLACES } from "@/data/spotted-places";
 
 export default function LeLabelPage() {
+  const labelledPlaces = ENRICHED_LIEUX.filter((lieu) => lieu.status === "actif");
+  const visualPlaces = labelledPlaces.filter((lieu) => Boolean(lieu.photoUrl)).slice(0, 10);
+  const marqueePlaces = [...visualPlaces, ...visualPlaces];
+
   return (
-    <div className="min-h-screen bg-white pt-20 sm:pt-24">
+    <div className="min-h-screen bg-white">
       {/* ===== HERO ===== */}
-      <section className="relative py-20 sm:py-28 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-emerald-50/50 to-white" />
-        <div className="relative z-10 max-w-4xl mx-auto px-6 text-center space-y-6">
-          <span className="inline-block text-xs font-semibold tracking-[0.2em] uppercase text-emerald-500">Pourquoi Label Vanlife ?</span>
-          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-neutral-900 leading-tight" style={{ fontFamily: "Outfit, sans-serif" }}>
-            Le Label<br />
-            <span className="text-emerald-500">Vanlife</span>
-          </h1>
-          <p className="text-lg sm:text-xl text-neutral-500 max-w-2xl mx-auto leading-relaxed">
-            Face à l&apos;explosion du voyage en van, quelque chose s&apos;est perdu en chemin. Voici pourquoi nous avons tout repensé.
-          </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link href="/devenir-membre">
-              <Button variant="cta" size="lg" className="text-base px-8">Rejoindre le mouvement</Button>
-            </Link>
+      <section className="relative flex min-h-[86vh] items-center overflow-hidden bg-[#071611] pt-24 text-white sm:pt-28">
+        <div className="absolute inset-0 opacity-55">
+          <div className="label-photo-marquee flex w-max gap-4">
+            {marqueePlaces.map((lieu, index) => (
+              <div
+                key={`${lieu.id}-label-top-${index}`}
+                className="h-44 w-72 shrink-0 rounded-[2rem] border border-white/10 bg-white/5 shadow-2xl shadow-black/30 sm:h-56 sm:w-96"
+                style={{ backgroundImage: `url(${lieu.photoUrl})`, backgroundSize: "cover", backgroundPosition: "center" }}
+                aria-hidden="true"
+              />
+            ))}
+          </div>
+          <div className="label-photo-marquee-reverse mt-4 flex w-max gap-4">
+            {[...marqueePlaces].reverse().map((lieu, index) => (
+              <div
+                key={`${lieu.id}-label-bottom-${index}`}
+                className="h-40 w-64 shrink-0 rounded-[2rem] border border-white/10 bg-white/5 shadow-2xl shadow-black/30 sm:h-52 sm:w-80"
+                style={{ backgroundImage: `url(${lieu.photoUrl})`, backgroundSize: "cover", backgroundPosition: "center" }}
+                aria-hidden="true"
+              />
+            ))}
+          </div>
+        </div>
+        <div className="absolute inset-0 bg-gradient-to-r from-[#071611] via-[#071611]/88 to-[#071611]/55" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#071611]/20 via-transparent to-[#071611]" />
+        <div className="absolute -right-20 -top-28 h-96 w-96 rounded-full bg-[#c39960]/20 blur-3xl" />
+        <div className="absolute -bottom-40 -left-24 h-96 w-96 rounded-full bg-emerald-500/15 blur-3xl" />
+        <div className="relative z-10 mx-auto grid w-full max-w-6xl gap-12 px-6 py-20 lg:grid-cols-[0.92fr_1.08fr] lg:items-center">
+          <div className="space-y-6">
+            <span className="inline-flex rounded-full border border-white/15 bg-white/10 px-4 py-2 text-xs font-semibold tracking-[0.2em] uppercase text-[#dfc59f] backdrop-blur-md">
+              Pourquoi Label Vanlife ?
+            </span>
+            <h1 className="text-5xl font-bold leading-tight text-white sm:text-6xl lg:text-7xl" style={{ fontFamily: "Outfit, sans-serif" }}>
+              Le Label<br />
+              <span className="text-[#dfc59f]">Vanlife</span>
+            </h1>
+            <p className="max-w-2xl text-lg leading-relaxed text-white/70 sm:text-xl">
+              Face à l&apos;explosion du voyage en van, quelque chose s&apos;est perdu en chemin. Voici pourquoi nous avons tout repensé.
+            </p>
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+              <Link href="/devenir-membre">
+                <Button variant="cta" size="lg" className="text-base px-8">Rejoindre le mouvement</Button>
+              </Link>
+              <Link href="/explorer" className="inline-flex items-center gap-2 text-sm font-semibold text-white/70 transition-colors hover:text-white">
+                Voir les lieux labellisés <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
+          </div>
+
+          <div className="rounded-[2rem] border border-white/15 bg-white/12 p-4 shadow-2xl shadow-black/30 backdrop-blur-2xl sm:p-5">
+            <div className="rounded-[1.5rem] bg-white p-4 text-neutral-900 shadow-xl sm:p-5">
+              <div className="mb-4 flex items-center justify-between gap-3">
+                <span className="rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-bold text-emerald-700">Réseau de confiance</span>
+                <span className="text-xs font-semibold text-neutral-400">France entière</span>
+              </div>
+              <div className="rounded-2xl border border-neutral-200 bg-neutral-50 p-4">
+                <p className="text-xs font-bold uppercase tracking-[0.18em] text-neutral-400">Le constat</p>
+                <div className="mt-2 flex items-start gap-3">
+                  <Sparkles className="mt-1 h-5 w-5 shrink-0 text-[#c39960]" />
+                  <p className="text-lg font-bold tracking-tight text-neutral-950">On ne veut plus seulement trouver un spot. On veut être attendu.</p>
+                </div>
+              </div>
+              <div className="mt-4 grid gap-2 sm:grid-cols-2">
+                {[
+                  "Lieux vérifiés",
+                  "Accueil engagé",
+                  "Charte commune",
+                  "Voyage plus respectueux",
+                ].map((item) => (
+                  <div key={item} className="flex items-center gap-2 rounded-2xl border border-neutral-100 bg-white px-4 py-3 text-sm font-semibold text-neutral-700 shadow-sm">
+                    <Check className="h-4 w-4 text-emerald-600" />
+                    {item}
+                  </div>
+                ))}
+              </div>
+              <div className="mt-5 grid gap-3 sm:grid-cols-3">
+                <div className="rounded-2xl bg-emerald-50 p-3">
+                  <MapPin className="h-4 w-4 text-emerald-700" />
+                  <p className="mt-2 text-sm font-black text-neutral-950">{labelledPlaces.length}</p>
+                  <p className="text-[11px] text-neutral-500">lieux labellisés</p>
+                </div>
+                <div className="rounded-2xl bg-[#f6efe5] p-3">
+                  <Shield className="h-4 w-4 text-[#9a703f]" />
+                  <p className="mt-2 text-sm font-black text-neutral-950">Charte</p>
+                  <p className="text-[11px] text-neutral-500">respect & calme</p>
+                </div>
+                <div className="rounded-2xl bg-neutral-100 p-3">
+                  <Heart className="h-4 w-4 text-neutral-700" />
+                  <p className="mt-2 text-sm font-black text-neutral-950">{SPOTTED_PLACES.length}</p>
+                  <p className="text-[11px] text-neutral-500">lieux repérés</p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>

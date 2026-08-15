@@ -5,7 +5,7 @@ import { Resend } from "resend";
 import { Prisma } from "@/generated/prisma/client";
 import { formatEuro } from "@/config/products";
 import { getPrisma } from "@/lib/prisma";
-import { getAppUrl, getBackOfficeEmail, getTransactionalEmailFrom, requireServerEnv } from "@/server/env";
+import { getAppUrl, getBackOfficeEmails, getTransactionalEmailFrom, requireServerEnv } from "@/server/env";
 import { generateMemberAccessCode, hashMemberAccessCode, hashMemberAccessLookupCode } from "@/server/member-access";
 import { getStripe } from "@/server/stripe";
 
@@ -44,7 +44,7 @@ async function sendLabellisationPaymentConfirmation(orderId: string): Promise<vo
   const messages = [
     resend.emails.send({
       from,
-      to: getBackOfficeEmail(),
+      to: getBackOfficeEmails(),
       replyTo: candidateEmail || undefined,
       subject: `Paiement reçu — ${establishmentName}`,
       text: `Le paiement de ${amount} pour la candidature de ${establishmentName} a bien été reçu.\n\nCommande : ${order.id}\nLe dossier peut maintenant être étudié depuis l'administration Label Vanlife.`,
@@ -123,10 +123,10 @@ async function sendMembershipActivation(orderId: string): Promise<void> {
       } as Prisma.InputJsonObject,
     },
   });
-  const [adminEmailResult, memberEmailResult] = await Promise.allSettled([
+  const [adminEmailResult, memberWelcomeEmailResult, memberAccessCodeEmailResult] = await Promise.allSettled([
     resend.emails.send({
     from,
-    to: getBackOfficeEmail(),
+    to: getBackOfficeEmails(),
     replyTo: order.user.email,
     subject: `Nouveau membre payé — ${fullName}`,
     text: `Un nouveau membre vient de finaliser son paiement.\n\nPersonnes couvertes :\n${coveredPeople}\n\nEmail : ${order.user.email}\nTéléphone : ${profile?.phone || "Non renseigné"}\nMontant : ${formatEuro(order.amount)}\nCarte membre : ${cardNumber}\nCommande : ${order.id}`,
@@ -134,13 +134,20 @@ async function sendMembershipActivation(orderId: string): Promise<void> {
     resend.emails.send({
     from,
     to: order.user.email,
-    subject: "Votre carte membre Label Vanlife est activée",
-    text: `Bonjour ${profile?.firstName || ""},\n\nVotre paiement de ${formatEuro(order.amount)} est confirmé et votre espace membre est actif pendant 12 mois.\n\nVotre code d'accès personnel : ${code}\nConservez-le : il reste valable pendant toute la durée de votre carte membre. Saisissez uniquement ce code sur ${getAppUrl()}/member-login.\n\nNuméro de carte membre : ${cardNumber}\nPrésentez votre carte numérique et ce numéro aux lieux labellisés pour faire vérifier sa validité et bénéficier des avantages membres.\n\nVous avez maintenant accès à la MAP interactive, à votre carte membre et au téléchargement de l'application depuis votre espace en ligne.\n\nL'équipe Label Vanlife`,
+    subject: "Bienvenue dans Label Vanlife",
+    text: `Bonjour ${profile?.firstName || ""},\n\nBienvenue dans Label Vanlife — votre paiement de ${formatEuro(order.amount)} est confirmé et votre carte membre est active pendant 12 mois.\n\nNuméro de carte membre : ${cardNumber}\n\nVotre espace membre vous donne accès à la MAP interactive, à votre carte membre numérique, aux fiches détaillées des lieux et au téléchargement de l'application depuis votre espace en ligne.\n\nPrésentez votre carte numérique aux lieux labellisés pour faire vérifier sa validité et bénéficier des avantages membres.\n\nL'équipe Label Vanlife`,
+    }),
+    resend.emails.send({
+    from,
+    to: order.user.email,
+    subject: "Votre code d'accès personnel Label Vanlife",
+    text: `Bonjour ${profile?.firstName || ""},\n\nVoici votre code d'accès personnel : ${code}\n\nConservez-le : il reste valable pendant toute la durée de votre carte membre.\n\nConnexion à votre espace membre : ${getAppUrl()}/member-login\n\nSaisissez uniquement ce code, puis vous serez redirigé vers votre espace membre.\n\nL'équipe Label Vanlife`,
     }),
   ]);
   const emailErrors = [
     resendEmailErrorMessage(adminEmailResult) && `admin: ${resendEmailErrorMessage(adminEmailResult)}`,
-    resendEmailErrorMessage(memberEmailResult) && `member: ${resendEmailErrorMessage(memberEmailResult)}`,
+    resendEmailErrorMessage(memberWelcomeEmailResult) && `member welcome: ${resendEmailErrorMessage(memberWelcomeEmailResult)}`,
+    resendEmailErrorMessage(memberAccessCodeEmailResult) && `member access code: ${resendEmailErrorMessage(memberAccessCodeEmailResult)}`,
   ].filter((message): message is string => Boolean(message));
 
   await prisma.checkoutOrder.update({
@@ -152,6 +159,10 @@ async function sendMembershipActivation(orderId: string): Promise<void> {
         memberAccessCodeLookupHash: codeLookupHash,
         memberAccessCodeExpiresAt: codeExpiresAt.toISOString(),
         memberAccessCodeUsedAt: null,
+        memberPaidAmount: order.amount,
+        memberPaidCurrency: order.currency,
+        memberRenewalProtectedPrice: order.amount,
+        memberRenewalProtectedPriceSourceOrderId: order.id,
         activationEmailAttemptedAt: new Date().toISOString(),
         ...(emailErrors.length === 0
           ? { activationEmailSentAt: new Date().toISOString() }

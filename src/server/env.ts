@@ -32,5 +32,14 @@ export function getTransactionalEmailFrom(): string {
 }
 
 export function getBackOfficeEmail(): string {
-  return process.env.BACKOFFICE_EMAIL || CONTACT_EMAIL;
+  return getBackOfficeEmails()[0] || CONTACT_EMAIL;
+}
+
+export function getBackOfficeEmails(): string[] {
+  const raw = process.env.BACKOFFICE_EMAILS || process.env.BACKOFFICE_EMAIL || CONTACT_EMAIL;
+  const emails = raw
+    .split(",")
+    .map((email) => email.trim())
+    .filter(Boolean);
+  return emails.length > 0 ? emails : [CONTACT_EMAIL];
 }

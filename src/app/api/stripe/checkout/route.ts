@@ -66,23 +66,61 @@ export async function POST(request: NextRequest) {
     const product = PRODUCTS.membership;
     const stripe = getStripe();
     const priceId = requireServerEnv(product.priceEnv);
-    await assertStripePrice(stripe, priceId, product.amount, product.currency);
 
     const prisma = getPrisma();
+    const existingMember = await prisma.user.findUnique({
+      where: { id: user.id },
+      include: {
+        membership: true,
+        checkoutOrders: {
+          where: { product: "MEMBERSHIP", status: "PAID" },
+          orderBy: [{ paidAt: "desc" }, { createdAt: "desc" }],
+          take: 1,
+        },
+      },
+    });
+    const previousPaidOrder = existingMember?.membership ? existingMember.checkoutOrders[0] : null;
+    const protectedRenewalAmount = previousPaidOrder?.amount && previousPaidOrder.amount > 0
+      ? previousPaidOrder.amount
+      : null;
+    const amount = protectedRenewalAmount ?? product.amount;
+    const isProtectedRenewal = Boolean(protectedRenewalAmount);
+    if (!isProtectedRenewal) await assertStripePrice(stripe, priceId, product.amount, product.currency);
+
     const order = await prisma.checkoutOrder.create({
       data: {
         userId: user.id,
         product: product.code,
-        amount: product.amount,
+        amount,
         currency: product.currency,
+        payload: isProtectedRenewal
+          ? {
+              renewalPriceProtected: true,
+              previousPaidOrderId: previousPaidOrder?.id,
+              previousPaidAmount: protectedRenewalAmount,
+            }
+          : undefined,
       },
     });
 
     const appUrl = getAppUrl();
+    const lineItem = isProtectedRenewal
+      ? {
+          price_data: {
+            currency: product.currency,
+            unit_amount: amount,
+            product_data: {
+              name: product.name,
+              description: "Renouvellement au prix payé l'année précédente",
+            },
+          },
+          quantity: 1,
+        }
+      : { price: priceId, quantity: 1 };
     const session = await stripe.checkout.sessions.create(
       {
         mode: "payment",
-        line_items: [{ price: priceId, quantity: 1 }],
+        line_items: [lineItem],
         customer_email: user.email ?? undefined,
         client_reference_id: order.id,
         metadata: { orderId: order.id, product: product.code, userId: user.id },
