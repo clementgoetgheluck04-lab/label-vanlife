@@ -19,8 +19,6 @@ function getTypeLabel(type: string): string {
 export default function Home() {
   const labelledPlaces = ENRICHED_LIEUX.filter((l) => l.status === "actif");
   const featured = labelledPlaces.slice(0, 6);
-  const visualPlaces = labelledPlaces.filter((lieu) => Boolean(lieu.photoUrl)).slice(0, 10);
-  const marqueePlaces = [...visualPlaces, ...visualPlaces];
 
   return (
     <div className="min-h-screen bg-white">
@@ -68,41 +66,17 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="relative overflow-hidden bg-[#071611] py-20 text-white sm:py-28">
-        <div className="absolute inset-0 opacity-55">
-          <div className="label-photo-marquee flex w-max gap-4">
-            {marqueePlaces.map((lieu, index) => (
-              <div
-                key={`${lieu.id}-top-${index}`}
-                className="h-44 w-72 shrink-0 overflow-hidden rounded-[2rem] border border-white/10 bg-white/5 shadow-2xl shadow-black/30 sm:h-56 sm:w-96"
-                style={{ backgroundImage: `url(${lieu.photoUrl})`, backgroundSize: "cover", backgroundPosition: "center" }}
-                aria-hidden="true"
-              />
-            ))}
-          </div>
-          <div className="label-photo-marquee-reverse mt-4 flex w-max gap-4">
-            {[...marqueePlaces].reverse().map((lieu, index) => (
-              <div
-                key={`${lieu.id}-bottom-${index}`}
-                className="h-40 w-64 shrink-0 overflow-hidden rounded-[2rem] border border-white/10 bg-white/5 shadow-2xl shadow-black/30 sm:h-52 sm:w-80"
-                style={{ backgroundImage: `url(${lieu.photoUrl})`, backgroundSize: "cover", backgroundPosition: "center" }}
-                aria-hidden="true"
-              />
-            ))}
-          </div>
-        </div>
-        <div className="absolute inset-0 bg-gradient-to-r from-[#071611] via-[#071611]/86 to-[#071611]/55" />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#071611]/30 via-transparent to-[#071611]" />
-        <div className="absolute -right-20 -top-28 h-96 w-96 rounded-full bg-[#c39960]/20 blur-3xl" />
-        <div className="absolute -bottom-40 -left-24 h-96 w-96 rounded-full bg-emerald-500/15 blur-3xl" />
-        <div className="relative mx-auto grid max-w-6xl gap-12 px-6 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
+      <section className="relative overflow-hidden bg-neutral-950 py-20 text-white sm:py-28">
+        <div className="absolute -right-20 -top-28 h-96 w-96 rounded-full bg-[#c39960]/15 blur-3xl" />
+        <div className="absolute -bottom-40 -left-24 h-96 w-96 rounded-full bg-emerald-500/10 blur-3xl" />
+        <div className="relative mx-auto grid max-w-6xl gap-12 px-6 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
           <div>
-            <span className="inline-flex rounded-full border border-white/15 bg-white/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-[#dfc59f] backdrop-blur-md">Carte membre Label Vanlife</span>
-            <h2 className="mt-5 text-3xl font-bold leading-tight sm:text-5xl">
+            <span className="text-xs font-semibold uppercase tracking-[0.2em] text-[#dfc59f]">Carte membre Label Vanlife</span>
+            <h2 className="mt-4 text-3xl font-bold leading-tight sm:text-5xl">
               Toute ta vanlife,<br />
               dans ta poche.
             </h2>
-            <p className="mt-5 max-w-xl leading-relaxed text-white/70">
+            <p className="mt-5 max-w-xl leading-relaxed text-white/60">
               La MAP, ta carte membre, les réductions et les fiches détaillées des lieux labellisés. Tout ce qu'il faut pour savoir où aller, quoi réserver et comment être bien accueilli.
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-4">
@@ -110,51 +84,20 @@ export default function Home() {
               <p className="text-sm text-white/60"><span className="mr-2 line-through">39 €</span><strong className="text-white">29 € cette année</strong><br /><span className="text-xs">Renouvellement non automatique</span></p>
             </div>
           </div>
-
-          <div className="rounded-[2rem] border border-white/15 bg-white/12 p-4 shadow-2xl shadow-black/30 backdrop-blur-2xl sm:p-5">
-            <div className="rounded-[1.5rem] bg-white p-4 text-neutral-900 shadow-xl sm:p-5">
-              <div className="mb-4 flex items-center justify-between gap-3">
-                <span className="rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-bold text-emerald-700">Toute la France</span>
-                <span className="text-xs font-semibold text-neutral-400">{labelledPlaces.length} lieux labellisés · {SPOTTED_PLACES.length} repérés</span>
+          <div className="grid gap-4 sm:grid-cols-2">
+            {[
+              { icon: MapPin, value: String(labelledPlaces.length), title: "lieux déjà labellisés", text: `Des fiches complètes avec photos, services et informations pratiques. Et nous avons repéré ${SPOTTED_PLACES.length} lieux pas encore labellisés, disponibles aussi sur notre MAP.` },
+              { icon: Percent, value: "10 à 20%", title: "d'avantage membre", text: "Le pourcentage est public ; le code éventuel reste dans votre espace privé." },
+              { icon: Shield, value: "Vérifiés", title: "selon une vraie charte", text: "Accueil, environnement, confort et tranquillité sont évalués." },
+              { icon: Smartphone, value: "Partout", title: "sur internet puis prochainement en application mobile", text: "Votre carte numérique et la map vous suivent partout sur votre téléphone." },
+            ].map((item) => { const Icon = item.icon; return (
+              <div key={item.title} className="rounded-2xl border border-white/10 bg-white/[0.06] p-6 backdrop-blur-sm">
+                <Icon className="h-5 w-5 text-[#dfc59f]" />
+                <p className="mt-5 text-2xl font-bold">{item.value}</p>
+                <h3 className="mt-1 font-semibold text-white/90">{item.title}</h3>
+                <p className="mt-3 text-sm leading-relaxed text-white/50">{item.text}</p>
               </div>
-              <div className="rounded-2xl border border-neutral-200 bg-neutral-50 p-4">
-                <p className="text-xs font-bold uppercase tracking-[0.18em] text-neutral-400">Recherche</p>
-                <div className="mt-2 flex items-center gap-3">
-                  <MapPin className="h-5 w-5 text-[#c39960]" />
-                  <p className="text-lg font-bold tracking-tight text-neutral-950">Où veux-tu dormir ce soir ?</p>
-                </div>
-              </div>
-              <div className="mt-4 grid gap-2 sm:grid-cols-2">
-                {[
-                  { label: "Lieux labellisés", href: "/explorer" },
-                  { label: "Autour de moi", href: "/explorer" },
-                  { label: "10 à 20% membres", href: "/devenir-membre" },
-                  { label: "MAP interactive", href: "/member-login" },
-                ].map((shortcut) => (
-                  <Link
-                    key={shortcut.label}
-                    href={shortcut.href}
-                    className="group flex items-center justify-between rounded-2xl border border-neutral-100 bg-white px-4 py-3 text-sm font-semibold text-neutral-700 shadow-sm transition-all hover:-translate-y-0.5 hover:border-emerald-200 hover:text-emerald-700 hover:shadow-md"
-                  >
-                    {shortcut.label}
-                    <ArrowRight className="h-4 w-4 text-neutral-300 transition-transform group-hover:translate-x-1 group-hover:text-emerald-600" />
-                  </Link>
-                ))}
-              </div>
-              <div className="mt-5 grid gap-3 sm:grid-cols-3">
-                {[
-                  { icon: Percent, value: "10–20%", text: "réductions" },
-                  { icon: Shield, value: "Vérifié", text: "par charte" },
-                  { icon: Smartphone, value: "Mobile", text: "web puis app" },
-                ].map((item) => { const Icon = item.icon; return (
-                  <div key={item.text} className="rounded-2xl bg-emerald-50 p-3">
-                    <Icon className="h-4 w-4 text-emerald-700" />
-                    <p className="mt-2 text-sm font-black text-neutral-950">{item.value}</p>
-                    <p className="text-[11px] text-neutral-500">{item.text}</p>
-                  </div>
-                ); })}
-              </div>
-            </div>
+            ); })}
           </div>
         </div>
       </section>
