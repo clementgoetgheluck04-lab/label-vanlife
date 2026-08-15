@@ -288,4 +288,13 @@ html {
   .label-photo-marquee-reverse {
     animation: none !important;
   }
+  .label-photo-background .label-photo-marquee {
+    animation: label-photo-marquee 56s linear infinite !important;
+  }
+  .label-photo-background .label-photo-marquee-reverse {
+    animation: label-photo-marquee-reverse 64s linear infinite !important;
+  }
+  .label-photo-background .label-photo-marquee:nth-child(3) {
+    animation-duration: 72s !important;
+  }
 }
