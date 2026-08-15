@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { apiError } from "@/server/http";
-import { getAppUrl, getTransactionalEmailFrom, requireServerEnv } from "@/server/env";
+import { getAppUrl, getBackOfficeEmail, getTransactionalEmailFrom, requireServerEnv } from "@/server/env";
 import { assertSameOrigin, enforceRateLimit } from "@/server/request-security";
 import { parseLabellisationPayload } from "@/server/validation";
 import { LABELLISATION_CRITERIA } from "@/config/labellisation-criteria";
@@ -164,7 +164,7 @@ export async function POST(request: NextRequest) {
       }),
       resend.emails.send({
         from,
-        to: "contact@labelvanlife.com",
+        to: getBackOfficeEmail(),
         replyTo: payload.email,
         subject: `Nouvelle candidature — ${payload.establishmentName}`,
         text: fullApplication,

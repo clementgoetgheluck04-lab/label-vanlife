@@ -5,7 +5,7 @@ import { Resend } from "resend";
 import { Prisma } from "@/generated/prisma/client";
 import { formatEuro } from "@/config/products";
 import { getPrisma } from "@/lib/prisma";
-import { getAppUrl, getTransactionalEmailFrom, requireServerEnv } from "@/server/env";
+import { getAppUrl, getBackOfficeEmail, getTransactionalEmailFrom, requireServerEnv } from "@/server/env";
 import { generateMemberAccessCode, hashMemberAccessCode, hashMemberAccessLookupCode } from "@/server/member-access";
 import { getStripe } from "@/server/stripe";
 
@@ -44,7 +44,7 @@ async function sendLabellisationPaymentConfirmation(orderId: string): Promise<vo
   const messages = [
     resend.emails.send({
       from,
-      to: "contact@labelvanlife.com",
+      to: getBackOfficeEmail(),
       replyTo: candidateEmail || undefined,
       subject: `Paiement reçu — ${establishmentName}`,
       text: `Le paiement de ${amount} pour la candidature de ${establishmentName} a bien été reçu.\n\nCommande : ${order.id}\nLe dossier peut maintenant être étudié depuis l'administration Label Vanlife.`,
@@ -126,7 +126,7 @@ async function sendMembershipActivation(orderId: string): Promise<void> {
   const [adminEmailResult, memberEmailResult] = await Promise.allSettled([
     resend.emails.send({
     from,
-    to: "contact@labelvanlife.com",
+    to: getBackOfficeEmail(),
     replyTo: order.user.email,
     subject: `Nouveau membre payé — ${fullName}`,
     text: `Un nouveau membre vient de finaliser son paiement.\n\nPersonnes couvertes :\n${coveredPeople}\n\nEmail : ${order.user.email}\nTéléphone : ${profile?.phone || "Non renseigné"}\nMontant : ${formatEuro(order.amount)}\nCarte membre : ${cardNumber}\nCommande : ${order.id}`,

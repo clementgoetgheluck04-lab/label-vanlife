@@ -1,3 +1,5 @@
+import { CONTACT_EMAIL } from "@/config/contact";
+
 export class ServerConfigurationError extends Error {
   constructor(variable: string) {
     super(`Missing server configuration: ${variable}`);
@@ -26,5 +28,9 @@ export function getAppUrl(): string {
 }
 
 export function getTransactionalEmailFrom(): string {
-  return process.env.RESEND_FROM_EMAIL || "Label Vanlife <contact@labelvanlife.com>";
+  return process.env.RESEND_FROM_EMAIL || `Label Vanlife <${CONTACT_EMAIL}>`;
+}
+
+export function getBackOfficeEmail(): string {
+  return process.env.BACKOFFICE_EMAIL || CONTACT_EMAIL;
 }

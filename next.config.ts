@@ -121,8 +121,31 @@ const nextConfig: NextConfig = {
         permanent: true,
       },
       {
+        source: "/member-login",
+        has: [
+          {
+            type: "query",
+            key: "mode",
+            value: "(?!login|register).+",
+          },
+        ],
+        destination: "/member-login?mode=login",
+        permanent: false,
+      },
+      {
+        source: "/member-login",
+        missing: [
+          {
+            type: "query",
+            key: "mode",
+          },
+        ],
+        destination: "/member-login?mode=login",
+        permanent: false,
+      },
+      {
         source: "/membre-login",
-        destination: "/member-login",
+        destination: "/member-login?mode=login",
         permanent: true,
       },
       {

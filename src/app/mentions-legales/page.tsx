@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { CONTACT_EMAIL, CONTACT_MAILTO } from "@/config/contact";
 
 export default function MentionsLegalesPage() {
   return (
@@ -13,7 +14,7 @@ export default function MentionsLegalesPage() {
             Association Loi 1901<br />
             SIRET : À venir<br />
             Siège social : France<br />
-            Email : <Link href="mailto:contact@labelvanlife.com" className="text-emerald-600 hover:underline">contact@labelvanlife.com</Link>
+            Email : <Link href={CONTACT_MAILTO} className="text-emerald-600 hover:underline">{CONTACT_EMAIL}</Link>
           </p>
         </section>
 
@@ -42,7 +43,7 @@ export default function MentionsLegalesPage() {
         <section className="space-y-4">
           <h2 className="text-xl font-bold text-neutral-800">Données personnelles</h2>
           <p className="text-sm text-neutral-600 leading-relaxed">
-            Conformément au RGPD, vous disposez d'un droit d'accès, de rectification et de suppression de vos données. Pour l'exercer, contactez-nous à <Link href="mailto:contact@labelvanlife.com" className="text-emerald-600 hover:underline">contact@labelvanlife.com</Link>.
+            Conformément au RGPD, vous disposez d'un droit d'accès, de rectification et de suppression de vos données. Pour l'exercer, contactez-nous à <Link href={CONTACT_MAILTO} className="text-emerald-600 hover:underline">{CONTACT_EMAIL}</Link>.
           </p>
         </section>
       </div>

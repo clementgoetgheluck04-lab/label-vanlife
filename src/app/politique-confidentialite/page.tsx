@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { CONTACT_EMAIL, CONTACT_MAILTO } from "@/config/contact";
 
 export default function PolitiqueConfidentialitePage() {
   return (
@@ -37,7 +38,7 @@ export default function PolitiqueConfidentialitePage() {
         <section className="space-y-4">
           <h2 className="text-xl font-bold text-neutral-800">Contact</h2>
           <p className="text-sm text-neutral-600">
-            Pour toute question : <Link href="mailto:contact@labelvanlife.com" className="text-emerald-600 hover:underline">contact@labelvanlife.com</Link>
+            Pour toute question : <Link href={CONTACT_MAILTO} className="text-emerald-600 hover:underline">{CONTACT_EMAIL}</Link>
           </p>
         </section>
       </div>

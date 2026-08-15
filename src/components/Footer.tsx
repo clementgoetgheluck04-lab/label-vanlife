@@ -6,13 +6,14 @@ import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight, Check, Mail } from "lucide-react";
 import { BRAND_ASSETS } from "@/config/brand-assets";
+import { CONTACT_MAILTO } from "@/config/contact";
 
 const NAVIGATION = [
   { label: "Accueil", href: "/" },
   { label: "Le Label", href: "/le-label" },
   { label: "Labellisation", href: "/labellisation" },
   { label: "Lieux Label Vanlife", href: "/explorer" },
-  { label: "Connexion", href: "/member-login" },
+  { label: "Connexion", href: "/member-login?mode=login" },
 ] as const;
 
 const OFFERS = [
@@ -84,7 +85,7 @@ export default function Footer() {
               <a href="https://www.facebook.com/labelvanlife" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 rounded-full border border-white/15 px-4 py-2 text-sm text-white/75 transition-colors hover:border-white/30 hover:text-white">
                 <FacebookMark className="h-4 w-4" /> Page Facebook
               </a>
-              <a href="mailto:contact@labelvanlife.com" className="inline-flex items-center gap-2 rounded-full border border-white/15 px-4 py-2 text-sm text-white/75 transition-colors hover:border-white/30 hover:text-white">
+              <a href={CONTACT_MAILTO} className="inline-flex items-center gap-2 rounded-full border border-white/15 px-4 py-2 text-sm text-white/75 transition-colors hover:border-white/30 hover:text-white">
                 <Mail className="h-4 w-4" /> Nous contacter
               </a>
             </div>

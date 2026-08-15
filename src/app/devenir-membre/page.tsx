@@ -27,6 +27,7 @@ import { Card, CardContent } from "@/components/ui/Card";
 import { cn } from "@/lib/utils";
 import { MemberDigitalAccess } from "@/components/MemberDigitalAccess";
 import { MembershipCardPreview, MembershipJourneyNav } from "@/components/MembershipWelcome";
+import { CONTACT_EMAIL, CONTACT_MAILTO } from "@/config/contact";
 
 const AVANTAGES = [
   {
@@ -305,7 +306,7 @@ export default function DevenirMembrePage() {
                                       </div>
                                     </CardContent>
                                   </Card>
-                                  <p className="text-center text-xs text-neutral-400 pt-2">Une question ? <a href="mailto:contact@labelvanlife.com" className="text-emerald-600 underline">contact@labelvanlife.com</a></p>
+                                  <p className="text-center text-xs text-neutral-400 pt-2">Une question ? <a href={CONTACT_MAILTO} className="text-emerald-600 underline">{CONTACT_EMAIL}</a></p>
               </div>
             </section>
 

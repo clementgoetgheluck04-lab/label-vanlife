@@ -1,3 +1,5 @@
+import { CONTACT_EMAIL } from "@/config/contact";
+
 /**
  * JsonLd — Composant générique pour injecter des données structurées JSON-LD
  * dans le <head> via un <script type="application/ld+json>.
@@ -36,7 +38,7 @@ export function OrganizationJsonLd() {
     foundingDate: "2024",
     contactPoint: {
       "@type": "ContactPoint",
-      email: "contact@labelvanlife.com",
+      email: CONTACT_EMAIL,
       contactType: "customer service",
       availableLanguage: ["French", "English"],
     },

@@ -1,6 +1,7 @@
 import places from "./member-camping-network.json";
 import { isSpottedDuplicateOfLabelled } from "./place-deduplication";
 import { getVerifiedSpottedGps } from "./verified-spotted-gps";
+import { CONTACT_EMAIL } from "@/config/contact";
 
 export type SpottedPlace = {
   id: string;
@@ -115,5 +116,5 @@ export function buildRemovalMailto(place: SpottedPlace) {
     "",
     "Merci de me recontacter afin de vérifier ma demande.",
   ].join("\n");
-  return `mailto:contact@labelvanlife.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  return `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 }
