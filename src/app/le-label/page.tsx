@@ -15,6 +15,53 @@ export default function LeLabelPage() {
 
   return (
     <div className="min-h-screen bg-white">
+      <style>{`
+        @keyframes label-photo-marquee {
+          from { transform: translate3d(0, 0, 0); }
+          to { transform: translate3d(-50%, 0, 0); }
+        }
+
+        @keyframes label-photo-marquee-reverse {
+          from { transform: translate3d(-50%, 0, 0); }
+          to { transform: translate3d(0, 0, 0); }
+        }
+
+        .label-photo-background {
+          inset: -12% -45%;
+          pointer-events: none;
+          transform: rotate(-6deg) scale(1.14);
+          transform-origin: center;
+          width: auto;
+        }
+
+        .label-photo-background .label-photo-marquee {
+          animation: label-photo-marquee 32s linear infinite !important;
+          will-change: transform;
+        }
+
+        .label-photo-background .label-photo-marquee-reverse {
+          animation: label-photo-marquee-reverse 40s linear infinite !important;
+          will-change: transform;
+        }
+
+        .label-photo-background .label-photo-marquee:nth-child(3) {
+          animation-duration: 48s !important;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .label-photo-background .label-photo-marquee {
+            animation: label-photo-marquee 56s linear infinite !important;
+          }
+
+          .label-photo-background .label-photo-marquee-reverse {
+            animation: label-photo-marquee-reverse 64s linear infinite !important;
+          }
+
+          .label-photo-background .label-photo-marquee:nth-child(3) {
+            animation-duration: 72s !important;
+          }
+        }
+      `}</style>
       {/* ===== HERO ===== */}
       <section className="relative flex min-h-[86vh] items-center overflow-hidden bg-[#071611] pt-24 text-white sm:pt-28">
         <div className="label-photo-background absolute opacity-65">
