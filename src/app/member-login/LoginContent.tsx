@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { AlertCircle, ArrowRight, Check, Download, KeyRound, Loader2, Lock, Mail, Phone, Plus, UserRound, Users, X } from "lucide-react";
 import { Button } from "@/components/ui/Button";
@@ -10,7 +10,9 @@ import { MembershipJourneyNav } from "@/components/MembershipWelcome";
 export function LoginContent() {
   const searchParams = useSearchParams();
   const isRegister = searchParams.get("mode") === "register";
+  const hasAuthFailed = searchParams.get("error") === "auth_failed";
   const [email, setEmail] = useState("");
+  const [confirmationEmail, setConfirmationEmail] = useState("");
   const [password, setPassword] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -27,19 +29,51 @@ export function LoginContent() {
   const [recoveryLoading, setRecoveryLoading] = useState(false);
   const [confirmationMessage, setConfirmationMessage] = useState("");
   const [confirmationLoading, setConfirmationLoading] = useState(false);
+  const [authLinkIssue, setAuthLinkIssue] = useState<{
+    title: string;
+    description: string;
+  } | null>(null);
+
+  useEffect(() => {
+    const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ""));
+    const hashErrorCode = hashParams.get("error_code");
+    const hashErrorDescription = hashParams.get("error_description");
+    const isExpiredLink = hashErrorCode === "otp_expired" || hashErrorDescription?.toLowerCase().includes("expired");
+    const isInvalidLink = hashParams.get("error") === "access_denied" || hasAuthFailed;
+
+    if (isExpiredLink) {
+      setAuthLinkIssue({
+        title: "Lien de confirmation expiré",
+        description: "Ce lien email n’est plus valable ou a déjà été utilisé. Ce n’est pas grave : demande un nouveau lien de confirmation, puis clique sur le dernier email reçu.",
+      });
+      return;
+    }
+
+    if (isInvalidLink) {
+      setAuthLinkIssue({
+        title: "Lien de connexion invalide",
+        description: "Le lien utilisé ne permet pas d’ouvrir la session. Tu peux demander un nouveau lien de confirmation, ou te connecter avec ton code membre si ta carte est déjà activée.",
+      });
+    }
+  }, [hasAuthFailed]);
 
   const updateCompanion = (index: number, patch: Partial<(typeof companions)[number]>) => {
     setCompanions((current) => current.map((companion, companionIndex) => companionIndex === index ? { ...companion, ...patch } : companion));
   };
 
   const handleConfirmationResend = async () => {
+    const targetEmail = (email || confirmationEmail).trim();
+    if (!targetEmail) {
+      setConfirmationMessage("Indiquez l’adresse email utilisée pour l’inscription.");
+      return;
+    }
     setConfirmationLoading(true);
     setConfirmationMessage("");
     try {
       const response = await fetch("/api/auth/resend-confirmation", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email: targetEmail }),
       });
       const result = await response.json();
       if (!response.ok) throw new Error(result.error || "Envoi impossible");
@@ -163,6 +197,37 @@ export function LoginContent() {
                 : "Saisissez simplement le code personnel reçu après votre paiement."}
             </p>
           </div>
+
+          {authLinkIssue && (
+            <div className="space-y-4 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-left">
+              <div className="flex gap-3">
+                <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-amber-600" />
+                <div>
+                  <p className="text-sm font-bold text-amber-950">{authLinkIssue.title}</p>
+                  <p className="mt-1 text-xs leading-relaxed text-amber-900/80">{authLinkIssue.description}</p>
+                </div>
+              </div>
+              <label className="block space-y-2 text-sm font-medium text-amber-950">
+                <span>Email utilisé lors de l’inscription</span>
+                <input
+                  type="email"
+                  value={confirmationEmail}
+                  onChange={(event) => setConfirmationEmail(event.target.value)}
+                  className="h-12 w-full rounded-xl border border-amber-200 bg-white px-4 text-neutral-900 focus:ring-2 focus:ring-[#c39960]"
+                  placeholder="vous@email.com"
+                  autoComplete="email"
+                />
+              </label>
+              <Button type="button" variant="secondary-dark" className="w-full" onClick={handleConfirmationResend} disabled={confirmationLoading}>
+                {confirmationLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Mail className="h-4 w-4" />}
+                Renvoyer l’email de confirmation
+              </Button>
+              {confirmationMessage && <p className="text-xs text-amber-900/70" role="status">{confirmationMessage}</p>}
+              <p className="text-[11px] leading-relaxed text-amber-900/60">
+                Si votre carte membre est déjà payée, ignorez ce lien email et connectez-vous simplement avec le code d’accès reçu après paiement.
+              </p>
+            </div>
+          )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
             {isRegister ? (
