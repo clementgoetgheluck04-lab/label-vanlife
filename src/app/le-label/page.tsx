@@ -11,14 +11,15 @@ export default function LeLabelPage() {
   const labelledPlaces = ENRICHED_LIEUX.filter((lieu) => lieu.status === "actif");
   const visualPlaces = labelledPlaces.filter((lieu) => Boolean(lieu.photoUrl)).slice(0, 10);
   const marqueePlaces = [...visualPlaces, ...visualPlaces];
+  const denseMarqueePlaces = [...marqueePlaces, ...marqueePlaces];
 
   return (
     <div className="min-h-screen bg-white">
       {/* ===== HERO ===== */}
       <section className="relative flex min-h-[86vh] items-center overflow-hidden bg-[#071611] pt-24 text-white sm:pt-28">
-        <div className="absolute inset-0 opacity-55">
+        <div className="label-photo-background absolute opacity-65">
           <div className="label-photo-marquee flex w-max gap-4">
-            {marqueePlaces.map((lieu, index) => (
+            {denseMarqueePlaces.map((lieu, index) => (
               <div
                 key={`${lieu.id}-label-top-${index}`}
                 className="h-44 w-72 shrink-0 rounded-[2rem] border border-white/10 bg-white/5 shadow-2xl shadow-black/30 sm:h-56 sm:w-96"
@@ -28,10 +29,20 @@ export default function LeLabelPage() {
             ))}
           </div>
           <div className="label-photo-marquee-reverse mt-4 flex w-max gap-4">
-            {[...marqueePlaces].reverse().map((lieu, index) => (
+            {[...denseMarqueePlaces].reverse().map((lieu, index) => (
               <div
                 key={`${lieu.id}-label-bottom-${index}`}
                 className="h-40 w-64 shrink-0 rounded-[2rem] border border-white/10 bg-white/5 shadow-2xl shadow-black/30 sm:h-52 sm:w-80"
+                style={{ backgroundImage: `url(${lieu.photoUrl})`, backgroundSize: "cover", backgroundPosition: "center" }}
+                aria-hidden="true"
+              />
+            ))}
+          </div>
+          <div className="label-photo-marquee mt-4 flex w-max gap-4">
+            {[...denseMarqueePlaces].slice().reverse().map((lieu, index) => (
+              <div
+                key={`${lieu.id}-label-third-${index}`}
+                className="h-36 w-60 shrink-0 rounded-[2rem] border border-white/10 bg-white/5 shadow-2xl shadow-black/30 sm:h-48 sm:w-72"
                 style={{ backgroundImage: `url(${lieu.photoUrl})`, backgroundSize: "cover", backgroundPosition: "center" }}
                 aria-hidden="true"
               />

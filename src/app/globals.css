@@ -193,13 +193,13 @@ html {
 }
 
 @keyframes label-photo-marquee {
-  from { transform: translateX(0); }
-  to { transform: translateX(-50%); }
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(-50%, 0, 0); }
 }
 
 @keyframes label-photo-marquee-reverse {
-  from { transform: translateX(-50%); }
-  to { transform: translateX(0); }
+  from { transform: translate3d(-50%, 0, 0); }
+  to { transform: translate3d(0, 0, 0); }
 }
 
 .animate-confetti {
@@ -247,10 +247,32 @@ html {
 
 .label-photo-marquee {
   animation: label-photo-marquee 46s linear infinite;
+  will-change: transform;
 }
 
 .label-photo-marquee-reverse {
   animation: label-photo-marquee-reverse 54s linear infinite;
+  will-change: transform;
+}
+
+.label-photo-background {
+  inset: -12% -45%;
+  pointer-events: none;
+  transform: rotate(-6deg) scale(1.14);
+  transform-origin: center;
+  width: auto;
+}
+
+.label-photo-background .label-photo-marquee {
+  animation-duration: 32s;
+}
+
+.label-photo-background .label-photo-marquee-reverse {
+  animation-duration: 40s;
+}
+
+.label-photo-background .label-photo-marquee:nth-child(3) {
+  animation-duration: 48s;
 }
 
 @media (prefers-reduced-motion: reduce) {
