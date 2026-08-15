@@ -28,7 +28,7 @@ export function getAppUrl(): string {
 }
 
 export function getTransactionalEmailFrom(): string {
-  return process.env.RESEND_FROM_EMAIL || `Label Vanlife <${CONTACT_EMAIL}>`;
+  return process.env.RESEND_FROM_EMAIL || "Label Vanlife <onboarding@resend.dev>";
 }
 
 export function getBackOfficeEmail(): string {
