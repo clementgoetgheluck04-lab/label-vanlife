@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Activity, ArrowLeft, Building2, CalendarDays, CircleAlert, ExternalLink, Mail, MapPin, Navigation, Phone, ShieldCheck, Users } from "lucide-react";
+import MemberRoadTripPanel from "@/components/roadtrip/MemberRoadTripPanel";
 import { buildClaimHref, buildRemovalMailto, classifySpottedPlace, getSpottedPlace, normalizeExternalWebsite, PLACE_UNIVERSE_LABELS, SPOTTED_PLACES } from "@/data/spotted-places";
 
 type PageProps = { params: Promise<{ id: string }> };
@@ -56,6 +57,23 @@ export default async function SpottedPlacePage({ params }: PageProps) {
               </div>
             </div>
           </div>
+
+          <MemberRoadTripPanel
+            place={{
+              id: `spotted:${place.id}`,
+              name: place.name,
+              city: place.city,
+              region: place.region,
+              lat: place.lat,
+              lng: place.lng,
+              href: `/lieux-reperes/${place.id}?member=1`,
+              kind: "spotted",
+            }}
+            title="Ajouter ce lieu repéré à mon road trip"
+            description="Utilisez-le comme étape indicative. Aucun avantage membre n’est garanti tant que le lieu n’est pas labellisé."
+            variant="spotted"
+            visibility="member-query"
+          />
 
           <div className="grid gap-8 p-6 sm:p-10 lg:grid-cols-[1fr_0.9fr]">
             <div>

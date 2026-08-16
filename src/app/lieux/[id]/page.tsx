@@ -27,6 +27,7 @@ import {
 import type { LucideIcon } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
+import AddToRoadTripButton from "@/components/roadtrip/AddToRoadTripButton";
 import { ENRICHED_LIEUX } from "@/data/enriched-lieux";
 import { getPlaceContact } from "@/data/place-contacts";
 import { getPlaceMedia } from "@/data/place-media";
@@ -163,6 +164,34 @@ export default async function LieuDetailPage({ params }: { params: Promise<{ id:
             </div>
           </div>
         </section>
+
+        {memberHasAccess && (
+          <section className="flex flex-col gap-4 rounded-3xl border border-emerald-100 bg-gradient-to-r from-emerald-50 to-[#f7f1e8] p-5 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.18em] text-emerald-700">Préparer mon itinéraire</p>
+              <h2 className="mt-1 text-lg font-bold text-neutral-900">Ajouter ce lieu à mon road trip</h2>
+              <p className="mt-1 text-sm leading-relaxed text-neutral-600">
+                Retrouvez ensuite cette étape dans votre espace Road Trips pour ouvrir l’itinéraire dans Google Maps ou Waze.
+              </p>
+            </div>
+            <AddToRoadTripButton
+              place={{
+                id: `labelled:${lieu.id}`,
+                name: lieu.nom,
+                city: lieu.ville,
+                region: lieu.region,
+                lat: lieu.coordonnees.lat,
+                lng: lieu.coordonnees.lng,
+                href: `/lieux/${lieu.id}`,
+                kind: "labelled",
+              }}
+              variant="gold"
+              size="lg"
+              showViewLink
+              className="sm:w-64"
+            />
+          </section>
+        )}
 
         {richDetails?.discountInstructions && richDetails.discountInstructions.length > 0 && (
           <section className="overflow-hidden rounded-3xl border border-[#c39960]/35 bg-[#f7f1e8]">

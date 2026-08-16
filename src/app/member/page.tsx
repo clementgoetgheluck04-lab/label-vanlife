@@ -21,6 +21,7 @@ import {
   Sparkles,
   ArrowRight,
   Clock,
+  Navigation,
 } from "lucide-react";
 import { Card, CardTitle, CardContent } from "@/components/ui/Card";
 import { Badge as UIBadge } from "@/components/ui/Badge";
@@ -299,6 +300,42 @@ export default function MemberDashboard() {
           </Link>
         </section>
 
+        {/* ── Parcours principal ── */}
+        <section className="grid gap-3 sm:grid-cols-2">
+          <Link href="/member/map" className="group">
+            <Card variant="interactive" className="relative overflow-hidden p-5">
+              <div className="absolute -right-10 -top-10 h-28 w-28 rounded-full bg-sage/10 transition-transform duration-500 group-hover:scale-125" />
+              <div className="relative flex items-center gap-4">
+                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-sage text-white shadow-lg shadow-sage/20">
+                  <Map className="h-7 w-7" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs font-bold uppercase tracking-[0.16em] text-sage">Étape 1</p>
+                  <h2 className="mt-1 text-base font-bold text-charcoal">Ouvrir la MAP</h2>
+                  <p className="mt-1 text-xs leading-relaxed text-stone">Lieux labellisés en priorité, lieux repérés en option, filtres et GPS.</p>
+                </div>
+                <ArrowRight className="h-5 w-5 text-sage transition-transform group-hover:translate-x-1" />
+              </div>
+            </Card>
+          </Link>
+          <Link href="/member/roadtrips" className="group">
+            <Card variant="interactive" className="relative overflow-hidden p-5">
+              <div className="absolute -right-10 -top-10 h-28 w-28 rounded-full bg-[#c39960]/15 transition-transform duration-500 group-hover:scale-125" />
+              <div className="relative flex items-center gap-4">
+                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-[#c39960] text-white shadow-lg shadow-[#c39960]/20">
+                  <Navigation className="h-7 w-7" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#9a7445]">Étape 2</p>
+                  <h2 className="mt-1 text-base font-bold text-charcoal">Préparer un road trip</h2>
+                  <p className="mt-1 text-xs leading-relaxed text-stone">Ajoute des étapes depuis la MAP, puis ouvre Maps ou Waze.</p>
+                </div>
+                <ArrowRight className="h-5 w-5 text-[#9a7445] transition-transform group-hover:translate-x-1" />
+              </div>
+            </Card>
+          </Link>
+        </section>
+
         {/* ── Quick links ── */}
         <section className="grid grid-cols-3 sm:grid-cols-6 gap-3">
           <Link href="/member/map">
@@ -480,7 +517,7 @@ export default function MemberDashboard() {
 
         {/* ── Carte et communauté ── */}
         <section className="flex flex-col sm:flex-row gap-3">
-          <Link href="/map" className="flex-1">
+          <Link href="/member/map" className="flex-1">
             <Card variant="interactive" className="p-5 flex items-center gap-4">
               <div className="h-12 w-12 rounded-xl bg-sage/10 flex items-center justify-center shrink-0">
                 <Map className="h-6 w-6 text-sage" />

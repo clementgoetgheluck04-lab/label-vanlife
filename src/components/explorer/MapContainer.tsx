@@ -186,7 +186,7 @@ export default function MapContainer({
             <h3>${escapeHtml(lieu.nom)}</h3>
             <p>${escapeHtml(lieu.ville)}, ${escapeHtml(lieu.region)}</p>
             <p class="popup-benefit">${lieu.discountPercent > 0 ? `Avantage membre : <strong>-${lieu.discountPercent}%</strong>` : escapeHtml(lieu.priceHighlight || "Accueil Label Vanlife")}</p>
-            <a class="popup-cta" href="/lieux/${encodeURIComponent(lieu.id)}">Voir la fiche complète</a>
+            <a class="popup-cta" href="/lieux/${encodeURIComponent(lieu.id)}?member=1">Voir la fiche complète</a>
             <div class="popup-navigation">
               <a href="${escapeHtml(navigation.maps)}" target="_blank" rel="noreferrer" aria-label="Ouvrir l'itinéraire dans Google Maps">Google Maps</a>
               <a href="${escapeHtml(navigation.waze)}" target="_blank" rel="noreferrer" aria-label="Ouvrir l'itinéraire dans Waze">Waze</a>
@@ -210,7 +210,7 @@ export default function MapContainer({
             <h3>${escapeHtml(place.name)}</h3>
             <p>${escapeHtml(place.address || `${place.postalCode} ${place.city}`)}</p>
             <p class="popup-warning">Adresse utile non labellisée Label Vanlife. Vérifiez les conditions avant votre venue.</p>
-            <a class="popup-cta popup-cta-network" href="/lieux-reperes/${encodeURIComponent(place.id)}">Voir la fiche complète</a>
+            <a class="popup-cta popup-cta-network" href="/lieux-reperes/${encodeURIComponent(place.id)}?member=1">Voir la fiche complète</a>
             ${website}
             <div class="popup-navigation">
               <a href="${escapeHtml(navigation.maps)}" target="_blank" rel="noreferrer" aria-label="Ouvrir l'itinéraire dans Google Maps">Google Maps</a>

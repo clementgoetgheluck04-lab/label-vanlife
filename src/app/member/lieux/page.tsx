@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Heart, MapPin, ArrowLeft, Compass } from "lucide-react";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
+import AddToRoadTripButton from "@/components/roadtrip/AddToRoadTripButton";
 import { MOCK_MEMBRES } from "@/data/mock-membres";
 import { ENRICHED_LIEUX } from "@/data/enriched-lieux";
 
@@ -22,8 +23,8 @@ export default function MemberLieuxPage() {
       <div className="max-w-2xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex items-center gap-3">
-          <Link href="/member" className="lg:hidden">
-            <ArrowLeft className="h-5 w-5 text-stone" />
+          <Link href="/member" className="flex min-h-10 min-w-10 items-center justify-center rounded-full text-stone transition-colors hover:bg-neutral-100 hover:text-neutral-700" aria-label="Retour à l’espace membre">
+            <ArrowLeft className="h-5 w-5" />
           </Link>
           <div>
             <h1 className="text-2xl font-bold text-charcoal flex items-center gap-2">
@@ -45,7 +46,7 @@ export default function MemberLieuxPage() {
                 Explore la carte et ajoute tes premiers lieux en favoris
               </p>
             </div>
-            <Link href="/map">
+            <Link href="/member/map">
               <Button variant="primary" size="sm">
                 Explorer les lieux
               </Button>
@@ -54,23 +55,40 @@ export default function MemberLieuxPage() {
         ) : (
           <div className="space-y-3">
             {favoris.map((lieu) => (
-              <Link key={lieu.id} href={`/lieux/${lieu.id}`}>
-                <Card variant="interactive" className="flex items-center gap-4 p-4">
-                  <div className="h-14 w-14 rounded-xl bg-sage/10 flex items-center justify-center shrink-0 overflow-hidden">
-                    <MapPin className="h-6 w-6 text-sage" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-charcoal text-sm truncate">{lieu.nom}</h3>
-                    <p className="text-xs text-stone truncate">{lieu.ville}, {lieu.region}</p>
-                    <div className="flex items-center gap-2 mt-1">
-                      <span className="text-[10px] font-medium text-amber bg-amber/10 px-2 py-0.5 rounded-full">
-                        -{lieu.discountPercent}%
-                      </span>
-                      <span className="text-[10px] text-stone/60">★ {lieu.note}</span>
+              <article key={lieu.id} className="space-y-2">
+                <Link href={`/lieux/${lieu.id}`} className="block">
+                  <Card variant="interactive" className="flex items-center gap-4 p-4">
+                    <div className="h-14 w-14 rounded-xl bg-sage/10 flex items-center justify-center shrink-0 overflow-hidden">
+                      <MapPin className="h-6 w-6 text-sage" />
                     </div>
-                  </div>
-                </Card>
-              </Link>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-semibold text-charcoal text-sm truncate">{lieu.nom}</h3>
+                      <p className="text-xs text-stone truncate">{lieu.ville}, {lieu.region}</p>
+                      <div className="flex items-center gap-2 mt-1">
+                        <span className="text-[10px] font-medium text-amber bg-amber/10 px-2 py-0.5 rounded-full">
+                          -{lieu.discountPercent}%
+                        </span>
+                        <span className="text-[10px] text-stone/60">★ {lieu.note}</span>
+                      </div>
+                    </div>
+                  </Card>
+                </Link>
+                <AddToRoadTripButton
+                  place={{
+                    id: `labelled:${lieu.id}`,
+                    name: lieu.nom,
+                    city: lieu.ville,
+                    region: lieu.region,
+                    lat: lieu.coordonnees.lat,
+                    lng: lieu.coordonnees.lng,
+                    href: `/lieux/${lieu.id}`,
+                    kind: "labelled",
+                  }}
+                  size="sm"
+                  variant="white"
+                  showViewLink
+                />
+              </article>
             ))}
           </div>
         )}

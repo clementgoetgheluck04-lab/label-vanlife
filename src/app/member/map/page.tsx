@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/browser";
-import { X, Filter, MapPin, Percent, ArrowLeft, BadgeCheck, TentTree, Building2, ExternalLink, Navigation } from "lucide-react";
+import { X, Filter, MapPin, Percent, ArrowLeft, BadgeCheck, TentTree, Building2, ExternalLink, Navigation, Route, Plus, CheckCircle2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ENRICHED_LIEUX } from "@/data/enriched-lieux";
 import Filters, { type FilterValues } from "@/components/explorer/Filters";
@@ -25,6 +25,19 @@ const DEFAULT_FILTERS: FilterValues = {
   region: "",
   search: "",
 };
+
+type RoadTripDraftPlace = {
+  id: string;
+  name: string;
+  city: string;
+  region: string;
+  lat: number;
+  lng: number;
+  href: string;
+  kind: "labelled" | "spotted";
+};
+
+const ROADTRIP_DRAFT_STORAGE_KEY = "label-vanlife-roadtrip-draft";
 
 export default function MemberMapPage() {
   const router = useRouter();
@@ -48,6 +61,8 @@ export default function MemberMapPage() {
   const [memberOnlyPlaces, setMemberOnlyPlaces] = useState<MemberCampingPoint[]>([]);
   const [universe, setUniverse] = useState<PlaceUniverse>("tous");
   const [visibleMemberPlaces, setVisibleMemberPlaces] = useState(24);
+  const [roadTripDraft, setRoadTripDraft] = useState<RoadTripDraftPlace[]>([]);
+  const [roadTripDraftLoaded, setRoadTripDraftLoaded] = useState(false);
 
   // Compute available regions from data
   const regions = useMemo(() => {
@@ -96,15 +111,48 @@ export default function MemberMapPage() {
       .catch(() => setMemberOnlyPlaces([]));
   }, [authed]);
 
+  useEffect(() => {
+    try {
+      const saved = window.localStorage.getItem(ROADTRIP_DRAFT_STORAGE_KEY);
+      if (!saved) return;
+      const parsed = JSON.parse(saved) as RoadTripDraftPlace[];
+      if (Array.isArray(parsed)) setRoadTripDraft(parsed.filter((place) => place.id && place.name));
+    } catch {
+      setRoadTripDraft([]);
+    } finally {
+      setRoadTripDraftLoaded(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!roadTripDraftLoaded) return;
+    try {
+      window.localStorage.setItem(ROADTRIP_DRAFT_STORAGE_KEY, JSON.stringify(roadTripDraft));
+    } catch {
+      // Le brouillon reste utilisable pendant la session même si le stockage local est indisponible.
+    }
+  }, [roadTripDraft, roadTripDraftLoaded]);
+
+  function addDestination(place: RoadTripDraftPlace) {
+    setRoadTripDraft((current) => {
+      if (current.some((item) => item.id === place.id)) return current;
+      return [...current, place];
+    });
+  }
+
+  function isDestinationAdded(id: string) {
+    return roadTripDraft.some((place) => place.id === id);
+  }
+
   if (!authed) return null;
 
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
       <div className="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-neutral-100">
-        <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+        <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <Link href="/member" className="text-neutral-400 hover:text-neutral-600">
+            <Link href="/member" className="flex min-h-10 min-w-10 items-center justify-center rounded-full text-neutral-400 transition-colors hover:bg-neutral-100 hover:text-neutral-700" aria-label="Retour à l’espace membre">
               <ArrowLeft className="h-5 w-5" />
             </Link>
             <div>
@@ -114,19 +162,29 @@ export default function MemberMapPage() {
               </p>
             </div>
           </div>
-          <button
-            onClick={() => setShowFilters(!showFilters)}
-            className={cn(
-              "flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all",
-              showFilters
-                ? "bg-emerald-50 text-emerald-600 border border-emerald-200"
-                : "bg-neutral-100 text-neutral-600 hover:bg-neutral-200 border border-transparent"
-            )}
-          >
-            <Filter className="h-4 w-4" />
-            Filtres
-            {showFilters && <X className="h-4 w-4" />}
-          </button>
+          <div className="flex items-center gap-2">
+            <Link
+              href="/member/roadtrips"
+              className="hidden min-h-10 items-center gap-2 rounded-xl bg-[#c39960] px-4 py-2 text-sm font-bold text-white shadow-sm transition hover:bg-[#ad8250] sm:flex"
+            >
+              <Route className="h-4 w-4" />
+              Road trip
+              {roadTripDraft.length > 0 && <span className="rounded-full bg-white/20 px-2 py-0.5 text-xs">{roadTripDraft.length}</span>}
+            </Link>
+            <button
+              onClick={() => setShowFilters(!showFilters)}
+              className={cn(
+                "flex min-h-10 items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all",
+                showFilters
+                  ? "bg-emerald-50 text-emerald-600 border border-emerald-200"
+                  : "bg-neutral-100 text-neutral-600 hover:bg-neutral-200 border border-transparent"
+              )}
+            >
+              <Filter className="h-4 w-4" />
+              Filtres
+              {showFilters && <X className="h-4 w-4" />}
+            </button>
+          </div>
         </div>
       </div>
 
@@ -155,6 +213,27 @@ export default function MemberMapPage() {
 
       {/* Map + Cards */}
       <div className="max-w-6xl mx-auto px-4 py-6 space-y-6">
+        <div className="rounded-3xl border border-emerald-100 bg-gradient-to-r from-emerald-50 to-[#f7f1e8] p-5 shadow-sm">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-start gap-3">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-white text-emerald-700 shadow-sm">
+                <Route className="h-5 w-5" />
+              </div>
+              <div>
+                <p className="text-xs font-bold uppercase tracking-[0.18em] text-emerald-700">Créer mon road trip</p>
+                <h2 className="mt-1 text-lg font-bold text-neutral-900">Ajoutez vos destinations depuis la MAP</h2>
+                <p className="mt-1 text-sm leading-relaxed text-neutral-600">
+                  Sélectionnez des lieux labellisés ou repérés, puis retrouvez votre brouillon dans Road Trips pour ouvrir l’itinéraire dans Google Maps ou Waze.
+                </p>
+              </div>
+            </div>
+            <Link href="/member/roadtrips" className="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-xl bg-neutral-900 px-4 py-2 text-sm font-bold text-white transition hover:bg-neutral-800">
+              Voir mon road trip
+              {roadTripDraft.length > 0 && <span className="rounded-full bg-white/15 px-2 py-0.5 text-xs">{roadTripDraft.length}</span>}
+            </Link>
+          </div>
+        </div>
+
         <div className="grid gap-3 sm:grid-cols-2">
           <button
             type="button"
@@ -232,9 +311,37 @@ export default function MemberMapPage() {
             <span className="text-xs text-neutral-400">({filteredLieux.length})</span>
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filteredLieux.map((lieu) => (
-              <LieuCard key={lieu.id} lieu={lieu} />
-            ))}
+            {filteredLieux.map((lieu) => {
+              const added = isDestinationAdded(`labelled:${lieu.id}`);
+              return (
+                <div key={lieu.id} className="space-y-2">
+                  <LieuCard lieu={lieu} />
+                  <button
+                    type="button"
+                    onClick={() => addDestination({
+                      id: `labelled:${lieu.id}`,
+                      name: lieu.nom,
+                      city: lieu.ville,
+                      region: lieu.region,
+                      lat: lieu.coordonnees.lat,
+                      lng: lieu.coordonnees.lng,
+                      href: `/lieux/${lieu.id}?member=1`,
+                      kind: "labelled",
+                    })}
+                    disabled={added}
+                    className={cn(
+                      "flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border px-3 py-2 text-sm font-bold transition",
+                      added
+                        ? "border-emerald-200 bg-emerald-50 text-emerald-700"
+                        : "border-neutral-200 bg-white text-neutral-700 hover:border-emerald-300 hover:text-emerald-800"
+                    )}
+                  >
+                    {added ? <CheckCircle2 className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
+                    {added ? "Ajouté au road trip" : "Ajouter au road trip"}
+                  </button>
+                </div>
+              );
+            })}
           </div>
           {filteredLieux.length === 0 && (
             <div className="text-center py-12 text-neutral-400">
@@ -255,6 +362,7 @@ export default function MemberMapPage() {
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {filteredMemberPlaces.slice(0, visibleMemberPlaces).map((place) => {
                   const website = normalizeExternalWebsite(place.website);
+                  const added = isDestinationAdded(`spotted:${place.id}`);
                   return (
                     <article key={place.id} className="flex min-h-56 flex-col rounded-2xl border border-neutral-200 bg-neutral-50/70 p-5 opacity-80 transition hover:opacity-100">
                       <div className="flex items-start justify-between gap-3">
@@ -265,7 +373,30 @@ export default function MemberMapPage() {
                       <p className="mt-2 flex items-start gap-1.5 text-sm text-neutral-500"><MapPin className="mt-0.5 h-4 w-4 shrink-0" />{place.city} · {place.region}</p>
                       <p className="mt-2 text-xs text-neutral-400">{PLACE_UNIVERSE_LABELS[classifySpottedPlace(place)]} · Repéré par Label Vanlife</p>
                       <div className="mt-auto flex flex-col gap-2 pt-5">
-                        <Link href={`/lieux-reperes/${place.id}`} className="flex min-h-11 items-center justify-center rounded-xl border border-neutral-300 bg-white px-3 py-2 text-center text-xs font-bold text-neutral-700 hover:border-neutral-400">Voir la fiche</Link>
+                        <Link href={`/lieux-reperes/${place.id}?member=1`} className="flex min-h-11 items-center justify-center rounded-xl border border-neutral-300 bg-white px-3 py-2 text-center text-xs font-bold text-neutral-700 hover:border-neutral-400">Voir la fiche</Link>
+                        <button
+                          type="button"
+                          onClick={() => addDestination({
+                            id: `spotted:${place.id}`,
+                            name: place.name,
+                            city: place.city,
+                            region: place.region,
+                            lat: place.lat,
+                            lng: place.lng,
+                            href: `/lieux-reperes/${place.id}?member=1`,
+                            kind: "spotted",
+                          })}
+                          disabled={added}
+                          className={cn(
+                            "flex min-h-11 items-center justify-center gap-1.5 rounded-xl px-3 py-2 text-center text-xs font-bold transition",
+                            added
+                              ? "bg-emerald-50 text-emerald-700"
+                              : "border border-neutral-300 bg-white text-neutral-700 hover:border-emerald-300 hover:text-emerald-800"
+                          )}
+                        >
+                          {added ? <CheckCircle2 className="h-3.5 w-3.5" /> : <Plus className="h-3.5 w-3.5" />}
+                          {added ? "Ajouté au road trip" : "Ajouter au road trip"}
+                        </button>
                         {website && <a href={website} target="_blank" rel="noreferrer nofollow" className="flex min-h-11 items-center justify-center gap-1.5 rounded-xl bg-[#c39960] px-3 py-2 text-center text-xs font-bold text-white hover:bg-[#ad8250]">Réserver sur le site <ExternalLink className="h-3.5 w-3.5" /></a>}
                         {!website && place.googleMapsUrl && <a href={place.googleMapsUrl} target="_blank" rel="noreferrer nofollow" className="flex min-h-11 items-center justify-center gap-1.5 rounded-xl bg-[#c39960] px-3 py-2 text-center text-xs font-bold text-white hover:bg-[#ad8250]">Ouvrir la fiche GPS <ExternalLink className="h-3.5 w-3.5" /></a>}
                         <div className="grid grid-cols-2 gap-2">
