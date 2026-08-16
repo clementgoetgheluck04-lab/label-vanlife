@@ -1,33 +1,12 @@
 "use client";
 
-import { useMemo, type ComponentType } from "react";
+import { useMemo } from "react";
 import Link from "next/link";
-import { Award, Lock, Check, ChevronRight, Trophy, Star, TreePine, Camera, Users, Moon, Sparkles } from "lucide-react";
+import { Award, Lock, Check, ArrowLeft, Trophy } from "lucide-react";
 import { Card } from "@/components/ui/Card";
 import { Badge as UIBadge } from "@/components/ui/Badge";
 import { MOCK_MEMBRES } from "@/data/mock-membres";
 import { MOCK_BADGES } from "@/data/mock-badges";
-
-type BadgeIconProps = { className?: string };
-
-const ICON_MAP: Record<string, ComponentType<BadgeIconProps>> = {
-  "📍": MapPin,
-  "🌍": Globe,
-  "🌱": TreePine,
-  "📸": Camera,
-  "🗣️": Users,
-  "🌙": Moon,
-  "👨‍👩‍👧‍👦": Users,
-  "🏆": Trophy,
-};
-
-// Fallback emoji renderer
-function EmojiIcon({ emoji, className }: { emoji: string; className?: string }) {
-  return <span className={className}>{emoji}</span>;
-}
-
-function MapPin(props: BadgeIconProps) { return <span className={props.className}>📍</span>; }
-function Globe(props: BadgeIconProps) { return <span className={props.className}>🌍</span>; }
 
 export default function MemberBadgesPage() {
   const membre = MOCK_MEMBRES[0]; // Utilisateur connecté
@@ -49,8 +28,8 @@ export default function MemberBadgesPage() {
         {/* Header */}
         <div className="space-y-2">
           <div className="flex items-center gap-3">
-            <Link href="/member" className="lg:hidden">
-              <ChevronRight className="h-5 w-5 text-neutral-400 rotate-180" />
+            <Link href="/member" className="flex min-h-10 min-w-10 items-center justify-center rounded-full text-neutral-400 transition-colors hover:bg-neutral-100 hover:text-neutral-700" aria-label="Retour à l’espace membre">
+              <ArrowLeft className="h-5 w-5" />
             </Link>
             <div className="w-12 h-12 rounded-xl bg-amber-50 flex items-center justify-center">
               <Trophy className="h-6 w-6 text-amber-500" />

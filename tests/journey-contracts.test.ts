@@ -20,7 +20,7 @@ test("membership journey keeps confirmation, Stripe and activation connected", (
   assert.match(webhook, /checkout\.session\.completed/);
   assert.match(webhook, /memberCard\.upsert/);
   assert.match(webhook, /activationEmailSentAt/);
-  assert.match(webhook, /getBackOfficeEmail\(\)/);
+  assert.match(webhook, /getBackOfficeEmails\(\)/);
   assert.match(contact, /contact@labelvanlife\.fr/);
   assert.doesNotMatch(webhook, /contact@labelvanlife\.com/);
 });
@@ -36,7 +36,7 @@ test("labellisation journey keeps dossier, Stripe, webhook and both emails conne
   assert.match(candidature, /photoFiles\.length >= 1/);
   assert.match(checkout, /labellisation\/success\?session_id=\{CHECKOUT_SESSION_ID\}/);
   assert.match(webhook, /sendLabellisationPaymentConfirmation/);
-  assert.match(webhook, /getBackOfficeEmail\(\)/);
+  assert.match(webhook, /getBackOfficeEmails\(\)/);
   assert.match(webhook, /to: candidateEmail/);
   assert.match(contact, /contact@labelvanlife\.fr/);
   assert.doesNotMatch(webhook, /contact@labelvanlife\.com/);

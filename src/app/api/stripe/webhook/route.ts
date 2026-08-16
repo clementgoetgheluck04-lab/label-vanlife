@@ -4,6 +4,7 @@ import type Stripe from "stripe";
 import { Resend } from "resend";
 import { Prisma } from "@/generated/prisma/client";
 import { formatEuro } from "@/config/products";
+import { MEMBER_EXPIRY_ISO, MEMBER_PRODUCT_NAME, MEMBER_VALIDITY_TEXT } from "@/config/commercial";
 import { getPrisma } from "@/lib/prisma";
 import { getAppUrl, getBackOfficeEmails, getTransactionalEmailFrom, requireServerEnv } from "@/server/env";
 import { generateMemberAccessCode, hashMemberAccessCode, hashMemberAccessLookupCode } from "@/server/member-access";
@@ -100,7 +101,7 @@ async function sendMembershipActivation(orderId: string): Promise<void> {
     code,
     requireServerEnv("MEMBER_ACCESS_CODE_SECRET"),
   );
-  const codeExpiresAt = order.user.membership?.expiresAt ?? new Date(Date.now() + 365 * 24 * 60 * 60 * 1_000);
+  const codeExpiresAt = order.user.membership?.expiresAt ?? new Date(MEMBER_EXPIRY_ISO);
   const profile = order.user.profile;
   const fullName = [profile?.firstName, profile?.lastName].filter(Boolean).join(" ") || "Nouveau membre";
   const coveredPeople = [
@@ -135,13 +136,13 @@ async function sendMembershipActivation(orderId: string): Promise<void> {
     from,
     to: order.user.email,
     subject: "Bienvenue dans Label Vanlife",
-    text: `Bonjour ${profile?.firstName || ""},\n\nBienvenue dans Label Vanlife — votre paiement de ${formatEuro(order.amount)} est confirmé et votre carte membre est active pendant 12 mois.\n\nNuméro de carte membre : ${cardNumber}\n\nVotre espace membre vous donne accès à la MAP interactive, à votre carte membre numérique, aux fiches détaillées des lieux et au téléchargement de l'application depuis votre espace en ligne.\n\nPrésentez votre carte numérique aux lieux labellisés pour faire vérifier sa validité et bénéficier des avantages membres.\n\nL'équipe Label Vanlife`,
+    text: `Bonjour ${profile?.firstName || ""},\n\nBienvenue dans Label Vanlife — votre paiement de ${formatEuro(order.amount)} est confirmé.\n\n${MEMBER_PRODUCT_NAME}\n${MEMBER_VALIDITY_TEXT}\n\nNuméro de carte membre : ${cardNumber}\n\nVotre espace membre vous donne accès à la MAP Label Vanlife, à votre Carte membre numérique, aux fiches détaillées des lieux et au téléchargement de l'application depuis votre espace en ligne lorsqu'elle est disponible.\n\nPrésentez votre Carte membre numérique aux lieux labellisés pour faire vérifier sa validité et bénéficier des avantages membres.\n\nL'équipe Label Vanlife`,
     }),
     resend.emails.send({
     from,
     to: order.user.email,
     subject: "Votre code d'accès personnel Label Vanlife",
-    text: `Bonjour ${profile?.firstName || ""},\n\nVoici votre code d'accès personnel : ${code}\n\nConservez-le : il reste valable pendant toute la durée de votre carte membre.\n\nConnexion à votre espace membre : ${getAppUrl()}/member-login\n\nSaisissez uniquement ce code, puis vous serez redirigé vers votre espace membre.\n\nL'équipe Label Vanlife`,
+    text: `Bonjour ${profile?.firstName || ""},\n\nVoici votre code d'accès personnel : ${code}\n\nConservez-le : il reste valable jusqu'au 31 décembre 2026, comme votre Carte membre.\n\nConnexion à votre espace membre : ${getAppUrl()}/member-login\n\nSaisissez uniquement ce code, puis vous serez redirigé vers votre espace membre.\n\nL'équipe Label Vanlife`,
     }),
   ]);
   const emailErrors = [
@@ -236,7 +237,7 @@ async function activatePaidOrder(session: Stripe.Checkout.Session): Promise<void
         status: "SUCCEEDED",
         type: order.product === "MEMBERSHIP" ? "MEMBERSHIP" : "LABELLISATION",
         description: order.product === "MEMBERSHIP"
-          ? "Carte membre Label Vanlife — 12 mois"
+          ? MEMBER_PRODUCT_NAME
           : "Candidature Vanlife Friendly",
       },
       update: {
@@ -247,11 +248,8 @@ async function activatePaidOrder(session: Stripe.Checkout.Session): Promise<void
 
     if (order.product === "MEMBERSHIP") {
       if (!order.userId) throw new Error("Membership checkout is missing userId");
-      const current = await tx.membership.findUnique({ where: { userId: order.userId } });
       const now = new Date();
-      const base = current?.expiresAt && current.expiresAt > now ? current.expiresAt : now;
-      const expiresAt = new Date(base);
-      expiresAt.setUTCFullYear(expiresAt.getUTCFullYear() + 1);
+      const expiresAt = new Date(MEMBER_EXPIRY_ISO);
 
       await tx.membership.upsert({
         where: { userId: order.userId },

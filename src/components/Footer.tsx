@@ -7,6 +7,8 @@ import Image from "next/image";
 import { ArrowRight, Check, Mail } from "lucide-react";
 import { BRAND_ASSETS } from "@/config/brand-assets";
 import { CONTACT_MAILTO } from "@/config/contact";
+import { MEMBER_DISCOUNT_TEXT, MEMBER_SHORT_LABEL, MEMBER_VALIDITY_TEXT } from "@/config/commercial";
+import { SITE_STATS } from "@/config/site-stats";
 
 const NAVIGATION = [
   { label: "Accueil", href: "/" },
@@ -17,7 +19,7 @@ const NAVIGATION = [
 ] as const;
 
 const OFFERS = [
-  { label: "Carte membre — 29€ au lieu de 39€", href: "/devenir-membre" },
+  { label: `${MEMBER_SHORT_LABEL} au lieu de 39€`, href: "/devenir-membre" },
   { label: "Labelliser mon lieu — offre 2026 à 110€", href: "/labellisation/candidature" },
 ] as const;
 
@@ -79,7 +81,7 @@ export default function Footer() {
             </Link>
             <p className="mt-5 max-w-sm text-sm leading-relaxed text-white/60">
               Le réseau de lieux vérifiés qui accueille les vanlifers responsables partout en France.
-              26 établissements labellisés et des avantages de 10 à 20% pour les membres.
+              {SITE_STATS.labelledPlacesCount} établissements labellisés et des avantages de {MEMBER_DISCOUNT_TEXT} pour les membres.
             </p>
             <div className="mt-6 flex flex-wrap gap-3">
               <a href="https://www.facebook.com/labelvanlife" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 rounded-full border border-white/15 px-4 py-2 text-sm text-white/75 transition-colors hover:border-white/30 hover:text-white">
@@ -110,7 +112,7 @@ export default function Footer() {
           <div>
             <h2 className="text-xs font-semibold uppercase tracking-[0.18em] text-white/45">Rejoindre</h2>
             <ul className="mt-5 space-y-3">{OFFERS.map((item) => <li key={item.href}><Link href={item.href} className="group inline-flex items-start gap-2 text-sm text-white/65 transition-colors hover:text-white">{item.label}<ArrowRight className="mt-0.5 h-3.5 w-3.5 shrink-0 transition-transform group-hover:translate-x-0.5" /></Link></li>)}</ul>
-            <p className="mt-6 text-xs leading-relaxed text-white/40">Carte membre valable 12 mois, sans renouvellement automatique. Labellisation annuelle, sans commission sur les réservations.</p>
+            <p className="mt-6 text-xs leading-relaxed text-white/40">Carte membre Label Vanlife 2026 — {MEMBER_VALIDITY_TEXT}. Labellisation annuelle, sans commission sur les réservations.</p>
           </div>
 
           <div>

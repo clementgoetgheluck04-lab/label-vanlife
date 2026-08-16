@@ -28,26 +28,28 @@ import { cn } from "@/lib/utils";
 import { MemberDigitalAccess } from "@/components/MemberDigitalAccess";
 import { MembershipCardPreview, MembershipJourneyNav } from "@/components/MembershipWelcome";
 import { CONTACT_EMAIL, CONTACT_MAILTO } from "@/config/contact";
+import { MEMBER_CTA_LABEL, MEMBER_DISCOUNT_TEXT, MEMBER_PRICE_TEXT, MEMBER_VALIDITY_TEXT } from "@/config/commercial";
+import { SITE_STATS } from "@/config/site-stats";
 
 const AVANTAGES = [
   {
     icone: MapPin,
-    titre: "Carte interactive complète",
-    desc: "Accès à tous les 26 lieux labellisés sur notre carte privée, avec filtres, photos et avis membres.",
+    titre: "MAP Label Vanlife",
+    desc: "Accès aux lieux labellisés sur la MAP réservée aux membres, avec filtres, photos et informations privées.",
     color: "text-emerald-500",
     bg: "bg-emerald-50",
   },
   {
     icone: CreditCard,
-    titre: "Jusqu'à -20% chez les partenaires",
+    titre: `Jusqu'à ${MEMBER_DISCOUNT_TEXT} chez les partenaires`,
     desc: "Réductions exclusives membres dans tous les campings, étapes nature et hébergements labellisés.",
     color: "text-amber-500",
     bg: "bg-amber-50",
   },
   {
     icone: Award,
-    titre: "Défis, badges et récompenses",
-    desc: "Gagne des points à chaque visite, débloque des niveaux et obtiens des avantages exclusifs.",
+    titre: "Road trips, défis et badges",
+    desc: "Fonctionnalités en amélioration progressive dans l’espace membre : prépare tes étapes, puis découvre les évolutions à venir.",
     color: "text-emerald-500",
     bg: "bg-emerald-50",
   },
@@ -61,23 +63,23 @@ const AVANTAGES = [
 ];
 
 const CHIFFRES = [
-  { valeur: "26", label: "lieux labellisés" },
-  { valeur: "-20%", label: "jusqu'à chez les partenaires" },
-  { valeur: "39€", label: "tarif annuel normal" },
-  { valeur: "29€", label: "offre de cette année" },
+  { valeur: String(SITE_STATS.labelledPlacesCount), label: "lieux labellisés" },
+  { valeur: MEMBER_DISCOUNT_TEXT, label: "d'avantages membres" },
+  { valeur: "39€", label: "prix public normal" },
+  { valeur: "29€", label: "édition 2026" },
 ];
 
 const PROBLEMES = [
-  { icon: Ban, title: "Spots bondés ou panneaux d'interdiction", text: "Vous cherchez un endroit tranquille, vous tombez sur un parking saturé ou un panneau « Stationnement interdit aux camping-cars ». Encore." },
-  { icon: CircleDollarSign, title: "Plein tarif dans des campings qui ne comprennent pas la vanlife", text: "Tarif normal, emplacement standard, aucun regard particulier. Vous payez comme tout le monde — sans jamais être vraiment accueillis." },
-  { icon: Meh, title: "Vous ne savez jamais si vous êtes bienvenus ou juste tolérés", text: "Certains gérants acceptent, d'autres font la grimace. L'incertitude à chaque arrivée, c'est épuisant." },
+  { icon: Ban, title: "Spots bondés ou panneaux d'interdiction", text: "Tu cherches un endroit tranquille, tu tombes sur un parking saturé ou un panneau « Stationnement interdit aux camping-cars ». Encore." },
+  { icon: CircleDollarSign, title: "Plein tarif dans des campings qui ne comprennent pas la vanlife", text: "Tarif normal, emplacement standard, aucun regard particulier. Tu paies comme tout le monde — sans jamais être vraiment accueilli." },
+  { icon: Meh, title: "Tu ne sais jamais si tu es bienvenu ou juste toléré", text: "Certains gérants acceptent, d'autres font la grimace. L'incertitude à chaque arrivée, c'est épuisant." },
 ];
 
 const ETAPES_ROAD_TRIP = [
-  { icon: Map, eyebrow: "Votre espace membre", title: "Vous ouvrez votre espace membre et la MAP Label Vanlife", text: "Tous les lieux labellisés sur une carte interactive. Filtrez par région, type d'accueil et équipements. Des spots vérifiés, pas un annuaire." },
-  { icon: Route, eyebrow: "Road trip & GPS · App native à venir", title: "Vous sélectionnez un ou plusieurs lieux pour créer votre road trip", text: "Composez votre itinéraire étape par étape, exportable vers votre GPS — et bientôt disponible dans notre application native." },
-  { icon: Handshake, eyebrow: "Accueil garanti", title: "Vous arrivez ou réservez avec votre code ou votre carte membre", text: "Montrez votre carte à l'accueil ou communiquez le numéro membre lors de la réservation. Vous êtes attendu — pas simplement toléré." },
-  { icon: BadgePercent, eyebrow: "Réduction immédiate", title: "Vous payez 10 à 20 % de moins", text: "La réduction prévue par chaque lieu s'applique après vérification de votre carte membre active." },
+  { icon: Map, eyebrow: "Ton espace membre", title: "Tu ouvres ton espace membre et la MAP Label Vanlife", text: "Tous les lieux labellisés sur une carte interactive. Filtre par région, type d'accueil et équipements. Des lieux vérifiés, pas un annuaire." },
+  { icon: Route, eyebrow: "Road trip & GPS", title: "Tu sélectionnes un ou plusieurs lieux pour préparer ton étape", text: "Ajoute des destinations à ton road trip, puis ouvre directement Google Maps ou Waze." },
+  { icon: Handshake, eyebrow: "Accueil clair", title: "Tu arrives ou réserves avec ta Carte membre", text: "Présente ta Carte membre ou communique ton numéro membre selon les modalités du lieu. Tu es attendu — pas simplement toléré." },
+  { icon: BadgePercent, eyebrow: "Avantage membre", title: `Tu profites de ${MEMBER_DISCOUNT_TEXT} d'avantage`, text: "L'avantage prévu par chaque lieu s'applique après vérification de ta Carte membre active." },
 ];
 
 export default function DevenirMembrePage() {
@@ -131,31 +133,30 @@ export default function DevenirMembrePage() {
           </div>
 
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-neutral-900 leading-tight mb-4" style={{ fontFamily: "Outfit, sans-serif" }}>
-            Deviens membre
+            Deviens membre Label Vanlife
             <br />
-            <span className="text-emerald-500">29 € cette année</span>
+            <span className="text-emerald-500">{MEMBER_PRICE_TEXT}</span>
           </h1>
 
           <p className="text-lg sm:text-xl text-neutral-500 max-w-2xl mx-auto mb-8 leading-relaxed">
-            Accès illimité à tous les lieux labellisés, réductions exclusives
-            jusqu&apos;à -20% et défis pour pimenter tes voyages.
+            Des lieux vérifiés, une MAP pensée pour tes voyages et jusqu&apos;à {MEMBER_DISCOUNT_TEXT} d&apos;avantage chez les partenaires.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Button variant="cta" size="lg" className="text-base px-10 py-4 h-auto shadow-lg shadow-amber-500/20" onClick={handleCheckout} disabled={loading}>
               {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : <ArrowRight className="h-5 w-5" />}
-              Devenir membre — 29€
+              {MEMBER_CTA_LABEL}
             </Button>
             <Link href="/explorer">
               <Button variant="secondary-dark" size="lg" className="text-base px-8 py-4 h-auto">
-                Explorer les lieux
+                Découvrir les lieux
               </Button>
             </Link>
           </div>
 
           <div className="mt-6 flex items-center justify-center gap-2 text-sm text-neutral-400">
             <Shield className="h-4 w-4" />
-            <span>Renouvellement non automatique</span>
+            <span>{MEMBER_VALIDITY_TEXT}</span>
           </div>
           {checkoutError && <p className="mt-4 text-sm font-medium text-red-600" role="alert">{checkoutError}</p>}
         </div>
@@ -163,16 +164,25 @@ export default function DevenirMembrePage() {
 
       <section className="bg-neutral-950 py-20 text-white sm:py-28">
         <div className="mx-auto max-w-6xl px-6">
-          <div className="mx-auto max-w-2xl text-center"><p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#c39960]">Vous reconnaissez-vous ?</p><h2 className="mt-3 text-3xl font-bold sm:text-4xl">Ce que vivent la plupart des vanlifers</h2></div>
+          <div className="mx-auto max-w-2xl text-center"><p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#c39960]">Tu te reconnais ?</p><h2 className="mt-3 text-3xl font-bold sm:text-4xl">Ce que vivent la plupart des vanlifers</h2></div>
           <div className="mt-12 grid gap-5 md:grid-cols-3">{PROBLEMES.map(({ icon: Icon, title, text }) => <article key={title} className="rounded-2xl border border-white/10 bg-white/5 p-6"><Icon className="h-7 w-7 text-[#c39960]" /><h3 className="mt-5 text-lg font-bold">{title}</h3><p className="mt-3 text-sm leading-relaxed text-white/60">{text}</p></article>)}</div>
         </div>
       </section>
 
       <section className="py-20 sm:py-28">
         <div className="mx-auto max-w-6xl px-6">
-          <div className="mx-auto max-w-2xl text-center"><p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#9a7445]">Imaginez votre prochain road trip</p><h2 className="mt-3 text-3xl font-bold text-neutral-900 sm:text-4xl">En 4 étapes, du canapé à la nuit parfaite.</h2></div>
+          <div className="mx-auto max-w-2xl text-center"><p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#9a7445]">Imagine ton prochain road trip</p><h2 className="mt-3 text-3xl font-bold text-neutral-900 sm:text-4xl">En 4 étapes, du canapé à la nuit parfaite.</h2></div>
           <div className="relative mt-14 grid gap-6 lg:grid-cols-4">{ETAPES_ROAD_TRIP.map(({ icon: Icon, eyebrow, title, text }, index) => <article key={title} className="relative rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm"><span className="absolute -top-3 right-5 grid h-7 w-7 place-items-center rounded-full bg-[#c39960] text-xs font-bold text-white">{index + 1}</span><Icon className="h-7 w-7 text-emerald-600" /><p className="mt-5 text-xs font-bold uppercase tracking-wider text-[#9a7445]">{eyebrow}</p><h3 className="mt-2 font-bold text-neutral-900">{title}</h3><p className="mt-3 text-sm leading-relaxed text-neutral-500">{text}</p></article>)}</div>
-          <div className="mt-12 rounded-3xl bg-[#f7f1e8] p-8 text-center sm:p-10"><h3 className="text-2xl font-bold text-neutral-900">Et si votre prochain arrêt vous coûtait 10 à 20 % de moins ?</h3><p className="mt-3 text-neutral-600">C'est exactement ce que fait la carte membre. Dès la première nuit.</p><Button variant="cta" size="lg" className="mt-6" onClick={handleCheckout} disabled={loading}>Je renseigne mes informations <ArrowRight className="h-5 w-5" /></Button></div>
+          <div className="mt-12 rounded-3xl bg-[#f7f1e8] p-8 text-center sm:p-10">
+            <h3 className="text-2xl font-bold text-neutral-900">Et si ta prochaine étape devenait plus simple à préparer ?</h3>
+            <p className="mt-3 text-neutral-600">Selon les lieux et la durée de ton séjour, ta Carte membre peut rapidement être amortie grâce aux avantages partenaires.</p>
+            <div className="mx-auto mt-5 max-w-md rounded-2xl bg-white p-4 text-sm text-neutral-700 shadow-sm">
+              <strong>Exemple :</strong> 4 nuits × 75 € = 300 € · -10 % = 30 € économisés.
+              <br />
+              <span className="text-emerald-700">Une Carte membre à 29 € peut ainsi être amortie sur un seul séjour.</span>
+            </div>
+            <Button variant="cta" size="lg" className="mt-6" onClick={handleCheckout} disabled={loading}>{MEMBER_CTA_LABEL} <ArrowRight className="h-5 w-5" /></Button>
+          </div>
         </div>
       </section>
 
@@ -214,10 +224,10 @@ export default function DevenirMembrePage() {
               Tout inclus
             </span>
             <h2 className="text-3xl sm:text-4xl font-bold text-neutral-800" style={{ fontFamily: "Outfit, sans-serif" }}>
-              Ce que ta carte annuelle débloque pour 29 € cette année
+              Ce que ta carte annuelle débloque avec l&apos;édition 2026
             </h2>
             <p className="text-neutral-500 max-w-xl mx-auto">
-              Pas de surprise, pas de frais cachés. Un seul prix pour tout débloquer.
+              Pas de surprise, pas de frais cachés. Une édition 2026 valable jusqu&apos;au 31 décembre 2026.
             </p>
           </div>
 
@@ -259,26 +269,24 @@ export default function DevenirMembrePage() {
                     <div className="text-center space-y-6">
                       <div>
                         <p className="text-sm text-neutral-500 uppercase tracking-wider mb-1">
-                          Membre Label Vanlife
+                          Carte membre Label Vanlife 2026
                         </p>
                         <div className="flex items-baseline justify-center gap-2">
                           <span className="text-2xl text-neutral-400 line-through">39€</span>
                           <span className="text-5xl sm:text-6xl font-bold text-neutral-900" style={{ fontFamily: "Outfit, sans-serif" }}>29€</span>
-                          <span className="text-lg text-neutral-400 font-medium">cette année</span>
+                          <span className="text-lg text-neutral-400 font-medium">édition 2026</span>
                         </div>
-                        <p className="text-sm text-emerald-500 font-semibold mt-1">
-                          Moins de 2,50€ par mois
-                        </p>
+                        <p className="text-sm text-emerald-500 font-semibold mt-1">{MEMBER_VALIDITY_TEXT}</p>
                       </div>
 
                       <div className="border-t border-neutral-100 pt-6 space-y-3">
                         {[
-                          "Carte interactive 26 lieux",
-                          "Réductions -10% à -20%",
-                          "Défis, badges, niveaux",
+                          `MAP Label Vanlife avec ${SITE_STATS.labelledPlacesCount} lieux`,
+                          `Avantages ${MEMBER_DISCOUNT_TEXT}`,
+                          "Fiches détaillées et modalités privées",
                           "Carte membre numérique accessible en ligne",
-                          "Application PWA en développement",
                           "Accès aux road trips membres",
+                          "Application mobile : bientôt",
                           "Renouvellement non automatique",
                         ].map((item) => (
                           <div key={item} className="flex items-center gap-3 text-sm text-neutral-600">
@@ -297,10 +305,10 @@ export default function DevenirMembrePage() {
                           disabled={loading}
                         >
                           {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : <ArrowRight className="h-5 w-5" />}
-                          Je deviens membre — 29€
+                          {MEMBER_CTA_LABEL}
                         </Button>
                         <p className="text-xs text-neutral-400 mt-3">
-                                            Paiement sécurisé Stripe · Renouvellement non automatique
+                                            Paiement sécurisé Stripe · {MEMBER_VALIDITY_TEXT}
                                           </p>
                                         </div>
                                       </div>
@@ -319,10 +327,10 @@ export default function DevenirMembrePage() {
             La communauté t&apos;attend
           </h2>
           <p className="text-lg text-white/70 mb-8 max-w-md mx-auto">
-            Offre de cette année : 29 € au lieu de 39 € pour voyager plus simplement et profiter des avantages du réseau.
+            {MEMBER_PRICE_TEXT} au lieu de 39 € pour voyager plus simplement et profiter des avantages du réseau.
           </p>
           <Button variant="cta" size="lg" className="text-base px-10 shadow-xl shadow-amber-500/25" onClick={handleCheckout} disabled={loading}>
-            Je deviens membre — 29€
+            {MEMBER_CTA_LABEL}
             <ArrowRight className="h-5 w-5 ml-1" />
           </Button>
         </div>

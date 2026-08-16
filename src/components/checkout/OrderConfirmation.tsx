@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { AlertCircle, Check, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { MEMBER_VALIDITY_TEXT } from "@/config/commercial";
 
 type OrderStatus = "PENDING" | "CHECKOUT_CREATED" | "PAID" | "CANCELED" | "FAILED" | "REFUNDED";
 type OrderProduct = "MEMBERSHIP" | "LABELLISATION";
@@ -52,7 +53,7 @@ export function OrderConfirmation({ product }: { product: OrderProduct }) {
     : failed ? "Confirmation impossible" : "Paiement en cours de confirmation";
   const description = paid
     ? product === "MEMBERSHIP"
-      ? "Le paiement a été vérifié et votre accès est valable pendant 12 mois."
+      ? `Le paiement a été vérifié. Votre Carte membre est active — ${MEMBER_VALIDITY_TEXT}.`
       : "Votre paiement a été vérifié et un email de confirmation vous est envoyé. Votre dossier passe maintenant en étude. En cas de non-conformité, il sera remboursé intégralement."
     : failed
       ? "Aucun droit n’a été activé. Contactez-nous si votre compte bancaire a été débité."

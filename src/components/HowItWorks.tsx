@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { MEMBER_DISCOUNT_TEXT, MEMBER_PRICE_TEXT, MEMBER_VALIDITY_TEXT } from "@/config/commercial";
 
 const TESTIMONIALS = [
   {
@@ -21,19 +22,19 @@ export default function HowItWorks() {
       number: "01",
       title: "Je prends ma carte",
       description:
-        "La carte membre est au tarif unique de 39€, actuellement proposée à 29€ pour cette année. Accès immédiat à tous les avantages.",
+        `La carte membre ${MEMBER_PRICE_TEXT} donne accès immédiatement aux avantages. ${MEMBER_VALIDITY_TEXT}.`,
     },
     {
       number: "02",
       title: "Je trouve un lieu",
       description:
-        "Sur la carte interactive privée, je repère les lieux labellisés avec leurs réductions. Je peux même planifier mon road trip étape par étape.",
+        "Sur la MAP Label Vanlife réservée aux membres, je repère les lieux labellisés avec leurs avantages. Je peux même planifier mon road trip étape par étape.",
     },
     {
       number: "03",
       title: "Je présente ma carte",
       description:
-        "Sur place, je montre ma carte membre et j'obtiens 10 à 20% de réduction. La réduction peut aussi s'appliquer via un code fourni par le lieu lors de la réservation en ligne.",
+        `Sur place, je montre ma carte membre et je profite de ${MEMBER_DISCOUNT_TEXT} d'avantage. Le code de réservation reste réservé aux membres connectés.`,
     },
   ];
 

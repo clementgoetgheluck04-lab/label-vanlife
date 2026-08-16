@@ -32,8 +32,8 @@ export default function MemberPasseportPage() {
       <div className="max-w-2xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex items-center gap-3">
-          <Link href="/member" className="lg:hidden">
-            <ArrowLeft className="h-5 w-5 text-stone" />
+          <Link href="/member" className="flex min-h-10 min-w-10 items-center justify-center rounded-full text-stone transition-colors hover:bg-neutral-100 hover:text-neutral-700" aria-label="Retour à l’espace membre">
+            <ArrowLeft className="h-5 w-5" />
           </Link>
           <div>
             <h1 className="text-2xl font-bold text-charcoal flex items-center gap-2">

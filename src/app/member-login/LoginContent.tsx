@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { AlertCircle, ArrowRight, Check, Download, KeyRound, Loader2, Lock, Mail, Phone, Plus, UserRound, Users, X } from "lucide-react";
 import { Button } from "@/components/ui/Button";
@@ -29,33 +29,22 @@ export function LoginContent() {
   const [recoveryLoading, setRecoveryLoading] = useState(false);
   const [confirmationMessage, setConfirmationMessage] = useState("");
   const [confirmationLoading, setConfirmationLoading] = useState(false);
-  const [authLinkIssue, setAuthLinkIssue] = useState<{
-    title: string;
-    description: string;
-  } | null>(null);
-
-  useEffect(() => {
-    const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ""));
-    const hashErrorCode = hashParams.get("error_code");
-    const hashErrorDescription = hashParams.get("error_description");
-    const isExpiredLink = hashErrorCode === "otp_expired" || hashErrorDescription?.toLowerCase().includes("expired");
-    const isInvalidLink = hashParams.get("error") === "access_denied" || hasAuthFailed;
-
-    if (isExpiredLink) {
-      setAuthLinkIssue({
+  const hashParams = typeof window !== "undefined" ? new URLSearchParams(window.location.hash.replace(/^#/, "")) : new URLSearchParams();
+  const hashErrorCode = hashParams.get("error_code");
+  const hashErrorDescription = hashParams.get("error_description");
+  const isExpiredLink = hashErrorCode === "otp_expired" || hashErrorDescription?.toLowerCase().includes("expired");
+  const isInvalidLink = hashParams.get("error") === "access_denied" || hasAuthFailed;
+  const authLinkIssue = isExpiredLink
+    ? {
         title: "Lien de confirmation expiré",
         description: "Ce lien email n’est plus valable ou a déjà été utilisé. Ce n’est pas grave : demande un nouveau lien de confirmation, puis clique sur le dernier email reçu.",
-      });
-      return;
-    }
-
-    if (isInvalidLink) {
-      setAuthLinkIssue({
-        title: "Lien de connexion invalide",
-        description: "Le lien utilisé ne permet pas d’ouvrir la session. Tu peux demander un nouveau lien de confirmation, ou te connecter avec ton code membre si ta carte est déjà activée.",
-      });
-    }
-  }, [hasAuthFailed]);
+      }
+    : isInvalidLink
+      ? {
+          title: "Lien de connexion invalide",
+          description: "Le lien utilisé ne permet pas d’ouvrir la session. Tu peux demander un nouveau lien de confirmation, ou te connecter avec ton code membre si ta carte est déjà activée.",
+        }
+      : null;
 
   const updateCompanion = (index: number, patch: Partial<(typeof companions)[number]>) => {
     setCompanions((current) => current.map((companion, companionIndex) => companionIndex === index ? { ...companion, ...patch } : companion));

@@ -7,22 +7,24 @@ import { createClient } from "@/lib/supabase/browser";
 import { ArrowRight, Check, Compass, MapPin, Sparkles, Shield, Lock, Mail, Loader2, AlertCircle, Star, Route, Heart, Users } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
+import { MEMBER_CTA_LABEL, MEMBER_DISCOUNT_TEXT, MEMBER_PRICE_TEXT, MEMBER_VALIDITY_TEXT } from "@/config/commercial";
+import { SITE_STATS } from "@/config/site-stats";
 
 export default function MembrePage() {
   const router = useRouter();
   const [selected, setSelected] = useState<"vanlife" | "future" | null>(null);
 
   const problems = [
-    { icon: "🚫", title: "Spots bondés ou panneaux d'interdiction", desc: "Vous cherchez un endroit tranquille, vous tombez sur un parking saturé ou un panneau 'Stationnement interdit aux camping-cars'. Encore." },
-    { icon: "💸", title: "Plein tarif dans des campings qui ne comprennent pas la vanlife", desc: "Tarif normal, emplacement standard, aucun regard particulier. Vous payez comme tout le monde — sans jamais être vraiment accueillis." },
-    { icon: "😶", title: "Vous ne savez jamais si vous êtes bienvenus ou juste tolérés", desc: "Certains gérants acceptent, d'autres font la grimace. L'incertitude à chaque arrivée, c'est épuisant." },
+    { icon: "🚫", title: "Spots bondés ou panneaux d'interdiction", desc: "Tu cherches un endroit tranquille, tu tombes sur un parking saturé ou un panneau 'Stationnement interdit aux camping-cars'. Encore." },
+    { icon: "💸", title: "Plein tarif dans des campings qui ne comprennent pas la vanlife", desc: "Tarif normal, emplacement standard, aucun regard particulier. Tu paies comme tout le monde — sans jamais être vraiment accueilli." },
+    { icon: "😶", title: "Tu ne sais jamais si tu es bienvenu ou juste toléré", desc: "Certains gérants acceptent, d'autres font la grimace. L'incertitude à chaque arrivée, c'est épuisant." },
   ];
 
   const steps = [
-    { icon: "🗺️", title: "Votre espace membre", desc: "Vous ouvrez votre espace membre et la MAP Label Vanlife. Tous les lieux labellisés sur une carte interactive. Filtrez par région, type d'accueil, équipements. Des spots vérifiés, pas un annuaire." },
-    { icon: "📍", title: "Road trip & GPS", sub: "App en PWA", desc: "Vous sélectionnez un ou plusieurs lieux pour créer votre road trip. Composez votre itinéraire étape par étape. Exportable directement sur votre GPS — et bientôt sur notre application native." },
-    { icon: "🤝", title: "Accueil garanti", desc: "Vous arrivez ou réservez avec votre code ou votre carte membre. Montrez votre carte à l'accueil ou communiquez votre code lors de la réservation. Vous êtes attendu — pas simplement toléré." },
-    { icon: "💚", title: "Réduction immédiate", desc: "Vous payez 10 à 20% de moins. La réduction s'applique automatiquement chez tous les lieux partenaires. Ce soir, demain soir, et tous les soirs de la saison." },
+    { icon: "🗺️", title: "Ton espace membre", desc: "Tu ouvres ton espace membre et la MAP Label Vanlife. Tous les lieux labellisés sur une carte interactive, avec filtres et informations privées." },
+    { icon: "📍", title: "Road trip & GPS", sub: "En ligne", desc: "Tu sélectionnes un ou plusieurs lieux pour préparer ton road trip, puis tu ouvres Google Maps ou Waze." },
+    { icon: "🤝", title: "Accueil clair", desc: "Tu arrives ou réserves avec ta Carte membre. Tu es attendu — pas simplement toléré." },
+    { icon: "💚", title: "Avantage membre", desc: `Tu profites de ${MEMBER_DISCOUNT_TEXT} d'avantage selon les lieux partenaires.` },
   ];
 
   return (
@@ -37,12 +39,12 @@ export default function MembrePage() {
             <span className="text-emerald-500">toutes les portes.</span>
           </h1>
           <p className="text-lg text-neutral-500 max-w-2xl mx-auto leading-relaxed">
-            Des lieux qui vous attendent vraiment. Des réductions qui se remboursent en 2 nuits. Une communauté qui protège la liberté de voyager.
+            Des lieux qui t'attendent vraiment. Une MAP claire, une Carte membre utile, et une communauté qui protège la liberté de voyager.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link href="/devenir-membre">
               <Button variant="cta" size="lg" className="gap-2 text-base px-8 shadow-xl shadow-amber-500/20">
-                Devenir membre <ArrowRight className="w-5 h-5" />
+                {MEMBER_CTA_LABEL} <ArrowRight className="w-5 h-5" />
               </Button>
             </Link>
             <Link href="/member-login">
@@ -60,8 +62,8 @@ export default function MembrePage() {
       {/* ===== AVANT TOUT ===== */}
       <section className="py-12 sm:py-16 bg-neutral-50">
         <div className="max-w-2xl mx-auto px-6 text-center space-y-6">
-          <h2 className="text-2xl sm:text-3xl font-bold text-neutral-800" style={{ fontFamily: "Outfit, sans-serif" }}>Vous voyagez en van ?</h2>
-          <p className="text-sm text-neutral-500">Votre réponse nous aide à vous montrer ce qui compte pour vous.</p>
+          <h2 className="text-2xl sm:text-3xl font-bold text-neutral-800" style={{ fontFamily: "Outfit, sans-serif" }}>Tu voyages en van ?</h2>
+          <p className="text-sm text-neutral-500">Ta réponse nous aide à te montrer ce qui compte pour toi.</p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <button
               onClick={() => setSelected("vanlife")}
@@ -83,7 +85,7 @@ export default function MembrePage() {
       <section className="py-16 sm:py-20">
         <div className="max-w-4xl mx-auto px-6 space-y-8">
           <div className="text-center">
-            <span className="inline-block text-xs font-semibold tracking-[0.2em] uppercase text-emerald-500">Vous reconnaissez-vous ?</span>
+            <span className="inline-block text-xs font-semibold tracking-[0.2em] uppercase text-emerald-500">Tu te reconnais ?</span>
             <h2 className="text-2xl sm:text-3xl font-bold text-neutral-800 mt-2" style={{ fontFamily: "Outfit, sans-serif" }}>Ce que vivent la plupart des vanlifers</h2>
           </div>
           <div className="grid sm:grid-cols-3 gap-4">
@@ -102,7 +104,7 @@ export default function MembrePage() {
       <section className="py-16 sm:py-20 bg-neutral-50">
         <div className="max-w-4xl mx-auto px-6 space-y-8">
           <div className="text-center">
-            <h2 className="text-2xl sm:text-3xl font-bold text-neutral-800" style={{ fontFamily: "Outfit, sans-serif" }}>Imaginez votre prochain road trip</h2>
+            <h2 className="text-2xl sm:text-3xl font-bold text-neutral-800" style={{ fontFamily: "Outfit, sans-serif" }}>Imagine ton prochain road trip</h2>
             <p className="text-sm text-neutral-500 mt-2">En 4 étapes, du canapé à la nuit parfaite.</p>
           </div>
           <div className="grid sm:grid-cols-2 gap-4">
@@ -119,8 +121,8 @@ export default function MembrePage() {
               </Card>
             ))}
           </div>
-          <p className="text-center text-lg font-semibold text-emerald-600">Et si votre prochain arrêt vous coûtait 10 à 20% de moins ?</p>
-          <p className="text-center text-sm text-neutral-500">C&apos;est exactement ce que fait la carte membre. Dès la première nuit.</p>
+          <p className="text-center text-lg font-semibold text-emerald-600">Et si ta prochaine étape devenait plus simple à préparer ?</p>
+          <p className="text-center text-sm text-neutral-500">Selon les lieux et la durée de ton séjour, ta Carte membre peut rapidement être amortie grâce aux avantages partenaires.</p>
         </div>
       </section>
 
@@ -129,15 +131,15 @@ export default function MembrePage() {
         <div className="max-w-2xl mx-auto px-6">
           <div className="flex items-center justify-center gap-12">
             <div className="text-center">
-              <p className="text-4xl font-bold text-neutral-900">27</p>
+              <p className="text-4xl font-bold text-neutral-900">{SITE_STATS.labelledPlacesCount}</p>
               <p className="text-xs text-neutral-500 mt-1">Lieux labellisés</p>
               <p className="text-[10px] text-neutral-400">Visités, vérifiés, validés par notre équipe</p>
             </div>
             <div className="w-px h-16 bg-neutral-200" />
             <div className="text-center">
-              <p className="text-4xl font-bold text-emerald-500">150</p>
-              <p className="text-xs text-neutral-500 mt-1">Candidatures en cours</p>
-              <p className="text-[10px] text-neutral-400">Lieux qui rejoindront le réseau prochainement</p>
+              <p className="text-4xl font-bold text-emerald-500">{SITE_STATS.spottedPlacesCount}</p>
+              <p className="text-xs text-neutral-500 mt-1">Lieux repérés</p>
+              <p className="text-[10px] text-neutral-400">À vérifier progressivement</p>
             </div>
           </div>
           <div className="mt-8 bg-emerald-50 rounded-2xl p-5 border border-emerald-100">
@@ -156,13 +158,13 @@ export default function MembrePage() {
           <div className="flex items-baseline justify-center gap-2">
             <span className="text-xl text-neutral-400 line-through">39€</span>
             <span className="text-5xl sm:text-6xl font-bold text-neutral-900" style={{ fontFamily: "Outfit, sans-serif" }}>29€</span>
-            <span className="text-lg text-neutral-400 font-medium">/12 mois</span>
+            <span className="text-lg text-neutral-400 font-medium">édition 2026</span>
           </div>
-          <p className="text-xs text-neutral-500">Tarif de lancement · saison 2026</p>
+          <p className="text-xs text-neutral-500">{MEMBER_VALIDITY_TEXT}</p>
           <ul className="space-y-3 max-w-sm mx-auto text-left">
             {[
-              "Carte exclusive des lieux certifiés",
-              "10% à 20% de réduction chez nos partenaires",
+              "MAP Label Vanlife réservée aux membres",
+              `${MEMBER_DISCOUNT_TEXT} d'avantages chez nos partenaires`,
               "Accès à la communauté engagée",
               "Soutien à la préservation de la liberté",
             ].map((item) => (
@@ -173,7 +175,7 @@ export default function MembrePage() {
           </ul>
           <Link href="/devenir-membre">
             <Button variant="cta" size="lg" className="gap-2 text-base px-10 shadow-xl shadow-amber-500/20">
-              Obtenir ma carte — 29€ <ArrowRight className="w-5 h-5" />
+              {MEMBER_CTA_LABEL} <ArrowRight className="w-5 h-5" />
             </Button>
           </Link>
         </div>

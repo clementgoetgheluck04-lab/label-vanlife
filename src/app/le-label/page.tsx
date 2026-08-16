@@ -5,7 +5,8 @@ import { ArrowRight, Shield, Leaf, Heart, X, Check, MapPin, Sparkles } from "luc
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { ENRICHED_LIEUX } from "@/data/enriched-lieux";
-import { SPOTTED_PLACES } from "@/data/spotted-places";
+import { MEMBER_SHORT_LABEL } from "@/config/commercial";
+import { SITE_STATS } from "@/config/site-stats";
 
 export default function LeLabelPage() {
   const labelledPlaces = ENRICHED_LIEUX.filter((lieu) => lieu.status === "actif");
@@ -114,7 +115,7 @@ export default function LeLabelPage() {
             </p>
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
               <Link href="/devenir-membre">
-                <Button variant="cta" size="lg" className="text-base px-8">Rejoindre le mouvement</Button>
+                <Button variant="cta" size="lg" className="text-base px-8">Devenir membre — {MEMBER_SHORT_LABEL.replace("Carte membre — ", "")}</Button>
               </Link>
               <Link href="/explorer" className="inline-flex items-center gap-2 text-sm font-semibold text-white/70 transition-colors hover:text-white">
                 Voir les lieux labellisés <ArrowRight className="h-4 w-4" />
@@ -151,7 +152,7 @@ export default function LeLabelPage() {
               <div className="mt-5 grid gap-3 sm:grid-cols-3">
                 <div className="rounded-2xl bg-emerald-50 p-3">
                   <MapPin className="h-4 w-4 text-emerald-700" />
-                  <p className="mt-2 text-sm font-black text-neutral-950">{labelledPlaces.length}</p>
+                  <p className="mt-2 text-sm font-black text-neutral-950">{SITE_STATS.labelledPlacesCount}</p>
                   <p className="text-[11px] text-neutral-500">lieux labellisés</p>
                 </div>
                 <div className="rounded-2xl bg-[#f6efe5] p-3">
@@ -161,7 +162,7 @@ export default function LeLabelPage() {
                 </div>
                 <div className="rounded-2xl bg-neutral-100 p-3">
                   <Heart className="h-4 w-4 text-neutral-700" />
-                  <p className="mt-2 text-sm font-black text-neutral-950">{SPOTTED_PLACES.length}</p>
+                  <p className="mt-2 text-sm font-black text-neutral-950">{SITE_STATS.spottedPlacesCount}</p>
                   <p className="text-[11px] text-neutral-500">lieux repérés</p>
                 </div>
               </div>
@@ -394,7 +395,7 @@ export default function LeLabelPage() {
             {[
               { num: "1", title: "Candidature", desc: "L'hôte présente son lieu, son mode d'accueil et son engagement envers la charte." },
               { num: "2", title: "Vérification", desc: "Le lieu est évalué par notre équipe ou par un membre ambassadeur de confiance." },
-              { num: "3", title: "Labellisation", desc: "Une fois validé, le lieu rejoint le réseau Label Vanlife et devient visible sur la carte réservée aux membres." },
+              { num: "3", title: "Labellisation", desc: "Une fois validé, le lieu rejoint le réseau Label Vanlife et devient visible sur la MAP Label Vanlife réservée aux membres." },
             ].map((item) => (
               <Card key={item.num} className="p-6 text-center space-y-3">
                 <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-emerald-500 text-white text-lg font-bold mx-auto">{item.num}</div>
@@ -430,10 +431,10 @@ export default function LeLabelPage() {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
             <Link href="/devenir-membre">
               <Button className="bg-white text-emerald-700 hover:bg-emerald-50 text-base px-8 py-3 rounded-xl font-semibold shadow-lg">
-                Devenir Membre
+                Devenir membre — 29 €
               </Button>
             </Link>
-            <Link href="/map">
+            <Link href="/explorer">
               <Button className="border-2 border-white text-white hover:bg-emerald-700 text-base px-8 py-3 rounded-xl font-semibold">
                 Voir les lieux
               </Button>

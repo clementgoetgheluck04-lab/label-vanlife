@@ -6,8 +6,9 @@ import Image from "next/image";
 import { Search, MapPin, ChevronLeft, Sparkles, Building2, ArrowRight, ShieldQuestion } from "lucide-react";
 import { ENRICHED_LIEUX } from "@/data/enriched-lieux";
 import { SPOTTED_PLACES } from "@/data/spotted-places";
+import { SITE_STATS } from "@/config/site-stats";
 
-type FilterTab = "tous" | "camping" | "etape_nature" | "hebergement_insolite";
+type FilterTab = "tous" | "camping" | "etape_nature" | "hebergement_insolite" | "activite";
 
 export default function ExplorerPage() {
   const [search, setSearch] = useState("");
@@ -75,7 +76,7 @@ export default function ExplorerPage() {
         <div className="bg-white rounded-2xl p-6 border border-neutral-200 shadow-sm space-y-4">
           <div className="flex items-center gap-2">
             <Sparkles className="h-5 w-5 text-emerald-500" />
-            <span className="text-xs font-semibold tracking-[0.15em] uppercase text-emerald-600">26 établissements labellisés</span>
+            <span className="text-xs font-semibold tracking-[0.15em] uppercase text-emerald-600">{SITE_STATS.labelledPlacesCount} établissements labellisés</span>
           </div>
           <h2 className="text-xl font-bold text-neutral-800 font-serif">Des lieux vérifiés, accueillants et engagés</h2>
           <p className="text-sm text-neutral-500 leading-relaxed">
@@ -91,6 +92,7 @@ export default function ExplorerPage() {
             { key: "camping", label: "Campings", count: ALL_LIEUX.filter((l) => l.type === "camping").length },
             { key: "etape_nature", label: "Étapes nature", count: ALL_LIEUX.filter((l) => l.type === "etape_nature").length },
             { key: "hebergement_insolite", label: "Hébergements", count: ALL_LIEUX.filter((l) => l.type === "hebergement_insolite").length },
+            { key: "activite", label: "Activités", count: ALL_LIEUX.filter((l) => l.type === "activite").length },
           ].map((t) => (
             <button
               key={t.key}
@@ -114,6 +116,7 @@ export default function ExplorerPage() {
               parking: "Parking",
               etape_nature: "Étape Nature",
               hebergement_insolite: "Insolite",
+              activite: "Activité",
             };
 
             return (
@@ -180,6 +183,9 @@ export default function ExplorerPage() {
                       ))}
                     </div>
                   )}
+                  <span className="inline-flex min-h-11 items-center justify-center rounded-xl bg-emerald-50 px-4 text-xs font-bold text-emerald-700 transition-colors group-hover:bg-emerald-100">
+                    Voir la fiche
+                  </span>
                 </div>
                               </Link>
                                           );

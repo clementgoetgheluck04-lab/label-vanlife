@@ -1,23 +1,25 @@
+import { LABEL_NORMAL_PRICE_CENTS, LABEL_PRICE_CENTS, MEMBER_PRICE_CENTS, MEMBER_PRODUCT_NAME } from "./commercial.ts";
+
 export const PRODUCTS = {
   membership: {
     code: "MEMBERSHIP" as const,
-    name: "Carte membre Label Vanlife — 12 mois",
-    amount: 2_900,
+    name: MEMBER_PRODUCT_NAME,
+    amount: MEMBER_PRICE_CENTS,
     currency: "eur",
     priceEnv: "STRIPE_MEMBERSHIP_PRICE_ID" as const,
   },
   labellisation: {
     code: "LABELLISATION" as const,
     name: "Candidature Vanlife Friendly",
-    amount: 22_000,
+    amount: LABEL_NORMAL_PRICE_CENTS,
     currency: "eur",
   },
 } as const;
 
 export const LABELLISATION_PROMOTION = {
   discountPercent: 50,
-  amount: 11_000,
-  standardAmount: 22_000,
+  amount: LABEL_PRICE_CENTS,
+  standardAmount: LABEL_NORMAL_PRICE_CENTS,
   endsAt: "2026-12-31T23:59:59+01:00",
 } as const;
 

@@ -8,6 +8,7 @@ import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
 import { BRAND_ASSETS } from "@/config/brand-assets";
+import { MEMBER_SHORT_LABEL } from "@/config/commercial";
 
 const NAV_ITEMS = [
   { label: "Accueil", href: "/" },
@@ -39,6 +40,8 @@ export default function Navbar() {
 
   const overlaysHero = pathname === "/" && !scrolled && !open;
   const isActive = (href: string) => href === "/" ? pathname === "/" : pathname.startsWith(href);
+
+  if (pathname.startsWith("/dignamik")) return null;
 
   return (
     <header
@@ -97,6 +100,11 @@ export default function Navbar() {
                 <LogIn className="h-4 w-4" /> Connexion
               </Button>
             </Link>
+            <Link href="/devenir-membre" className="ml-1">
+              <Button variant="cta" size="sm" className="gap-1.5">
+                {MEMBER_SHORT_LABEL}
+              </Button>
+            </Link>
           </nav>
 
           {/* Mobile Menu Button */}
@@ -136,6 +144,11 @@ export default function Navbar() {
               <Link href="/member-login" onClick={() => setOpen(false)}>
                 <Button variant="primary" className="w-full gap-2 uppercase">
                   <LogIn className="h-4 w-4" /> Connexion
+                </Button>
+              </Link>
+              <Link href="/devenir-membre" onClick={() => setOpen(false)} className="mt-2 block">
+                <Button variant="cta" className="w-full gap-2">
+                  {MEMBER_SHORT_LABEL}
                 </Button>
               </Link>
             </div>

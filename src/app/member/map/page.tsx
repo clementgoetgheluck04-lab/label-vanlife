@@ -112,16 +112,21 @@ export default function MemberMapPage() {
   }, [authed]);
 
   useEffect(() => {
+    let nextDraft: RoadTripDraftPlace[] = [];
     try {
       const saved = window.localStorage.getItem(ROADTRIP_DRAFT_STORAGE_KEY);
-      if (!saved) return;
-      const parsed = JSON.parse(saved) as RoadTripDraftPlace[];
-      if (Array.isArray(parsed)) setRoadTripDraft(parsed.filter((place) => place.id && place.name));
+      if (saved) {
+        const parsed = JSON.parse(saved) as RoadTripDraftPlace[];
+        if (Array.isArray(parsed)) nextDraft = parsed.filter((place) => place.id && place.name);
+      }
     } catch {
-      setRoadTripDraft([]);
-    } finally {
-      setRoadTripDraftLoaded(true);
+      nextDraft = [];
     }
+
+    queueMicrotask(() => {
+      setRoadTripDraft(nextDraft);
+      setRoadTripDraftLoaded(true);
+    });
   }, []);
 
   useEffect(() => {

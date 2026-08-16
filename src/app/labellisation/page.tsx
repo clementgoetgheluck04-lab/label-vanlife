@@ -7,6 +7,8 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
+import { LABEL_VALIDITY_TEXT } from "@/config/commercial";
+import { SITE_STATS } from "@/config/site-stats";
 
 export default function LabellisationPage() {
   const router = useRouter();
@@ -19,19 +21,20 @@ export default function LabellisationPage() {
           <div className="text-center space-y-6">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-amber-50 rounded-full text-amber-700 text-xs font-semibold tracking-wide">
               <Sparkles className="w-3.5 h-3.5" />
-              DEVENIEZ LIEU LABELLISÉ
+              DEVENEZ UN LIEU LABELLISÉ
             </div>
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-neutral-900 max-w-3xl mx-auto leading-tight" style={{ fontFamily: "Outfit, sans-serif" }}>
-              Attirez des vanlifers qualitatifs
+              Accueillez les vanlifers qui vous correspondent.
             </h1>
             <p className="text-lg sm:text-xl text-neutral-500 max-w-2xl mx-auto leading-relaxed">
-              Un réseau qui transforme vos visiteurs en clients fidèles. Rejoignez le premier label qui connecte les hôtes de qualité avec des voyageurs responsables et engagés.
+              Rejoignez un réseau de lieux sélectionnés pour leur accueil, leur calme et leur engagement. Gagnez en visibilité auprès d&apos;une communauté de vanlifers responsables, sans commission sur vos réservations.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Button variant="primary" size="lg" className="gap-2 text-base px-8" onClick={() => router.push("/labellisation/candidature")}>
                 Candidater au Label <ArrowRight className="w-5 h-5" />
               </Button>
             </div>
+            <p className="text-xs font-semibold text-neutral-500">{LABEL_VALIDITY_TEXT}</p>
           </div>
         </section>
 
@@ -72,16 +75,16 @@ export default function LabellisationPage() {
         <section className="py-8 border-y border-neutral-100">
           <div className="grid grid-cols-3 gap-8 text-center max-w-lg mx-auto">
             <div>
-              <p className="text-3xl sm:text-4xl font-bold text-neutral-900">26</p>
+              <p className="text-3xl sm:text-4xl font-bold text-neutral-900">{SITE_STATS.labelledPlacesCount}</p>
               <p className="text-xs text-neutral-500 mt-1">Lieux labellisés</p>
             </div>
             <div>
-              <p className="text-3xl sm:text-4xl font-bold text-neutral-900">216</p>
+              <p className="text-3xl sm:text-4xl font-bold text-neutral-900">{SITE_STATS.spottedPlacesCount}</p>
               <p className="text-xs text-neutral-500 mt-1">Lieux repérés</p>
             </div>
             <div>
-              <p className="text-3xl sm:text-4xl font-bold text-emerald-600">+30%</p>
-              <p className="text-xs text-neutral-500 mt-1">Résa. directes</p>
+              <p className="text-3xl sm:text-4xl font-bold text-emerald-600">0%</p>
+              <p className="text-xs text-neutral-500 mt-1">Commission</p>
             </div>
           </div>
         </section>
@@ -96,24 +99,24 @@ export default function LabellisationPage() {
           <div className="text-center mb-12 space-y-3">
             <span className="inline-block text-xs font-semibold tracking-[0.2em] uppercase text-emerald-500">Les bénéfices concrets</span>
             <h2 className="text-3xl sm:text-4xl font-bold text-neutral-800" style={{ fontFamily: "Outfit, sans-serif" }}>Ce que le label vous apporte</h2>
-            <p className="text-neutral-500 max-w-xl mx-auto">Des résultats mesurables pour votre activité. Pas de promesses vagues, des avantages concrets.</p>
+            <p className="text-neutral-500 max-w-xl mx-auto">Pas de promesses invérifiables : des bénéfices simples, lisibles et utiles pour votre établissement.</p>
           </div>
 
           <div className="grid sm:grid-cols-3 gap-6">
             <Card className="p-6 text-center">
-              <div className="text-4xl font-black text-emerald-500 mb-2">30%</div>
-              <h3 className="font-bold text-neutral-900 text-sm">Jusqu'à 30% de réservations directes</h3>
-              <p className="text-xs text-neutral-500 mt-2">Nos membres réservent en direct, sans commission de plateforme. Vous gardez la marge.</p>
+              <div className="text-4xl font-black text-emerald-500 mb-2">0%</div>
+              <h3 className="font-bold text-neutral-900 text-sm">Commission sur vos réservations</h3>
+              <p className="text-xs text-neutral-500 mt-2">Les membres réservent selon vos modalités. Vous gardez 100 % du montant de vos réservations.</p>
             </Card>
             <Card className="p-6 text-center">
-              <div className="text-4xl font-black text-emerald-500 mb-2">×10</div>
-              <h3 className="font-bold text-neutral-900 text-sm">Visibilité décuplée</h3>
-              <p className="text-xs text-neutral-500 mt-2">Votre lieu est mis en avant sur notre carte interactive, notre site et nos réseaux auprès de milliers de vanlifers.</p>
+              <div className="text-4xl font-black text-emerald-500 mb-2">{SITE_STATS.labelledPlacesCount}</div>
+              <h3 className="font-bold text-neutral-900 text-sm">Lieux déjà labellisés</h3>
+              <p className="text-xs text-neutral-500 mt-2">Vous rejoignez un réseau clair, structuré et visible auprès d'une audience vanlife ciblée.</p>
             </Card>
             <Card className="p-6 text-center">
-              <div className="text-4xl font-black text-emerald-500 mb-2">95%</div>
-              <h3 className="font-bold text-neutral-900 text-sm">Clientèle qualitative et fidèle</h3>
-              <p className="text-xs text-neutral-500 mt-2">Nos membres sont engagés et respectueux. Ils reviennent et vous recommandent.</p>
+              <div className="text-4xl font-black text-emerald-500 mb-2">MAP</div>
+              <h3 className="font-bold text-neutral-900 text-sm">Présence membre</h3>
+              <p className="text-xs text-neutral-500 mt-2">Votre fiche rejoint la MAP Label Vanlife réservée aux membres après validation.</p>
             </Card>
           </div>
         </section>
@@ -126,7 +129,7 @@ export default function LabellisationPage() {
                 <MapPin className="w-7 h-7" />
               </div>
               <h3 className="font-bold text-neutral-900">MAP</h3>
-              <p className="text-sm text-neutral-500">Présence sur notre carte exclusive. Accessible uniquement aux membres. Votre lieu bénéficie d'une fiche dédiée avec photos, avis et itinéraire.</p>
+              <p className="text-sm text-neutral-500">Présence sur la MAP Label Vanlife réservée aux membres. Votre lieu bénéficie d'une fiche dédiée avec photos, informations pratiques et itinéraire.</p>
             </Card>
             <Card className="p-6 text-center space-y-3">
               <div className="inline-flex h-14 w-14 rounded-2xl items-center justify-center bg-emerald-50 text-emerald-500 mx-auto">
@@ -264,8 +267,8 @@ export default function LabellisationPage() {
               <p className="text-sm text-neutral-500 mt-2">de commission sur vos réservations</p>
             </Card>
             <Card className="p-6 text-center">
-              <p className="text-4xl font-black text-emerald-500">+30%</p>
-              <p className="text-sm text-neutral-500 mt-2">de réservations directes en moyenne</p>
+              <p className="text-4xl font-black text-emerald-500">MAP</p>
+              <p className="text-sm text-neutral-500 mt-2">visibilité auprès des membres</p>
             </Card>
             <Card className="p-6 text-center">
               <p className="text-4xl font-black text-emerald-500">100%</p>
@@ -290,7 +293,7 @@ export default function LabellisationPage() {
             <Button variant="cta" size="lg" className="text-base px-10 shadow-xl shadow-amber-500/25" onClick={() => router.push("/labellisation/candidature")}>
               Remplir le formulaire de candidature <ArrowRight className="h-4 w-4 ml-2" />
             </Button>
-            <p className="text-white/60 text-xs mt-4">Dépôt gratuit · Étude complète à 110 € au lieu de 220 € jusqu'au 31 décembre 2026 · Remboursement intégral en cas de non-conformité.</p>
+            <p className="text-white/60 text-xs mt-4">{LABEL_VALIDITY_TEXT} · Remboursement intégral en cas de non-conformité.</p>
           </div>
         </section>
       </div>

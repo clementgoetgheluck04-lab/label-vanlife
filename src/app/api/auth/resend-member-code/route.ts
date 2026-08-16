@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Prisma } from "@/generated/prisma/client";
 import { Resend } from "resend";
+import { MEMBER_EXPIRY_ISO, MEMBER_EXPIRY_LABEL } from "@/config/commercial";
 import { getPrisma } from "@/lib/prisma";
 import { getAppUrl, getTransactionalEmailFrom, requireServerEnv } from "@/server/env";
 import { apiError } from "@/server/http";
@@ -43,14 +44,14 @@ export async function POST(request: NextRequest) {
     const payload = order.payload && typeof order.payload === "object" && !Array.isArray(order.payload)
       ? { ...(order.payload as Record<string, unknown>) }
       : {};
-    const expiresAt = user.membership?.expiresAt ?? new Date(Date.now() + 365 * 24 * 60 * 60 * 1_000);
+    const expiresAt = user.membership?.expiresAt ?? new Date(MEMBER_EXPIRY_ISO);
 
     const resend = new Resend(requireServerEnv("RESEND_API_KEY"));
     const { error } = await resend.emails.send({
       from: getTransactionalEmailFrom(),
       to: email,
       subject: "Votre nouveau code d’accès Label Vanlife",
-      text: `Bonjour ${user.profile?.firstName || ""},\n\nVoici votre nouveau code d'accès personnel : ${code}\n\nIl remplace le précédent et reste valable pendant toute la durée de votre carte membre.\n\nConnexion : ${getAppUrl()}/member-login\n\nL'équipe Label Vanlife`,
+      text: `Bonjour ${user.profile?.firstName || ""},\n\nVoici votre nouveau code d'accès personnel : ${code}\n\nIl remplace le précédent et reste valable jusqu'au ${MEMBER_EXPIRY_LABEL}, comme votre Carte membre.\n\nConnexion : ${getAppUrl()}/member-login\n\nL'équipe Label Vanlife`,
     });
     if (error) {
       console.error("[resend-member-code] email failed", error.message || error.name);

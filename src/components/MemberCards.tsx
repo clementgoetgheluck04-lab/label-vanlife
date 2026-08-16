@@ -1,15 +1,16 @@
 import Link from "next/link";
 import { BRAND_ASSETS } from "@/config/brand-assets";
+import { MEMBER_CTA_LABEL, MEMBER_DISCOUNT_TEXT, MEMBER_VALIDITY_TEXT } from "@/config/commercial";
 
 const CARDS = [
   {
     title: "Carte membre Label Vanlife",
-    subtitle: "Un tarif unique pour 12 mois",
+    subtitle: MEMBER_VALIDITY_TEXT,
     oldPrice: "39€",
     price: "29€",
-    period: "/12 mois",
+    period: "édition 2026",
     badge: "OFFRE ACTUELLE",
-    features: ["10-20% de réduction", "Carte interactive", "Road trip planner", "Carte numérique"],
+    features: [`${MEMBER_DISCOUNT_TEXT} d'avantages`, "MAP Label Vanlife", "Road trip planner", "Carte membre numérique"],
     image: BRAND_ASSETS.memberCardCouple,
   },
 ];
@@ -71,7 +72,7 @@ export default function MemberCards() {
                 href="/devenir-membre"
                 className="block w-full text-center px-6 py-3 bg-sage text-white font-semibold rounded-full hover:bg-sage/90 transition-colors"
               >
-                Obtenir ma carte — 29€
+                {MEMBER_CTA_LABEL}
               </Link>
             </div>
           ))}
@@ -83,7 +84,7 @@ export default function MemberCards() {
             <span className="text-sage">🔒</span> Paiement sécurisé
           </span>
           <span className="flex items-center gap-1">
-            <span className="text-sage">📅</span> Carte valable 1 année civile
+            <span className="text-sage">📅</span> {MEMBER_VALIDITY_TEXT}
           </span>
           <span className="flex items-center gap-1">
             <span className="text-sage">🚫</span> Sans reconduction tacite

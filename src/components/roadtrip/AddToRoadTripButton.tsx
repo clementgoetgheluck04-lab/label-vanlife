@@ -65,18 +65,12 @@ export default function AddToRoadTripButton({
   variant = "white",
   visibility = "always",
 }: AddToRoadTripButtonProps) {
-  const [canRender, setCanRender] = useState(visibility === "always");
+  const [canRender] = useState(() => {
+    if (visibility === "always") return true;
+    if (typeof window === "undefined") return false;
+    return new URLSearchParams(window.location.search).get("member") === "1";
+  });
   const [isAdded, setIsAdded] = useRoadTripPlaceState(place.id);
-
-  useEffect(() => {
-    if (visibility === "always") {
-      setCanRender(true);
-      return;
-    }
-
-    const params = new URLSearchParams(window.location.search);
-    setCanRender(params.get("member") === "1");
-  }, [visibility]);
 
   function addPlace() {
     const current = readDraft();

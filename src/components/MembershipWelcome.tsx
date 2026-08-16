@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Check, MapPinned, ShieldCheck } from "lucide-react";
+import { MEMBER_PRICE_TEXT, MEMBER_VALIDITY_TEXT } from "@/config/commercial";
 
 export function MembershipJourneyNav({ active }: { active: "join" | "login" }) {
   return (
@@ -25,13 +26,13 @@ export function MembershipCardPreview({ compact = false }: { compact?: boolean }
           <Image src="/brand/logo-combi.svg" alt="Combi Label Vanlife" width={150} height={75} className="h-auto w-28 object-contain" />
         </div>
         <div className={`${compact ? "mt-6" : "mt-10"} grid gap-3 text-sm text-white/80 sm:grid-cols-2`}>
-          <p className="flex items-center gap-2"><MapPinned className="h-4 w-4 text-[#dfc59f]" /> Map interactive privée</p>
+          <p className="flex items-center gap-2"><MapPinned className="h-4 w-4 text-[#dfc59f]" /> MAP Label Vanlife</p>
           <p className="flex items-center gap-2"><ShieldCheck className="h-4 w-4 text-[#dfc59f]" /> Avantages sécurisés</p>
           <p className="flex items-center gap-2"><Check className="h-4 w-4 text-[#dfc59f]" /> Lieux vérifiés</p>
           <p className="flex items-center gap-2"><Check className="h-4 w-4 text-[#dfc59f]" /> PWA en développement</p>
         </div>
         <div className="mt-7 flex items-end justify-between border-t border-white/10 pt-5">
-          <div><p className="text-xs text-white/50">Tarif annuel</p><p className="mt-1 text-lg font-bold"><span className="mr-2 text-white/40 line-through">39 €</span>29 € cette année</p></div>
+          <div><p className="text-xs text-white/50">Carte membre</p><p className="mt-1 text-lg font-bold"><span className="mr-2 text-white/40 line-through">39 €</span>{MEMBER_PRICE_TEXT}</p><p className="mt-1 text-[11px] text-white/45">{MEMBER_VALIDITY_TEXT}</p></div>
           <div className="h-8 w-12 rounded-md bg-gradient-to-br from-[#e5c99f] to-[#9d7442]" aria-hidden="true" />
         </div>
       </div>

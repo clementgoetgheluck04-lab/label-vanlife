@@ -41,14 +41,17 @@ export default function MemberRoadTripsPage() {
   }, [membre]);
 
   useEffect(() => {
+    let nextDraft: RoadTripDraftPlace[] = [];
     try {
       const saved = window.localStorage.getItem(ROADTRIP_DRAFT_STORAGE_KEY);
-      if (!saved) return;
-      const parsed = JSON.parse(saved) as RoadTripDraftPlace[];
-      if (Array.isArray(parsed)) setDraftPlaces(parsed.filter((place) => place.id && place.name));
+      if (saved) {
+        const parsed = JSON.parse(saved) as RoadTripDraftPlace[];
+        if (Array.isArray(parsed)) nextDraft = parsed.filter((place) => place.id && place.name);
+      }
     } catch {
-      setDraftPlaces([]);
+      nextDraft = [];
     }
+    queueMicrotask(() => setDraftPlaces(nextDraft));
   }, []);
 
   function removeDraftPlace(id: string) {

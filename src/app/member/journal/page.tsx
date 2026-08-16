@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { BookOpen, MapPin, Star, Send, ChevronRight, Image } from "lucide-react";
+import { BookOpen, MapPin, Star, Send, ArrowLeft } from "lucide-react";
 import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
@@ -43,8 +43,8 @@ export default function MemberJournalPage() {
       <div className="max-w-2xl mx-auto space-y-8">
         {/* Header */}
         <div className="flex items-center gap-3">
-          <Link href="/member" className="lg:hidden">
-            <ChevronRight className="h-5 w-5 text-neutral-400 rotate-180" />
+          <Link href="/member" className="flex min-h-10 min-w-10 items-center justify-center rounded-full text-neutral-400 transition-colors hover:bg-neutral-100 hover:text-neutral-700" aria-label="Retour à l’espace membre">
+            <ArrowLeft className="h-5 w-5" />
           </Link>
           <div className="w-12 h-12 rounded-xl bg-emerald-50 flex items-center justify-center">
             <BookOpen className="h-6 w-6 text-emerald-500" />

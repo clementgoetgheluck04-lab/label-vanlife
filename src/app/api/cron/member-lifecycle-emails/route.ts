@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 import { Prisma } from "@/generated/prisma/client";
 import { formatEuro } from "@/config/products";
+import { MEMBER_PRODUCT_NAME, MEMBER_VALIDITY_TEXT } from "@/config/commercial";
 import { getPrisma } from "@/lib/prisma";
 import { getAppUrl, getBackOfficeEmails, getTransactionalEmailFrom, requireServerEnv } from "@/server/env";
 import { generateMemberAccessCode } from "@/server/member-access";
@@ -58,7 +59,7 @@ async function sendSimulationEmails(customerEmail: string) {
       from,
       to: customerEmail,
       subject: "[TEST] Bienvenue dans Label Vanlife",
-      text: `Bonjour Clément,\n\n[Simulation] Votre paiement de 29 € est confirmé et votre carte membre est active pendant 12 mois.\n\nVotre espace membre vous donne accès à la MAP interactive, à votre carte membre numérique, aux fiches détaillées des lieux et au téléchargement de l'application depuis votre espace en ligne.\n\nL'équipe Label Vanlife`,
+      text: `Bonjour Clément,\n\n[Simulation] Votre paiement de 29 € est confirmé.\n\n${MEMBER_PRODUCT_NAME}\n${MEMBER_VALIDITY_TEXT}\n\nVotre espace membre vous donne accès à la MAP Label Vanlife, à votre Carte membre numérique, aux fiches détaillées des lieux et au téléchargement de l'application depuis votre espace en ligne lorsqu'elle est disponible.\n\nL'équipe Label Vanlife`,
     }),
     resend.emails.send({
       from,

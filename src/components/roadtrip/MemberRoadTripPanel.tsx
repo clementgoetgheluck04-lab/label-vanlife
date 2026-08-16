@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import AddToRoadTripButton, { type RoadTripDraftPlace } from "@/components/roadtrip/AddToRoadTripButton";
 import { cn } from "@/lib/utils";
 
@@ -21,17 +21,11 @@ export default function MemberRoadTripPanel({
   visibility = "always",
   className,
 }: MemberRoadTripPanelProps) {
-  const [canRender, setCanRender] = useState(visibility === "always");
-
-  useEffect(() => {
-    if (visibility === "always") {
-      setCanRender(true);
-      return;
-    }
-
-    const params = new URLSearchParams(window.location.search);
-    setCanRender(params.get("member") === "1");
-  }, [visibility]);
+  const [canRender] = useState(() => {
+    if (visibility === "always") return true;
+    if (typeof window === "undefined") return false;
+    return new URLSearchParams(window.location.search).get("member") === "1";
+  });
 
   if (!canRender) return null;
 

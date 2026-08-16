@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, Sparkles, Shield, Leaf, Heart, X, Check } from "lucide-react";
+import { ArrowRight, Shield, Leaf, Heart, X, Check } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 
@@ -27,7 +27,7 @@ export default function ManifestePage() {
               </Button>
             </a>
             <Link href="/devenir-membre">
-              <Button variant="cta" size="lg" className="text-base px-8">Rejoindre le mouvement</Button>
+              <Button variant="cta" size="lg" className="text-base px-8">Devenir membre — 29 €</Button>
             </Link>
           </div>
         </div>
@@ -257,7 +257,7 @@ export default function ManifestePage() {
             {[
               { num: "1", title: "Candidature", desc: "L'hôte présente son lieu, son mode d'accueil et son engagement envers la charte." },
               { num: "2", title: "Vérification", desc: "Le lieu est évalué par notre équipe ou par un membre ambassadeur de confiance." },
-              { num: "3", title: "Labellisation", desc: "Une fois validé, le lieu rejoint le réseau Label Vanlife et devient visible sur la carte réservée aux membres." },
+              { num: "3", title: "Labellisation", desc: "Une fois validé, le lieu rejoint le réseau Label Vanlife et devient visible sur la MAP Label Vanlife réservée aux membres." },
             ].map((item) => (
               <Card key={item.num} className="p-6 text-center space-y-3">
                 <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-emerald-500 text-white text-lg font-bold mx-auto">{item.num}</div>

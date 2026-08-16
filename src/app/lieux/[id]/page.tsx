@@ -28,6 +28,7 @@ import type { LucideIcon } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import AddToRoadTripButton from "@/components/roadtrip/AddToRoadTripButton";
+import { MEMBER_PRICE_TEXT, MEMBER_PRODUCT_NAME, MEMBER_VALIDITY_TEXT } from "@/config/commercial";
 import { ENRICHED_LIEUX } from "@/data/enriched-lieux";
 import { getPlaceContact } from "@/data/place-contacts";
 import { getPlaceMedia } from "@/data/place-media";
@@ -100,6 +101,14 @@ export default async function LieuDetailPage({ params }: { params: Promise<{ id:
   ])];
   const allPhotos = [...new Set([...media.photos, ...sourceDetails.flatMap((source) => source.images ?? [])])];
   const displayAddress = richDetails?.displayAddress || lieu.address;
+  const quickServices = [
+    ...(lieu.discountPercent > 0 ? [`🎁 Avantage membre : -${lieu.discountPercent}%`] : []),
+    ...(lieu.priceHighlight ? [`💚 ${lieu.priceHighlight}`] : []),
+    ...lieu.services.slice(0, 7).map((service) => {
+      const serviceData = SERVICE_ICONS[service];
+      return `${serviceData?.label ?? service}`;
+    }),
+  ];
 
   return (
     <main className="min-h-screen bg-white pb-24">
@@ -160,10 +169,23 @@ export default async function LieuDetailPage({ params }: { params: Promise<{ id:
             <div className="mt-2 flex items-center gap-1 text-sm text-neutral-500">
               <Star className="h-4 w-4 fill-[#c39960] text-[#c39960]" />
               <span className="font-medium text-neutral-700">{lieu.note.toFixed(1)}</span>
-              <span>({lieu.avisCount} avis)</span>
+              <span>· {lieu.avisCount} avis Google</span>
             </div>
           </div>
         </section>
+
+        {quickServices.length > 0 && (
+          <section className="rounded-3xl border border-emerald-100 bg-emerald-50/60 p-5 sm:p-6">
+            <p className="text-xs font-bold uppercase tracking-[0.18em] text-emerald-700">En un coup d’œil</p>
+            <div className="mt-4 flex flex-wrap gap-2">
+              {quickServices.map((item) => (
+                <span key={item} className="rounded-full border border-white bg-white px-3 py-2 text-xs font-bold text-neutral-800 shadow-sm">
+                  {item}
+                </span>
+              ))}
+            </div>
+          </section>
+        )}
 
         {memberHasAccess && (
           <section className="flex flex-col gap-4 rounded-3xl border border-emerald-100 bg-gradient-to-r from-emerald-50 to-[#f7f1e8] p-5 sm:flex-row sm:items-center sm:justify-between">
@@ -194,7 +216,7 @@ export default async function LieuDetailPage({ params }: { params: Promise<{ id:
         )}
 
         {richDetails?.discountInstructions && richDetails.discountInstructions.length > 0 && (
-          <section className="overflow-hidden rounded-3xl border border-[#c39960]/35 bg-[#f7f1e8]">
+          <section id="avantage-membre" className="overflow-hidden rounded-3xl border border-[#c39960]/35 bg-[#f7f1e8]">
             <div className="grid gap-6 p-6 sm:grid-cols-[180px_1fr] sm:p-8">
               <div>
                 <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#8b673d]">{lieu.discountPercent > 0 ? "Réduction membres" : "Tarif public accessible"}</p>
@@ -424,20 +446,35 @@ export default async function LieuDetailPage({ params }: { params: Promise<{ id:
           <div className="flex items-baseline justify-center gap-2 text-white">
             <span className="text-xl text-emerald-200 line-through">39€</span>
             <span className="text-4xl font-bold">29€</span>
-            <span className="text-emerald-100">/ 12 mois</span>
+            <span className="text-emerald-100">édition 2026</span>
           </div>
+          <p className="mt-2 text-sm font-semibold text-emerald-50">{MEMBER_VALIDITY_TEXT}</p>
           <p className="mx-auto mt-3 max-w-lg text-sm leading-6 text-emerald-50">
             {lieu.discountPercent > 0
               ? <>Devenez membre pour profiter de <strong className="text-white">−{lieu.discountPercent}%</strong> chez {lieu.nom} et des avantages de tous les lieux labellisés.</>
               : <>Repérez {lieu.nom} et tous les lieux labellisés depuis votre espace membre et la carte interactive Label Vanlife.</>}
           </p>
           <Link href="/devenir-membre" className="mt-5 inline-block">
-            <Button variant="primary" className="gap-2 bg-white px-8 text-emerald-800 hover:bg-emerald-50">Obtenir ma carte membre — 29€ <ArrowRight className="h-4 w-4" /></Button>
+            <Button variant="primary" className="gap-2 bg-white px-8 text-emerald-800 hover:bg-emerald-50">{MEMBER_PRODUCT_NAME} <ArrowRight className="h-4 w-4" /></Button>
           </Link>
         </section>}
 
         <div className="text-center">
           <Link href="/explorer"><Button variant="ghost" className="gap-1 text-neutral-500"><ArrowLeft className="h-4 w-4" /> Retour à la liste</Button></Link>
+        </div>
+      </div>
+      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-neutral-200 bg-white/95 px-4 py-3 shadow-2xl backdrop-blur sm:hidden">
+        <div className="mx-auto flex max-w-md items-center gap-3">
+          <p className="min-w-0 flex-1 text-xs font-semibold text-neutral-700">
+            {memberHasAccess
+              ? "Voir mon avantage membre"
+              : lieu.discountPercent > 0
+                ? `-${lieu.discountPercent}% ici avec la Carte membre`
+                : `${MEMBER_PRICE_TEXT} · ${MEMBER_VALIDITY_TEXT}`}
+          </p>
+          <Link href={memberHasAccess ? "#avantage-membre" : "/devenir-membre"} className="shrink-0">
+            <Button variant="cta" size="sm">{memberHasAccess ? "Voir" : "Devenir membre"}</Button>
+          </Link>
         </div>
       </div>
     </main>
