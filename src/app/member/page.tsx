@@ -90,6 +90,19 @@ function getRoadTripById(id: string) {
   return MOCK_ROADTRIPS.find((r) => r.id === id) ?? null;
 }
 
+const BADGE_ID_ALIASES: Record<string, string[]> = {
+  "badge-explorateur": ["badge-premiere-visite", "badge-bienvenue"],
+  "badge-eco-responsable": ["badge-eco"],
+};
+
+function hasObtainedBadge(badge: (typeof MOCK_BADGES)[number], obtainedIds: Set<string>, obtainedNames: Set<string>) {
+  return (
+    obtainedIds.has(badge.id) ||
+    obtainedNames.has(badge.nom) ||
+    (BADGE_ID_ALIASES[badge.id] ?? []).some((alias) => obtainedIds.has(alias))
+  );
+}
+
 // ─── Main Component ────────────────────────────────────────────
 
 export default function MemberDashboard() {
@@ -110,9 +123,10 @@ export default function MemberDashboard() {
   // Badges — all from MOCK_BADGES, mark obtained
   const badgesWithStatus = useMemo(() => {
     const obtainedIds = new Set(membre.badges.map((b) => b.id));
+    const obtainedNames = new Set(membre.badges.map((b) => b.nom));
     return MOCK_BADGES.map((badge) => ({
       ...badge,
-      obtained: obtainedIds.has(badge.id),
+      obtained: hasObtainedBadge(badge, obtainedIds, obtainedNames),
     }));
   }, [membre]);
 
@@ -259,7 +273,7 @@ export default function MemberDashboard() {
                     LAB-VL-{membre.id.split("-")[1]?.toUpperCase() ?? "0000"}
                   </p>
                   <p className="text-xs text-white/70 mt-0.5">
-                    {membre.offre === "annuel" ? "Abonnement annuel" : "Abonnement mensuel"}
+                    Carte membre 2026
                   </p>
                 </div>
                 <div className="text-right">

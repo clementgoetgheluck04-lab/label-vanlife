@@ -22,7 +22,7 @@ export default function EcosystemPage() {
       <section className="mx-auto mt-16 max-w-2xl px-6 text-center">
         <h2 className="text-2xl font-bold text-neutral-900">Commencer avec la carte membre</h2>
         <p className="mt-3 text-neutral-500">Le point d’entrée voyageur vers Places, Trips et Passport.</p>
-        <Link href="/devenir-membre"><Button variant="cta" size="lg" className="mt-6 gap-2">Découvrir la carte membre — 29€ au lieu de 39€ <ArrowRight className="h-4 w-4" /></Button></Link>
+        <Link href="/devenir-membre"><Button variant="cta" size="lg" className="mt-6 gap-2">Découvrir la carte membre — 29 € au lieu de 39 € <ArrowRight className="h-4 w-4" /></Button></Link>
       </section>
     </div>
   );

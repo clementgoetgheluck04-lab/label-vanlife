@@ -8,14 +8,28 @@ import { Badge as UIBadge } from "@/components/ui/Badge";
 import { MOCK_MEMBRES } from "@/data/mock-membres";
 import { MOCK_BADGES } from "@/data/mock-badges";
 
+const BADGE_ID_ALIASES: Record<string, string[]> = {
+  "badge-explorateur": ["badge-premiere-visite", "badge-bienvenue"],
+  "badge-eco-responsable": ["badge-eco"],
+};
+
+function hasObtainedBadge(badge: (typeof MOCK_BADGES)[number], obtainedIds: Set<string>, obtainedNames: Set<string>) {
+  return (
+    obtainedIds.has(badge.id) ||
+    obtainedNames.has(badge.nom) ||
+    (BADGE_ID_ALIASES[badge.id] ?? []).some((alias) => obtainedIds.has(alias))
+  );
+}
+
 export default function MemberBadgesPage() {
   const membre = MOCK_MEMBRES[0]; // Utilisateur connecté
 
   const badgesWithStatus = useMemo(() => {
     const obtainedIds = new Set(membre.badges.map((b) => b.id));
+    const obtainedNames = new Set(membre.badges.map((b) => b.nom));
     return MOCK_BADGES.map((badge) => ({
       ...badge,
-      obtained: obtainedIds.has(badge.id),
+      obtained: hasObtainedBadge(badge, obtainedIds, obtainedNames),
     }));
   }, [membre]);
 

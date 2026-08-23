@@ -41,7 +41,7 @@ const AVANTAGES = [
   },
   {
     icone: CreditCard,
-    titre: `Jusqu'à ${MEMBER_DISCOUNT_TEXT} chez les partenaires`,
+    titre: `${MEMBER_DISCOUNT_TEXT} de réduction chez les partenaires`,
     desc: "Réductions exclusives membres dans tous les campings, étapes nature et hébergements labellisés.",
     color: "text-amber-500",
     bg: "bg-amber-50",
@@ -64,9 +64,9 @@ const AVANTAGES = [
 
 const CHIFFRES = [
   { valeur: String(SITE_STATS.labelledPlacesCount), label: "lieux labellisés" },
-  { valeur: MEMBER_DISCOUNT_TEXT, label: "d'avantages membres" },
-  { valeur: "39€", label: "prix public normal" },
-  { valeur: "29€", label: "édition 2026" },
+  { valeur: MEMBER_DISCOUNT_TEXT, label: "de réduction membre" },
+  { valeur: "39 €", label: "prix public normal" },
+  { valeur: "29 €", label: "édition 2026" },
 ];
 
 const PROBLEMES = [
@@ -79,7 +79,7 @@ const ETAPES_ROAD_TRIP = [
   { icon: Map, eyebrow: "Ton espace membre", title: "Tu ouvres ton espace membre et la MAP Label Vanlife", text: "Tous les lieux labellisés sur une carte interactive. Filtre par région, type d'accueil et équipements. Des lieux vérifiés, pas un annuaire." },
   { icon: Route, eyebrow: "Road trip & GPS", title: "Tu sélectionnes un ou plusieurs lieux pour préparer ton étape", text: "Ajoute des destinations à ton road trip, puis ouvre directement Google Maps ou Waze." },
   { icon: Handshake, eyebrow: "Accueil clair", title: "Tu arrives ou réserves avec ta Carte membre", text: "Présente ta Carte membre ou communique ton numéro membre selon les modalités du lieu. Tu es attendu — pas simplement toléré." },
-  { icon: BadgePercent, eyebrow: "Avantage membre", title: `Tu profites de ${MEMBER_DISCOUNT_TEXT} d'avantage`, text: "L'avantage prévu par chaque lieu s'applique après vérification de ta Carte membre active." },
+  { icon: BadgePercent, eyebrow: "Avantage membre", title: `Tu profites de ${MEMBER_DISCOUNT_TEXT} de réduction`, text: "L'avantage prévu par chaque lieu s'applique après vérification de ta Carte membre active." },
 ];
 
 export default function DevenirMembrePage() {
@@ -139,7 +139,7 @@ export default function DevenirMembrePage() {
           </h1>
 
           <p className="text-lg sm:text-xl text-neutral-500 max-w-2xl mx-auto mb-8 leading-relaxed">
-            Des lieux vérifiés, une MAP pensée pour tes voyages et jusqu&apos;à {MEMBER_DISCOUNT_TEXT} d&apos;avantage chez les partenaires.
+            Des lieux vérifiés, une MAP pensée pour tes voyages et {MEMBER_DISCOUNT_TEXT} de réduction chez les partenaires.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -272,8 +272,8 @@ export default function DevenirMembrePage() {
                           Carte membre Label Vanlife 2026
                         </p>
                         <div className="flex items-baseline justify-center gap-2">
-                          <span className="text-2xl text-neutral-400 line-through">39€</span>
-                          <span className="text-5xl sm:text-6xl font-bold text-neutral-900" style={{ fontFamily: "Outfit, sans-serif" }}>29€</span>
+                          <span className="text-2xl text-neutral-400 line-through">39 €</span>
+                          <span className="text-5xl sm:text-6xl font-bold text-neutral-900" style={{ fontFamily: "Outfit, sans-serif" }}>29 €</span>
                           <span className="text-lg text-neutral-400 font-medium">édition 2026</span>
                         </div>
                         <p className="text-sm text-emerald-500 font-semibold mt-1">{MEMBER_VALIDITY_TEXT}</p>

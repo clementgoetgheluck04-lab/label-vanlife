@@ -24,7 +24,7 @@ export default function MembrePage() {
     { icon: "🗺️", title: "Ton espace membre", desc: "Tu ouvres ton espace membre et la MAP Label Vanlife. Tous les lieux labellisés sur une carte interactive, avec filtres et informations privées." },
     { icon: "📍", title: "Road trip & GPS", sub: "En ligne", desc: "Tu sélectionnes un ou plusieurs lieux pour préparer ton road trip, puis tu ouvres Google Maps ou Waze." },
     { icon: "🤝", title: "Accueil clair", desc: "Tu arrives ou réserves avec ta Carte membre. Tu es attendu — pas simplement toléré." },
-    { icon: "💚", title: "Avantage membre", desc: `Tu profites de ${MEMBER_DISCOUNT_TEXT} d'avantage selon les lieux partenaires.` },
+    { icon: "💚", title: "Avantage membre", desc: `Tu profites de ${MEMBER_DISCOUNT_TEXT} de réduction selon les lieux partenaires.` },
   ];
 
   return (
@@ -156,15 +156,15 @@ export default function MembrePage() {
           <span className="inline-block text-xs font-semibold tracking-[0.2em] uppercase text-emerald-500">Tarif de lancement · saison 2026</span>
           <h2 className="text-3xl sm:text-4xl font-bold text-neutral-800" style={{ fontFamily: "Outfit, sans-serif" }}>Carte MEMBRE</h2>
           <div className="flex items-baseline justify-center gap-2">
-            <span className="text-xl text-neutral-400 line-through">39€</span>
-            <span className="text-5xl sm:text-6xl font-bold text-neutral-900" style={{ fontFamily: "Outfit, sans-serif" }}>29€</span>
+            <span className="text-xl text-neutral-400 line-through">39 €</span>
+            <span className="text-5xl sm:text-6xl font-bold text-neutral-900" style={{ fontFamily: "Outfit, sans-serif" }}>29 €</span>
             <span className="text-lg text-neutral-400 font-medium">édition 2026</span>
           </div>
           <p className="text-xs text-neutral-500">{MEMBER_VALIDITY_TEXT}</p>
           <ul className="space-y-3 max-w-sm mx-auto text-left">
             {[
               "MAP Label Vanlife réservée aux membres",
-              `${MEMBER_DISCOUNT_TEXT} d'avantages chez nos partenaires`,
+              `${MEMBER_DISCOUNT_TEXT} de réduction chez nos partenaires`,
               "Accès à la communauté engagée",
               "Soutien à la préservation de la liberté",
             ].map((item) => (

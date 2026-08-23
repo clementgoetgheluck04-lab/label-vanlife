@@ -51,7 +51,7 @@ const criteria = [
 const faqs = [
   { question: "Qu'est-ce qu'un camping van friendly ?", answer: "C'est un établissement qui accueille réellement les voyageurs en van : accès et emplacements adaptés aux véhicules acceptés, informations claires, services annoncés avec précision et équipe bienveillante. L'expérience compte autant que la taille de l'emplacement." },
   { question: "Quelle différence avec un camping labellisé Label Vanlife ?", answer: "Un lieu labellisé rejoint une démarche structurée : sa candidature, ses informations d'accueil et ses engagements sont étudiés par Label Vanlife. Il annonce également l'avantage réservé aux membres et s'engage à maintenir sa fiche à jour." },
-  { question: "Comment trouver un camping van friendly près de chez moi ?", answer: `L'explorateur Label Vanlife présente actuellement ${networkCount} lieux actifs en France. Vous pouvez rechercher un nom ou une ville et consulter librement les équipements et le pourcentage d'avantage. La carte membre coûte 39 € par an et est actuellement proposée à 29 € pour cette année.` },
+  { question: "Comment trouver un camping van friendly près de chez moi ?", answer: `L'explorateur Label Vanlife présente actuellement ${networkCount} lieux actifs en France. Vous pouvez rechercher un nom ou une ville et consulter librement les équipements et le pourcentage de réduction. La Carte membre Label Vanlife 2026 est proposée à 29 € au lieu de 39 €, valable jusqu'au 31 décembre 2026 et sans renouvellement automatique.` },
 ] as const;
 
 export default function VanFriendlyCampingsPage() {

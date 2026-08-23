@@ -263,7 +263,7 @@ export const MOCK_MEMBRES: Membre[] = [
     roadTrips: [],
     passeport: passeportExplorateur,
     dateInscription: "2024-05-01",
-    offre: "mensuel",
+    offre: "annuel",
   },
   // ===== MEMBRE 2 — ROUTARD (intermédiaire) =====
   {

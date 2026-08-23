@@ -89,7 +89,7 @@ export default function Home() {
           <div className="grid gap-4 sm:grid-cols-2">
             {[
               { icon: MapPin, value: String(SITE_STATS.labelledPlacesCount), title: "lieux déjà labellisés", text: `Des fiches complètes avec photos, services et informations pratiques. Et nous avons repéré ${SITE_STATS.spottedPlacesCount} lieux pas encore labellisés, disponibles aussi sur notre MAP.` },
-              { icon: Percent, value: MEMBER_DISCOUNT_TEXT, title: "d'avantages membres", text: "Le pourcentage est public ; le code éventuel reste dans ton espace privé." },
+              { icon: Percent, value: MEMBER_DISCOUNT_TEXT, title: "de réduction membre", text: "Le pourcentage est public ; le code éventuel reste dans ton espace privé." },
               { icon: Shield, value: "Vérifiés", title: "selon une vraie charte", text: "Accueil, environnement, confort et tranquillité sont évalués." },
               { icon: Smartphone, value: "Partout", title: "sur internet puis prochainement en application mobile", text: "Ta Carte membre numérique et la MAP te suivent partout sur ton téléphone." },
             ].map((item) => { const Icon = item.icon; return (
@@ -338,7 +338,7 @@ export default function Home() {
       <section className="py-20 bg-gradient-to-br from-emerald-500 via-emerald-600 to-emerald-700">
         <div className="max-w-2xl mx-auto px-6 text-center space-y-6">
           <h2 className="text-3xl sm:text-4xl font-bold text-white" style={{ fontFamily: "Outfit, sans-serif" }}>Prêt pour ta prochaine étape ?</h2>
-          <p className="text-emerald-100"><span className="line-through opacity-70">39€</span> <strong>{MEMBER_PRICE_TEXT}</strong><br /><span className="text-sm">{MEMBER_VALIDITY_TEXT}</span></p>
+          <p className="text-emerald-100"><span className="line-through opacity-70">39 €</span> <strong>{MEMBER_PRICE_TEXT}</strong><br /><span className="text-sm">{MEMBER_VALIDITY_TEXT}</span></p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link href="/devenir-membre">
               <Button variant="primary" className="bg-white text-emerald-700 hover:bg-emerald-50 text-base px-8 py-3 rounded-xl font-semibold shadow-lg">

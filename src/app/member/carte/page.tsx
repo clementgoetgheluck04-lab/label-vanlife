@@ -46,7 +46,7 @@ export default function MemberCardPage() {
             level: "PRÉVISUALISATION",
             points: 0,
             cardNumber: "LV-ADMIN-PREVIEW",
-            offer: "Démonstration",
+            offer: "2026",
             people: [{ firstName: "Clément", lastName: "Goetgheluck", memberNumber: "LV-ADMIN-01" }],
           });
           setLoading(false);
@@ -91,7 +91,7 @@ export default function MemberCardPage() {
         level: profile?.level || "EXPLORATEUR",
         points: profile?.points || 0,
         cardNumber: card.cardNumber,
-        offer: membership?.offer === "YEARLY" ? "Annuel" : "Mensuel",
+        offer: "2026",
         expiresAt: membership?.expiresAt,
         people: [{
           firstName: profile?.firstName || String(user.user_metadata?.firstName || user.email?.split("@")[0] || "Membre"),
@@ -175,7 +175,7 @@ export default function MemberCardPage() {
                   {member.cardNumber}
                 </p>
                 <p className="text-xs text-white/60 mt-0.5">
-                  Abonnement {member.offer}
+                  Carte membre {member.offer}
                 </p>
               </div>
               <div className="text-right">

@@ -34,7 +34,7 @@ export default function HowItWorks() {
       number: "03",
       title: "Je présente ma carte",
       description:
-        `Sur place, je montre ma carte membre et je profite de ${MEMBER_DISCOUNT_TEXT} d'avantage. Le code de réservation reste réservé aux membres connectés.`,
+        `Sur place, je montre ma carte membre et je profite de ${MEMBER_DISCOUNT_TEXT} de réduction. Le code de réservation reste réservé aux membres connectés.`,
     },
   ];
 

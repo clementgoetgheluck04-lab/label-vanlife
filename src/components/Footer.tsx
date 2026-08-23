@@ -19,7 +19,7 @@ const NAVIGATION = [
 ] as const;
 
 const OFFERS = [
-  { label: `${MEMBER_SHORT_LABEL} au lieu de 39€`, href: "/devenir-membre" },
+  { label: `${MEMBER_SHORT_LABEL} au lieu de 39 €`, href: "/devenir-membre" },
   { label: "Labelliser mon lieu — offre 2026 à 110€", href: "/labellisation/candidature" },
 ] as const;
 
@@ -80,7 +80,7 @@ export default function Footer() {
               />
             </Link>
             <p className="mt-5 max-w-sm text-sm leading-relaxed text-white/60">
-              Le réseau de lieux vérifiés qui accueille les vanlifers responsables partout en France.
+              Le réseau de lieux vérifiés qui accueille les vanlifers responsables partout en France.{" "}
               {SITE_STATS.labelledPlacesCount} établissements labellisés et des avantages de {MEMBER_DISCOUNT_TEXT} pour les membres.
             </p>
             <div className="mt-6 flex flex-wrap gap-3">
