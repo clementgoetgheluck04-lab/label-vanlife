@@ -39,7 +39,6 @@ function textBlock(value: string): string {
 
 export function labelVanlifeEmail(options: LabelVanlifeEmailOptions): string {
   const appUrl = getAppUrl();
-  const logoUrl = `${appUrl}/brand/logo-noir.png`;
   const eyebrow = options.eyebrow || "LABEL VANLIFE";
   const signature = options.signature || "L’équipe Label Vanlife";
   const paragraphs = options.paragraphs || [];
@@ -89,13 +88,6 @@ export function labelVanlifeEmail(options: LabelVanlifeEmailOptions): string {
       <tr>
         <td align="center" style="padding:28px 12px;">
           <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="width:100%;max-width:620px;border:1px solid #e5e1da;border-radius:20px;background:#ffffff;overflow:hidden;box-shadow:0 10px 30px rgba(26,26,26,.06);">
-            <tr>
-              <td align="center" style="padding:24px 28px 20px;background:#ffffff;border-bottom:1px solid #eeeae3;">
-                <a href="${escapeHtml(appUrl)}" style="text-decoration:none;">
-                  <img src="${escapeHtml(logoUrl)}" width="176" alt="Label Vanlife" style="display:block;width:176px;max-width:100%;height:auto;border:0;">
-                </a>
-              </td>
-            </tr>
             <tr>
               <td style="padding:12px 34px;background:#065f46;color:#ffffff;font-family:Arial,sans-serif;font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;">${escapeHtml(eyebrow)}</td>
             </tr>
