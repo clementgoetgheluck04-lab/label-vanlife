@@ -22,7 +22,7 @@ export default function LabellisationPaymentPage() {
 
   useEffect(() => {
     const timeout = window.setTimeout(() => {
-      const saved = localStorage.getItem("labellisation-draft");
+      const saved = sessionStorage.getItem("labellisation-draft");
       if (!saved) return;
       try { setDraft(JSON.parse(saved) as Draft); } catch { setDraft(null); }
     }, 0);

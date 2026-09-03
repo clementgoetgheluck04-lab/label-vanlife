@@ -3,14 +3,17 @@ import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { apiError } from "@/server/http";
+import { labelVanlifeEmail } from "@/server/email-template";
 import { getAppUrl, getBackOfficeEmails, getTransactionalEmailFrom, requireServerEnv } from "@/server/env";
-import { assertSameOrigin, enforceRateLimit } from "@/server/request-security";
+import { assertSameOrigin, enforceRateLimit, readMultipartFormData } from "@/server/request-security";
 import { parseLabellisationPayload } from "@/server/validation";
 import { LABELLISATION_CRITERIA } from "@/config/labellisation-criteria";
+import { createDraftToken } from "@/server/labellisation-draft";
 
 export const dynamic = "force-dynamic";
 const BUCKET = "labellisation-attachments";
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
+const MAX_REQUEST_SIZE = (4 * MAX_FILE_SIZE) + (1024 * 1024);
 const PHOTO_TYPES = new Set(["image/jpeg", "image/png"]);
 const PLAN_TYPES = new Set(["image/jpeg", "image/png", "application/pdf"]);
 
@@ -22,6 +25,21 @@ function extension(file: File): string {
   if (file.type === "application/pdf") return "pdf";
   if (file.type === "image/png") return "png";
   return "jpg";
+}
+
+async function hasExpectedSignature(file: File): Promise<boolean> {
+  const bytes = new Uint8Array(await file.slice(0, 8).arrayBuffer());
+  if (file.type === "image/png") {
+    return [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]
+      .every((byte, index) => bytes[index] === byte);
+  }
+  if (file.type === "image/jpeg") {
+    return bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff;
+  }
+  if (file.type === "application/pdf") {
+    return [0x25, 0x50, 0x44, 0x46, 0x2d].every((byte, index) => bytes[index] === byte);
+  }
+  return false;
 }
 
 function formatApplication(payload: NonNullable<ReturnType<typeof parseLabellisationPayload>>, draftId: string, mediaLinks: string[]): string {
@@ -91,7 +109,7 @@ export async function POST(request: NextRequest) {
   try {
     assertSameOrigin(request);
     enforceRateLimit(request, "labellisation-draft", 3, 60 * 60 * 1_000);
-    const formData = await request.formData();
+    const formData = await readMultipartFormData(request, MAX_REQUEST_SIZE);
     const rawPayload = formData.get("payload");
     if (typeof rawPayload !== "string" || rawPayload.length > 100_000) {
       return NextResponse.json({ error: "Dossier invalide" }, { status: 400 });
@@ -108,6 +126,10 @@ export async function POST(request: NextRequest) {
     }
     if (photos.some((file) => !PHOTO_TYPES.has(file.type) || file.size > MAX_FILE_SIZE)) {
       return NextResponse.json({ error: "Chaque photo doit être au format JPG ou PNG et faire moins de 10MB" }, { status: 400 });
+    }
+    const signaturesValid = await Promise.all([plan, ...photos].map(hasExpectedSignature));
+    if (signaturesValid.some((valid) => !valid)) {
+      return NextResponse.json({ error: "Le contenu d’un fichier ne correspond pas à son format déclaré" }, { status: 400 });
     }
 
     const supabase = createAdminClient();
@@ -153,6 +175,7 @@ export async function POST(request: NextRequest) {
     }
     const mediaLinks = (signedMedia || []).map((item, index) => `${index === 0 ? "Plan" : `Photo ${index}`} : ${item.signedUrl}`);
     const fullApplication = formatApplication(payload, draftId, mediaLinks);
+    const draftToken = createDraftToken({ draftId, email: payload.email, attachmentPaths: uploaded });
     const resend = new Resend(requireServerEnv("RESEND_API_KEY"));
     const from = getTransactionalEmailFrom();
     const [{ error: applicantEmailError }, { error: adminEmailError }] = await Promise.all([
@@ -161,6 +184,19 @@ export async function POST(request: NextRequest) {
         to: payload.email,
         subject: "Votre candidature Label Vanlife a bien été enregistrée",
         text: `Bonjour ${payload.contactName},\n\nVotre candidature et ses pièces jointes ont bien été enregistrées. Voici le récapitulatif complet des informations transmises :\n\n${fullApplication}\n\nOffre 2026 : 110 € au lieu de 220 € jusqu'au 31 décembre 2026. Si le dossier est déclaré non conforme après étude, le paiement est remboursé intégralement.\n\nLe paiement sécurisé va s'ouvrir automatiquement. Si nécessaire, vous pouvez le reprendre ici : ${getAppUrl()}/labellisation/paiement\n\nL'équipe Label Vanlife`,
+        html: labelVanlifeEmail({
+          preheader: "Votre dossier de labellisation est bien enregistré",
+          eyebrow: "CANDIDATURE LABEL VANLIFE",
+          title: "Votre dossier est bien enregistré",
+          greeting: `Bonjour ${payload.contactName},`,
+          paragraphs: ["Nous avons bien reçu votre candidature et ses pièces jointes. Le paiement sécurisé va s’ouvrir automatiquement.", `Récapitulatif transmis :\n${fullApplication}`],
+          details: [
+            { label: "Établissement", value: payload.establishmentName },
+            { label: "Offre 2026", value: "110 € au lieu de 220 €" },
+          ],
+          action: { label: "Reprendre le paiement", href: `${getAppUrl()}/labellisation/paiement` },
+          notice: "Si le dossier est déclaré non conforme après étude, le paiement est remboursé intégralement.",
+        }),
       }),
       resend.emails.send({
         from,
@@ -168,6 +204,18 @@ export async function POST(request: NextRequest) {
         replyTo: payload.email,
         subject: `Nouvelle candidature — ${payload.establishmentName}`,
         text: fullApplication,
+        html: labelVanlifeEmail({
+          preheader: `Nouvelle candidature — ${payload.establishmentName}`,
+          eyebrow: "NOUVEAU DOSSIER PARTENAIRE",
+          title: "Une candidature vient d’être déposée",
+          paragraphs: [fullApplication],
+          details: [
+            { label: "Établissement", value: payload.establishmentName },
+            { label: "Contact", value: payload.contactName },
+            { label: "Email", value: payload.email },
+          ],
+          notice: "Les liens vers les pièces jointes sont temporaires et expirent après sept jours.",
+        }),
       }),
     ]);
     if (applicantEmailError || adminEmailError) {
@@ -178,11 +226,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({
         draftId,
         attachmentPaths: uploaded,
+        draftToken,
         emailWarning: true,
       }, { headers: { "Cache-Control": "no-store" } });
     }
 
-    return NextResponse.json({ draftId, attachmentPaths: uploaded }, { headers: { "Cache-Control": "no-store" } });
+    return NextResponse.json({ draftId, attachmentPaths: uploaded, draftToken }, { headers: { "Cache-Control": "no-store" } });
   } catch (error) {
     if (error instanceof SyntaxError) return NextResponse.json({ error: "Données invalides" }, { status: 400 });
     return apiError(error, "labellisation-draft");

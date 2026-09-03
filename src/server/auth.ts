@@ -1,9 +1,9 @@
+import "server-only";
 import { redirect } from "next/navigation";
 import type { User } from "@supabase/supabase-js";
 import type { UserRole } from "@/generated/prisma/client";
 import { createClient } from "@/lib/supabase/server";
 import { getPrisma } from "@/lib/prisma";
-import { CONTACT_EMAIL } from "@/config/contact";
 import { cookies } from "next/headers";
 import { ADMIN_PREVIEW_COOKIE, isAdminPreviewCookie } from "@/server/admin-preview";
 
@@ -85,8 +85,6 @@ export async function requirePageRole(allowed: UserRole[]): Promise<void> {
 export async function requireAdminUser(): Promise<User> {
   const user = await getAuthenticatedUser();
   const record = await getPrisma().user.findUnique({ where: { id: user.id }, select: { role: true } });
-  if (record?.role !== "ADMIN" && user.email?.toLowerCase() !== CONTACT_EMAIL) {
-    throw new AuthorizationError();
-  }
+  if (record?.role !== "ADMIN") throw new AuthorizationError();
   return user;
 }

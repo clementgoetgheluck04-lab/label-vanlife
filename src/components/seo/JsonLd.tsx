@@ -1,4 +1,5 @@
 import { CONTACT_EMAIL } from "@/config/contact";
+import { serializeJsonLd } from "@/lib/seo/json-ld";
 
 /**
  * JsonLd — Composant générique pour injecter des données structurées JSON-LD
@@ -16,7 +17,7 @@ export function JsonLd({ data, id }: JsonLdProps) {
       type="application/ld+json"
       {...(id ? { id } : {})}
       dangerouslySetInnerHTML={{
-        __html: JSON.stringify(data),
+        __html: serializeJsonLd(data),
       }}
     />
   );

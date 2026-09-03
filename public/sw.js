@@ -1,6 +1,5 @@
-// Label Vanlife V2 — Service Worker
-// Cache les pages clés pour le mode hors-ligne : carte, espace membre
-const CACHE_NAME = "label-vanlife-v2";
+// Label Vanlife V3 — cache public uniquement, aucune donnée de session.
+const CACHE_NAME = "label-vanlife-v3-public";
 
 const PRECACHE_URLS = [
   "/",
@@ -9,8 +8,22 @@ const PRECACHE_URLS = [
   "/icons/icon-192.svg",
   "/icons/icon-512.svg",
   "/explorer",
-  "/compte",
+  "/offline",
 ];
+
+const PUBLIC_DOCUMENTS = new Set(["/", "/explorer", "/offline"]);
+const PRIVATE_PREFIXES = ["/api", "/auth", "/member", "/admin", "/pro", "/compte"];
+
+function isPrivatePath(pathname) {
+  return PRIVATE_PREFIXES.some((prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`));
+}
+
+function mayCache(response) {
+  if (!response || !response.ok || response.type === "opaque") return false;
+  const cacheControl = response.headers.get("cache-control") || "";
+  return !/(?:^|,)\s*(?:private|no-store|no-cache)\b/i.test(cacheControl)
+    && !response.headers.has("set-cookie");
+}
 
 // Install — pré-cache des assets statiques et pages clés
 self.addEventListener("install", (event) => {
@@ -44,6 +57,7 @@ self.addEventListener("fetch", (event) => {
   // Ne pas intercepter les requêtes non-GET ou cross-origin
   if (request.method !== "GET") return;
   if (url.origin !== self.location.origin) return;
+  if (isPrivatePath(url.pathname)) return;
 
   // Stratégie Cache-First pour les assets statiques
   if (
@@ -62,12 +76,12 @@ self.addEventListener("fetch", (event) => {
     request.destination === "document" ||
     request.mode === "navigate"
   ) {
-    event.respondWith(networkFirst(request));
+    event.respondWith(networkFirst(request, PUBLIC_DOCUMENTS.has(url.pathname)));
     return;
   }
 
-  // Pour tout le reste : Network-First
-  event.respondWith(networkFirst(request));
+  // Les autres requêtes peuvent contenir des données personnalisées : réseau uniquement.
+  event.respondWith(fetch(request));
 });
 
 // Cache-First : sert depuis le cache, met à jour en arrière-plan
@@ -77,7 +91,7 @@ async function cacheFirst(request) {
     // Mise à jour asynchrone du cache
     fetch(request)
       .then((response) => {
-        if (response.ok) {
+        if (mayCache(response)) {
           caches.open(CACHE_NAME).then((cache) => {
             cache.put(request, response);
           });
@@ -91,32 +105,41 @@ async function cacheFirst(request) {
 
   try {
     const response = await fetch(request);
-    if (response.ok) {
+    if (mayCache(response)) {
       const cache = await caches.open(CACHE_NAME);
       cache.put(request, response.clone());
     }
     return response;
   } catch {
-    return caches.match("/");
+    return Response.error();
   }
 }
 
 // Network-First : tente le réseau, fallback cache
-async function networkFirst(request) {
+async function networkFirst(request, cacheAllowed) {
   try {
     const response = await fetch(request);
-    if (response.ok) {
+    if (cacheAllowed && mayCache(response)) {
       const cache = await caches.open(CACHE_NAME);
       cache.put(request, response.clone());
     }
     return response;
   } catch {
-    const cached = await caches.match(request);
+    const cached = cacheAllowed ? await caches.match(request) : null;
     if (cached) {
       return cached;
     }
-    // Fallback ultime : page d'accueil en cache
-    return caches.match("/");
+    return caches.match("/offline");
+  }
+}
+
+function safeNotificationPath(value) {
+  try {
+    const url = new URL(typeof value === "string" ? value : "/", self.location.origin);
+    if (url.origin !== self.location.origin || isPrivatePath(url.pathname)) return "/";
+    return `${url.pathname}${url.search}${url.hash}`;
+  } catch {
+    return "/";
   }
 }
 // Push notifications
@@ -129,7 +152,7 @@ self.addEventListener("push", (event) => {
         body: data.body || "",
         icon: data.icon || "/icons/icon-192.svg",
         badge: "/icons/icon-192.svg",
-        data: { url: data.url || "/" },
+        data: { url: safeNotificationPath(data.url) },
         vibrate: [200, 100, 200],
       })
     );
@@ -140,6 +163,6 @@ self.addEventListener("push", (event) => {
 
 self.addEventListener("notificationclick", (event) => {
   event.notification.close();
-  const url = event.notification.data?.url || "/";
+  const url = safeNotificationPath(event.notification.data?.url);
   event.waitUntil(clients.openWindow(url));
 });

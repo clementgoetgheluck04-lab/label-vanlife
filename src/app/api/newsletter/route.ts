@@ -1,16 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 import { getPrisma } from "@/lib/prisma";
-import { getTransactionalEmailFrom, requireServerEnv } from "@/server/env";
+import { getAppUrl, getTransactionalEmailFrom, requireServerEnv } from "@/server/env";
 import { apiError } from "@/server/http";
-import { assertSameOrigin, enforceRateLimit } from "@/server/request-security";
+import { labelVanlifeEmail } from "@/server/email-template";
+import { assertSameOrigin, enforceRateLimit, readJsonRequest } from "@/server/request-security";
 import { parseEmail, parseText } from "@/server/validation";
 
 export async function POST(request: NextRequest) {
   try {
     assertSameOrigin(request);
     enforceRateLimit(request, "newsletter", 5, 60 * 60 * 1_000);
-    const body = await request.json();
+    const body = await readJsonRequest(request, 4_096) as Record<string, unknown>;
+    if (typeof body.companyWebsite === "string" && body.companyWebsite.trim()) {
+      return NextResponse.json({ success: true });
+    }
     const email = parseEmail(body.email);
     const source = parseText(body.source, { max: 80 }) || "web";
     if (!email) return NextResponse.json({ error: "Invalid email" }, { status: 400 });
@@ -28,6 +32,14 @@ export async function POST(request: NextRequest) {
         to: email,
         subject: "Bienvenue sur Label Vanlife",
         text: "Merci pour votre inscription. Vous recevrez désormais les actualités de Label Vanlife.",
+        html: labelVanlifeEmail({
+          preheader: "Bienvenue dans les nouvelles Label Vanlife",
+          eyebrow: "SUR LA ROUTE AVEC NOUS",
+          title: "Bienvenue dans les nouvelles Label Vanlife",
+          paragraphs: ["Merci pour votre inscription. Vous recevrez nos nouveaux lieux, les actualités du réseau, les offres membres et nos conseils pour voyager autrement."],
+          action: { label: "Découvrir les lieux", href: `${getAppUrl()}/explorer` },
+          notice: "Nous privilégions les informations utiles et les nouveautés du réseau. Pas de bruit inutile.",
+        }),
       });
       if (error) console.error("[newsletter] welcome email failed", error.message || error.name);
     }

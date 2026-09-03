@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { AuthenticationError, AuthorizationError } from "@/server/auth";
 import { DatabaseConfigurationError } from "@/lib/prisma";
 import { ServerConfigurationError } from "@/server/env";
-import { OriginError, RateLimitError } from "@/server/request-security";
+import { OriginError, RateLimitError, RequestBodyError } from "@/server/request-security";
 
 export function apiError(error: unknown, context: string): NextResponse {
   if (error instanceof AuthenticationError) {
@@ -19,6 +19,9 @@ export function apiError(error: unknown, context: string): NextResponse {
       { error: "Too many requests" },
       { status: 429, headers: { "Retry-After": String(error.retryAfter) } },
     );
+  }
+  if (error instanceof RequestBodyError) {
+    return NextResponse.json({ error: error.message }, { status: error.status });
   }
   if (
     error instanceof DatabaseConfigurationError ||

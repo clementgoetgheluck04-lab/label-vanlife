@@ -3,9 +3,10 @@ import { Resend } from "resend";
 import { Prisma } from "@/generated/prisma/client";
 import { getPrisma } from "@/lib/prisma";
 import { requireAdminUser } from "@/server/auth";
-import { getTransactionalEmailFrom, requireServerEnv } from "@/server/env";
+import { getAppUrl, getTransactionalEmailFrom, requireServerEnv } from "@/server/env";
 import { apiError } from "@/server/http";
-import { assertSameOrigin, enforceRateLimit } from "@/server/request-security";
+import { labelVanlifeEmail } from "@/server/email-template";
+import { assertSameOrigin, enforceRateLimit, getClientAddress, readJsonRequest } from "@/server/request-security";
 import { getStripe } from "@/server/stripe";
 import { parseText } from "@/server/validation";
 
@@ -30,7 +31,7 @@ export async function POST(request: NextRequest) {
     assertSameOrigin(request);
     enforceRateLimit(request, "admin-labellisation-decision", 30, 60 * 60 * 1_000);
     const admin = await requireAdminUser();
-    const input = await request.json() as Record<string, unknown>;
+    const input = await readJsonRequest(request, 8_192) as Record<string, unknown>;
     const orderId = parseText(input.orderId, { min: 10, max: 120, required: true });
     const decision = input.decision === "ACCEPTED" || input.decision === "REJECTED" ? input.decision : null;
     const reason = parseText(input.reason, { max: 1_000 });
@@ -73,6 +74,24 @@ export async function POST(request: NextRequest) {
         text: accepted
           ? `Bonjour,\n\nVotre candidature pour ${establishmentName} est conforme et validée. Nous revenons vers vous avec votre fiche et votre kit Label Vanlife.\n\nL'équipe Label Vanlife`
           : `Bonjour,\n\nAprès étude, la candidature de ${establishmentName} ne peut pas être validée en l'état.\n\nMotif : ${reason}\n\nLe remboursement intégral du paiement a été déclenché sur le moyen de paiement utilisé. Le délai d'apparition dépend de votre établissement financier.\n\nL'équipe Label Vanlife`,
+        html: accepted
+          ? labelVanlifeEmail({
+              preheader: `La candidature de ${establishmentName} est validée`,
+              eyebrow: "LABELLISATION VALIDÉE",
+              title: "Bienvenue parmi les lieux Label Vanlife",
+              greeting: "Bonjour,",
+              paragraphs: [`La candidature de ${establishmentName} est conforme et validée. Nous revenons vers vous avec votre fiche et votre kit Label Vanlife.`],
+              action: { label: "Découvrir le réseau", href: `${getAppUrl()}/explorer` },
+            })
+          : labelVanlifeEmail({
+              preheader: `Décision concernant ${establishmentName}`,
+              eyebrow: "SUIVI DE CANDIDATURE",
+              title: "Décision concernant votre candidature",
+              greeting: "Bonjour,",
+              paragraphs: [`Après étude, la candidature de ${establishmentName} ne peut pas être validée en l’état.`],
+              details: [{ label: "Motif", value: reason || "Non précisé" }],
+              notice: "Le remboursement intégral a été déclenché sur le moyen de paiement utilisé. Le délai d’apparition dépend de votre établissement financier.",
+            }),
       });
       if (emailError) {
         console.error("[admin-labellisation-decision] email failed", emailError.message || emailError.name);
@@ -90,6 +109,15 @@ export async function POST(request: NextRequest) {
     await prisma.$transaction([
       prisma.checkoutOrder.update({ where: { id: order.id }, data: { payload: reviewedPayload, ...(decision === "REJECTED" ? { status: "REFUNDED" as const } : {}) } }),
       ...(decision === "REJECTED" ? [prisma.payment.updateMany({ where: { orderId: order.id }, data: { status: "REFUNDED" } })] : []),
+      prisma.adminLog.create({
+        data: {
+          adminId: admin.id,
+          action: `LABELLISATION_${decision}`,
+          target: order.id,
+          metadata: { refunded: decision === "REJECTED" },
+          ipAddress: getClientAddress(request),
+        },
+      }),
     ]);
 
     return NextResponse.json({ success: true, decision, refunded: decision === "REJECTED" });

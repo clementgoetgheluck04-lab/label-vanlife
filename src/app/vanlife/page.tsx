@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Check, Compass, Euro, HelpCircle, Leaf, MapPin, ShieldCheck, Wrench } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { serializeJsonLd } from "@/lib/seo/json-ld";
 
 const title = "Vanlife France : le guide complet 2026 pour voyager en van";
 const description = "Vanlife France : où dormir en van, budget, loi, itinéraires, campings van friendly, carte des lieux et conseils pour préparer un road trip en van.";
@@ -156,9 +157,9 @@ export default function VanlifeGuidePage() {
 
   return (
     <main className="bg-white pb-24 pt-16 text-neutral-800">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(articleSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(faqSchema) }} />
 
       <header className="relative isolate min-h-[72vh] overflow-hidden bg-neutral-950 text-white">
         <Image src="/images/hero-label-vanlife.png" alt="Van aménagé devant un lac au coucher du soleil" fill priority sizes="100vw" className="object-cover" />

@@ -4,13 +4,13 @@ import { getPrisma } from "@/lib/prisma";
 import { getAppUrl } from "@/server/env";
 import { apiError } from "@/server/http";
 import { parseMemberSignupPayload } from "@/server/validation";
-import { assertSameOrigin, enforceRateLimit } from "@/server/request-security";
+import { assertSameOrigin, enforceRateLimit, readJsonRequest } from "@/server/request-security";
 
 export async function POST(request: NextRequest) {
   try {
     assertSameOrigin(request);
     enforceRateLimit(request, "signup", 5, 60 * 60 * 1_000);
-    const body = await request.json();
+    const body = await readJsonRequest(request, 20_000);
     const signup = parseMemberSignupPayload(body);
     if (!signup) {
       return NextResponse.json(

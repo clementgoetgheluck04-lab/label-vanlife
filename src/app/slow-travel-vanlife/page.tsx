@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Bike, ChevronRight, Clock3, Compass, HeartHandshake, Leaf, MapPin, ShoppingBasket, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { serializeJsonLd } from "@/lib/seo/json-ld";
 
 const title = "Slow travel vanlife : voyager en van sans se presser";
 const description = "Découvrez les six principes du slow travel en van : rester plus longtemps, rouler moins, consommer local et laisser une place réelle à l'imprévu.";
@@ -54,7 +55,7 @@ export default function SlowTravelVanlifePage() {
 
   return (
     <main className="bg-white pb-24 pt-16 text-neutral-800">
-      {schemas.map((schema, index) => <script key={index} type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />)}
+      {schemas.map((schema, index) => <script key={index} type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(schema) }} />)}
 
       <div className="mx-auto max-w-6xl px-6 pt-8">
         <nav aria-label="Fil d'Ariane" className="flex items-center gap-2 text-xs text-neutral-400"><Link href="/" className="hover:text-emerald-700">Accueil</Link><ChevronRight className="h-3.5 w-3.5" /><span className="text-neutral-700">Slow travel vanlife</span></nav>

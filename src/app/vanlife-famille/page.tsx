@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Baby, BedDouble, BookOpen, ChevronRight, Droplets, Heart, Map, ShieldCheck, SlidersHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { serializeJsonLd } from "@/lib/seo/json-ld";
 
 const title = "Vanlife en famille : le guide complet pour voyager avec des enfants";
 const description = "Aménagement, sécurité, rythme, hygiène, itinéraires et scolarité : préparez sereinement un voyage en van avec vos enfants.";
@@ -51,7 +52,7 @@ export default function FamilyVanlifePage() {
 
   return (
     <main className="bg-white pb-24 pt-16 text-neutral-800">
-      {schemas.map((schema, index) => <script key={index} type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />)}
+      {schemas.map((schema, index) => <script key={index} type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(schema) }} />)}
 
       <div className="mx-auto max-w-6xl px-6 pt-8">
         <nav aria-label="Fil d'Ariane" className="flex flex-wrap items-center gap-2 text-xs text-neutral-400"><Link href="/" className="hover:text-emerald-700">Accueil</Link><ChevronRight className="h-3.5 w-3.5" /><Link href="/vanlife" className="hover:text-emerald-700">Vanlife</Link><ChevronRight className="h-3.5 w-3.5" /><span className="text-neutral-700">Vanlife famille</span></nav>

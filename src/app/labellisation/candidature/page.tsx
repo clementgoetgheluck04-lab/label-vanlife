@@ -81,13 +81,13 @@ export default function CandidaturePage() {
 
   useEffect(() => {
     const timeout = window.setTimeout(() => {
-      const saved = localStorage.getItem("labellisation-form-progress");
+      const saved = sessionStorage.getItem("labellisation-form-progress");
       let restored: Partial<typeof initialForm> = {};
       if (saved) {
         try {
           restored = JSON.parse(saved) as Partial<typeof initialForm>;
         } catch {
-          localStorage.removeItem("labellisation-form-progress");
+          sessionStorage.removeItem("labellisation-form-progress");
         }
       }
       const claimId = new URLSearchParams(window.location.search).get("claim");
@@ -115,7 +115,7 @@ export default function CandidaturePage() {
   }, []);
 
   useEffect(() => {
-    if (progressRestored) localStorage.setItem("labellisation-form-progress", JSON.stringify(form));
+    if (progressRestored) sessionStorage.setItem("labellisation-form-progress", JSON.stringify(form));
   }, [form, progressRestored]);
 
   useEffect(() => {
@@ -196,9 +196,9 @@ export default function CandidaturePage() {
       const response = await fetch("/api/labellisation/submit-draft", { method: "POST", body });
       const result = await response.json();
       if (!response.ok) throw new Error(result.error || "Impossible d'envoyer la candidature.");
-      const finalizedDraft = { ...draft, draftId: result.draftId, attachmentPaths: result.attachmentPaths };
-      localStorage.setItem("labellisation-draft", JSON.stringify(finalizedDraft));
-      localStorage.removeItem("labellisation-form-progress");
+      const finalizedDraft = { ...draft, draftId: result.draftId, attachmentPaths: result.attachmentPaths, draftToken: result.draftToken };
+      sessionStorage.setItem("labellisation-draft", JSON.stringify(finalizedDraft));
+      sessionStorage.removeItem("labellisation-form-progress");
       sessionStorage.setItem("labellisation-confirmation", JSON.stringify({ establishmentName: form.establishmentName, email: form.email, draftId: result.draftId }));
       const checkoutResponse = await fetch("/api/stripe/checkout-labellisation", {
         method: "POST",

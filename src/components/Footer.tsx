@@ -1,7 +1,6 @@
 "use client";
 
 import { FormEvent, useState } from "react";
-import { usePathname } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight, Check, Mail } from "lucide-react";
@@ -40,19 +39,20 @@ function FacebookMark({ className }: { className?: string }) {
 }
 
 export default function Footer() {
-  const pathname = usePathname();
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
 
   const subscribe = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!email) return;
+    const formData = new FormData(event.currentTarget);
+    const companyWebsite = String(formData.get("companyWebsite") || "");
     setStatus("loading");
     try {
       const response = await fetch("/api/newsletter", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, source: "footer" }),
+        body: JSON.stringify({ email, source: "footer", companyWebsite }),
       });
       if (!response.ok) throw new Error("newsletter");
       setStatus("success");
@@ -61,8 +61,6 @@ export default function Footer() {
       setStatus("error");
     }
   };
-
-  if (pathname.startsWith("/dignamik")) return null;
 
   return (
     <footer className="bg-neutral-950 text-white">
@@ -119,6 +117,14 @@ export default function Footer() {
             <h2 className="text-xs font-semibold uppercase tracking-[0.18em] text-white/45">Newsletter</h2>
             <p className="mt-5 text-sm leading-relaxed text-white/60">Nouveaux lieux, actualités du réseau et conseils vanlife. Sans spam.</p>
             <form onSubmit={subscribe} className="mt-4 flex gap-2">
+              <input
+                type="text"
+                name="companyWebsite"
+                tabIndex={-1}
+                autoComplete="off"
+                aria-hidden="true"
+                className="pointer-events-none absolute h-px w-px opacity-0"
+              />
               <label className="sr-only" htmlFor="footer-email">Votre email</label>
               <input id="footer-email" type="email" required value={email} onChange={(event) => setEmail(event.target.value)} placeholder="votre@email.com" className="min-w-0 flex-1 rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-white outline-none placeholder:text-white/30 focus:border-[#c39960]" />
               <button type="submit" disabled={status === "loading"} className="rounded-xl bg-[#c39960] px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#d0ad7d] disabled:opacity-60" aria-label="S'inscrire à la newsletter">{status === "success" ? <Check className="h-4 w-4" /> : <ArrowRight className="h-4 w-4" />}</button>

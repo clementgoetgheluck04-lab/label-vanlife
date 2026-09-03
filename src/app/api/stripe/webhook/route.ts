@@ -6,9 +6,12 @@ import { Prisma } from "@/generated/prisma/client";
 import { formatEuro } from "@/config/products";
 import { MEMBER_EXPIRY_ISO, MEMBER_PRODUCT_NAME, MEMBER_VALIDITY_TEXT } from "@/config/commercial";
 import { getPrisma } from "@/lib/prisma";
-import { getAppUrl, getBackOfficeEmails, getTransactionalEmailFrom, requireServerEnv } from "@/server/env";
+import { getAppUrl, getBackOfficeEmails, getTransactionalEmailFrom, requireSecretEnv, requireServerEnv } from "@/server/env";
 import { generateMemberAccessCode, hashMemberAccessCode, hashMemberAccessLookupCode } from "@/server/member-access";
 import { getStripe } from "@/server/stripe";
+import { assertRequestSize } from "@/server/request-security";
+import { apiError } from "@/server/http";
+import { labelVanlifeEmail } from "@/server/email-template";
 
 export const dynamic = "force-dynamic";
 
@@ -49,6 +52,18 @@ async function sendLabellisationPaymentConfirmation(orderId: string): Promise<vo
       replyTo: candidateEmail || undefined,
       subject: `Paiement reçu — ${establishmentName}`,
       text: `Le paiement de ${amount} pour la candidature de ${establishmentName} a bien été reçu.\n\nCommande : ${order.id}\nLe dossier peut maintenant être étudié depuis l'administration Label Vanlife.`,
+      html: labelVanlifeEmail({
+        preheader: `Paiement reçu pour ${establishmentName}`,
+        eyebrow: "ESPACE PROFESSIONNEL",
+        title: "Un paiement de labellisation a été reçu",
+        paragraphs: [`Le dossier de ${establishmentName} peut maintenant être étudié depuis l’administration Label Vanlife.`],
+        details: [
+          { label: "Établissement", value: establishmentName },
+          { label: "Montant", value: amount },
+          { label: "Commande", value: order.id },
+        ],
+        action: { label: "Ouvrir l’administration", href: `${getAppUrl()}/admin/labellisations` },
+      }),
     }),
   ];
   if (candidateEmail) {
@@ -57,6 +72,18 @@ async function sendLabellisationPaymentConfirmation(orderId: string): Promise<vo
       to: candidateEmail,
       subject: `Paiement confirmé — ${establishmentName}`,
       text: `Bonjour${candidateName ? ` ${candidateName}` : ""},\n\nNous confirmons la réception de votre paiement de ${amount} pour la candidature de ${establishmentName}. Votre dossier va maintenant être étudié.\n\nS'il est déclaré non conforme aux critères du Label Vanlife, ce paiement sera remboursé intégralement sur le moyen de paiement utilisé.\n\nL'équipe Label Vanlife`,
+      html: labelVanlifeEmail({
+        preheader: `Votre paiement de ${amount} est confirmé`,
+        eyebrow: "CANDIDATURE ENREGISTRÉE",
+        title: "Votre paiement est confirmé",
+        greeting: `Bonjour${candidateName ? ` ${candidateName}` : ""},`,
+        paragraphs: [`Nous avons bien reçu votre paiement pour la candidature de ${establishmentName}. Votre dossier va maintenant être étudié par notre équipe.`],
+        details: [
+          { label: "Établissement", value: establishmentName },
+          { label: "Montant réglé", value: amount },
+        ],
+        notice: "Si le dossier est déclaré non conforme aux critères du Label Vanlife, le paiement sera remboursé intégralement sur le moyen de paiement utilisé.",
+      }),
     }));
   }
 
@@ -95,11 +122,11 @@ async function sendMembershipActivation(orderId: string): Promise<void> {
   const codeHash = hashMemberAccessCode(
     order.user.email,
     code,
-    requireServerEnv("MEMBER_ACCESS_CODE_SECRET"),
+    requireSecretEnv("MEMBER_ACCESS_CODE_SECRET"),
   );
   const codeLookupHash = hashMemberAccessLookupCode(
     code,
-    requireServerEnv("MEMBER_ACCESS_CODE_SECRET"),
+    requireSecretEnv("MEMBER_ACCESS_CODE_SECRET"),
   );
   const codeExpiresAt = order.user.membership?.expiresAt ?? new Date(MEMBER_EXPIRY_ISO);
   const profile = order.user.profile;
@@ -131,18 +158,58 @@ async function sendMembershipActivation(orderId: string): Promise<void> {
     replyTo: order.user.email,
     subject: `Nouveau membre payé — ${fullName}`,
     text: `Un nouveau membre vient de finaliser son paiement.\n\nPersonnes couvertes :\n${coveredPeople}\n\nEmail : ${order.user.email}\nTéléphone : ${profile?.phone || "Non renseigné"}\nMontant : ${formatEuro(order.amount)}\nCarte membre : ${cardNumber}\nCommande : ${order.id}`,
+    html: labelVanlifeEmail({
+      preheader: `Nouvelle adhésion payée — ${fullName}`,
+      eyebrow: "NOUVELLE ADHÉSION",
+      title: "Un nouveau membre rejoint Label Vanlife",
+      paragraphs: ["Le paiement a été confirmé et la carte membre a été activée automatiquement.", `Personnes couvertes :\n${coveredPeople}`],
+      details: [
+        { label: "Membre", value: fullName },
+        { label: "Email", value: order.user.email },
+        { label: "Téléphone", value: profile?.phone || "Non renseigné" },
+        { label: "Montant", value: formatEuro(order.amount) },
+        { label: "Carte", value: cardNumber },
+        { label: "Commande", value: order.id },
+      ],
+      action: { label: "Ouvrir l’administration", href: `${getAppUrl()}/admin` },
+    }),
     }),
     resend.emails.send({
     from,
     to: order.user.email,
     subject: "Bienvenue dans Label Vanlife",
     text: `Bonjour ${profile?.firstName || ""},\n\nBienvenue dans Label Vanlife — votre paiement de ${formatEuro(order.amount)} est confirmé.\n\n${MEMBER_PRODUCT_NAME}\n${MEMBER_VALIDITY_TEXT}\n\nNuméro de carte membre : ${cardNumber}\n\nVotre espace membre vous donne accès à la MAP Label Vanlife, à votre Carte membre numérique, aux fiches détaillées des lieux et au téléchargement de l'application depuis votre espace en ligne lorsqu'elle est disponible.\n\nPrésentez votre Carte membre numérique aux lieux labellisés pour faire vérifier sa validité et bénéficier des avantages membres.\n\nL'équipe Label Vanlife`,
+    html: labelVanlifeEmail({
+      preheader: `Votre paiement de ${formatEuro(order.amount)} est confirmé et votre carte est active`,
+      eyebrow: "BIENVENUE DANS LA COMMUNAUTÉ",
+      title: "Votre Carte membre est active",
+      greeting: `Bonjour ${profile?.firstName || ""},`,
+      paragraphs: ["Bienvenue dans Label Vanlife. Votre paiement est confirmé et votre espace membre est prêt.", "Retrouvez la MAP Label Vanlife, votre Carte membre numérique, les fiches détaillées des lieux et tous vos avantages."],
+      details: [
+        { label: "Offre", value: MEMBER_PRODUCT_NAME },
+        { label: "Montant", value: formatEuro(order.amount) },
+        { label: "Carte membre", value: cardNumber },
+        { label: "Validité", value: MEMBER_VALIDITY_TEXT },
+      ],
+      action: { label: "Accéder à mon espace membre", href: `${getAppUrl()}/member-login` },
+      notice: "Présentez votre Carte membre numérique aux lieux labellisés pour faire vérifier sa validité et bénéficier des avantages membres.",
+    }),
     }),
     resend.emails.send({
     from,
     to: order.user.email,
     subject: "Votre code d'accès personnel Label Vanlife",
     text: `Bonjour ${profile?.firstName || ""},\n\nVoici votre code d'accès personnel : ${code}\n\nConservez-le : il reste valable jusqu'au 31 décembre 2026, comme votre Carte membre.\n\nConnexion à votre espace membre : ${getAppUrl()}/member-login\n\nSaisissez uniquement ce code, puis vous serez redirigé vers votre espace membre.\n\nL'équipe Label Vanlife`,
+    html: labelVanlifeEmail({
+      preheader: "Votre code personnel pour ouvrir l’espace membre",
+      eyebrow: "ACCÈS MEMBRE SÉCURISÉ",
+      title: "Voici votre code d’accès personnel",
+      greeting: `Bonjour ${profile?.firstName || ""},`,
+      paragraphs: ["Utilisez ce code pour vous connecter simplement à votre espace membre Label Vanlife."],
+      code,
+      action: { label: "Ouvrir l’espace membre", href: `${getAppUrl()}/member-login` },
+      notice: "Ce code est personnel. Ne le transmettez jamais. Il reste valable jusqu’au 31 décembre 2026, comme votre Carte membre.",
+    }),
     }),
   ]);
   const emailErrors = [
@@ -327,6 +394,11 @@ async function processEvent(event: Stripe.Event): Promise<void> {
 }
 
 export async function POST(request: NextRequest) {
+  try {
+    assertRequestSize(request, 2 * 1024 * 1024);
+  } catch (error) {
+    return apiError(error, "stripe-webhook-size");
+  }
   const signature = request.headers.get("stripe-signature");
   if (!signature) return NextResponse.json({ error: "Missing signature" }, { status: 400 });
 
@@ -335,7 +407,7 @@ export async function POST(request: NextRequest) {
     event = getStripe().webhooks.constructEvent(
       await request.text(),
       signature,
-      requireServerEnv("STRIPE_WEBHOOK_SECRET"),
+      requireSecretEnv("STRIPE_WEBHOOK_SECRET"),
     );
   } catch {
     return NextResponse.json({ error: "Invalid signature" }, { status: 400 });

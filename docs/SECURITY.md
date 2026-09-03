@@ -1,12 +1,21 @@
 # Sécurité
 
-## Priorités immédiates
+## État du durcissement (3 septembre 2026)
 
-1. Désactiver l'encaissement tant que les flux C1–C5 de l'audit ne sont pas corrigés.
-2. Retirer la création admin publique de comptes.
-3. Imposer rôle et propriété côté serveur pour admin, pro et membre.
-4. Déployer et tester les RLS Supabase.
-5. Rendre les webhooks idempotents et observables.
+- L'endpoint public de création de membres par code admin a été supprimé.
+- La prévisualisation membre est limitée à localhost et désactivée en production.
+- Les routes admin exigent un utilisateur Supabase possédant réellement le rôle `ADMIN`.
+- Les mutations navigateur exigent une origine identique, un type de contenu explicite et une taille bornée.
+- Les pages privées et toutes les API sont marquées `private, no-store`.
+- Le service worker ne peut mettre en cache ni API, ni authentification, ni espaces membre/admin/pro.
+- Le dossier de labellisation est lié au paiement par une preuve HMAC à durée limitée et un identifiant unique en base.
+- Les fichiers sont contrôlés par taille, MIME et signature binaire avant stockage privé.
+- Le webhook Stripe vérifie sa signature, borne son corps et déduplique les événements.
+- Les décisions de labellisation sont journalisées avec l'identifiant admin, la cible et l'adresse IP.
+- Les redirections d'authentification refusent les destinations externes et les variantes avec antislash.
+- Les données JSON-LD sont échappées contre la fermeture de balise `script`.
+- L'ancienne colonne applicative `users.password`, inutilisée avec Supabase Auth, est supprimée par migration.
+- Next.js est maintenu sur une version corrigée et un audit de dépendances est exécuté en CI.
 
 ## Modèle d'autorisation
 
@@ -38,4 +47,12 @@ Le rôle n'est jamais pris dans une requête client. Les routes et politiques RL
 
 ## Limites de l'audit
 
-Le dépôt ne permet pas de certifier les RLS, secrets, sauvegardes, journaux ou configurations externes. Une revue en lecture des consoles Supabase, Stripe, Vercel et Resend est obligatoire.
+Le dépôt ne permet pas à lui seul de certifier les réglages distants. Avant mise en production du durcissement :
+
+1. Définir `LABELLISATION_DRAFT_SECRET` dans Vercel pour Production et Preview.
+2. Vérifier que les migrations et RLS sont appliquées sur Supabase, puis tester avec les rôles anon/authenticated.
+3. Activer CAPTCHA et régler les limites Supabase Auth.
+4. Activer les règles WAF/rate limiting Vercel sur inscription, codes, newsletter, candidature et checkout.
+5. Vérifier les événements Stripe, la signature webhook et les alertes d'échec.
+6. Vérifier les sauvegardes Supabase, leur rétention et un test de restauration.
+7. Activer MFA pour tous les comptes Hostinger, Vercel, Supabase, Stripe, Resend et GitHub.

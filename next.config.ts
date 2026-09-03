@@ -12,7 +12,8 @@ const securityHeaders = [
   },
   { key: "X-Content-Type-Options", value: "nosniff" },
   { key: "X-Frame-Options", value: "DENY" },
-  { key: "X-XSS-Protection", value: "1; mode=block" },
+  { key: "X-Permitted-Cross-Domain-Policies", value: "none" },
+  { key: "Cross-Origin-Resource-Policy", value: "same-origin" },
   {
     key: "Referrer-Policy",
     value: "strict-origin-when-cross-origin",
@@ -22,14 +23,16 @@ const securityHeaders = [
     value:
       "camera=(), microphone=(), geolocation=(), interest-cohort=()",
   },
-  { key: "Cross-Origin-Opener-Policy", value: "same-origin-allow-popups" },
+  { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
   { key: "Origin-Agent-Cluster", value: "?1" },
   {
     key: "Content-Security-Policy",
     value: [
       "default-src 'self'",
       scriptSources,
+      "script-src-attr 'none'",
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+      "style-src-attr 'unsafe-inline'",
       "img-src 'self' data: blob: https://*.vercel.app https://*.basemaps.cartocdn.com https://api.bienvenue-a-la-ferme.com",
       "font-src 'self' data: https://fonts.gstatic.com",
       "connect-src 'self' https://*.vercel.app https://*.supabase.co wss://*.supabase.co https://*.stripe.com https://checkout.stripe.com",
@@ -47,6 +50,7 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  poweredByHeader: false,
   images: {
     remotePatterns: [
       {
@@ -85,6 +89,35 @@ const nextConfig: NextConfig = {
         source: "/icons/:path*",
         headers: [
           { key: "Cache-Control", value: "public, max-age=31536000, immutable" },
+        ],
+      },
+      {
+        source: "/api/:path*",
+        headers: [
+          { key: "Cache-Control", value: "private, no-store, max-age=0" },
+          { key: "X-Robots-Tag", value: "noindex, nofollow, noarchive" },
+          { key: "X-Content-Type-Options", value: "nosniff" },
+        ],
+      },
+      {
+        source: "/member/:path*",
+        headers: [
+          { key: "Cache-Control", value: "private, no-store, max-age=0" },
+          { key: "X-Robots-Tag", value: "noindex, nofollow, noarchive" },
+        ],
+      },
+      {
+        source: "/admin/:path*",
+        headers: [
+          { key: "Cache-Control", value: "private, no-store, max-age=0" },
+          { key: "X-Robots-Tag", value: "noindex, nofollow, noarchive" },
+        ],
+      },
+      {
+        source: "/pro/:path*",
+        headers: [
+          { key: "Cache-Control", value: "private, no-store, max-age=0" },
+          { key: "X-Robots-Tag", value: "noindex, nofollow, noarchive" },
         ],
       },
       {

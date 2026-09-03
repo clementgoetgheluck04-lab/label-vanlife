@@ -4,6 +4,7 @@ import Link from "next/link";
 import { ArrowRight, ChevronRight, CircleCheck, Compass, Heart, LockKeyhole, MapPin, PiggyBank, ShieldCheck, Sparkles, Users, Wrench } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { MEMBER_PRICE_TEXT, MEMBER_VALIDITY_TEXT } from "@/config/commercial";
+import { serializeJsonLd } from "@/lib/seo/json-ld";
 
 const title = "Vanlife solo : le guide complet pour voyager seul en van";
 const description = "Sécurité, choix du van, budget, communauté et itinéraires : préparez votre premier voyage en van solo en France avec des conseils concrets.";
@@ -53,7 +54,7 @@ export default function VanlifeSoloPage() {
 
   return (
     <main className="bg-white pb-24 pt-16 text-neutral-800">
-      {schemas.map((schema, index) => <script key={index} type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />)}
+      {schemas.map((schema, index) => <script key={index} type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(schema) }} />)}
       <div className="mx-auto max-w-6xl px-6 pt-8"><nav aria-label="Fil d’Ariane" className="flex flex-wrap items-center gap-2 text-xs text-neutral-400"><Link href="/" className="hover:text-emerald-700">Accueil</Link><ChevronRight className="h-3.5 w-3.5" /><Link href="/vanlife" className="hover:text-emerald-700">Vanlife France</Link><ChevronRight className="h-3.5 w-3.5" /><span className="text-neutral-700">Vanlife solo</span></nav></div>
 
       <header className="mx-auto grid max-w-6xl gap-10 px-6 py-12 lg:grid-cols-[.95fr_1.05fr] lg:items-center lg:py-16"><div className="animate-fade-in-up"><p className="text-xs font-bold uppercase tracking-[0.22em] text-[#9a7445]">Guide vanlife</p><h1 className="mt-4 text-4xl font-bold leading-[1.08] text-neutral-950 sm:text-6xl">Vanlife solo : voyager seul, libre et bien préparé</h1><p className="mt-5 text-lg leading-8 text-neutral-600">Partir quand on veut, modifier l’itinéraire et s’arrêter là où cela nous plaît : la liberté est immense. Pour qu’elle reste agréable, elle se prépare.</p><div className="mt-7 flex flex-wrap gap-2">{["Sécurité", "Choix du van", "Budget solo", "Itinéraires", "Communauté"].map((tag) => <span key={tag} className="rounded-full border border-[#c39960]/30 bg-[#f7f1e8] px-3 py-1.5 text-xs font-semibold text-[#7d5d38]">{tag}</span>)}</div></div><div className="relative aspect-[4/3] overflow-hidden rounded-[2rem] shadow-2xl shadow-neutral-900/15"><Image src="/images/hero-label-vanlife.png" alt="Voyage en van solo au bord d’un lac" fill priority sizes="(max-width: 1024px) 100vw, 52vw" className="object-cover" /><div className="absolute inset-0 bg-gradient-to-t from-black/35 to-transparent" /></div></header>

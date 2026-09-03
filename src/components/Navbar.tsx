@@ -41,8 +41,6 @@ export default function Navbar() {
   const overlaysHero = pathname === "/" && !scrolled && !open;
   const isActive = (href: string) => href === "/" ? pathname === "/" : pathname.startsWith(href);
 
-  if (pathname.startsWith("/dignamik")) return null;
-
   return (
     <header
       className={cn(

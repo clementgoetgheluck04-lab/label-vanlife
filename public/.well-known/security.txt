@@ -1,0 +1,5 @@
+Contact: mailto:contact@labelvanlife.fr
+Preferred-Languages: fr, en
+Canonical: https://www.labelvanlife.fr/.well-known/security.txt
+Policy: https://www.labelvanlife.fr/politique-confidentialite
+Expires: 2027-09-03T00:00:00Z

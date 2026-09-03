@@ -13,25 +13,86 @@ function isPublicPath(pathname: string): boolean {
   return PUBLIC_ROUTES.some((route) => pathname === route || pathname.startsWith(`${route}/`));
 }
 
-function withDeploymentHeaders(response: NextResponse, request: NextRequest): NextResponse {
+function isSensitivePath(pathname: string): boolean {
+  return ["/member", "/admin", "/pro"].some(
+    (route) => pathname === route || pathname.startsWith(`${route}/`),
+  );
+}
+
+function strictContentSecurityPolicy(nonce: string): string {
+  const scripts = process.env.NODE_ENV === "production"
+    ? `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'`
+    : `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' 'unsafe-eval'`;
+  return [
+    "default-src 'self'",
+    scripts,
+    "script-src-attr 'none'",
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+    "style-src-attr 'unsafe-inline'",
+    "img-src 'self' data: blob: https://*.vercel.app https://*.basemaps.cartocdn.com https://api.bienvenue-a-la-ferme.com",
+    "font-src 'self' data: https://fonts.gstatic.com",
+    "connect-src 'self' https://*.vercel.app https://*.supabase.co wss://*.supabase.co https://*.stripe.com https://checkout.stripe.com",
+    "frame-src 'self' https://checkout.stripe.com",
+    "object-src 'none'",
+    "media-src 'self'",
+    "worker-src 'self' blob:",
+    "frame-ancestors 'none'",
+    "form-action 'self'",
+    "base-uri 'self'",
+    "manifest-src 'self'",
+    ...(process.env.NODE_ENV === "production" ? ["upgrade-insecure-requests"] : []),
+  ].join("; ");
+}
+
+function withDeploymentHeaders(
+  response: NextResponse,
+  request: NextRequest,
+  contentSecurityPolicy?: string,
+): NextResponse {
   if (request.nextUrl.hostname.endsWith(".vercel.app")) {
     response.headers.set("X-Robots-Tag", "noindex, nofollow");
+  }
+  if (isSensitivePath(request.nextUrl.pathname)) {
+    response.headers.set("Cache-Control", "private, no-store, max-age=0");
+    response.headers.set("X-Robots-Tag", "noindex, nofollow, noarchive");
+  }
+  if (contentSecurityPolicy) {
+    response.headers.set("Content-Security-Policy", contentSecurityPolicy);
   }
   return response;
 }
 
 export async function proxy(request: NextRequest) {
+  const sensitive = isSensitivePath(request.nextUrl.pathname);
+  const nonce = sensitive ? crypto.randomUUID().replaceAll("-", "") : "";
+  const contentSecurityPolicy = sensitive ? strictContentSecurityPolicy(nonce) : undefined;
+  const requestHeaders = new Headers(request.headers);
+  if (contentSecurityPolicy) {
+    requestHeaders.set("Content-Security-Policy", contentSecurityPolicy);
+    requestHeaders.set("x-nonce", nonce);
+  }
+
+  const nextResponse = () => NextResponse.next({ request: { headers: requestHeaders } });
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  if (!url || !key) return withDeploymentHeaders(NextResponse.next(), request);
+  if (!url || !key) {
+    if (sensitive) {
+      return withDeploymentHeaders(
+        NextResponse.json({ error: "Authentication service unavailable" }, { status: 503 }),
+        request,
+        contentSecurityPolicy,
+      );
+    }
+    return withDeploymentHeaders(nextResponse(), request, contentSecurityPolicy);
+  }
 
-  let response = NextResponse.next({ request });
+  let response = nextResponse();
   const supabase = createServerClient(url, key, {
     cookies: {
       getAll: () => request.cookies.getAll(),
       setAll: (cookiesToSet) => {
         cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
-        response = NextResponse.next({ request });
+        response = nextResponse();
         cookiesToSet.forEach(({ name, value, options }) => response.cookies.set(name, value, options));
       },
     },
@@ -41,7 +102,7 @@ export async function proxy(request: NextRequest) {
   const adminPreview = isAdminPreviewCookie(request.cookies.get(ADMIN_PREVIEW_COOKIE)?.value);
   if (isPublicPath(pathname)) {
     await supabase.auth.getUser();
-    return withDeploymentHeaders(response, request);
+    return withDeploymentHeaders(response, request, contentSecurityPolicy);
   }
 
   const { data: { user } } = await supabase.auth.getUser();
@@ -50,10 +111,10 @@ export async function proxy(request: NextRequest) {
   if (!user && (protectedWithoutPreview || memberWithoutAccess)) {
     const loginUrl = new URL("/member-login", request.url);
     loginUrl.searchParams.set("redirect", pathname);
-    return withDeploymentHeaders(NextResponse.redirect(loginUrl), request);
+    return withDeploymentHeaders(NextResponse.redirect(loginUrl), request, contentSecurityPolicy);
   }
 
-  return withDeploymentHeaders(response, request);
+  return withDeploymentHeaders(response, request, contentSecurityPolicy);
 }
 
 export const config = {

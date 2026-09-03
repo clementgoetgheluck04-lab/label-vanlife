@@ -4,6 +4,7 @@ import Link from "next/link";
 import { ArrowRight, CheckCircle2, ChevronRight, MapPin, Ruler, ShowerHead, Trees, Users, Volume2, Wifi } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { ENRICHED_LIEUX } from "@/data/enriched-lieux";
+import { serializeJsonLd } from "@/lib/seo/json-ld";
 
 const title = "Campings van friendly en France : la sélection Label Vanlife";
 const description = "Découvrez ce qui distingue un véritable camping van friendly et consultez la sélection 2026 des campings labellisés Label Vanlife en France.";
@@ -68,7 +69,7 @@ export default function VanFriendlyCampingsPage() {
 
   return (
     <main className="bg-white pb-24 pt-16 text-neutral-800">
-      {schemas.map((schema, index) => <script key={index} type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />)}
+      {schemas.map((schema, index) => <script key={index} type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(schema) }} />)}
 
       <div className="mx-auto max-w-6xl px-6 pt-8">
         <nav aria-label="Fil d'Ariane" className="flex items-center gap-2 text-xs text-neutral-400"><Link href="/" className="hover:text-emerald-700">Accueil</Link><ChevronRight className="h-3.5 w-3.5" /><span className="text-neutral-700">Campings van friendly</span></nav>

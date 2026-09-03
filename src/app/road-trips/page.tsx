@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, CalendarDays, ChevronRight, Compass, Map, MapPin, Mountain, Route, ShieldCheck, Sparkles, Waves } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { serializeJsonLd } from "@/lib/seo/json-ld";
 
 const title = "Road trip en van en France : 6 itinéraires incontournables";
 const description = "Préparez votre road trip en van en France : Bretagne, Alpes, Provence, Atlantique, Pyrénées et Corse, avec durées, saisons et conseils pratiques.";
@@ -41,9 +42,9 @@ export default function RoadTripsPage() {
 
   return (
     <main className="bg-white pb-24 pt-16 text-neutral-800">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(schema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(itemListSchema) }} />
       <div className="mx-auto max-w-6xl px-6 pt-8"><nav aria-label="Fil d’Ariane" className="flex items-center gap-2 text-xs text-neutral-400"><Link href="/" className="hover:text-emerald-700">Accueil</Link><ChevronRight className="h-3.5 w-3.5" /><span className="text-neutral-700">Itinéraires</span></nav></div>
 
       <header className="mx-auto grid max-w-6xl gap-10 px-6 py-12 lg:grid-cols-[.95fr_1.05fr] lg:items-center lg:py-16">

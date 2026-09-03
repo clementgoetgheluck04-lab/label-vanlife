@@ -42,7 +42,6 @@ enum StripeEventStatus {
 model User {
   id               String   @id @default(cuid())
   email            String   @unique
-  password         String?
   role             UserRole @default(VISITOR)
   stripeCustomerId String?  @unique
 
@@ -530,6 +529,7 @@ model CheckoutOrder {
   amount                  Int
   currency                String       @default("eur")
   payload                 Json?
+  labellisationDraftId    String?      @unique
   stripeCheckoutSessionId String?      @unique
   stripePaymentIntentId   String?      @unique
   paidAt                  DateTime?

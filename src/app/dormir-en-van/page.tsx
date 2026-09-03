@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Check, ChevronRight, CircleAlert, ExternalLink, Home, Info, MapPin, MoonStar, ShieldCheck, Smartphone, TentTree } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { serializeJsonLd } from "@/lib/seo/json-ld";
 
 const title = "Où dormir en van en France ? Règles et solutions";
 const description = "Voie publique, aires, campings, terrains privés et lieux labellisés : comparez les solutions pour dormir en van en France et préparez une étape sereine.";
@@ -58,7 +59,7 @@ export default function DormirEnVanPage() {
 
   return (
     <main className="bg-white pb-24 pt-16 text-neutral-800">
-      {schemas.map((schema, index) => <script key={index} type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />)}
+      {schemas.map((schema, index) => <script key={index} type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(schema) }} />)}
       <div className="mx-auto max-w-6xl px-6 pt-8"><nav aria-label="Fil d’Ariane" className="flex items-center gap-2 text-xs text-neutral-400"><Link href="/" className="hover:text-emerald-700">Accueil</Link><ChevronRight className="h-3.5 w-3.5" /><span className="text-neutral-700">Hébergement en van</span></nav></div>
 
       <header className="mx-auto grid max-w-6xl gap-10 px-6 py-12 lg:grid-cols-[.95fr_1.05fr] lg:items-center lg:py-16"><div className="animate-fade-in-up"><p className="text-xs font-bold uppercase tracking-[0.22em] text-[#9a7445]">Hébergement en van</p><h1 className="mt-4 text-4xl font-bold leading-[1.08] text-neutral-950 sm:text-6xl">Où dormir en van en France ?</h1><p className="mt-5 text-lg leading-8 text-neutral-600">C’est la question du premier soir. Les solutions sont nombreuses, mais leur cadre, leurs services et leurs règles ne sont pas identiques.</p><div className="mt-7 flex flex-wrap gap-2">{["Règles essentielles", "6 solutions comparées", "Lieux vérifiés"].map((tag) => <span key={tag} className="rounded-full border border-[#c39960]/30 bg-[#f7f1e8] px-3 py-1.5 text-xs font-semibold text-[#7d5d38]">{tag}</span>)}</div></div><div className="relative aspect-[4/3] overflow-hidden rounded-[2rem] shadow-2xl shadow-neutral-900/15"><Image src="/images/hero-label-vanlife.png" alt="Van installé pour une nuit dans un cadre naturel" fill priority sizes="(max-width: 1024px) 100vw, 52vw" className="object-cover" /><div className="absolute inset-0 bg-gradient-to-t from-black/35 to-transparent" /></div></header>

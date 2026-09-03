@@ -3,11 +3,12 @@ import { Prisma } from "@/generated/prisma/client";
 import { Resend } from "resend";
 import { MEMBER_EXPIRY_ISO, MEMBER_EXPIRY_LABEL } from "@/config/commercial";
 import { getPrisma } from "@/lib/prisma";
-import { getAppUrl, getTransactionalEmailFrom, requireServerEnv } from "@/server/env";
+import { getAppUrl, getTransactionalEmailFrom, requireSecretEnv, requireServerEnv } from "@/server/env";
 import { apiError } from "@/server/http";
 import { generateMemberAccessCode, hashMemberAccessCode, hashMemberAccessLookupCode } from "@/server/member-access";
-import { assertSameOrigin, enforceRateLimit } from "@/server/request-security";
+import { assertSameOrigin, enforceRateLimit, readJsonRequest } from "@/server/request-security";
 import { parseEmail } from "@/server/validation";
+import { labelVanlifeEmail } from "@/server/email-template";
 
 const GENERIC_MESSAGE = "Si une carte membre active correspond à cette adresse, un nouveau code vient d’être envoyé.";
 
@@ -15,7 +16,7 @@ export async function POST(request: NextRequest) {
   try {
     assertSameOrigin(request);
     enforceRateLimit(request, "resend-member-code", 3, 60 * 60 * 1_000);
-    const body = await request.json() as Record<string, unknown>;
+    const body = await readJsonRequest(request, 4_096) as Record<string, unknown>;
     const email = parseEmail(body.email);
     if (!email) return NextResponse.json({ success: true, message: GENERIC_MESSAGE });
 
@@ -39,7 +40,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: true, message: GENERIC_MESSAGE });
     }
 
-    const secret = requireServerEnv("MEMBER_ACCESS_CODE_SECRET");
+    const secret = requireSecretEnv("MEMBER_ACCESS_CODE_SECRET");
     const code = generateMemberAccessCode();
     const payload = order.payload && typeof order.payload === "object" && !Array.isArray(order.payload)
       ? { ...(order.payload as Record<string, unknown>) }
@@ -52,6 +53,16 @@ export async function POST(request: NextRequest) {
       to: email,
       subject: "Votre nouveau code d’accès Label Vanlife",
       text: `Bonjour ${user.profile?.firstName || ""},\n\nVoici votre nouveau code d'accès personnel : ${code}\n\nIl remplace le précédent et reste valable jusqu'au ${MEMBER_EXPIRY_LABEL}, comme votre Carte membre.\n\nConnexion : ${getAppUrl()}/member-login\n\nL'équipe Label Vanlife`,
+      html: labelVanlifeEmail({
+        preheader: "Votre nouveau code personnel Label Vanlife",
+        eyebrow: "ACCÈS MEMBRE SÉCURISÉ",
+        title: "Votre nouveau code d’accès",
+        greeting: `Bonjour ${user.profile?.firstName || ""},`,
+        paragraphs: ["Voici le nouveau code à utiliser pour vous connecter à votre espace membre. Il remplace immédiatement le précédent."],
+        code,
+        action: { label: "Ouvrir l’espace membre", href: `${getAppUrl()}/member-login` },
+        notice: `Ce code est personnel et reste valable jusqu’au ${MEMBER_EXPIRY_LABEL}, comme votre Carte membre.`,
+      }),
     });
     if (error) {
       console.error("[resend-member-code] email failed", error.message || error.name);

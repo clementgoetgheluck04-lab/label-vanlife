@@ -2,10 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { Prisma } from "@/generated/prisma/client";
 import { getPrisma } from "@/lib/prisma";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { getAppUrl, requireServerEnv } from "@/server/env";
+import { getAppUrl, requireSecretEnv } from "@/server/env";
 import { apiError } from "@/server/http";
 import { hashMemberAccessLookupCode, memberAccessCodeMatches, normalizeMemberAccessCode } from "@/server/member-access";
-import { assertSameOrigin, enforceRateLimit } from "@/server/request-security";
+import { assertSameOrigin, enforceRateLimit, readJsonRequest } from "@/server/request-security";
 import { ADMIN_PREVIEW_COOKIE, adminPreviewCodeMatches, getAdminPreviewCookieValue, isLocalPreviewHost } from "@/server/admin-preview";
 
 export const dynamic = "force-dynamic";
@@ -14,11 +14,11 @@ export async function POST(request: NextRequest) {
   try {
     assertSameOrigin(request);
     enforceRateLimit(request, "member-access-code", 8, 15 * 60 * 1_000);
-    const body = await request.json() as Record<string, unknown>;
+    const body = await readJsonRequest(request, 4_096) as Record<string, unknown>;
     const rawCode = typeof body.code === "string" ? body.code : "";
     const requestHost = (request.headers.get("host") || "").split(":")[0];
     const localAdminPreview = isLocalPreviewHost(request.nextUrl.hostname) || isLocalPreviewHost(requestHost);
-    const validAdminPreviewCode = adminPreviewCodeMatches(rawCode);
+    const validAdminPreviewCode = localAdminPreview && adminPreviewCodeMatches(rawCode);
     if (validAdminPreviewCode) {
       const response = NextResponse.json({ url: "/member", preview: true }, { headers: { "Cache-Control": "no-store" } });
       response.cookies.set(ADMIN_PREVIEW_COOKIE, getAdminPreviewCookieValue(), {
@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
     }
 
     const prisma = getPrisma();
-    const secret = requireServerEnv("MEMBER_ACCESS_CODE_SECRET");
+    const secret = requireSecretEnv("MEMBER_ACCESS_CODE_SECRET");
     const lookupHash = hashMemberAccessLookupCode(code, secret);
     const order = await prisma.checkoutOrder.findFirst({
       where: {

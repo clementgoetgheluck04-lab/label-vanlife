@@ -117,6 +117,7 @@ export type LabellisationPayload = {
   photoFileNames?: string[];
   draftId?: string;
   attachmentPaths?: string[];
+  draftToken?: string;
 };
 
 const PLACE_TYPES = new Set([
@@ -222,6 +223,9 @@ export function parseLabellisationPayload(value: unknown): LabellisationPayload 
   const attachmentPaths = Array.isArray(input.attachmentPaths)
     ? input.attachmentPaths.filter((item): item is string => typeof item === "string" && /^pending\/[0-9a-f-]{36}\/[a-z0-9.-]+$/i.test(item)).slice(0, 5)
     : [];
+  const draftToken = typeof input.draftToken === "string" && /^\d{13}\.[A-Za-z0-9_-]{43}$/.test(input.draftToken)
+    ? input.draftToken
+    : "";
   const criteria: NonNullable<LabellisationPayload["criteria"]> = {};
   if (input.criteria && typeof input.criteria === "object" && !Array.isArray(input.criteria)) {
     for (const [id, raw] of Object.entries(input.criteria as Record<string, unknown>).slice(0, 22)) {
@@ -255,6 +259,6 @@ export function parseLabellisationPayload(value: unknown): LabellisationPayload 
     familyPitchNumbers: familyPitchNumbers || "", capacityCouples, capacityFamilies,
     bookingUrl, bookingSoftware: bookingSoftware || "", bookingChannelManager: bookingChannelManager || "", activities: activities || "",
     discoveryUrl, foodOptions: foodOptions || "", practicalInfo: practicalInfo || "", photoFileNames,
-    draftId, attachmentPaths,
+    draftId, attachmentPaths, draftToken,
   };
 }
