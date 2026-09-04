@@ -41,3 +41,13 @@ test("labellisation journey keeps dossier, Stripe, webhook and both emails conne
   assert.match(contact, /contact@labelvanlife\.fr/);
   assert.doesNotMatch(webhook, /contact@labelvanlife\.com/);
 });
+
+test("commercial campaign previews stay limited to the requested test inbox", () => {
+  const lifecycle = source("../src/app/api/cron/member-lifecycle-emails/route.ts");
+
+  assert.match(lifecycle, /body\.mode === "commercial-preview"/);
+  assert.match(lifecycle, /to: previewEmail/);
+  assert.match(lifecycle, /\[TEST À VALIDER\] Votre renouvellement partenaire 2027 est offert/);
+  assert.match(lifecycle, /\[TEST À VALIDER\] Votre Carte ambassadeur 2027 est offerte/);
+  assert.match(lifecycle, /Aucun paiement et aucun renouvellement automatique/);
+});

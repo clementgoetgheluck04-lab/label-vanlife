@@ -137,6 +137,72 @@ async function sendSimulationEmails(customerEmail: string) {
   return { sent: results.length - errors.length, failed: errors.length, errors };
 }
 
+async function sendCommercialPreviewEmails(previewEmail: string) {
+  const resend = new Resend(requireServerEnv("RESEND_API_KEY"));
+  const from = getTransactionalEmailFrom();
+  const appUrl = getAppUrl();
+  const replyTo = "contact@labelvanlife.com";
+
+  const messages = [
+    resend.emails.send({
+      from,
+      to: previewEmail,
+      replyTo,
+      subject: "[TEST À VALIDER] Votre renouvellement partenaire 2027 est offert",
+      text: `Bonjour [Prénom / Nom du lieu],\n\nVous faites partie des 26 premiers lieux labellisés Label Vanlife. Votre confiance a contribué à lancer le réseau et nous souhaitons vous remercier en vous offrant votre renouvellement pour 2027.\n\nPour l'activer, nous vous demanderons simplement de vérifier les informations de votre fiche, de confirmer l'avantage réservé aux membres, de nous partager votre retour d'expérience 2026 et, si vous le souhaitez, de nous autoriser à publier un court témoignage.\n\nAucun paiement n'est nécessaire. Répondez à cet email pour confirmer votre participation et nous vous accompagnerons dans la mise à jour de votre fiche.\n\nMerci de faire partie des lieux fondateurs de Label Vanlife.\n\nL'équipe Label Vanlife`,
+      html: labelVanlifeEmail({
+        preheader: "Votre renouvellement partenaire Label Vanlife 2027 est offert",
+        eyebrow: "TEST À VALIDER — PARTENAIRES 2027",
+        title: "Votre renouvellement partenaire 2027 est offert",
+        greeting: "Bonjour [Prénom / Nom du lieu],",
+        paragraphs: [
+          "Vous faites partie des 26 premiers lieux labellisés Label Vanlife. Votre confiance a contribué à lancer le réseau et nous souhaitons vous remercier en vous offrant votre renouvellement pour 2027.",
+          "Pour l’activer, nous vous demanderons simplement de vérifier les informations de votre fiche, de confirmer l’avantage réservé aux membres et de nous partager votre retour d’expérience 2026. Si vous le souhaitez, nous pourrons aussi publier un court témoignage avec votre accord.",
+        ],
+        details: [
+          { label: "Renouvellement 2027", value: "Offert" },
+          { label: "À confirmer", value: "Fiche, avantage membre et retour 2026" },
+        ],
+        action: { label: "Répondre pour confirmer", href: "mailto:contact@labelvanlife.com?subject=Renouvellement%20partenaire%202027" },
+        notice: "Cette offre est réservée aux 26 lieux déjà labellisés. Aucun paiement n’est nécessaire.",
+      }),
+    }),
+    resend.emails.send({
+      from,
+      to: previewEmail,
+      replyTo,
+      subject: "[TEST À VALIDER] Votre Carte ambassadeur 2027 est offerte",
+      text: `Bonjour [Prénom],\n\nVous faites partie des tout premiers membres de Label Vanlife. Pour vous remercier et construire la meilleure expérience possible, nous souhaitons vous offrir votre Carte ambassadeur 2027.\n\nEn échange, nous vous proposons de tester réellement votre espace membre, la MAP, votre carte numérique et la présentation des avantages, puis de répondre à cinq questions très courtes :\n\n1. L'utilisation du site vous paraît-elle simple ?\n2. La MAP vous aide-t-elle à choisir un lieu ?\n3. Les avantages membres sont-ils faciles à comprendre ?\n4. Avez-vous rencontré un problème ou un blocage ?\n5. Recommanderiez-vous Label Vanlife à un autre vanlifer ?\n\nVous pouvez répondre directement à cet email. Aucun paiement et aucun renouvellement automatique ne seront déclenchés.\n\nMerci de nous aider à construire Label Vanlife avec ses premiers membres.\n\nL'équipe Label Vanlife`,
+      html: labelVanlifeEmail({
+        preheader: "Rejoignez le groupe pilote des membres ambassadeurs 2027",
+        eyebrow: "TEST À VALIDER — MEMBRES AMBASSADEURS",
+        title: "Votre Carte ambassadeur 2027 est offerte",
+        greeting: "Bonjour [Prénom],",
+        paragraphs: [
+          "Vous faites partie des tout premiers membres de Label Vanlife. Pour vous remercier et construire la meilleure expérience possible, nous souhaitons vous offrir votre Carte ambassadeur 2027.",
+          "En échange, testez réellement votre espace membre, la MAP, votre carte numérique et la présentation des avantages, puis répondez simplement à ces cinq questions :\n\n1. L’utilisation du site vous paraît-elle simple ?\n2. La MAP vous aide-t-elle à choisir un lieu ?\n3. Les avantages membres sont-ils faciles à comprendre ?\n4. Avez-vous rencontré un problème ou un blocage ?\n5. Recommanderiez-vous Label Vanlife à un autre vanlifer ?",
+        ],
+        details: [
+          { label: "Carte ambassadeur 2027", value: "Offerte" },
+          { label: "Votre contribution", value: "Un test réel et 5 réponses courtes" },
+        ],
+        action: { label: "Tester mon espace membre", href: `${appUrl}/member-login` },
+        notice: "Répondez directement à cet email avec votre retour. Aucun paiement et aucun renouvellement automatique.",
+      }),
+    }),
+  ];
+
+  const results = await Promise.allSettled(messages);
+  const errors = results
+    .map((result) => {
+      if (result.status === "rejected") return result.reason instanceof Error ? result.reason.message : "Email failed";
+      return result.value.error?.message || null;
+    })
+    .filter((message): message is string => Boolean(message));
+
+  return { sent: results.length - errors.length, failed: errors.length, errors };
+}
+
 async function runDueLifecycleEmails() {
   const prisma = getPrisma();
   const resend = new Resend(requireServerEnv("RESEND_API_KEY"));
@@ -237,6 +303,8 @@ export async function POST(request: NextRequest) {
   const body = await readJsonRequest(request, 4_096) as Record<string, unknown>;
   const customerEmail = parseEmail(body.customerEmail);
   if (!customerEmail) return NextResponse.json({ error: "Invalid customerEmail" }, { status: 400 });
-  const result = await sendSimulationEmails(customerEmail);
+  const result = body.mode === "commercial-preview"
+    ? await sendCommercialPreviewEmails(customerEmail)
+    : await sendSimulationEmails(customerEmail);
   return NextResponse.json({ success: result.failed === 0, ...result }, { headers: { "Cache-Control": "no-store" } });
 }
