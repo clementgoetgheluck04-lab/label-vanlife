@@ -7,7 +7,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
-import { LABEL_VALIDITY_TEXT } from "@/config/commercial";
+import { LABEL_NORMAL_PRICE, LABEL_PRICE, LABEL_VALIDITY_TEXT } from "@/config/commercial";
 import { SITE_STATS } from "@/config/site-stats";
 
 export default function LabellisationPage() {
@@ -33,6 +33,15 @@ export default function LabellisationPage() {
               <Button variant="primary" size="lg" className="gap-2 text-base px-8" onClick={() => router.push("/labellisation/candidature")}>
                 Candidater au Label <ArrowRight className="w-5 h-5" />
               </Button>
+            </div>
+            <div className="mx-auto inline-flex flex-col items-center rounded-2xl border border-amber-200 bg-white px-6 py-4 shadow-sm">
+              <span className="text-xs font-bold uppercase tracking-[0.16em] text-amber-700">Offre de lancement 2026 · nombre de places limité</span>
+              <p className="mt-2 flex items-end justify-center gap-3">
+                <span className="pb-1 text-xl font-semibold text-neutral-400 line-through">{LABEL_NORMAL_PRICE} €</span>
+                <strong className="text-4xl font-black text-neutral-900">{LABEL_PRICE} €</strong>
+                <span className="pb-1 text-sm text-neutral-500">paiement unique</span>
+              </p>
+              <span className="mt-1 text-xs text-neutral-500">Dans la limite des places disponibles.</span>
             </div>
             <p className="text-xs font-semibold text-neutral-500">{LABEL_VALIDITY_TEXT}</p>
           </div>
@@ -282,7 +291,7 @@ export default function LabellisationPage() {
           <div className="absolute inset-0 bg-gradient-to-br from-emerald-500 via-emerald-600 to-emerald-700" />
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-amber-500/10 via-transparent to-transparent" />
           <div className="relative z-10 text-center px-6 max-w-lg mx-auto">
-            <span className="inline-block px-4 py-1.5 bg-white/10 rounded-full text-white/80 text-xs font-semibold tracking-wide mb-4">Offre exceptionnelle 2026</span>
+            <span className="inline-block px-4 py-1.5 bg-white/10 rounded-full text-white/80 text-xs font-semibold tracking-wide mb-4">Offre exceptionnelle 2026 · nombre de places limité</span>
             <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4" style={{ fontFamily: "Outfit, sans-serif" }}>Prêt à développer votre activité ?</h2>
             <p className="text-white/70 mb-8">Candidatez dès maintenant. Notre équipe vous recontactera sous 10 jours pour échanger sur votre lieu.</p>
             <div className="flex flex-wrap justify-center gap-3 mb-8">
@@ -293,6 +302,7 @@ export default function LabellisationPage() {
             <Button variant="cta" size="lg" className="text-base px-10 shadow-xl shadow-amber-500/25" onClick={() => router.push("/labellisation/candidature")}>
               Remplir le formulaire de candidature <ArrowRight className="h-4 w-4 ml-2" />
             </Button>
+            <p className="mt-5 text-white"><span className="mr-2 text-lg text-white/45 line-through">{LABEL_NORMAL_PRICE} €</span><strong className="text-3xl">{LABEL_PRICE} €</strong> <span className="text-sm text-white/70">paiement unique</span></p>
             <p className="text-white/60 text-xs mt-4">{LABEL_VALIDITY_TEXT} · Remboursement intégral en cas de non-conformité.</p>
           </div>
         </section>

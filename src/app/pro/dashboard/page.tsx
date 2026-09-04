@@ -119,7 +119,7 @@ export default function ProDashboard() {
               </div>
               <div>
                 <p className="font-semibold text-neutral-900">Obtenir le label</p>
-                <p className="text-sm text-neutral-500">Offre 2026 — 110€ au lieu de 220€</p>
+                <p className="text-sm text-neutral-500">Offre limitée 2026 — 110€ au lieu de 290€</p>
               </div>
             </Card>
           </Link>

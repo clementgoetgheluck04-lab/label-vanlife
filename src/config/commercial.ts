@@ -20,7 +20,7 @@ export const MEMBER_NORMAL_PRICE_TEXT = `${MEMBER_NORMAL_PRICE} €`;
 export const MEMBER_DISCOUNT_TEXT = `${MEMBER_DISCOUNT_MIN} à ${MEMBER_DISCOUNT_MAX} %`;
 
 export const LABEL_PRICE = 110;
-export const LABEL_NORMAL_PRICE = 220;
+export const LABEL_NORMAL_PRICE = 290;
 export const LABEL_PRICE_CENTS = LABEL_PRICE * 100;
 export const LABEL_NORMAL_PRICE_CENTS = LABEL_NORMAL_PRICE * 100;
-export const LABEL_VALIDITY_TEXT = "Candidature gratuite · Étude 110 € en 2026 · 0 % de commission";
+export const LABEL_VALIDITY_TEXT = "Candidature gratuite · Étude 110 € au lieu de 290 € · Nombre de places limité · 0 % de commission";
