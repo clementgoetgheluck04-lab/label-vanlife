@@ -37,10 +37,10 @@ export default function LabellisationPage() {
             <div className="mx-auto inline-flex flex-col items-center rounded-2xl border border-amber-200 bg-white px-6 py-4 shadow-sm">
               <span className="text-xs font-bold uppercase tracking-[0.16em] text-amber-700">Offre de lancement 2026 · nombre de places limité</span>
               <p className="mt-2 flex items-end justify-center gap-3">
-                <span className="pb-1 text-xl font-semibold text-neutral-400 line-through">{LABEL_NORMAL_PRICE} €</span>
                 <strong className="text-4xl font-black text-neutral-900">{LABEL_PRICE} €</strong>
                 <span className="pb-1 text-sm text-neutral-500">paiement unique</span>
               </p>
+              <span className="mt-1 text-xs font-semibold text-amber-800">Tarif public 2027 annoncé : {LABEL_NORMAL_PRICE} €</span>
               <span className="mt-1 text-xs text-neutral-500">Dans la limite des places disponibles.</span>
             </div>
             <p className="text-xs font-semibold text-neutral-500">{LABEL_VALIDITY_TEXT}</p>
@@ -302,7 +302,8 @@ export default function LabellisationPage() {
             <Button variant="cta" size="lg" className="text-base px-10 shadow-xl shadow-amber-500/25" onClick={() => router.push("/labellisation/candidature")}>
               Remplir le formulaire de candidature <ArrowRight className="h-4 w-4 ml-2" />
             </Button>
-            <p className="mt-5 text-white"><span className="mr-2 text-lg text-white/45 line-through">{LABEL_NORMAL_PRICE} €</span><strong className="text-3xl">{LABEL_PRICE} €</strong> <span className="text-sm text-white/70">paiement unique</span></p>
+            <p className="mt-5 text-white"><strong className="text-3xl">{LABEL_PRICE} €</strong> <span className="text-sm text-white/70">paiement unique</span></p>
+            <p className="mt-1 text-xs font-semibold text-[#f0d6ad]">Tarif public 2027 annoncé : {LABEL_NORMAL_PRICE} €</p>
             <p className="text-white/60 text-xs mt-4">{LABEL_VALIDITY_TEXT} · Remboursement intégral en cas de non-conformité.</p>
           </div>
         </section>

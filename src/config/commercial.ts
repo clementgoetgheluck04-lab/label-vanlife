@@ -23,4 +23,4 @@ export const LABEL_PRICE = 110;
 export const LABEL_NORMAL_PRICE = 290;
 export const LABEL_PRICE_CENTS = LABEL_PRICE * 100;
 export const LABEL_NORMAL_PRICE_CENTS = LABEL_NORMAL_PRICE * 100;
-export const LABEL_VALIDITY_TEXT = "Candidature gratuite · Étude 110 € au lieu de 290 € · Nombre de places limité · 0 % de commission";
+export const LABEL_VALIDITY_TEXT = "Candidature gratuite · Offre fondateur 2026 : 110 € · Tarif public 2027 annoncé : 290 € · Nombre de places limité · 0 % de commission";

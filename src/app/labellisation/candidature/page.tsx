@@ -379,7 +379,7 @@ export default function CandidaturePage() {
           </div>
           {!canContinue && <p className="mt-3 text-center text-xs text-neutral-500">{missingMessage}</p>}
         </Card>
-        <div className="grid gap-3 text-center text-xs text-neutral-500 sm:grid-cols-3"><p>✓ Aucune commission</p><p>✓ Dossier enregistré avant paiement</p><p>✓ Offre limitée : 110 € au lieu de 290 €</p></div>
+        <div className="grid gap-3 text-center text-xs text-neutral-500 sm:grid-cols-3"><p>✓ Aucune commission</p><p>✓ Dossier enregistré avant paiement</p><p>✓ Offre fondateur 2026 : 110 € · Tarif public 2027 annoncé : 290 €</p></div>
       </div>
     </main>
   );
