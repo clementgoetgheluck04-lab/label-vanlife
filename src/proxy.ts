@@ -1,12 +1,14 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { ADMIN_PREVIEW_COOKIE, isAdminPreviewCookie } from "@/server/admin-preview";
+import { KIT_ACCESS_COOKIE, hasValidKitAccess } from "@/lib/kit-access-token";
 
 const PUBLIC_ROUTES = [
   "/", "/explorer", "/le-label", "/labellisation", "/devenir-membre",
   "/member-login", "/membre", "/lieux", "/lieux-reperes", "/mentions-legales",
   "/politique-confidentialite", "/blog", "/evenements", "/marketplace",
   "/road-trips", "/offline",
+  "/kit-communication-2027",
 ];
 
 function isPublicPath(pathname: string): boolean {
@@ -14,7 +16,7 @@ function isPublicPath(pathname: string): boolean {
 }
 
 function isSensitivePath(pathname: string): boolean {
-  return ["/member", "/admin", "/pro"].some(
+  return ["/member", "/admin", "/pro", "/kit-communication-2027", "/kits"].some(
     (route) => pathname === route || pathname.startsWith(`${route}/`),
   );
 }
@@ -73,6 +75,17 @@ export async function proxy(request: NextRequest) {
   }
 
   const nextResponse = () => NextResponse.next({ request: { headers: requestHeaders } });
+  if (request.nextUrl.pathname.startsWith("/kits/")) {
+    const authorized = hasValidKitAccess(request.cookies.get(KIT_ACCESS_COOKIE)?.value);
+    if (!authorized) {
+      return withDeploymentHeaders(
+        NextResponse.redirect(new URL("/kit-communication-2027", request.url)),
+        request,
+        contentSecurityPolicy,
+      );
+    }
+    return withDeploymentHeaders(nextResponse(), request, contentSecurityPolicy);
+  }
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   if (!url || !key) {
@@ -119,6 +132,7 @@ export async function proxy(request: NextRequest) {
 
 export const config = {
   matcher: [
+    "/kits/:path*",
     "/((?!api|auth|_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt|manifest.json|sw.js|.*\\.(?:svg|png|jpg|jpeg|gif|webp|avif|ico)$).*)",
   ],
 };

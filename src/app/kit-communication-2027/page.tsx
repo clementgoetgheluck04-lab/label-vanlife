@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import { cookies } from "next/headers";
 import { ArrowLeft, Download, ExternalLink, MessageCircle } from "lucide-react";
+import { KIT_ACCESS_COOKIE, hasValidKitAccess } from "@/lib/kit-access-token";
+import KitAccessGate from "./KitAccessGate";
 
 export const metadata: Metadata = {
   title: "Kit de communication 2027 | Label Vanlife",
@@ -48,7 +51,14 @@ const ASSETS = [
   },
 ] as const;
 
-export default function KitCommunication2027Page() {
+export default async function KitCommunication2027Page({ searchParams }: { searchParams: Promise<{ erreur?: string }> }) {
+  const cookieStore = await cookies();
+  const authorized = hasValidKitAccess(cookieStore.get(KIT_ACCESS_COOKIE)?.value);
+  if (!authorized) {
+    const query = await searchParams;
+    return <KitAccessGate invalidLink={Boolean(query.erreur)} />;
+  }
+
   return (
     <main className="min-h-screen bg-[#eef1eb] px-4 py-10 text-[#20332b] sm:py-16">
       <div className="mx-auto max-w-5xl">
@@ -75,6 +85,9 @@ export default function KitCommunication2027Page() {
           />
 
           <div className="px-6 py-9 sm:px-10 sm:py-12">
+            <div className="mb-6 rounded-2xl border border-emerald-200 bg-emerald-50 px-5 py-4 text-sm font-semibold text-emerald-900">
+              Accès partenaire vérifié · Les fichiers sont réservés aux lieux labellisés Label Vanlife.
+            </div>
             <div className="rounded-3xl border border-[#e7dcc1] bg-[#f5f0e3] p-6 text-center sm:p-8">
               <h2 className="text-2xl font-bold text-[#173e32]">Tout télécharger en une fois</h2>
               <p className="mx-auto mt-2 max-w-xl text-sm leading-relaxed text-neutral-600 sm:text-base">

@@ -7,7 +7,7 @@ export type PlaceContact = {
 // Coordonnées publiques vérifiées dans les pages enregistrées fournies avec la V1.
 // Les adresses Label Vanlife et les valeurs de démonstration ont été exclues.
 const CONTACTS: Record<string, PlaceContact> = {
-  "camping-au-tylo-soleil": { website: "https://autylosoleil.fr/" },
+  "camping-au-tylo-soleil": { website: "https://autylosoleil.fr/", email: "contact@autylosoleil.fr" },
   "camping-bon-sejour": { website: "https://camping-bonsejour.fr/", email: "contact@camping-bonsejour.fr", phone: "+33466514711" },
   "camping-de-fontenoy": { website: "https://www.campingfontenoy.com/", email: "camping.fontenoylechateau@outlook.fr", phone: "+33329363474" },
   "camping-de-gracay": { website: "https://www.camping-berry.com/", email: "contact@campingdegracay.com", phone: "+33681993766" },
@@ -37,4 +37,11 @@ const CONTACTS: Record<string, PlaceContact> = {
 
 export function getPlaceContact(placeId: string): PlaceContact {
   return CONTACTS[placeId] ?? {};
+}
+
+export function getLabelledPlaceByEmail(email: string): { placeId: string; contact: PlaceContact } | undefined {
+  const normalized = email.trim().toLowerCase();
+  if (!normalized) return undefined;
+  const entry = Object.entries(CONTACTS).find(([, contact]) => contact.email?.trim().toLowerCase() === normalized);
+  return entry ? { placeId: entry[0], contact: entry[1] } : undefined;
 }
