@@ -1,5 +1,6 @@
 export type RichPlaceDetails = {
   labelYear: number;
+  labelYears?: number[];
   displayType?: string;
   displayAddress?: string;
   contactName?: string;
@@ -511,6 +512,7 @@ const RICH_PLACE_DETAILS: Record<string, RichPlaceDetails> = {
   },
   "camping-le-coin-charmant": {
     labelYear: 2026,
+    labelYears: [2026, 2027],
     displayType: "Camping 3 étoiles",
     displayAddress: "1050 chemin des Digues, 07120 Chauzon",
     facebookUrl: "https://www.facebook.com/campinglecoincharmant",
@@ -956,6 +958,22 @@ const RICH_PLACE_DETAILS: Record<string, RichPlaceDetails> = {
 
 export function getRichPlaceDetails(placeId: string): RichPlaceDetails | undefined {
   return RICH_PLACE_DETAILS[placeId];
+}
+
+export function getVisibleLabelYears(details: RichPlaceDetails, now = new Date()): number[] {
+  const years = [...new Set(details.labelYears ?? [details.labelYear])].sort((a, b) => a - b);
+  if (years.length <= 1) return years;
+
+  const currentYear = Number(
+    new Intl.DateTimeFormat("en", { year: "numeric", timeZone: "Europe/Paris" }).format(now),
+  );
+  const newestYear = years[years.length - 1];
+
+  // Pendant l'année de renouvellement, les deux millésimes restent visibles.
+  // À partir du 1er janvier du nouveau millésime, seul celui-ci est affiché.
+  if (currentYear >= newestYear) return [newestYear];
+
+  return years.filter((year) => year >= currentYear);
 }
 
 function escapeRegExp(value: string): string {

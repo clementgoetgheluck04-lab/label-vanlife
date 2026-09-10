@@ -33,7 +33,7 @@ import { ENRICHED_LIEUX } from "@/data/enriched-lieux";
 import { getPlaceContact } from "@/data/place-contacts";
 import { getPlaceMedia } from "@/data/place-media";
 import { cleanSourceActivities, cleanSourceCapacity, cleanSourceOpeningHours, getLabelledSourceDetails } from "@/data/labelled-source-details";
-import { getPublicRichPlaceDetails, getRichPlaceDetails } from "@/data/rich-place-details";
+import { getPublicRichPlaceDetails, getRichPlaceDetails, getVisibleLabelYears } from "@/data/rich-place-details";
 import { getVerifiedPlaceGps } from "@/data/verified-place-gps";
 import { hasActiveMemberAccess } from "@/server/auth";
 
@@ -84,6 +84,7 @@ export default async function LieuDetailPage({ params }: { params: Promise<{ id:
     ? getRichPlaceDetails(lieu.id)
     : getPublicRichPlaceDetails(lieu.id);
   const sourceDetails = getLabelledSourceDetails(lieu.id);
+  const visibleLabelYears = richDetails ? getVisibleLabelYears(richDetails) : [];
   const phones = [...new Set([verifiedContact.phone, lieu.telephone, ...sourceDetails.flatMap((source) => source.phones ?? [])].filter((value): value is string => Boolean(value)))];
   const emails = [...new Set([verifiedContact.email, lieu.email, ...sourceDetails.flatMap((source) => source.emails ?? [])].filter((value): value is string => Boolean(value)))];
   const contactNames = [...new Set([richDetails?.contactName, ...sourceDetails.map((source) => source.contactName)].filter((value): value is string => Boolean(value)))];
@@ -164,7 +165,7 @@ export default async function LieuDetailPage({ params }: { params: Promise<{ id:
           <div className="flex-1">
             <div className="flex flex-wrap items-center gap-2">
               <h2 className="text-2xl font-bold text-neutral-900">{lieu.nom}</h2>
-              <span className="rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-[11px] font-bold tracking-wide text-emerald-700">LABELLISÉ LABEL VANLIFE{richDetails?.labelYear ? ` · ${richDetails.labelYear}` : ""}</span>
+              <span className="rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-[11px] font-bold tracking-wide text-emerald-700">LABELLISÉ LABEL VANLIFE{visibleLabelYears.length ? ` · ${visibleLabelYears.join(" · ")}` : ""}</span>
             </div>
             <div className="mt-2 flex items-center gap-1 text-sm text-neutral-500">
               <Star className="h-4 w-4 fill-[#c39960] text-[#c39960]" />

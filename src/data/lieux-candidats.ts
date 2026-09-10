@@ -92,17 +92,6 @@ export const LIEUX_CANDIDATS: LieuCandidat[] = [
     avisCount: 41,
   },
   {
-    id: "candidat-coin-charmant",
-    nom: "Camping Le Coin Charmant",
-    type: "camping",
-    ville: "Villefort",
-    region: "Occitanie",
-    description: "Petit camping de montagne au bord du lac de Villefort. Calme, nature, pêche et randonnée. Accueil vanlife authentique.",
-    photoUrl: "",
-    note: 4.4,
-    avisCount: 56,
-  },
-  {
     id: "candidat-bon-sejour",
     nom: "Camping Bon Séjour",
     type: "camping",

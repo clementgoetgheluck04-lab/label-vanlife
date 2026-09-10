@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { getPublicRichPlaceDetails, getRichPlaceDetails } from "../src/data/rich-place-details.ts";
+import { getPublicRichPlaceDetails, getRichPlaceDetails, getVisibleLabelYears } from "../src/data/rich-place-details.ts";
 
 test("les codes promotionnels ne sont jamais exposés dans les données publiques", () => {
   const protectedPlaces = [
@@ -234,6 +234,9 @@ test("la fiche enrichie du Coin Charmant contient les périodes membres et le li
   const details = getRichPlaceDetails("camping-le-coin-charmant");
   assert.ok(details);
   assert.equal(details.labelYear, 2026);
+  assert.deepEqual(details.labelYears, [2026, 2027]);
+  assert.deepEqual(getVisibleLabelYears(details, new Date("2026-12-31T22:59:59Z")), [2026, 2027]);
+  assert.deepEqual(getVisibleLabelYears(details, new Date("2026-12-31T23:00:00Z")), [2027]);
   assert.equal(details.discountInstructions?.length, 2);
   assert.equal(details.openingMonths?.length, 6);
   assert.equal(details.activities?.length, 7);
