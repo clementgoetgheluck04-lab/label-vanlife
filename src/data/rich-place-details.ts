@@ -73,6 +73,7 @@ const RICH_PLACE_DETAILS: Record<string, RichPlaceDetails> = {
   },
   "camping-le-verger": {
     labelYear: 2026,
+    labelYears: [2026, 2027],
     displayAddress: "27 Rue Jean-Pierre Pigot - Bellecroix, 17139 Dompierre-sur-Mer",
     facebookUrl: "https://www.facebook.com/CampingLeVerger17",
     discountInstructions: [
