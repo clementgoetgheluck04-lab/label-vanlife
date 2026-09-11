@@ -7,6 +7,7 @@ const SECRET = "test-secret-with-more-than-thirty-two-characters";
 
 test("le kit reconnaît uniquement les adresses professionnelles labellisées", () => {
   assert.equal(getLabelledPlaceByEmail(" CAMPINGLECOINCHARMANT@GMAIL.COM ")?.placeId, "camping-le-coin-charmant");
+  assert.equal(getLabelledPlaceByEmail("CONTACT@CAMPINGLEVERGER17.COM")?.contact.contactName, "Élise");
   assert.equal(getLabelledPlaceByEmail("inconnu@example.com"), undefined);
 });
 

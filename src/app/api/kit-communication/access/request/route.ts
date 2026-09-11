@@ -22,6 +22,7 @@ export async function POST(request: NextRequest) {
     const labelledPlace = getLabelledPlaceByEmail(email);
     if (labelledPlace) {
       const placeName = ENRICHED_LIEUX.find((place) => place.id === labelledPlace.placeId)?.nom || "votre établissement";
+      const greetingName = labelledPlace.contact.contactName || placeName;
       const token = signKitAccessToken({
         version: 1,
         kind: "magic-link",
@@ -35,16 +36,25 @@ export async function POST(request: NextRequest) {
         from: getTransactionalEmailFrom(),
         to: email,
         replyTo: "contact@labelvanlife.com",
-        subject: "Votre accès au kit partenaire Label Vanlife 2027",
-        text: `Bonjour,\n\nVoici le lien sécurisé permettant à ${placeName} d’accéder au kit de communication Label Vanlife 2027 :\n${accessUrl}\n\nCe lien expire dans 15 minutes.\n\nL’équipe Label Vanlife`,
+        subject: `${placeName} — votre kit de communication Label Vanlife 2027`,
+        text: `Bonjour ${greetingName},\n\nMerci de poursuivre l’aventure avec Label Vanlife. Le renouvellement 2027 de ${placeName} est confirmé. Votre fiche affiche les millésimes 2026 et 2027 ; le millésime 2026 disparaîtra automatiquement le 1er janvier 2027.\n\nVotre kit contient les six visuels officiels 2027, prêts pour votre site, vos réseaux sociaux, vos newsletters et vos supports imprimés. Vous pouvez également placer le logo dans le pied de page de votre site et rendre l’image cliquable vers https://www.labelvanlife.fr/.\n\nAccéder au kit :\n${accessUrl}\n\nCe lien personnel expire dans 15 minutes. Après ouverture, l’accès restera actif pendant 30 jours sur le même appareil.\n\nVotre fiche : https://www.labelvanlife.fr/lieux/${labelledPlace.placeId}\nPage Facebook : https://www.facebook.com/labelvanlife\n\nBelle saison 2027 à vos côtés,\nL’équipe Label Vanlife`,
         html: labelVanlifeEmail({
-          preheader: "Votre lien sécurisé vers le kit partenaire 2027",
-          eyebrow: "ESPACE PARTENAIRE 2027",
-          title: "Accédez à votre kit de communication",
-          greeting: `Bonjour ${placeName},`,
-          paragraphs: ["Votre adresse professionnelle a bien été reconnue parmi les lieux labellisés Label Vanlife."],
+          preheader: `Le renouvellement 2027 de ${placeName} est confirmé : découvrez vos six visuels officiels.`,
+          eyebrow: "LABEL VANLIFE · PARTENAIRE 2027",
+          title: "Votre kit de communication 2027 est prêt",
+          greeting: `Bonjour ${greetingName},`,
+          paragraphs: [
+            `Merci de poursuivre l’aventure avec Label Vanlife. Le renouvellement 2027 de ${placeName} est confirmé. Votre fiche affiche les millésimes 2026 et 2027 ; le millésime 2026 disparaîtra automatiquement le 1er janvier 2027.`,
+            "Votre kit réunit les six visuels officiels 2027, prêts à être utilisés sur votre site internet, vos réseaux sociaux, vos newsletters, vos brochures et vos supports d’accueil.",
+          ],
+          details: [
+            { label: "Kit", value: "6 fichiers haute définition" },
+            { label: "Utilisation", value: "Web, réseaux sociaux et impression" },
+            { label: "Lien conseillé", value: "www.labelvanlife.fr" },
+          ],
           action: { label: "Ouvrir le kit 2027", href: accessUrl },
-          notice: "Ce lien personnel expire dans 15 minutes. Après ouverture, votre accès restera actif sur cet appareil pendant 30 jours.",
+          notice: `Ce lien personnel expire dans 15 minutes. Après ouverture, votre accès restera actif sur cet appareil pendant 30 jours. Votre fiche : www.labelvanlife.fr/lieux/${labelledPlace.placeId} · Facebook : facebook.com/labelvanlife`,
+          signature: "L’équipe Label Vanlife",
         }),
       });
       if (error) throw new Error(`Resend kit access failed: ${error.message || error.name}`);

@@ -2,6 +2,7 @@ export type PlaceContact = {
   website?: string;
   email?: string;
   phone?: string;
+  contactName?: string;
 };
 
 // Coordonnées publiques vérifiées dans les pages enregistrées fournies avec la V1.
@@ -24,7 +25,11 @@ const CONTACTS: Record<string, PlaceContact> = {
   "camping-le-coin-charmant": { website: "https://www.camping-lecoincharmant-ardeche.com/", email: "campinglecoincharmant@gmail.com", phone: "+33646414803" },
   "camping-le-moulin-du-bel-air": { website: "https://www.lot-camping.com/", email: "contact@lot-camping.com", phone: "+33565310071" },
   "camping-le-patis": { website: "https://sites.google.com/view/camping-lesaynans/accueil", email: "campinglesaynans@gmail.com", phone: "+33673919778" },
-  "camping-le-verger": { website: "https://www.campingleverger17.com/", email: "contact@campingleverger17.com" },
+  "camping-le-verger": {
+    website: "https://www.campingleverger17.com/",
+    email: "contact@campingleverger17.com",
+    contactName: "Élise",
+  },
   "camping-les-amarines": { website: "https://www.campinglesamarines.com/", email: "les.amarines@orange.fr", phone: "+33466822492" },
   "camping-les-drouihedes": { website: "https://www.campingcevennes.com/", email: "info@campingcevennes.com", phone: "+33466250480" },
   "camping-les-terrasses": { website: "https://www.camping-les-terrasses.com/", email: "campinglesterrasses34@gmail.com", phone: "+33467253506" },
