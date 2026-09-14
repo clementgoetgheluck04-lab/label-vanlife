@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import MemberSectionNav from "@/components/member/MemberSectionNav";
 import { requireActiveMember } from "@/server/auth";
 
 export const metadata: Metadata = {
@@ -27,6 +28,7 @@ export default async function MemberLayout({
           Se déconnecter
         </button>
       </form>
+      <MemberSectionNav />
       {children}
     </>
   );
