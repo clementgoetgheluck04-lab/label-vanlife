@@ -44,6 +44,12 @@ async function sendLabellisationPaymentConfirmation(orderId: string): Promise<vo
   const establishmentName = typeof payload.establishmentName === "string" ? payload.establishmentName : "l'établissement";
   const amount = formatEuro(order.amount);
   const resend = new Resend(requireServerEnv("RESEND_API_KEY"));
+  if (candidateEmail) {
+    await prisma.prospect.updateMany({
+      where: { email: candidateEmail.trim().toLowerCase() },
+      data: { status: "CONVERTED", convertedAt: new Date(), nextActionAt: null },
+    });
+  }
   const from = getTransactionalEmailFrom();
   const messages = [
     resend.emails.send({

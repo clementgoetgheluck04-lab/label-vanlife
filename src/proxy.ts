@@ -8,6 +8,7 @@ const PUBLIC_ROUTES = [
   "/member-login", "/membre", "/lieux", "/lieux-reperes", "/mentions-legales",
   "/politique-confidentialite", "/blog", "/evenements", "/marketplace",
   "/road-trips", "/offline",
+  "/desinscription",
   "/kit-communication-2027",
 ];
 

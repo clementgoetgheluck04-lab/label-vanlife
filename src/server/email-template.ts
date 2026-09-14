@@ -20,8 +20,11 @@ type LabelVanlifeEmailOptions = {
   details?: EmailDetail[];
   code?: string;
   action?: EmailAction;
+  secondaryAction?: EmailAction;
   notice?: string;
   signature?: string;
+  legalFooter?: string;
+  unsubscribeHref?: string;
 };
 
 function escapeHtml(value: string): string {
@@ -63,7 +66,7 @@ export function labelVanlifeEmail(options: LabelVanlifeEmailOptions): string {
     </div>` : "";
 
   const actionHtml = options.action ? `
-    <table role="presentation" cellpadding="0" cellspacing="0" style="margin:28px 0;">
+    <table role="presentation" cellpadding="0" cellspacing="0" style="margin:28px 0 12px;">
       <tr>
         <td bgcolor="#059669" style="border-radius:12px;">
           <a href="${escapeHtml(options.action.href)}" style="display:inline-block;padding:15px 24px;color:#ffffff;font-family:Arial,sans-serif;font-size:15px;font-weight:700;text-decoration:none;">${escapeHtml(options.action.label)} &nbsp;→</a>
@@ -71,8 +74,23 @@ export function labelVanlifeEmail(options: LabelVanlifeEmailOptions): string {
       </tr>
     </table>` : "";
 
+  const secondaryActionHtml = options.secondaryAction ? `
+    <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 0 28px;">
+      <tr>
+        <td style="border:1px solid #d6d3d1;border-radius:12px;">
+          <a href="${escapeHtml(options.secondaryAction.href)}" style="display:inline-block;padding:13px 22px;color:#065f46;font-family:Arial,sans-serif;font-size:14px;font-weight:700;text-decoration:none;">${escapeHtml(options.secondaryAction.label)} &nbsp;→</a>
+        </td>
+      </tr>
+    </table>` : "";
+
   const noticeHtml = options.notice ? `
     <div style="margin:24px 0;padding:15px 17px;border-left:4px solid #c39960;border-radius:8px;background:#fffaf2;color:#66533b;font-family:Arial,sans-serif;font-size:14px;line-height:1.55;">${textBlock(options.notice)}</div>` : "";
+
+  const legalFooterHtml = options.legalFooter || options.unsubscribeHref ? `
+    <div style="margin:26px 0 0;padding-top:20px;border-top:1px solid #e5e1da;color:#78716c;font-family:Arial,sans-serif;font-size:11px;line-height:1.55;">
+      ${options.legalFooter ? textBlock(options.legalFooter) : ""}
+      ${options.unsubscribeHref ? `<br><a href="${escapeHtml(options.unsubscribeHref)}" style="color:#57534e;text-decoration:underline;">Ne plus recevoir nos messages de prospection</a>` : ""}
+    </div>` : "";
 
   return `<!doctype html>
 <html lang="fr">
@@ -99,8 +117,10 @@ export function labelVanlifeEmail(options: LabelVanlifeEmailOptions): string {
                 ${detailsHtml}
                 ${codeHtml}
                 ${actionHtml}
+                ${secondaryActionHtml}
                 ${noticeHtml}
                 <p style="margin:28px 0 0;color:#1a1a1a;font-family:Arial,sans-serif;font-size:15px;line-height:1.6;">À bientôt sur la route,<br><strong>${escapeHtml(signature)}</strong></p>
+                ${legalFooterHtml}
               </td>
             </tr>
             <tr>

@@ -9,6 +9,7 @@ import { assertSameOrigin, enforceRateLimit, readMultipartFormData } from "@/ser
 import { parseLabellisationPayload } from "@/server/validation";
 import { LABELLISATION_CRITERIA } from "@/config/labellisation-criteria";
 import { createDraftToken } from "@/server/labellisation-draft";
+import { getPrisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 const BUCKET = "labellisation-attachments";
@@ -176,6 +177,10 @@ export async function POST(request: NextRequest) {
     const mediaLinks = (signedMedia || []).map((item, index) => `${index === 0 ? "Plan" : `Photo ${index}`} : ${item.signedUrl}`);
     const fullApplication = formatApplication(payload, draftId, mediaLinks);
     const draftToken = createDraftToken({ draftId, email: payload.email, attachmentPaths: uploaded });
+    await getPrisma().prospect.updateMany({
+      where: { email: payload.email.trim().toLowerCase(), status: { notIn: ["CONVERTED", "UNSUBSCRIBED", "INVALID"] } },
+      data: { status: "QUALIFIED", nextActionAt: null },
+    });
     const resend = new Resend(requireServerEnv("RESEND_API_KEY"));
     const from = getTransactionalEmailFrom();
     const [{ error: applicantEmailError }, { error: adminEmailError }] = await Promise.all([

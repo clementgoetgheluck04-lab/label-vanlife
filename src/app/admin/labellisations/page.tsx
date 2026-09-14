@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { CheckCircle2, Clock, Loader2, RotateCcw, XCircle } from "lucide-react";
+import Link from "next/link";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 
@@ -62,7 +63,7 @@ export default function AdminLabellisations() {
   return (
     <main className="min-h-screen bg-neutral-50 px-4 pb-24 pt-28">
       <div className="mx-auto max-w-5xl space-y-7">
-        <header><p className="text-sm font-semibold text-emerald-600">Administration sécurisée</p><h1 className="mt-1 text-3xl font-bold text-neutral-900">Candidatures payées</h1><p className="mt-2 text-neutral-500">Une non-conformité déclenche un remboursement Stripe intégral et un email au candidat.</p></header>
+        <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between"><div><p className="text-sm font-semibold text-emerald-600">Administration sécurisée</p><h1 className="mt-1 text-3xl font-bold text-neutral-900">Candidatures payées</h1><p className="mt-2 text-neutral-500">Une non-conformité déclenche un remboursement Stripe intégral et un email au candidat.</p></div><Link href="/admin/prospection" className="inline-flex min-h-11 items-center justify-center rounded-full bg-neutral-950 px-5 text-sm font-bold text-white">Pilotage prospection</Link></header>
         {error && <p role="alert" className="rounded-xl bg-red-50 p-4 text-sm font-medium text-red-700">{error}</p>}
         {orders.length === 0 ? <Card className="p-12 text-center"><Clock className="mx-auto h-12 w-12 text-neutral-300" /><p className="mt-3 text-neutral-500">Aucune candidature payée à étudier.</p></Card> : <div className="space-y-4">{orders.map((order) => {
           const review = order.payload?.reviewStatus || (order.status === "REFUNDED" ? "REJECTED" : "PENDING");

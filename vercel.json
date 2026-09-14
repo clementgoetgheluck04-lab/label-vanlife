@@ -3,6 +3,10 @@
     {
       "path": "/api/cron/member-lifecycle-emails",
       "schedule": "0 8 * * *"
+    },
+    {
+      "path": "/api/cron/prospection",
+      "schedule": "15 8 * * 1-5"
     }
   ]
 }

@@ -39,6 +39,36 @@ enum StripeEventStatus {
   FAILED
 }
 
+enum ProspectStatus {
+  NEW
+  SENDING
+  CONTACTED
+  FOLLOW_UP_1
+  FOLLOW_UP_2
+  INTERESTED
+  QUALIFIED
+  CONVERTED
+  NOT_INTERESTED
+  UNSUBSCRIBED
+  INVALID
+  NEEDS_HUMAN
+  PAUSED
+  ERROR
+}
+
+enum ProspectMessageDirection {
+  OUTBOUND
+  INBOUND
+  INTERNAL
+}
+
+enum ProspectMessageStatus {
+  QUEUED
+  SENT
+  RECEIVED
+  FAILED
+}
+
 model User {
   id               String   @id @default(cuid())
   email            String   @unique
@@ -683,4 +713,74 @@ model NewsletterSubscriber {
 
   @@index([unsubscribedAt, createdAt])
   @@map("newsletter_subscribers")
+}
+
+// ─── PROSPECTION COMMERCIALE B2B ─────────────────────────
+
+model Prospect {
+  id               String         @id @default(cuid())
+  sourceId         String?        @unique
+  name             String
+  contactName      String?
+  email            String         @unique
+  website          String?
+  city             String?
+  region           String?
+  segment          String         @default("PLACE")
+  sourceLabel      String?
+  sourceUrl        String?
+  status           ProspectStatus @default(NEW)
+  followUpCount    Int            @default(0)
+  firstContactedAt DateTime?
+  lastContactedAt  DateTime?
+  lastInboundAt    DateTime?
+  nextActionAt     DateTime?
+  convertedAt      DateTime?
+  unsubscribeToken String         @unique @default(cuid())
+  metadata         Json?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  messages ProspectMessage[]
+
+  @@index([status, nextActionAt])
+  @@index([createdAt])
+  @@map("prospects")
+}
+
+model ProspectMessage {
+  id                String                   @id @default(cuid())
+  prospectId        String
+  direction         ProspectMessageDirection
+  kind              String
+  status            ProspectMessageStatus   @default(QUEUED)
+  campaignKey       String?                  @unique
+  providerMessageId String?                  @unique
+  subject           String
+  text              String
+  error             String?
+  sentAt            DateTime?
+  receivedAt        DateTime?
+  metadata          Json?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  prospect Prospect @relation(fields: [prospectId], references: [id], onDelete: Cascade)
+
+  @@index([prospectId, createdAt])
+  @@index([status, createdAt])
+  @@map("prospect_messages")
+}
+
+model ProspectSuppression {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  reason    String
+  source    String
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+  @@map("prospect_suppressions")
 }

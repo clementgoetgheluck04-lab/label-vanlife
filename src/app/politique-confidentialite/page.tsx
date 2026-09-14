@@ -22,6 +22,16 @@ export default function PolitiqueConfidentialitePage() {
         </section>
 
         <section className="space-y-4">
+          <h2 className="text-xl font-bold text-neutral-800">Prospection auprès des établissements professionnels</h2>
+          <p className="text-sm text-neutral-600 leading-relaxed">
+            Pour présenter Label Vanlife à des établissements dont l’activité est directement liée à l’accueil touristique ou aux voyageurs en van, nous pouvons utiliser leurs coordonnées professionnelles rendues publiques sur leur site internet ou dans un annuaire professionnel. Ce traitement repose sur notre intérêt légitime à développer le réseau Label Vanlife.
+          </p>
+          <p className="text-sm text-neutral-600 leading-relaxed">
+            Chaque message précise l’identité de Label Vanlife, la raison du contact et comporte un moyen de s’opposer simplement et gratuitement à toute nouvelle sollicitation. Une opposition, un refus, une plainte ou une adresse invalide arrête immédiatement les relances et place l’adresse sur une liste d’exclusion.
+          </p>
+        </section>
+
+        <section className="space-y-4">
           <h2 className="text-xl font-bold text-neutral-800">Paiements</h2>
           <p className="text-sm text-neutral-600 leading-relaxed">
             Les paiements sont traités via Stripe. Nous ne stockons aucune information bancaire. Consultez la politique de confidentialité de Stripe pour plus d'informations.
@@ -31,7 +41,7 @@ export default function PolitiqueConfidentialitePage() {
         <section className="space-y-4">
           <h2 className="text-xl font-bold text-neutral-800">Durée de conservation</h2>
           <p className="text-sm text-neutral-600 leading-relaxed">
-            Vos données sont conservées pendant la durée de votre adhésion et jusqu'à 3 ans après la résiliation.
+            Les données des membres et partenaires sont conservées pendant la relation contractuelle puis pendant la durée nécessaire au respect de nos obligations. Les données d’un prospect non client sont conservées au maximum trois ans à compter de leur collecte ou du dernier contact émanant du prospect. Les informations nécessaires au respect d’une opposition peuvent être conservées afin d’éviter toute nouvelle sollicitation.
           </p>
         </section>
 
