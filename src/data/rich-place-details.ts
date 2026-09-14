@@ -119,6 +119,16 @@ const RICH_PLACE_DETAILS: Record<string, RichPlaceDetails> = {
     reservationUrl: "https://www.laportedautan.fr/",
     regionLink: { label: "Découvrir les autres lieux vanlife de la région", href: "/explorer" },
   },
+  "camping-la-communnion": {
+    labelYear: 2026,
+    labelYears: [2026, 2027],
+    displayType: "Camping à la ferme",
+    displayAddress: "1 impasse des Communions, La Communion d’en Bas, 31310 Latour",
+    contactName: "Gitte et Jochen Roesing",
+    bookingMethods: ["En ligne", "Par email", "Par téléphone"],
+    reservationUrl: "http://www.vacances-lacommunion.fr/",
+    regionLink: { label: "Découvrir les autres lieux vanlife de la région", href: "/explorer" },
+  },
   "camping-le-clos-de-la-lere": {
     labelYear: 2026,
     displayAddress: "230 route de Septfonds, 82240 Cayriech",

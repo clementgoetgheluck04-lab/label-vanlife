@@ -13,6 +13,11 @@ test("le kit reconnaît uniquement les adresses professionnelles labellisées", 
   assert.equal(porteAutan?.contact.contactName, "Jean-Louis");
   assert.match(porteAutan?.contact.kitEmailSubject ?? "", /renouvellement 2027/);
   assert.ok(porteAutan?.contact.kitEmailParagraphs?.some((paragraph) => paragraph.includes("aucune visite identifiée")));
+  const communion = getLabelledPlaceByEmail(" LACOMMUNION@ORANGE.FR ");
+  assert.equal(communion?.placeId, "camping-la-communnion");
+  assert.equal(communion?.contact.contactName, "Gitte et Jochen");
+  assert.match(communion?.contact.kitEmailSubject ?? "", /renouvellement 2027/);
+  assert.ok(communion?.contact.kitEmailParagraphs?.some((paragraph) => paragraph.includes("aucun voyageur")));
   assert.equal(getLabelledPlaceByEmail("inconnu@example.com"), undefined);
 });
 
