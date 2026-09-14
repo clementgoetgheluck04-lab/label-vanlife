@@ -83,7 +83,7 @@ export default function Home() {
             </article>
             <article className="rounded-3xl bg-neutral-950 p-6 text-white shadow-sm sm:p-8">
               <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#dfc59f]">J&apos;accueille des voyageurs</p>
-              <h2 className="mt-2 text-2xl font-bold">Je réserve mon label 2027.</h2>
+              <h2 className="mt-2 text-2xl font-bold">Je DEMANDE mon label 2027.</h2>
               <p className="mt-3 text-sm leading-relaxed text-white/65">Fiche détaillée, présence sur la MAP, kit de communication et 0 % de commission. Actif dès validation jusqu&apos;au 31 décembre 2027.</p>
               <div className="mt-6 flex flex-wrap items-center gap-4">
                 <Link href="/labellisation"><Button variant="cta">Découvrir l&apos;offre — {LABEL_PRICE} € <ArrowRight className="h-4 w-4" /></Button></Link>
