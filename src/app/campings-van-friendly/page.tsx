@@ -7,7 +7,7 @@ import { ENRICHED_LIEUX } from "@/data/enriched-lieux";
 import { serializeJsonLd } from "@/lib/seo/json-ld";
 
 const title = "Campings van friendly en France : la sélection Label Vanlife";
-const description = "Découvrez ce qui distingue un véritable camping van friendly et consultez la sélection 2026 des campings labellisés Label Vanlife en France.";
+const description = "Découvrez ce qui distingue un véritable camping van friendly et consultez la sélection des campings labellisés Label Vanlife en France.";
 
 export const metadata: Metadata = {
   title,
@@ -52,7 +52,7 @@ const criteria = [
 const faqs = [
   { question: "Qu'est-ce qu'un camping van friendly ?", answer: "C'est un établissement qui accueille réellement les voyageurs en van : accès et emplacements adaptés aux véhicules acceptés, informations claires, services annoncés avec précision et équipe bienveillante. L'expérience compte autant que la taille de l'emplacement." },
   { question: "Quelle différence avec un camping labellisé Label Vanlife ?", answer: "Un lieu labellisé rejoint une démarche structurée : sa candidature, ses informations d'accueil et ses engagements sont étudiés par Label Vanlife. Il annonce également l'avantage réservé aux membres et s'engage à maintenir sa fiche à jour." },
-  { question: "Comment trouver un camping van friendly près de chez moi ?", answer: `L'explorateur Label Vanlife présente actuellement ${networkCount} lieux actifs en France. Vous pouvez rechercher un nom ou une ville et consulter librement les équipements et le pourcentage de réduction. La Carte membre Label Vanlife 2026 est proposée à 29 € au lieu de 39 €, valable jusqu'au 31 décembre 2026 et sans renouvellement automatique.` },
+  { question: "Comment trouver un camping van friendly près de chez moi ?", answer: `L'explorateur Label Vanlife présente actuellement ${networkCount} lieux actifs en France. Vous pouvez rechercher un nom ou une ville et consulter librement les équipements et le pourcentage de réduction. La Carte membre Label Vanlife 2027 est proposée à 29 € au lieu de 39 €, active dès l'achat jusqu'au 31 décembre 2027 et sans renouvellement automatique.` },
 ] as const;
 
 export default function VanFriendlyCampingsPage() {
@@ -76,7 +76,7 @@ export default function VanFriendlyCampingsPage() {
       </div>
 
       <header className="mx-auto max-w-6xl px-6 py-12 text-center sm:py-16">
-        <p className="text-xs font-bold uppercase tracking-[0.22em] text-[#9a7445]">Sélection 2026</p>
+        <p className="text-xs font-bold uppercase tracking-[0.22em] text-[#9a7445]">Sélection Label Vanlife</p>
         <h1 className="mx-auto mt-4 max-w-4xl text-4xl font-bold leading-[1.08] text-neutral-950 sm:text-6xl">Campings van friendly en France</h1>
         <p className="mx-auto mt-5 max-w-3xl text-lg leading-8 text-neutral-600">Un camping van friendly n'est pas seulement un camping avec un grand emplacement. C'est un lieu qui comprend l'esprit vanlife, l'accueille et partage ses valeurs.</p>
         <div className="mx-auto mt-8 grid max-w-3xl gap-3 sm:grid-cols-3">{[[String(networkCount), "lieux labellisés"], ["✓", "vérifiés et sélectionnés"], ["France", "un réseau qui grandit"]].map(([value, label]) => <div key={label} className="rounded-2xl border border-neutral-200 bg-[#f7f1e8]/60 p-4"><strong className="block text-2xl text-[#8b673d]">{value}</strong><span className="text-xs text-neutral-500">{label}</span></div>)}</div>

@@ -4,7 +4,7 @@ import type Stripe from "stripe";
 import { Resend } from "resend";
 import { Prisma } from "@/generated/prisma/client";
 import { formatEuro } from "@/config/products";
-import { MEMBER_EXPIRY_ISO, MEMBER_PRODUCT_NAME, MEMBER_VALIDITY_TEXT } from "@/config/commercial";
+import { MEMBER_EXPIRY_ISO, MEMBER_EXPIRY_LABEL, MEMBER_PRODUCT_NAME, MEMBER_VALIDITY_TEXT } from "@/config/commercial";
 import { getPrisma } from "@/lib/prisma";
 import { getAppUrl, getBackOfficeEmails, getTransactionalEmailFrom, requireSecretEnv, requireServerEnv } from "@/server/env";
 import { generateMemberAccessCode, hashMemberAccessCode, hashMemberAccessLookupCode } from "@/server/member-access";
@@ -199,7 +199,7 @@ async function sendMembershipActivation(orderId: string): Promise<void> {
     from,
     to: order.user.email,
     subject: "Votre code d'accès personnel Label Vanlife",
-    text: `Bonjour ${profile?.firstName || ""},\n\nVoici votre code d'accès personnel : ${code}\n\nConservez-le : il reste valable jusqu'au 31 décembre 2026, comme votre Carte membre.\n\nConnexion à votre espace membre : ${getAppUrl()}/member-login\n\nSaisissez uniquement ce code, puis vous serez redirigé vers votre espace membre.\n\nL'équipe Label Vanlife`,
+    text: `Bonjour ${profile?.firstName || ""},\n\nVoici votre code d'accès personnel : ${code}\n\nConservez-le : il reste valable jusqu'au ${MEMBER_EXPIRY_LABEL}, comme votre Carte membre.\n\nConnexion à votre espace membre : ${getAppUrl()}/member-login\n\nSaisissez uniquement ce code, puis vous serez redirigé vers votre espace membre.\n\nL'équipe Label Vanlife`,
     html: labelVanlifeEmail({
       preheader: "Votre code personnel pour ouvrir l’espace membre",
       eyebrow: "ACCÈS MEMBRE SÉCURISÉ",
@@ -208,7 +208,7 @@ async function sendMembershipActivation(orderId: string): Promise<void> {
       paragraphs: ["Utilisez ce code pour vous connecter simplement à votre espace membre Label Vanlife."],
       code,
       action: { label: "Ouvrir l’espace membre", href: `${getAppUrl()}/member-login` },
-      notice: "Ce code est personnel. Ne le transmettez jamais. Il reste valable jusqu’au 31 décembre 2026, comme votre Carte membre.",
+      notice: `Ce code est personnel. Ne le transmettez jamais. Il reste valable jusqu’au ${MEMBER_EXPIRY_LABEL}, comme votre Carte membre.`,
     }),
     }),
   ]);

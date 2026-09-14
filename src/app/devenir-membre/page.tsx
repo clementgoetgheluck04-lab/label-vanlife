@@ -28,7 +28,7 @@ import { cn } from "@/lib/utils";
 import { MemberDigitalAccess } from "@/components/MemberDigitalAccess";
 import { MembershipCardPreview, MembershipJourneyNav } from "@/components/MembershipWelcome";
 import { CONTACT_EMAIL, CONTACT_MAILTO } from "@/config/contact";
-import { MEMBER_CTA_LABEL, MEMBER_DISCOUNT_TEXT, MEMBER_PRICE_TEXT, MEMBER_VALIDITY_TEXT } from "@/config/commercial";
+import { CURRENT_YEAR, MEMBER_CTA_LABEL, MEMBER_DISCOUNT_TEXT, MEMBER_PRICE_TEXT, MEMBER_VALIDITY_TEXT } from "@/config/commercial";
 import { SITE_STATS } from "@/config/site-stats";
 
 const AVANTAGES = [
@@ -66,7 +66,7 @@ const CHIFFRES = [
   { valeur: String(SITE_STATS.labelledPlacesCount), label: "lieux labellisés" },
   { valeur: MEMBER_DISCOUNT_TEXT, label: "de réduction membre" },
   { valeur: "39 €", label: "prix public normal" },
-  { valeur: "29 €", label: "édition 2026" },
+  { valeur: "29 €", label: `édition ${CURRENT_YEAR}` },
 ];
 
 const PROBLEMES = [
@@ -140,6 +140,9 @@ export default function DevenirMembrePage() {
 
           <p className="text-lg sm:text-xl text-neutral-500 max-w-2xl mx-auto mb-8 leading-relaxed">
             Des lieux vérifiés, une MAP pensée pour tes voyages et {MEMBER_DISCOUNT_TEXT} de réduction chez les partenaires.
+          </p>
+          <p className="mx-auto mb-7 max-w-xl rounded-2xl border border-amber-200 bg-amber-50 px-5 py-3 text-sm font-semibold text-amber-900">
+            Offre 2027 ouverte dès maintenant : profite de tous les avantages immédiatement, jusqu&apos;au 31 décembre 2027.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -224,10 +227,10 @@ export default function DevenirMembrePage() {
               Tout inclus
             </span>
             <h2 className="text-3xl sm:text-4xl font-bold text-neutral-800" style={{ fontFamily: "Outfit, sans-serif" }}>
-              Ce que ta carte annuelle débloque avec l&apos;édition 2026
+              Ce que ta carte annuelle débloque avec l&apos;édition {CURRENT_YEAR}
             </h2>
             <p className="text-neutral-500 max-w-xl mx-auto">
-              Pas de surprise, pas de frais cachés. Une édition 2026 valable jusqu&apos;au 31 décembre 2026.
+              Pas de surprise, pas de frais cachés. Ton accès commence dès l&apos;achat et reste actif jusqu&apos;au 31 décembre {CURRENT_YEAR}.
             </p>
           </div>
 
@@ -269,12 +272,12 @@ export default function DevenirMembrePage() {
                     <div className="text-center space-y-6">
                       <div>
                         <p className="text-sm text-neutral-500 uppercase tracking-wider mb-1">
-                          Carte membre Label Vanlife 2026
+                          Carte membre Label Vanlife {CURRENT_YEAR}
                         </p>
                         <div className="flex items-baseline justify-center gap-2">
                           <span className="text-2xl text-neutral-400 line-through">39 €</span>
                           <span className="text-5xl sm:text-6xl font-bold text-neutral-900" style={{ fontFamily: "Outfit, sans-serif" }}>29 €</span>
-                          <span className="text-lg text-neutral-400 font-medium">édition 2026</span>
+                          <span className="text-lg text-neutral-400 font-medium">édition {CURRENT_YEAR}</span>
                         </div>
                         <p className="text-sm text-emerald-500 font-semibold mt-1">{MEMBER_VALIDITY_TEXT}</p>
                       </div>

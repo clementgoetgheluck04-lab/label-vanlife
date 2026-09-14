@@ -183,7 +183,7 @@ export async function POST(request: NextRequest) {
         from,
         to: payload.email,
         subject: "Votre candidature Label Vanlife a bien été enregistrée",
-        text: `Bonjour ${payload.contactName},\n\nVotre candidature et ses pièces jointes ont bien été enregistrées. Voici le récapitulatif complet des informations transmises :\n\n${fullApplication}\n\nOffre fondateur 2026 : 110 € jusqu'au 31 décembre 2026, dans la limite des places disponibles. Tarif public 2027 annoncé : 290 €. Si le dossier est déclaré non conforme après étude, le paiement est remboursé intégralement.\n\nLe paiement sécurisé va s'ouvrir automatiquement. Si nécessaire, vous pouvez le reprendre ici : ${getAppUrl()}/labellisation/paiement\n\nL'équipe Label Vanlife`,
+        text: `Bonjour ${payload.contactName},\n\nVotre candidature et ses pièces jointes ont bien été enregistrées. Voici le récapitulatif complet des informations transmises :\n\n${fullApplication}\n\nPrévente 2027 : 110 € au lieu de 290 €, dans la limite des places disponibles. Le label est actif dès validation jusqu'au 31 décembre 2027. Si le dossier est déclaré non conforme après étude, le paiement est remboursé intégralement.\n\nLe paiement sécurisé va s'ouvrir automatiquement. Si nécessaire, vous pouvez le reprendre ici : ${getAppUrl()}/labellisation/paiement\n\nL'équipe Label Vanlife`,
         html: labelVanlifeEmail({
           preheader: "Votre dossier de labellisation est bien enregistré",
           eyebrow: "CANDIDATURE LABEL VANLIFE",
@@ -192,7 +192,7 @@ export async function POST(request: NextRequest) {
           paragraphs: ["Nous avons bien reçu votre candidature et ses pièces jointes. Le paiement sécurisé va s’ouvrir automatiquement.", `Récapitulatif transmis :\n${fullApplication}`],
           details: [
             { label: "Établissement", value: payload.establishmentName },
-            { label: "Offre fondateur 2026", value: "110 € · Tarif public 2027 annoncé : 290 €" },
+            { label: "Prévente 2027", value: "110 € au lieu de 290 € · places limitées" },
           ],
           action: { label: "Reprendre le paiement", href: `${getAppUrl()}/labellisation/paiement` },
           notice: "Si le dossier est déclaré non conforme après étude, le paiement est remboursé intégralement.",

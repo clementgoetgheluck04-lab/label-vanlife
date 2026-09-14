@@ -84,7 +84,7 @@ export default function KitCommunicationPage() {
           <h2 className="text-xl font-bold text-neutral-900">Pas encore labellisé</h2>
           <p className="text-sm text-neutral-500">Le kit de communication est disponible après validation de ta labellisation.</p>
           <Link href="/labellisation">
-            <Button variant="cta">Candidater — offre 2026 à 110€</Button>
+            <Button variant="cta">Candidater pour 2027 — 110€ au lieu de 290€</Button>
           </Link>
         </Card>
       </div>

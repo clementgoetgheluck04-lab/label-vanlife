@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { BRAND_ASSETS } from "@/config/brand-assets";
-import { MEMBER_CTA_LABEL, MEMBER_DISCOUNT_TEXT, MEMBER_VALIDITY_TEXT } from "@/config/commercial";
+import { CURRENT_YEAR, MEMBER_CTA_LABEL, MEMBER_DISCOUNT_TEXT, MEMBER_VALIDITY_TEXT } from "@/config/commercial";
 
 const CARDS = [
   {
@@ -8,7 +8,7 @@ const CARDS = [
     subtitle: MEMBER_VALIDITY_TEXT,
     oldPrice: "39 €",
     price: "29 €",
-    period: "édition 2026",
+    period: `édition ${CURRENT_YEAR}`,
     badge: "OFFRE ACTUELLE",
     features: [`${MEMBER_DISCOUNT_TEXT} de réduction`, "MAP Label Vanlife", "Road trip planner", "Carte membre numérique"],
     image: BRAND_ASSETS.memberCardCouple,
@@ -21,7 +21,7 @@ export default function MemberCards() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16 space-y-4">
           <span className="inline-block text-xs font-semibold tracking-[0.2em] uppercase text-sage">
-            Carte Membre 2026
+            Carte Membre {CURRENT_YEAR}
           </span>
           <h2 className="text-4xl sm:text-5xl font-bold text-charcoal">
             Une seule carte, tous les avantages

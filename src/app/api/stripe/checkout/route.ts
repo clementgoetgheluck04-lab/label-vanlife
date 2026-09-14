@@ -2,9 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { PRODUCTS } from "@/config/products";
 import { getPrisma } from "@/lib/prisma";
 import { ensureAppUser, getAuthenticatedUser } from "@/server/auth";
-import { getAppUrl, requireServerEnv } from "@/server/env";
+import { getAppUrl } from "@/server/env";
 import { apiError } from "@/server/http";
-import { assertStripePrice, getStripe } from "@/server/stripe";
+import { getStripe } from "@/server/stripe";
 import { assertSameOrigin, enforceRateLimit } from "@/server/request-security";
 import type { User } from "@supabase/supabase-js";
 
@@ -65,8 +65,6 @@ export async function POST(request: NextRequest) {
 
     const product = PRODUCTS.membership;
     const stripe = getStripe();
-    const priceId = requireServerEnv(product.priceEnv);
-
     const prisma = getPrisma();
     const existingMember = await prisma.user.findUnique({
       where: { id: user.id },
@@ -85,8 +83,6 @@ export async function POST(request: NextRequest) {
       : null;
     const amount = protectedRenewalAmount ?? product.amount;
     const isProtectedRenewal = Boolean(protectedRenewalAmount);
-    if (!isProtectedRenewal) await assertStripePrice(stripe, priceId, product.amount, product.currency);
-
     const order = await prisma.checkoutOrder.create({
       data: {
         userId: user.id,
@@ -104,19 +100,19 @@ export async function POST(request: NextRequest) {
     });
 
     const appUrl = getAppUrl();
-    const lineItem = isProtectedRenewal
-      ? {
-          price_data: {
-            currency: product.currency,
-            unit_amount: amount,
-            product_data: {
-              name: product.name,
-              description: "Renouvellement au prix payé l'année précédente",
-            },
-          },
-          quantity: 1,
-        }
-      : { price: priceId, quantity: 1 };
+    const lineItem = {
+      price_data: {
+        currency: product.currency,
+        unit_amount: amount,
+        product_data: {
+          name: product.name,
+          description: isProtectedRenewal
+            ? "Renouvellement au prix payé l'année précédente"
+            : "Accès immédiat aux avantages membres jusqu'au 31 décembre 2027, sans renouvellement automatique",
+        },
+      },
+      quantity: 1,
+    };
     const session = await stripe.checkout.sessions.create(
       {
         mode: "payment",

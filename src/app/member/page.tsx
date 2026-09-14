@@ -273,7 +273,7 @@ export default function MemberDashboard() {
                     LAB-VL-{membre.id.split("-")[1]?.toUpperCase() ?? "0000"}
                   </p>
                   <p className="text-xs text-white/70 mt-0.5">
-                    Carte membre 2026
+                    Carte membre 2027
                   </p>
                 </div>
                 <div className="text-right">

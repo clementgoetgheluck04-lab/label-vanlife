@@ -17,10 +17,10 @@ export const PRODUCTS = {
 } as const;
 
 export const LABELLISATION_PROMOTION = {
-  discountPercent: 50,
+  discountPercent: 62,
   amount: LABEL_PRICE_CENTS,
   standardAmount: LABEL_NORMAL_PRICE_CENTS,
-  endsAt: "2026-12-31T23:59:59+01:00",
+  endsAt: "2027-12-31T23:59:59+01:00",
 } as const;
 
 export function getLabellisationProduct(now = new Date()) {
@@ -28,7 +28,7 @@ export function getLabellisationProduct(now = new Date()) {
   return promotionActive
     ? {
         ...PRODUCTS.labellisation,
-        name: "Labellisation Label Vanlife — offre 2026",
+        name: "Labellisation Label Vanlife — prévente 2027",
         amount: LABELLISATION_PROMOTION.amount,
       }
     : PRODUCTS.labellisation;

@@ -66,10 +66,10 @@ export default function LabellisationPaymentPage() {
 
         <Card className="overflow-hidden border-[#c39960]/30 shadow-xl shadow-[#c39960]/10">
           <div className="bg-neutral-950 p-7 text-white sm:p-9">
-            <div className="flex flex-wrap items-start justify-between gap-5"><div><p className="text-sm text-white/60">{draft.establishmentName || "Votre établissement"}</p><h2 className="mt-1 text-2xl font-bold">Étude et labellisation annuelle</h2></div><span className="rounded-full bg-[#c39960] px-3 py-1.5 text-xs font-bold">OFFRE 2026 · PLACES LIMITÉES</span></div>
+            <div className="flex flex-wrap items-start justify-between gap-5"><div><p className="text-sm text-white/60">{draft.establishmentName || "Votre établissement"}</p><h2 className="mt-1 text-2xl font-bold">Étude et labellisation 2027</h2></div><span className="rounded-full bg-[#c39960] px-3 py-1.5 text-xs font-bold">PRÉVENTE 2027 · PLACES LIMITÉES</span></div>
             <div className="mt-7 flex items-end gap-3"><strong className="text-5xl">110 €</strong><span className="pb-1 text-sm text-white/50">paiement unique</span></div>
-            <p className="mt-2 text-xs font-semibold text-[#dfc59f]">Tarif public 2027 annoncé : 290 €</p>
-            <p className="mt-1 text-xs text-white/55">Offre valable jusqu'au 31 décembre 2026, dans la limite des places disponibles.</p>
+            <p className="mt-2 text-xs font-semibold text-[#dfc59f]"><span className="line-through">290 €</span> · 180 € économisés</p>
+            <p className="mt-1 text-xs text-white/55">110 € au lieu de 290 €. Label actif dès validation jusqu'au 31 décembre 2027, dans la limite des places disponibles.</p>
           </div>
           <div className="space-y-6 p-7 sm:p-9">
             <ul className="space-y-3 text-sm text-neutral-700">{["Analyse des 22 critères et des pièces jointes", "Création de la fiche établissement", "Validation humaine par Label Vanlife", "Kit partenaire après acceptation", "Aucune commission sur les réservations"].map((item) => <li key={item} className="flex gap-3"><Check className="h-5 w-5 shrink-0 text-emerald-600" />{item}</li>)}</ul>

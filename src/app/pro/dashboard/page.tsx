@@ -119,7 +119,7 @@ export default function ProDashboard() {
               </div>
               <div>
                 <p className="font-semibold text-neutral-900">Obtenir le label</p>
-                <p className="text-sm text-neutral-500">Offre fondateur 2026 : 110€ · Tarif public 2027 annoncé : 290€</p>
+                <p className="text-sm text-neutral-500">Prévente 2027 : 110€ au lieu de 290€ · places limitées</p>
               </div>
             </Card>
           </Link>

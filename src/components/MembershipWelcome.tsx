@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Check, MapPinned, ShieldCheck } from "lucide-react";
-import { MEMBER_PRICE_TEXT, MEMBER_VALIDITY_TEXT } from "@/config/commercial";
+import { CURRENT_YEAR, MEMBER_PRICE_TEXT, MEMBER_VALIDITY_TEXT } from "@/config/commercial";
 
 export function MembershipJourneyNav({ active }: { active: "join" | "login" }) {
   return (
@@ -21,7 +21,7 @@ export function MembershipCardPreview({ compact = false }: { compact?: boolean }
         <div className="flex items-start justify-between gap-5">
           <div>
             <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-[#dfc59f]">Label Vanlife</p>
-            <h2 className={`${compact ? "mt-2 text-2xl" : "mt-3 text-3xl"} font-bold`}>Carte membre 2026</h2>
+            <h2 className={`${compact ? "mt-2 text-2xl" : "mt-3 text-3xl"} font-bold`}>Carte membre {CURRENT_YEAR}</h2>
           </div>
           <Image src="/brand/logo-combi.svg" alt="Combi Label Vanlife" width={150} height={75} className="h-auto w-28 object-contain" />
         </div>

@@ -6,7 +6,7 @@ import { ArrowRight, Star, Shield, Heart, Moon, Quote, Compass, ChevronDown, Map
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { ENRICHED_LIEUX } from "@/data/enriched-lieux";
-import { MEMBER_CTA_LABEL, MEMBER_DISCOUNT_TEXT, MEMBER_PRICE_TEXT, MEMBER_VALIDITY_TEXT } from "@/config/commercial";
+import { LABEL_NORMAL_PRICE, LABEL_PRICE, MEMBER_CTA_LABEL, MEMBER_DISCOUNT_TEXT, MEMBER_PRICE_TEXT, MEMBER_VALIDITY_TEXT } from "@/config/commercial";
 import { SITE_STATS } from "@/config/site-stats";
 
 function getTypeLabel(type: string): string {
@@ -53,18 +53,44 @@ export default function Home() {
                   {MEMBER_CTA_LABEL} <ArrowRight className="h-4 w-4 ml-2" />
                 </Button>
               </Link>
-              <Link href="/explorer">
+              <Link href="/labellisation">
                 <Button variant="primary" className="bg-white/10 backdrop-blur-sm text-white border border-white/30 hover:bg-white/20 text-base px-8 rounded-xl">
-                  Découvrir les lieux
+                  Je labellise mon lieu — {LABEL_PRICE} €
                 </Button>
               </Link>
             </div>
             <p className="mt-4 text-sm text-white/70">{MEMBER_VALIDITY_TEXT}</p>
+            <Link href="/explorer" className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-white/80 underline decoration-white/30 underline-offset-4 hover:text-white">Découvrir les lieux <ArrowRight className="h-3.5 w-3.5" /></Link>
           </div>
         </div>
         <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-2">
           <span className="text-xs tracking-[0.2em] uppercase text-white/30">Découvrir</span>
           <ChevronDown className="h-5 w-5 text-white/40 animate-bounce" />
+        </div>
+      </section>
+
+      <section className="border-b border-neutral-200 bg-[#f7f1e8] py-10 sm:py-12">
+        <div className="mx-auto max-w-6xl px-6">
+          <div className="grid gap-5 md:grid-cols-2">
+            <article className="rounded-3xl border border-white bg-white p-6 shadow-sm sm:p-8">
+              <p className="text-xs font-bold uppercase tracking-[0.18em] text-emerald-700">Je voyage en van</p>
+              <h2 className="mt-2 text-2xl font-bold text-neutral-900">La Carte membre 2027, active dès aujourd&apos;hui.</h2>
+              <p className="mt-3 text-sm leading-relaxed text-neutral-600">MAP privée, lieux labellisés, informations détaillées et {MEMBER_DISCOUNT_TEXT} d&apos;avantages jusqu&apos;au 31 décembre 2027.</p>
+              <div className="mt-6 flex flex-wrap items-center gap-4">
+                <Link href="/devenir-membre"><Button variant="cta">Je prends ma carte — 29 € <ArrowRight className="h-4 w-4" /></Button></Link>
+                <span className="text-sm text-neutral-400"><span className="line-through">39 €</span> · paiement unique</span>
+              </div>
+            </article>
+            <article className="rounded-3xl bg-neutral-950 p-6 text-white shadow-sm sm:p-8">
+              <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#dfc59f]">J&apos;accueille des voyageurs</p>
+              <h2 className="mt-2 text-2xl font-bold">Je réserve mon label 2027.</h2>
+              <p className="mt-3 text-sm leading-relaxed text-white/65">Fiche détaillée, présence sur la MAP, kit de communication et 0 % de commission. Actif dès validation jusqu&apos;au 31 décembre 2027.</p>
+              <div className="mt-6 flex flex-wrap items-center gap-4">
+                <Link href="/labellisation"><Button variant="cta">Découvrir l&apos;offre — {LABEL_PRICE} € <ArrowRight className="h-4 w-4" /></Button></Link>
+                <span className="text-sm text-white/45"><span className="line-through">{LABEL_NORMAL_PRICE} €</span> · places limitées</span>
+              </div>
+            </article>
+          </div>
         </div>
       </section>
 

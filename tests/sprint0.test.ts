@@ -12,7 +12,9 @@ test("the server catalog contains the approved one-time prices", () => {
   assert.equal(PRODUCTS.labellisation.amount, 29_000);
   assert.equal(PRODUCTS.labellisation.currency, "eur");
   assert.equal(getLabellisationProduct(new Date("2026-12-31T12:00:00+01:00")).amount, 11_000);
-  assert.equal(getLabellisationProduct(new Date("2027-01-01T00:00:01+01:00")).amount, 29_000);
+  assert.equal(getLabellisationProduct(new Date("2027-12-31T12:00:00+01:00")).amount, 11_000);
+  assert.equal(getLabellisationProduct(new Date("2028-01-01T00:00:00+01:00")).amount, 29_000);
+  assert.equal(getLabellisationProduct(new Date("2027-01-01T00:00:01+01:00")).amount, 11_000);
 });
 
 test("the brand ecosystem has unique, stable product names", () => {

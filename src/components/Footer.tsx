@@ -19,7 +19,7 @@ const NAVIGATION = [
 
 const OFFERS = [
   { label: `${MEMBER_SHORT_LABEL} au lieu de 39 €`, href: "/devenir-membre" },
-  { label: "Labelliser mon lieu — offre 2026 à 110€", href: "/labellisation/candidature" },
+  { label: "Labelliser mon lieu en 2027 — 110€ au lieu de 290€", href: "/labellisation/candidature" },
 ] as const;
 
 const SEO_GUIDES = [
@@ -110,7 +110,7 @@ export default function Footer() {
           <div>
             <h2 className="text-xs font-semibold uppercase tracking-[0.18em] text-white/45">Rejoindre</h2>
             <ul className="mt-5 space-y-3">{OFFERS.map((item) => <li key={item.href}><Link href={item.href} className="group inline-flex items-start gap-2 text-sm text-white/65 transition-colors hover:text-white">{item.label}<ArrowRight className="mt-0.5 h-3.5 w-3.5 shrink-0 transition-transform group-hover:translate-x-0.5" /></Link></li>)}</ul>
-            <p className="mt-6 text-xs leading-relaxed text-white/40">Carte membre Label Vanlife 2026 — {MEMBER_VALIDITY_TEXT}. Labellisation annuelle, sans commission sur les réservations.</p>
+            <p className="mt-6 text-xs leading-relaxed text-white/40">Carte membre Label Vanlife 2027 — {MEMBER_VALIDITY_TEXT}. Labellisation 2027 active dès validation, sans commission sur les réservations.</p>
           </div>
 
           <div>

@@ -7,6 +7,7 @@ import { createClient } from "@/lib/supabase/browser";
 import { Compass, QrCode, Download, ArrowLeft, Sparkles, Loader2, Mail, Phone, ShieldCheck, UserRound, Users } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
+import { CURRENT_YEAR } from "@/config/commercial";
 
 type MemberCardView = {
   firstName: string;
@@ -46,7 +47,7 @@ export default function MemberCardPage() {
             level: "PRÉVISUALISATION",
             points: 0,
             cardNumber: "LV-ADMIN-PREVIEW",
-            offer: "2026",
+            offer: String(CURRENT_YEAR),
             people: [{ firstName: "Clément", lastName: "Goetgheluck", memberNumber: "LV-ADMIN-01" }],
           });
           setLoading(false);
@@ -91,7 +92,7 @@ export default function MemberCardPage() {
         level: profile?.level || "EXPLORATEUR",
         points: profile?.points || 0,
         cardNumber: card.cardNumber,
-        offer: "2026",
+        offer: membership?.expiresAt ? String(new Date(membership.expiresAt).getFullYear()) : String(CURRENT_YEAR),
         expiresAt: membership?.expiresAt,
         people: [{
           firstName: profile?.firstName || String(user.user_metadata?.firstName || user.email?.split("@")[0] || "Membre"),

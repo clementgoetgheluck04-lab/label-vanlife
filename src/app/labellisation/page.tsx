@@ -35,13 +35,13 @@ export default function LabellisationPage() {
               </Button>
             </div>
             <div className="mx-auto inline-flex flex-col items-center rounded-2xl border border-amber-200 bg-white px-6 py-4 shadow-sm">
-              <span className="text-xs font-bold uppercase tracking-[0.16em] text-amber-700">Offre de lancement 2026 · nombre de places limité</span>
+              <span className="text-xs font-bold uppercase tracking-[0.16em] text-amber-700">Prévente 2027 · nombre de places limité</span>
               <p className="mt-2 flex items-end justify-center gap-3">
                 <strong className="text-4xl font-black text-neutral-900">{LABEL_PRICE} €</strong>
                 <span className="pb-1 text-sm text-neutral-500">paiement unique</span>
               </p>
-              <span className="mt-1 text-xs font-semibold text-amber-800">Tarif public 2027 annoncé : {LABEL_NORMAL_PRICE} €</span>
-              <span className="mt-1 text-xs text-neutral-500">Dans la limite des places disponibles.</span>
+              <span className="mt-1 text-xs font-semibold text-amber-800"><span className="mr-1 line-through">{LABEL_NORMAL_PRICE} €</span> tarif de lancement : {LABEL_PRICE} €</span>
+              <span className="mt-1 text-xs text-neutral-500">Active dès validation jusqu&apos;au 31 décembre 2027, dans la limite des places disponibles.</span>
             </div>
             <p className="text-xs font-semibold text-neutral-500">{LABEL_VALIDITY_TEXT}</p>
           </div>
@@ -127,6 +127,25 @@ export default function LabellisationPage() {
               <h3 className="font-bold text-neutral-900 text-sm">Présence membre</h3>
               <p className="text-xs text-neutral-500 mt-2">Votre fiche rejoint la MAP Label Vanlife réservée aux membres après validation.</p>
             </Card>
+          </div>
+        </section>
+
+        <section className="pb-12 sm:pb-16">
+          <div className="rounded-3xl border border-neutral-200 bg-white p-7 shadow-sm sm:p-9">
+            <div className="grid gap-8 md:grid-cols-2">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-[0.18em] text-emerald-600">Notre engagement concret</p>
+                <h2 className="mt-2 text-2xl font-bold text-neutral-900">Vous savez exactement ce que vous achetez.</h2>
+                <ul className="mt-5 space-y-3 text-sm text-neutral-600">
+                  {["Une fiche établissement détaillée et modifiable", "La présence sur la MAP Label Vanlife", "Le kit de communication officiel 2027", "Un accompagnement pour présenter votre avantage membre"].map((item) => <li key={item} className="flex gap-2"><Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />{item}</li>)}
+                </ul>
+              </div>
+              <div className="rounded-2xl bg-neutral-50 p-6">
+                <p className="text-xs font-bold uppercase tracking-[0.18em] text-neutral-500">Transparence</p>
+                <h3 className="mt-2 text-lg font-bold text-neutral-900">Pas de fausse promesse de réservations.</h3>
+                <p className="mt-3 text-sm leading-relaxed text-neutral-600">Le label vous donne de la visibilité et des outils de confiance auprès d&apos;une audience ciblée. Les résultats dépendent aussi de votre offre, de votre avantage membre, de votre disponibilité et de la croissance du réseau.</p>
+              </div>
+            </div>
           </div>
         </section>
 
@@ -291,19 +310,19 @@ export default function LabellisationPage() {
           <div className="absolute inset-0 bg-gradient-to-br from-emerald-500 via-emerald-600 to-emerald-700" />
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-amber-500/10 via-transparent to-transparent" />
           <div className="relative z-10 text-center px-6 max-w-lg mx-auto">
-            <span className="inline-block px-4 py-1.5 bg-white/10 rounded-full text-white/80 text-xs font-semibold tracking-wide mb-4">Offre exceptionnelle 2026 · nombre de places limité</span>
+            <span className="inline-block px-4 py-1.5 bg-white/10 rounded-full text-white/80 text-xs font-semibold tracking-wide mb-4">Prévente 2027 · nombre de places limité</span>
             <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4" style={{ fontFamily: "Outfit, sans-serif" }}>Prêt à développer votre activité ?</h2>
             <p className="text-white/70 mb-8">Candidatez dès maintenant. Notre équipe vous recontactera sous 10 jours pour échanger sur votre lieu.</p>
             <div className="flex flex-wrap justify-center gap-3 mb-8">
               <span className="inline-flex items-center gap-1 px-3 py-1.5 bg-white/10 rounded-full text-white/80 text-xs"><Check className="w-3 h-3" /> Sans engagement</span>
               <span className="inline-flex items-center gap-1 px-3 py-1.5 bg-white/10 rounded-full text-white/80 text-xs"><Check className="w-3 h-3" /> 0% de commission</span>
-              <span className="inline-flex items-center gap-1 px-3 py-1.5 bg-white/10 rounded-full text-white/80 text-xs"><Check className="w-3 h-3" /> Année civile 2026</span>
+              <span className="inline-flex items-center gap-1 px-3 py-1.5 bg-white/10 rounded-full text-white/80 text-xs"><Check className="w-3 h-3" /> Jusqu&apos;au 31/12/2027</span>
             </div>
             <Button variant="cta" size="lg" className="text-base px-10 shadow-xl shadow-amber-500/25" onClick={() => router.push("/labellisation/candidature")}>
               Remplir le formulaire de candidature <ArrowRight className="h-4 w-4 ml-2" />
             </Button>
             <p className="mt-5 text-white"><strong className="text-3xl">{LABEL_PRICE} €</strong> <span className="text-sm text-white/70">paiement unique</span></p>
-            <p className="mt-1 text-xs font-semibold text-[#f0d6ad]">Tarif public 2027 annoncé : {LABEL_NORMAL_PRICE} €</p>
+            <p className="mt-1 text-xs font-semibold text-[#f0d6ad]"><span className="line-through">{LABEL_NORMAL_PRICE} €</span> · vous économisez {LABEL_NORMAL_PRICE - LABEL_PRICE} €</p>
             <p className="text-white/60 text-xs mt-4">{LABEL_VALIDITY_TEXT} · Remboursement intégral en cas de non-conformité.</p>
           </div>
         </section>

@@ -7,7 +7,7 @@ import { createClient } from "@/lib/supabase/browser";
 import { ArrowRight, Check, Compass, MapPin, Sparkles, Shield, Lock, Mail, Loader2, AlertCircle, Star, Route, Heart, Users } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
-import { MEMBER_CTA_LABEL, MEMBER_DISCOUNT_TEXT, MEMBER_PRICE_TEXT, MEMBER_VALIDITY_TEXT } from "@/config/commercial";
+import { CURRENT_YEAR, MEMBER_CTA_LABEL, MEMBER_DISCOUNT_TEXT, MEMBER_PRICE_TEXT, MEMBER_VALIDITY_TEXT } from "@/config/commercial";
 import { SITE_STATS } from "@/config/site-stats";
 
 export default function MembrePage() {
@@ -33,7 +33,7 @@ export default function MembrePage() {
       <section className="relative py-20 sm:py-28 overflow-hidden pt-28 sm:pt-32">
         <div className="absolute inset-0 bg-gradient-to-b from-emerald-50/40 to-white" />
         <div className="relative z-10 max-w-4xl mx-auto px-6 text-center space-y-8">
-          <span className="inline-block px-4 py-1.5 bg-amber-50 rounded-full text-amber-700 text-xs font-semibold tracking-wide">Adhésion Officielle 2026</span>
+          <span className="inline-block px-4 py-1.5 bg-amber-50 rounded-full text-amber-700 text-xs font-semibold tracking-wide">Adhésion officielle {CURRENT_YEAR} · active dès maintenant</span>
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-neutral-900 leading-tight" style={{ fontFamily: "Outfit, sans-serif" }}>
             La carte qui ouvre<br />
             <span className="text-emerald-500">toutes les portes.</span>
@@ -153,12 +153,12 @@ export default function MembrePage() {
       {/* ===== CARTE MEMBRE ===== */}
       <section className="py-16 sm:py-20 bg-gradient-to-b from-emerald-50/30 to-white">
         <div className="max-w-2xl mx-auto px-6 text-center space-y-6">
-          <span className="inline-block text-xs font-semibold tracking-[0.2em] uppercase text-emerald-500">Tarif de lancement · saison 2026</span>
+          <span className="inline-block text-xs font-semibold tracking-[0.2em] uppercase text-emerald-500">Tarif de lancement · édition {CURRENT_YEAR}</span>
           <h2 className="text-3xl sm:text-4xl font-bold text-neutral-800" style={{ fontFamily: "Outfit, sans-serif" }}>Carte MEMBRE</h2>
           <div className="flex items-baseline justify-center gap-2">
             <span className="text-xl text-neutral-400 line-through">39 €</span>
             <span className="text-5xl sm:text-6xl font-bold text-neutral-900" style={{ fontFamily: "Outfit, sans-serif" }}>29 €</span>
-            <span className="text-lg text-neutral-400 font-medium">édition 2026</span>
+            <span className="text-lg text-neutral-400 font-medium">édition {CURRENT_YEAR}</span>
           </div>
           <p className="text-xs text-neutral-500">{MEMBER_VALIDITY_TEXT}</p>
           <ul className="space-y-3 max-w-sm mx-auto text-left">

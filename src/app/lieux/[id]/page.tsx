@@ -447,7 +447,7 @@ export default async function LieuDetailPage({ params }: { params: Promise<{ id:
           <div className="flex items-baseline justify-center gap-2 text-white">
             <span className="text-xl text-emerald-200 line-through">39 €</span>
             <span className="text-4xl font-bold">29 €</span>
-            <span className="text-emerald-100">édition 2026</span>
+            <span className="text-emerald-100">édition 2027</span>
           </div>
           <p className="mt-2 text-sm font-semibold text-emerald-50">{MEMBER_VALIDITY_TEXT}</p>
           <p className="mx-auto mt-3 max-w-lg text-sm leading-6 text-emerald-50">
