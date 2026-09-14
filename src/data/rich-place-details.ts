@@ -96,6 +96,7 @@ const RICH_PLACE_DETAILS: Record<string, RichPlaceDetails> = {
   },
   "eco-camping-la-porte-dautan": {
     labelYear: 2026,
+    labelYears: [2026, 2027],
     displayAddress: "1 rue Boris Vian, 11310 Saissac",
     promoCode: "labelvanlife",
     discountInstructions: [

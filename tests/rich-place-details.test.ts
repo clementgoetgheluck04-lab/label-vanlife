@@ -258,6 +258,15 @@ test("la fiche enrichie du Camping Le Verger affiche son renouvellement 2027", (
   assert.deepEqual(getVisibleLabelYears(details, new Date("2026-12-31T23:00:00Z")), [2027]);
 });
 
+test("la fiche enrichie de La Porte d'Autan affiche son renouvellement 2027", () => {
+  const details = getRichPlaceDetails("eco-camping-la-porte-dautan");
+  assert.ok(details);
+  assert.equal(details.labelYear, 2026);
+  assert.deepEqual(details.labelYears, [2026, 2027]);
+  assert.deepEqual(getVisibleLabelYears(details, new Date("2026-12-31T22:59:59Z")), [2026, 2027]);
+  assert.deepEqual(getVisibleLabelYears(details, new Date("2026-12-31T23:00:00Z")), [2027]);
+});
+
 test("la fiche enrichie du Camping Bon Séjour contient l’accueil Camargue et la réservation membre", () => {
   const details = getRichPlaceDetails("camping-bon-sejour");
   assert.ok(details);

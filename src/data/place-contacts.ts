@@ -3,6 +3,10 @@ export type PlaceContact = {
   email?: string;
   phone?: string;
   contactName?: string;
+  kitEmailSubject?: string;
+  kitEmailPreheader?: string;
+  kitEmailTitle?: string;
+  kitEmailParagraphs?: string[];
 };
 
 // Coordonnées publiques vérifiées dans les pages enregistrées fournies avec la V1.
@@ -35,7 +39,21 @@ const CONTACTS: Record<string, PlaceContact> = {
   "camping-les-terrasses": { website: "https://www.camping-les-terrasses.com/", email: "campinglesterrasses34@gmail.com", phone: "+33467253506" },
   "camping-saint-lambert": { website: "https://www.camping-millau-riviere.fr/fr-fr", email: "contact@campingsaintlambert.fr", phone: "+33565600048" },
   "domaine-de-mepillat": { website: "https://www.camping-mepillat.fr/", email: "contact@camping-mepillat.fr", phone: "+33970770121" },
-  "eco-camping-la-porte-dautan": { website: "https://www.laportedautan.fr/", email: "contact@laportedautan.fr", phone: "+33630766221" },
+  "eco-camping-la-porte-dautan": {
+    website: "https://www.laportedautan.fr/",
+    email: "contact@laportedautan.fr",
+    phone: "+33630766221",
+    contactName: "Jean-Louis",
+    kitEmailSubject: "Jean-Louis, votre renouvellement 2027 et votre kit Label Vanlife",
+    kitEmailPreheader: "Merci de poursuivre l’aventure avec nous : votre renouvellement et votre kit 2027 sont prêts.",
+    kitEmailTitle: "Merci Jean-Louis, cap sur 2027",
+    kitEmailParagraphs: [
+      "Merci pour votre réponse, votre franchise et votre confiance renouvelée. Nous avons bien entendu votre retour : en 2026, Label Vanlife ne vous a apporté aucune visite identifiée sur votre site et aucune demande de réduction. Il est important pour nous de le reconnaître clairement afin de faire mieux.",
+      "Nous sommes sincèrement désolés que la saison ait été aussi éprouvante. Entre la canicule, les incendies qui ont affecté l’image du département, la tempête de Castelnaudary et la tornade qui a frappé un village, vous avez subi une succession d’événements particulièrement difficile, même lorsque votre camping n’était pas directement touché.",
+      "2026 était l’année de lancement de Label Vanlife. Nous voulons faire de 2027 une année de croissance, avec davantage de visibilité pour les lieux, un suivi plus attentif des retombées et une communication plus régulière auprès des voyageurs. Votre renouvellement est bien entendu offert pour toute la saison 2027.",
+      "L’Éco-Camping La Porte d’Autan porte exactement le type d’accueil humain, engagé et proche de la nature que nous souhaitons mieux faire connaître. Nous vous souhaitons beaucoup de courage pour préparer la prochaine saison et espérons qu’elle vous apportera le nouvel élan que votre établissement mérite.",
+    ],
+  },
   "ferme-pedagogique-solidor": { website: "https://fermedesolidor.fr/", email: "contact@fermedesolidor.fr" },
   "mas-de-bouzou": { website: "https://www.masdebouzou.net/", email: "kompostelle@yahoo.com", phone: "+33666500628" },
 };

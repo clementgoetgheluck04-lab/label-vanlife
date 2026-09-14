@@ -8,6 +8,11 @@ const SECRET = "test-secret-with-more-than-thirty-two-characters";
 test("le kit reconnaît uniquement les adresses professionnelles labellisées", () => {
   assert.equal(getLabelledPlaceByEmail(" CAMPINGLECOINCHARMANT@GMAIL.COM ")?.placeId, "camping-le-coin-charmant");
   assert.equal(getLabelledPlaceByEmail("CONTACT@CAMPINGLEVERGER17.COM")?.contact.contactName, "Élise");
+  const porteAutan = getLabelledPlaceByEmail(" CONTACT@LAPORTEDAUTAN.FR ");
+  assert.equal(porteAutan?.placeId, "eco-camping-la-porte-dautan");
+  assert.equal(porteAutan?.contact.contactName, "Jean-Louis");
+  assert.match(porteAutan?.contact.kitEmailSubject ?? "", /renouvellement 2027/);
+  assert.ok(porteAutan?.contact.kitEmailParagraphs?.some((paragraph) => paragraph.includes("aucune visite identifiée")));
   assert.equal(getLabelledPlaceByEmail("inconnu@example.com"), undefined);
 });
 
