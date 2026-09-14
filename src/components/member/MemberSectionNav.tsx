@@ -27,15 +27,21 @@ const MEMBER_SECTIONS = [
 export default function MemberSectionNav() {
   const pathname = usePathname();
 
-  if (pathname === "/member") return null;
+  if (pathname === "/member") {
+    return (
+      <div className="mt-16 border-b border-neutral-200 bg-white">
+        <div className="mx-auto flex max-w-6xl justify-end px-4 py-3">
+          <LogoutButton />
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="border-b border-neutral-200 bg-white">
-      <nav
-        aria-label="Navigation de l’espace membre"
-        className="mx-auto max-w-6xl px-4 py-3"
-      >
-        <div className="flex items-center gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+    <div className="mt-16 border-b border-neutral-200 bg-white">
+      <div className="mx-auto flex max-w-6xl items-center gap-3 px-4 py-3">
+        <nav aria-label="Navigation de l’espace membre" className="min-w-0 flex-1">
+          <div className="flex items-center gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           <Link
             href="/member"
             className="inline-flex min-h-11 shrink-0 items-center gap-2 rounded-xl bg-neutral-900 px-4 py-2 text-sm font-bold text-white shadow-sm transition hover:bg-neutral-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 focus-visible:ring-offset-2"
@@ -66,8 +72,24 @@ export default function MemberSectionNav() {
               </Link>
             );
           })}
-        </div>
-      </nav>
+          </div>
+        </nav>
+        <LogoutButton />
+      </div>
     </div>
+  );
+}
+
+function LogoutButton() {
+  return (
+    <form action="/auth/logout" method="post" className="shrink-0">
+      <button
+        type="submit"
+        className="min-h-11 rounded-xl border border-neutral-200 bg-white px-3 py-2 text-xs font-semibold text-neutral-700 shadow-sm transition hover:border-neutral-300 hover:text-neutral-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 sm:px-4"
+      >
+        <span className="sm:hidden">Quitter</span>
+        <span className="hidden sm:inline">Se déconnecter</span>
+      </button>
+    </form>
   );
 }
