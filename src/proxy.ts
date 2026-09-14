@@ -31,7 +31,7 @@ function strictContentSecurityPolicy(nonce: string): string {
     "script-src-attr 'none'",
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
     "style-src-attr 'unsafe-inline'",
-    "img-src 'self' data: blob: https://*.vercel.app https://*.basemaps.cartocdn.com https://api.bienvenue-a-la-ferme.com",
+    "img-src 'self' data: blob: https://*.vercel.app https://tile.openstreetmap.org https://api.bienvenue-a-la-ferme.com",
     "font-src 'self' data: https://fonts.gstatic.com",
     "connect-src 'self' https://*.vercel.app https://*.supabase.co wss://*.supabase.co https://*.stripe.com https://checkout.stripe.com",
     "frame-src 'self' https://checkout.stripe.com",
