@@ -9,9 +9,19 @@ import { getAppUrl, getBackOfficeEmails, getTransactionalEmailFrom, requireServe
 
 const DAY = 24 * 60 * 60 * 1_000;
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const ACTIVE_STATUSES: ProspectStatus[] = ["NEW", "CONTACTED", "FOLLOW_UP_1"];
+const ACTIVE_STATUSES: ProspectStatus[] = ["NEW", "CONTACTED", "FOLLOW_UP_1", "ENGAGED"];
 
-export type ProspectingStage = "INITIAL" | "FOLLOW_UP_1" | "FOLLOW_UP_2";
+export type ProspectingStage =
+  | "INITIAL"
+  | "FOLLOW_UP_1"
+  | "OFFER_3"
+  | "VANLIFE_NEWS"
+  | "VANLIFE_STATS"
+  | "WILD_SPOTS"
+  | "OFFER_7"
+  | "DREAM"
+  | "TESTIMONIAL"
+  | "OFFER_10";
 
 export function normalizeProspectEmail(value: string): string {
   return value.trim().toLowerCase();
@@ -30,10 +40,24 @@ export function getProspectionReplyTo(): string {
   return process.env.PROSPECTION_REPLY_TO || "contact@labelvanlife.com";
 }
 
-function stageForStatus(status: ProspectStatus): ProspectingStage | null {
-  if (status === "NEW") return "INITIAL";
-  if (status === "CONTACTED") return "FOLLOW_UP_1";
-  if (status === "FOLLOW_UP_1") return "FOLLOW_UP_2";
+function stageForProspect(prospect: Prospect): ProspectingStage | null {
+  if (prospect.status === "NEW") return "INITIAL";
+  if (prospect.status === "CONTACTED") return "FOLLOW_UP_1";
+  if (prospect.status === "FOLLOW_UP_1") return "OFFER_3";
+  if (prospect.status === "ENGAGED") {
+    const engagedStages: Record<number, ProspectingStage> = {
+      1: "FOLLOW_UP_1",
+      2: "OFFER_3",
+      3: "VANLIFE_NEWS",
+      4: "VANLIFE_STATS",
+      5: "WILD_SPOTS",
+      6: "OFFER_7",
+      7: "DREAM",
+      8: "TESTIMONIAL",
+      9: "OFFER_10",
+    };
+    return engagedStages[prospect.followUpCount] || null;
+  }
   return null;
 }
 
@@ -114,30 +138,153 @@ function messageFor(prospect: Prospect, stage: ProspectingStage) {
     };
   }
 
-  const subject = `Dernier message concernant ${prospect.name}`;
-  const paragraphs = [
-    `Je termine ici mes messages au sujet de ${prospect.name}${city}.`,
-    "Si vous souhaitez rejoindre le réseau 2027, la prévente est actuellement proposée à 110 € au lieu de 290 €, dans la limite des places disponibles. Elle comprend la fiche, la présence sur la MAP, le kit de communication et l’accompagnement, sans commission sur vos réservations.",
-    "Sans réponse de votre part, vous ne recevrez pas d’autre relance automatique. Vous pourrez naturellement revenir vers nous plus tard.",
-  ];
-  const text = `${greeting(prospect)}\n\n${paragraphs.join("\n\n")}\n\nVoir la labellisation : ${getAppUrl()}/labellisation\n\n${legal}\nDésinscription : ${unsubscribe}`;
+  if (stage === "OFFER_3") {
+    const subject = `L’offre Label Vanlife 2027 pour ${prospect.name}`;
+    const paragraphs = [
+      `Voici les conditions proposées à ${prospect.name}${city} pour rejoindre le réseau 2027.`,
+      "La prévente est actuellement à 110 € au lieu de 290 €, dans la limite des places disponibles. Elle comprend la fiche, la présence sur la MAP, le kit de communication et l’accompagnement, sans commission sur vos réservations.",
+      "Pour respecter votre choix, ce sera notre dernier email commercial sans signe d’intérêt de votre part. Un clic vers notre site nous indiquera simplement que vous souhaitez continuer à recevoir les contenus utiles de cette série.",
+    ];
+    const text = `${greeting(prospect)}\n\n${paragraphs.join("\n\n")}\n\nVoir la labellisation : ${getAppUrl()}/labellisation\n\n${legal}\nDésinscription : ${unsubscribe}`;
+    return {
+      subject,
+      text,
+      html: labelVanlifeEmail({
+        preheader: "L’offre 2027 et les outils remis à chaque établissement",
+        eyebrow: "OFFRE LABEL VANLIFE 2027",
+        title: "À vous de choisir la suite",
+        greeting: greeting(prospect),
+        paragraphs,
+        details: [
+          { label: "Prévente 2027", value: "110 € au lieu de 290 €" },
+          { label: "Commission", value: "0 % sur les réservations" },
+          { label: "Validité", value: "Jusqu’au 31 décembre 2027" },
+        ],
+        action: { label: "Découvrir la labellisation", href: `${getAppUrl()}/labellisation` },
+        secondaryAction: { label: "Déposer ma candidature", href: candidatureUrl(prospect) },
+        notice: "Sans clic ni réponse, aucune autre relance automatique ne sera envoyée.",
+        legalFooter: legal,
+        unsubscribeHref: unsubscribe,
+        signature: "Clément — Label Vanlife",
+      }),
+    };
+  }
+
+  const editorial = {
+    VANLIFE_NEWS: {
+      subject: "La dynamique du plein air continue de progresser",
+      eyebrow: "ACTUALITÉ VANLIFE",
+      title: "Le voyage en plein air gagne encore du terrain",
+      paragraphs: [
+        "La saison 2025 a confirmé l’intérêt des voyageurs pour l’hôtellerie de plein air : 124,9 millions de nuitées ont été enregistrées entre juin et septembre, soit une progression de 3,2 % sur un an selon les données relayées par la FFCC à partir de l’INSEE.",
+        `Pour ${prospect.name}, cette tendance représente une occasion concrète : être identifiable par les voyageurs mobiles avant qu’ils choisissent leur prochaine étape.`,
+        "Label Vanlife travaille précisément sur ce moment de décision, avec une MAP, des fiches claires et une communauté de voyageurs responsables.",
+      ],
+      action: { label: "Lire l’actualité source", href: "https://ffcc.fr/actualite/le-camping-champion-indetronable-de-lete-2025/" },
+      secondaryAction: { label: "Découvrir notre concept", href: `${getAppUrl()}/le-label` },
+      notice: "Cette donnée concerne l’hôtellerie de plein air dans son ensemble ; elle ne constitue pas une promesse individuelle de fréquentation.",
+    },
+    VANLIFE_STATS: {
+      subject: "Près d’un million de voyageurs en véhicules de loisirs",
+      eyebrow: "LE CHIFFRE À RETENIR",
+      title: "Un marché mobile qui cherche ses prochaines étapes",
+      paragraphs: [
+        "La Direction générale des Entreprises indique que 600 000 camping-cars sont utilisés en France par près d’un million de personnes, représentant environ 27 millions de nuitées par an.",
+        "Ces voyageurs ne cherchent pas tous la même chose, mais ils ont un besoin commun : comprendre rapidement où ils peuvent s’arrêter, ce qu’ils trouveront sur place et comment ils seront accueillis.",
+        `C’est cette lisibilité que Label Vanlife veut apporter à des établissements comme ${prospect.name}.`,
+      ],
+      action: { label: "Consulter la source officielle", href: "https://www.entreprises.gouv.fr/espace-entreprises/s-informer-sur-la-reglementation/les-terrains-de-camping-amenages-et-parcs" },
+      secondaryAction: { label: "Voir Label Vanlife", href: `${getAppUrl()}/le-label` },
+      notice: "Chiffres nationaux communiqués par la Direction générale des Entreprises ; aucune fréquentation individuelle n’est garantie.",
+    },
+    WILD_SPOTS: {
+      subject: "Votre concurrent le plus discret est peut-être le parking voisin",
+      eyebrow: "LE MANQUE À GAGNER INVISIBLE",
+      title: "Les spots sauvages ne font aucune publicité — mais ils captent des voyageurs",
+      paragraphs: [
+        "Un van garé gratuitement sur un parking ou un spot sauvage à proximité n’est pas forcément un voyageur qui refuse de payer. Souvent, il ignore simplement qu’un lieu adapté existe à quelques minutes et qu’il y serait réellement bien accueilli.",
+        `Pour ${prospect.name}, chaque étape non identifiée peut devenir un manque à gagner discret : une nuitée, un repas, une activité ou une recommandation qui n’aura pas lieu.`,
+        "Label Vanlife ne promet pas de supprimer le sauvage. Le label donne une raison claire de choisir votre établissement : accueil vérifié, informations utiles, avantage membre et confiance avant l’arrivée.",
+      ],
+      action: { label: "Voir comment le label vous rend visible", href: `${getAppUrl()}/labellisation` },
+      secondaryAction: { label: "Découvrir la MAP", href: `${getAppUrl()}/explorer` },
+      notice: "Notre approche valorise un accueil responsable sans dénigrer la liberté de voyager.",
+    },
+    OFFER_7: {
+      subject: "Rappel de l’offre Label Vanlife 2027 — 110 €",
+      eyebrow: "OFFRE 2027 · PLACES LIMITÉES",
+      title: "Une année complète pour installer votre visibilité",
+      paragraphs: [
+        `L’intégration de ${prospect.name} au réseau Label Vanlife 2027 est actuellement proposée à 110 € au lieu de 290 €.`,
+        "Le prix comprend l’étude du dossier, une fiche détaillée, la présence sur la MAP membre, le kit de communication 2027 et l’accompagnement, sans commission sur les réservations.",
+        "Le label est actif dès validation jusqu’au 31 décembre 2027. Si le dossier est déclaré non conforme après étude, le paiement est remboursé intégralement.",
+      ],
+      action: { label: "Je demande mon label 2027", href: candidatureUrl(prospect) },
+      secondaryAction: { label: "Relire toute l’offre", href: `${getAppUrl()}/labellisation` },
+      notice: "Paiement unique · 0 % de commission · Aucun renouvellement automatique.",
+    },
+    DREAM: {
+      subject: "Imaginez les bons voyageurs arriver en connaissant déjà votre lieu",
+      eyebrow: "PROJECTION 2027",
+      title: "Des vanlifers respectueux, informés avant leur arrivée",
+      paragraphs: [
+        "Imaginez des voyageurs qui découvrent votre fiche avant de prendre la route, comprennent vos règles, vos services et l’esprit de votre accueil, puis arrivent avec leur Carte membre Label Vanlife.",
+        "Ils ne viennent pas par hasard : ils ont choisi un lieu qui partage leur envie de voyager proprement, calmement et avec respect. De votre côté, vous savez pourquoi ils viennent et ce qu’ils attendent.",
+        `C’est la relation que nous voulons construire entre les membres et ${prospect.name} : moins de malentendus, plus de confiance et davantage de recommandations utiles.`,
+      ],
+      action: { label: "Projeter mon lieu dans le réseau", href: candidatureUrl(prospect) },
+      secondaryAction: { label: "Découvrir les lieux actuels", href: `${getAppUrl()}/explorer` },
+      notice: "Le label sélectionne et informe ; il ne promet jamais un volume de réservations.",
+    },
+    TESTIMONIAL: {
+      subject: "Ce qu’une vanlifeuse attend vraiment d’un lieu d’accueil",
+      eyebrow: "PAROLE DE VANLIFER",
+      title: "« Plus de stress, plus de mauvaises surprises »",
+      paragraphs: [
+        "« Label Vanlife a changé notre façon de voyager. Plus de stress, plus de mauvaises surprises. » — Hélène Family Vanlifers.",
+        "Derrière ce témoignage, le besoin est très simple : savoir avant d’arriver qu’un établissement comprend la vanlife et accueille réellement ce type de voyageur.",
+        `Une fiche précise de ${prospect.name}, reliée à une charte et à une Carte membre vérifiable, peut donner cette confiance au moment du choix.`,
+      ],
+      action: { label: "Comprendre la philosophie du label", href: `${getAppUrl()}/le-label` },
+      secondaryAction: { label: "Demander mon label", href: candidatureUrl(prospect) },
+      notice: "Témoignage déjà publié par Label Vanlife. Les expériences restent personnelles et ne garantissent pas un résultat identique.",
+    },
+    OFFER_10: {
+      subject: `Dernière invitation 2027 pour ${prospect.name}`,
+      eyebrow: "DERNIÈRE INVITATION",
+      title: "110 € au lieu de 290 € pour rejoindre le réseau 2027",
+      paragraphs: [
+        `Je termine ici la série consacrée à ${prospect.name}. Si notre vision vous correspond, vous pouvez encore demander votre label 2027 au tarif de prévente de 110 € au lieu de 290 €, dans la limite des places disponibles.`,
+        "Vous bénéficiez de la fiche, de la MAP membre, du kit de communication et de l’accompagnement jusqu’au 31 décembre 2027, avec 0 % de commission sur vos réservations.",
+        "Sans réponse de votre part, aucun autre message automatique ne sera envoyé. Vous pourrez naturellement revenir vers nous lorsque le moment sera le bon.",
+      ],
+      action: { label: "Je demande mon label 2027", href: candidatureUrl(prospect) },
+      secondaryAction: { label: "Découvrir une dernière fois l’offre", href: `${getAppUrl()}/labellisation` },
+      notice: "Fin définitive du parcours automatique après ce message.",
+    },
+  } satisfies Record<Exclude<ProspectingStage, "INITIAL" | "FOLLOW_UP_1" | "OFFER_3">, {
+    subject: string;
+    eyebrow: string;
+    title: string;
+    paragraphs: string[];
+    action: { label: string; href: string };
+    secondaryAction: { label: string; href: string };
+    notice: string;
+  }>;
+  const content = editorial[stage];
+  const text = `${greeting(prospect)}\n\n${content.paragraphs.join("\n\n")}\n\n${content.action.label} : ${content.action.href}\n${content.secondaryAction.label} : ${content.secondaryAction.href}\n\n${legal}\nDésinscription : ${unsubscribe}`;
   return {
-    subject,
+    subject: content.subject,
     text,
     html: labelVanlifeEmail({
-      preheader: "Dernier message — aucune autre relance automatique sans réponse",
-      eyebrow: "DERNIER MESSAGE",
-      title: "À vous de choisir la suite",
+      preheader: content.title,
+      eyebrow: content.eyebrow,
+      title: content.title,
       greeting: greeting(prospect),
-      paragraphs,
-      details: [
-        { label: "Prévente 2027", value: "110 € au lieu de 290 €" },
-        { label: "Commission", value: "0 % sur les réservations" },
-        { label: "Validité", value: "Jusqu’au 31 décembre 2027" },
-      ],
-      action: { label: "Découvrir la labellisation", href: `${getAppUrl()}/labellisation` },
-      secondaryAction: { label: "Déposer ma candidature", href: candidatureUrl(prospect) },
-      notice: "Sans réponse, aucune autre relance automatique ne sera envoyée.",
+      paragraphs: content.paragraphs,
+      action: content.action,
+      secondaryAction: content.secondaryAction,
+      notice: content.notice,
       legalFooter: legal,
       unsubscribeHref: unsubscribe,
       signature: "Clément — Label Vanlife",
@@ -195,7 +342,7 @@ export async function suppressProspect(email: string, reason: string, source: st
 }
 
 async function sendOne(prospect: Prospect): Promise<"sent" | "skipped" | "failed"> {
-  const stage = stageForStatus(prospect.status);
+  const stage = stageForProspect(prospect);
   if (!stage) return "skipped";
   const prisma = getPrisma();
   const suppression = await prisma.prospectSuppression.findUnique({ where: { email: prospect.email } });
@@ -258,15 +405,40 @@ async function sendOne(prospect: Prospect): Promise<"sent" | "skipped" | "failed
     return "failed";
   }
 
-  const nextStatus: ProspectStatus = stage === "INITIAL" ? "CONTACTED" : stage === "FOLLOW_UP_1" ? "FOLLOW_UP_1" : "FOLLOW_UP_2";
-  const nextActionAt = stage === "INITIAL" ? new Date(now.getTime() + 7 * DAY) : stage === "FOLLOW_UP_1" ? new Date(now.getTime() + 10 * DAY) : null;
+  const stageNumber: Record<ProspectingStage, number> = {
+    INITIAL: 1,
+    FOLLOW_UP_1: 2,
+    OFFER_3: 3,
+    VANLIFE_NEWS: 4,
+    VANLIFE_STATS: 5,
+    WILD_SPOTS: 6,
+    OFFER_7: 7,
+    DREAM: 8,
+    TESTIMONIAL: 9,
+    OFFER_10: 10,
+  };
+  const progress = stageNumber[stage];
+  const engaged = prospect.status === "ENGAGED";
+  const nextStatus: ProspectStatus = progress >= 10
+    ? "FOLLOW_UP_2"
+    : engaged
+      ? "ENGAGED"
+      : stage === "INITIAL"
+        ? "CONTACTED"
+        : stage === "FOLLOW_UP_1"
+          ? "FOLLOW_UP_1"
+          : "FOLLOW_UP_2";
+  const delayDays = progress === 1 ? 7 : progress === 2 ? 10 : 14;
+  const nextActionAt = nextStatus === "ENGAGED" || nextStatus === "CONTACTED" || nextStatus === "FOLLOW_UP_1"
+    ? new Date(now.getTime() + delayDays * DAY)
+    : null;
   await prisma.$transaction([
     prisma.prospectMessage.update({ where: { id: record.id }, data: { status: "SENT", providerMessageId: result.data.id, sentAt: now } }),
     prisma.prospect.update({
       where: { id: prospect.id },
       data: {
         status: nextStatus,
-        followUpCount: stage === "INITIAL" ? 0 : stage === "FOLLOW_UP_1" ? 1 : 2,
+        followUpCount: progress,
         firstContactedAt: prospect.firstContactedAt || now,
         lastContactedAt: now,
         nextActionAt,

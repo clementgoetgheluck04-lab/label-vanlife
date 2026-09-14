@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { AlertTriangle, ArrowUpRight, CheckCircle2, Clock3, Mail, MessageSquareReply, Pause, Play, RefreshCw, Send, ShieldCheck, Target, Users } from "lucide-react";
 
-type ProspectStatus = "NEW" | "SENDING" | "CONTACTED" | "FOLLOW_UP_1" | "FOLLOW_UP_2" | "INTERESTED" | "QUALIFIED" | "CONVERTED" | "NOT_INTERESTED" | "UNSUBSCRIBED" | "INVALID" | "NEEDS_HUMAN" | "PAUSED" | "ERROR";
+type ProspectStatus = "NEW" | "SENDING" | "CONTACTED" | "FOLLOW_UP_1" | "FOLLOW_UP_2" | "ENGAGED" | "INTERESTED" | "QUALIFIED" | "CONVERTED" | "NOT_INTERESTED" | "UNSUBSCRIBED" | "INVALID" | "NEEDS_HUMAN" | "PAUSED" | "ERROR";
 type Prospect = {
   id: string;
   name: string;
@@ -24,11 +24,13 @@ type Dashboard = {
 
 const LABELS: Record<ProspectStatus, string> = {
   NEW: "À contacter", SENDING: "Envoi en cours", CONTACTED: "Contacté", FOLLOW_UP_1: "Relance 1", FOLLOW_UP_2: "Cycle terminé",
+  ENGAGED: "Parcours éditorial",
   INTERESTED: "Intéressé", QUALIFIED: "Qualifié", CONVERTED: "Vendu", NOT_INTERESTED: "Refus", UNSUBSCRIBED: "Désinscrit",
   INVALID: "Adresse invalide", NEEDS_HUMAN: "À traiter", PAUSED: "En pause", ERROR: "Erreur",
 };
 const STATUS_STYLE: Record<ProspectStatus, string> = {
   NEW: "bg-sky-50 text-sky-700", SENDING: "bg-blue-50 text-blue-700", CONTACTED: "bg-stone-100 text-stone-700", FOLLOW_UP_1: "bg-amber-50 text-amber-700", FOLLOW_UP_2: "bg-stone-100 text-stone-500",
+  ENGAGED: "bg-violet-100 text-violet-800",
   INTERESTED: "bg-emerald-100 text-emerald-800", QUALIFIED: "bg-emerald-100 text-emerald-800", CONVERTED: "bg-[#174936] text-white", NOT_INTERESTED: "bg-stone-100 text-stone-500", UNSUBSCRIBED: "bg-stone-100 text-stone-500",
   INVALID: "bg-red-50 text-red-700", NEEDS_HUMAN: "bg-orange-100 text-orange-800", PAUSED: "bg-stone-100 text-stone-600", ERROR: "bg-red-100 text-red-800",
 };
@@ -65,7 +67,7 @@ export default function AdminProspectionPage() {
 
   const visible = useMemo(() => (data?.prospects || []).filter((prospect) => {
     if (filter === "attention") return ["INTERESTED", "NEEDS_HUMAN", "ERROR"].includes(prospect.status);
-    if (filter === "active") return ["NEW", "SENDING", "CONTACTED", "FOLLOW_UP_1"].includes(prospect.status);
+    if (filter === "active") return ["NEW", "SENDING", "CONTACTED", "FOLLOW_UP_1", "ENGAGED"].includes(prospect.status);
     if (filter === "won") return prospect.status === "CONVERTED";
     return true;
   }), [data, filter]);
@@ -78,7 +80,7 @@ export default function AdminProspectionPage() {
     <main className="min-h-screen bg-[#f8f6f1] px-4 pb-24 pt-28 sm:px-6">
       <div className="mx-auto max-w-7xl space-y-7">
         <header className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
-          <div><p className="text-xs font-black uppercase tracking-[.2em] text-emerald-700">Pilotage commercial</p><h1 className="mt-2 text-3xl font-black text-neutral-950 sm:text-4xl">Prospection autonome</h1><p className="mt-3 max-w-2xl text-sm leading-6 text-stone-600">Le moteur contacte les lieux qualifiés, effectue au maximum deux relances, classe les réponses et conduit les prospects intéressés jusqu’à la candidature.</p></div>
+          <div><p className="text-xs font-black uppercase tracking-[.2em] text-emerald-700">Pilotage commercial</p><h1 className="mt-2 text-3xl font-black text-neutral-950 sm:text-4xl">Prospection autonome</h1><p className="mt-3 max-w-2xl text-sm leading-6 text-stone-600">Le moteur envoie au maximum trois messages sans engagement. Après un clic, un parcours éditorial progressif peut continuer jusqu’au dixième et dernier message.</p></div>
           <div className="flex flex-wrap gap-2"><Link href="/admin/labellisations" className="inline-flex min-h-11 items-center gap-2 rounded-full border border-stone-300 bg-white px-5 text-sm font-bold text-neutral-800">Candidatures <ArrowUpRight className="h-4 w-4" /></Link><button onClick={() => action("sync")} disabled={working !== ""} className="inline-flex min-h-11 items-center gap-2 rounded-full bg-neutral-950 px-5 text-sm font-bold text-white"><RefreshCw className={`h-4 w-4 ${working.startsWith("sync") ? "animate-spin" : ""}`} />Synchroniser les prospects</button></div>
         </header>
 
@@ -102,7 +104,7 @@ export default function AdminProspectionPage() {
             {visible.map((prospect) => <article key={prospect.id} className="grid gap-4 p-5 lg:grid-cols-[1.5fr_1fr_auto] lg:items-center">
               <div className="min-w-0"><div className="flex flex-wrap items-center gap-2"><h3 className="truncate font-black text-neutral-950">{prospect.name}</h3><span className={`rounded-full px-2.5 py-1 text-[11px] font-bold ${STATUS_STYLE[prospect.status]}`}>{LABELS[prospect.status]}</span></div><p className="mt-1 truncate text-sm text-stone-500">{prospect.email}{prospect.city ? ` · ${prospect.city}` : ""}</p></div>
               <div className="text-xs text-stone-500">{prospect.messages[0] ? <><p className="truncate font-semibold text-stone-700"><Mail className="mr-1 inline h-3.5 w-3.5" />{prospect.messages[0].subject}</p><p className="mt-1">{new Date(prospect.messages[0].createdAt).toLocaleString("fr-FR")}</p></> : <p><Clock3 className="mr-1 inline h-3.5 w-3.5" />En attente du premier contact</p>}</div>
-              <div className="flex flex-wrap justify-start gap-2 lg:justify-end">{["NEW","CONTACTED","FOLLOW_UP_1"].includes(prospect.status) && <button title="Mettre en pause" onClick={() => action("pause", prospect.id)} className="rounded-full border border-stone-200 p-2 text-stone-600"><Pause className="h-4 w-4" /></button>}{["PAUSED","ERROR"].includes(prospect.status) && <button title="Reprendre" onClick={() => action(prospect.status === "ERROR" ? "retry" : "resume", prospect.id)} className="rounded-full border border-stone-200 p-2 text-emerald-700"><Play className="h-4 w-4" /></button>}{["INTERESTED","NEEDS_HUMAN"].includes(prospect.status) && <button onClick={() => action("qualified", prospect.id)} className="rounded-full bg-emerald-50 px-3 py-2 text-xs font-bold text-emerald-800">Qualifier</button>}{["INTERESTED","QUALIFIED","NEEDS_HUMAN"].includes(prospect.status) && <button onClick={() => action("converted", prospect.id)} className="rounded-full bg-neutral-950 px-3 py-2 text-xs font-bold text-white">Vente conclue</button>}{!["CONVERTED","UNSUBSCRIBED","NOT_INTERESTED","INVALID"].includes(prospect.status) && <button onClick={() => action("suppress", prospect.id)} className="rounded-full border border-stone-200 px-3 py-2 text-xs font-bold text-stone-600">Ne plus contacter</button>}</div>
+              <div className="flex flex-wrap justify-start gap-2 lg:justify-end">{["NEW","CONTACTED","FOLLOW_UP_1","ENGAGED"].includes(prospect.status) && <button title="Mettre en pause" onClick={() => action("pause", prospect.id)} className="rounded-full border border-stone-200 p-2 text-stone-600"><Pause className="h-4 w-4" /></button>}{["PAUSED","ERROR"].includes(prospect.status) && <button title="Reprendre" onClick={() => action(prospect.status === "ERROR" ? "retry" : "resume", prospect.id)} className="rounded-full border border-stone-200 p-2 text-emerald-700"><Play className="h-4 w-4" /></button>}{["INTERESTED","NEEDS_HUMAN"].includes(prospect.status) && <button onClick={() => action("qualified", prospect.id)} className="rounded-full bg-emerald-50 px-3 py-2 text-xs font-bold text-emerald-800">Qualifier</button>}{["INTERESTED","QUALIFIED","NEEDS_HUMAN"].includes(prospect.status) && <button onClick={() => action("converted", prospect.id)} className="rounded-full bg-neutral-950 px-3 py-2 text-xs font-bold text-white">Vente conclue</button>}{!["CONVERTED","UNSUBSCRIBED","NOT_INTERESTED","INVALID"].includes(prospect.status) && <button onClick={() => action("suppress", prospect.id)} className="rounded-full border border-stone-200 px-3 py-2 text-xs font-bold text-stone-600">Ne plus contacter</button>}</div>
             </article>)}
           </div>
         </section>

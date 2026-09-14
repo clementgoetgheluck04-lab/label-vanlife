@@ -15,6 +15,7 @@ type ResendEvent = {
     from?: string;
     to?: string[];
     subject?: string;
+    click?: { link?: string };
   };
 };
 
@@ -47,8 +48,34 @@ async function handleDeliveryEvent(event: ResendEvent): Promise<void> {
     include: { prospect: true },
   });
   if (!message) return;
-  if (event.type === "email.bounced") await suppressProspect(message.prospect.email, "bounce", "resend-webhook");
+  if (event.type === "email.bounced" || event.type === "email.suppressed") await suppressProspect(message.prospect.email, "bounce", "resend-webhook");
   if (event.type === "email.complained") await suppressProspect(message.prospect.email, "complaint", "resend-webhook");
+}
+
+async function handleClick(event: ResendEvent): Promise<void> {
+  const providerMessageId = event.data?.email_id;
+  const link = event.data?.click?.link || "";
+  let clickedUrl: URL;
+  try {
+    clickedUrl = new URL(link);
+  } catch {
+    return;
+  }
+  if (!providerMessageId || !/(^|\.)labelvanlife\.(fr|com)$/i.test(clickedUrl.hostname) || /desinscription|unsubscribe/i.test(clickedUrl.pathname)) return;
+  const prisma = getPrisma();
+  const message = await prisma.prospectMessage.findUnique({
+    where: { providerMessageId },
+    include: { prospect: true },
+  });
+  if (!message || message.direction !== "OUTBOUND" || message.prospect.followUpCount >= 10) return;
+  if (!["CONTACTED", "FOLLOW_UP_1", "FOLLOW_UP_2"].includes(message.prospect.status)) return;
+  await prisma.prospect.update({
+    where: { id: message.prospect.id },
+    data: {
+      status: "ENGAGED",
+      nextActionAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1_000),
+    },
+  });
 }
 
 async function sendSalesReply(prospect: { id: string; sourceId: string | null; name: string; email: string }, subject: string, inboundId: string, kind: "interested" | "question") {
@@ -171,7 +198,8 @@ export async function POST(request: NextRequest) {
     }) as ResendEvent;
 
     if (event.type === "email.received") await handleInbound(event);
-    if (event.type === "email.bounced" || event.type === "email.complained") await handleDeliveryEvent(event);
+    if (event.type === "email.clicked") await handleClick(event);
+    if (["email.bounced", "email.complained", "email.suppressed"].includes(event.type)) await handleDeliveryEvent(event);
     return NextResponse.json({ received: true });
   } catch (error) {
     console.error("[resend-webhook] rejected", error instanceof Error ? error.message : error);

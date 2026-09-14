@@ -13,14 +13,25 @@ test("prospection is disabled unless explicitly enabled and caps daily volume", 
   assert.match(engine, /parisWeekday === "Sat" \|\| parisWeekday === "Sun"/);
 });
 
-test("prospection stops after two follow-ups and includes working opposition controls", () => {
+test("silent prospects stop after message three and opposition controls remain available", () => {
   const engine = source("../src/server/prospection.ts");
-  assert.match(engine, /ACTIVE_STATUSES[^\n]+"NEW", "CONTACTED", "FOLLOW_UP_1"/);
-  assert.match(engine, /Sans réponse, aucune autre relance automatique/);
+  assert.match(engine, /ACTIVE_STATUSES[^\n]+"NEW", "CONTACTED", "FOLLOW_UP_1", "ENGAGED"/);
+  assert.match(engine, /Sans clic ni réponse, aucune autre relance automatique/);
+  assert.match(engine, /stage === "FOLLOW_UP_1"[\s\S]+"FOLLOW_UP_2"/);
   assert.match(engine, /List-Unsubscribe/);
   assert.match(engine, /List-Unsubscribe-Post/);
   assert.match(engine, /prospectSuppression/);
   assert.match(engine, /idempotencyKey: campaignKey/);
+});
+
+test("engaged prospects receive the complete ten-message editorial journey", () => {
+  const engine = source("../src/server/prospection.ts");
+  for (const stage of ["VANLIFE_NEWS", "VANLIFE_STATS", "WILD_SPOTS", "OFFER_7", "DREAM", "TESTIMONIAL", "OFFER_10"]) {
+    assert.match(engine, new RegExp(stage));
+  }
+  assert.match(engine, /prospect\.status === "ENGAGED"/);
+  assert.match(engine, /progress >= 10[\s\S]+"FOLLOW_UP_2"/);
+  assert.match(engine, /Fin définitive du parcours automatique après ce message/);
 });
 
 test("Resend inbound webhook is signed and escalates ambiguous replies", () => {
@@ -28,6 +39,10 @@ test("Resend inbound webhook is signed and escalates ambiguous replies", () => {
   assert.match(webhook, /resend\.webhooks\.verify/);
   assert.match(webhook, /RESEND_WEBHOOK_SECRET/);
   assert.match(webhook, /email\.received/);
+  assert.match(webhook, /email\.clicked/);
+  assert.match(webhook, /status: "ENGAGED"/);
+  assert.match(webhook, /labelvanlife\\\.\(fr\|com\)/);
+  assert.match(webhook, /\["CONTACTED", "FOLLOW_UP_1", "FOLLOW_UP_2"\]/);
   assert.match(webhook, /NEEDS_HUMAN/);
   assert.match(webhook, /sendNeedHumanAlert/);
   assert.match(webhook, /email\.bounced/);

@@ -57,7 +57,7 @@ export async function POST(request: NextRequest) {
 
     if (action === "pause") await prisma.prospect.update({ where: { id: prospectId }, data: { status: "PAUSED", nextActionAt: null } });
     else if (action === "resume" || action === "retry") {
-      const status = !prospect.firstContactedAt ? "NEW" : prospect.followUpCount === 0 ? "CONTACTED" : prospect.followUpCount === 1 ? "FOLLOW_UP_1" : "FOLLOW_UP_2";
+      const status = !prospect.firstContactedAt ? "NEW" : prospect.followUpCount >= 3 && prospect.followUpCount < 10 ? "ENGAGED" : prospect.followUpCount <= 1 ? "CONTACTED" : prospect.followUpCount === 2 ? "FOLLOW_UP_1" : "FOLLOW_UP_2";
       await prisma.prospect.update({ where: { id: prospectId }, data: { status, nextActionAt: status === "FOLLOW_UP_2" ? null : new Date() } });
     } else if (action === "qualified") await prisma.prospect.update({ where: { id: prospectId }, data: { status: "QUALIFIED", nextActionAt: null } });
     else if (action === "converted") await prisma.prospect.update({ where: { id: prospectId }, data: { status: "CONVERTED", convertedAt: new Date(), nextActionAt: null } });
