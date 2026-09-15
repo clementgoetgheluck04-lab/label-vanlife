@@ -74,3 +74,13 @@ test("Vanlife Activity measures the complete acquisition loop", () => {
     assert.equal(isAnalyticsEventName(event), true);
   }
 });
+
+test("the professional kit route uses the real secured 2027 kit", () => {
+  const legacyProKit = read("../src/app/pro/kit-communication/page.tsx");
+  const securedKit = read("../src/app/kit-communication-2027/page.tsx");
+
+  assert.match(legacyProKit, /redirect\("\/kit-communication-2027"\)/);
+  assert.doesNotMatch(legacyProKit, /download:\s*"#"|disabled/);
+  assert.match(securedKit, /hasValidKitAccess/);
+  assert.match(securedKit, /profile\?\.status === "CERTIFIED" \|\| profile\?\.status === "ACTIVE"/);
+});

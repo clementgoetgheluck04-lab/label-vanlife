@@ -4,6 +4,8 @@ import Link from "next/link";
 import { cookies } from "next/headers";
 import { ArrowLeft, Download, ExternalLink, MessageCircle } from "lucide-react";
 import { KIT_ACCESS_COOKIE, hasValidKitAccess } from "@/lib/kit-access-token";
+import { getPrisma } from "@/lib/prisma";
+import { createClient } from "@/lib/supabase/server";
 import KitAccessGate from "./KitAccessGate";
 
 export const metadata: Metadata = {
@@ -53,7 +55,24 @@ const ASSETS = [
 
 export default async function KitCommunication2027Page({ searchParams }: { searchParams: Promise<{ erreur?: string }> }) {
   const cookieStore = await cookies();
-  const authorized = hasValidKitAccess(cookieStore.get(KIT_ACCESS_COOKIE)?.value);
+  let authorized = hasValidKitAccess(cookieStore.get(KIT_ACCESS_COOKIE)?.value);
+
+  if (!authorized) {
+    try {
+      const supabase = await createClient();
+      const { data } = await supabase.auth.getUser();
+      if (data.user) {
+        const profile = await getPrisma().establishmentProfile.findUnique({
+          where: { userId: data.user.id },
+          select: { status: true },
+        });
+        authorized = profile?.status === "CERTIFIED" || profile?.status === "ACTIVE";
+      }
+    } catch {
+      // The signed partner link remains available if account lookup is unavailable.
+    }
+  }
+
   if (!authorized) {
     const query = await searchParams;
     return <KitAccessGate invalidLink={Boolean(query.erreur)} />;
