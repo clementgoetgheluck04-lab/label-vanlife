@@ -210,6 +210,17 @@ test("the founder sees only aggregated reported member savings", () => {
   assert.doesNotMatch(dashboard, /passportStamp\.findMany/);
 });
 
+test("the founder dashboard measures the Vanlife Activity growth loop", () => {
+  const dashboard = read("../src/app/admin/page.tsx");
+  for (const event of ["activity_created", "recap_shared", "public_trip_membership_conversion"]) {
+    assert.match(dashboard, new RegExp(event));
+  }
+  assert.match(dashboard, /Taux de partage/);
+  assert.match(dashboard, /Conversion virale/);
+  assert.match(dashboard, /shareRate/);
+  assert.match(dashboard, /viralConversionRate/);
+});
+
 test("member notifications are marked read only by their owner after opening", () => {
   const endpoint = read("../src/app/api/member/notifications/read/route.ts");
   const page = read("../src/app/member/notifications/page.tsx");

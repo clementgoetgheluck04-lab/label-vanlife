@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, BadgeEuro, Building2, CreditCard, Map, Route, ShieldCheck, Users, WalletCards } from "lucide-react";
+import { ArrowRight, BadgeEuro, Building2, CreditCard, Map, Route, Share2, ShieldCheck, TrendingUp, Users, WalletCards } from "lucide-react";
 
 import { Card } from "@/components/ui/Card";
 import { getPrisma } from "@/lib/prisma";
@@ -24,7 +24,7 @@ export default async function FounderDashboardPage() {
     prisma.place.count({ where: { status: "PUBLISHED", createdAt: { gte: thirtyDaysAgo } } }),
     prisma.checkoutOrder.count({ where: { status: "PAID", createdAt: { gte: thirtyDaysAgo } } }),
     prisma.checkoutOrder.count({ where: { status: { in: ["CHECKOUT_CREATED", "PAID", "FAILED", "CANCELED"] }, createdAt: { gte: thirtyDaysAgo } } }),
-    prisma.analyticsEvent.groupBy({ by: ["name"], where: { createdAt: { gte: thirtyDaysAgo }, name: { in: ["map_open", "place_view", "route_start", "qr_scan", "benefit_view"] } }, _count: { _all: true } }),
+    prisma.analyticsEvent.groupBy({ by: ["name"], where: { createdAt: { gte: thirtyDaysAgo }, name: { in: ["map_open", "place_view", "route_start", "qr_scan", "benefit_view", "activity_created", "recap_shared", "public_trip_view", "public_trip_signup", "public_trip_membership_conversion"] } }, _count: { _all: true } }),
     prisma.passportStamp.aggregate({ where: { visitedAt: { gte: thirtyDaysAgo }, amountSavedCents: { not: null } }, _sum: { amountSavedCents: true }, _count: { amountSavedCents: true } }),
     prisma.prospect.groupBy({ by: ["status"], _count: { _all: true } }),
     prisma.placeRecommendation.count({ where: { status: "PENDING" } }),
@@ -38,6 +38,8 @@ export default async function FounderDashboardPage() {
   const prospects = prospectGroups.reduce((sum, row) => sum + row._count._all, 0);
   const convertedProspects = prospectGroups.find((row) => row.status === "CONVERTED")?._count._all ?? 0;
   const checkoutConversion = checkoutOrders > 0 ? Math.round((paidOrders / checkoutOrders) * 100) : null;
+  const shareRate = (byEvent.activity_created ?? 0) > 0 ? Math.round(((byEvent.recap_shared ?? 0) / byEvent.activity_created) * 100) : null;
+  const viralConversionRate = (byEvent.recap_shared ?? 0) > 0 ? Math.round(((byEvent.public_trip_membership_conversion ?? 0) / byEvent.recap_shared) * 100) : null;
   const metrics = [
     { label: "Revenu du mois", value: euros(revenue._sum.amount ?? 0), detail: `B2C ${euros(b2cRevenue)} · B2B ${euros(b2bRevenue)}`, icon: BadgeEuro },
     { label: "Membres actifs", value: String(activeMembers), detail: `+${newMembers} sur 30 jours`, icon: Users },
@@ -46,6 +48,8 @@ export default async function FounderDashboardPage() {
     { label: "MAP ouverte", value: String(byEvent.map_open ?? 0), detail: `${byEvent.place_view ?? 0} fiches vues sur 30 jours`, icon: Map },
     { label: "Connexions qualifiées", value: String(qualifiedConnections), detail: "Itinéraires + QR + avantages sur 30 jours", icon: Route },
     { label: "Économies déclarées", value: euros(memberSavings._sum.amountSavedCents ?? 0), detail: `${memberSavings._count.amountSavedCents} visite(s) renseignée(s) sur 30 jours`, icon: WalletCards },
+    { label: "Taux de partage", value: shareRate === null ? "—" : `${shareRate} %`, detail: `${byEvent.recap_shared ?? 0} récap(s) partagé(s) / ${byEvent.activity_created ?? 0} activité(s)`, icon: Share2 },
+    { label: "Conversion virale", value: viralConversionRate === null ? "—" : `${viralConversionRate} %`, detail: `${byEvent.public_trip_membership_conversion ?? 0} carte(s) attribuée(s) aux partages`, icon: TrendingUp },
   ];
 
   return <main className="min-h-screen bg-[#f8f6f1] px-4 pb-24 pt-28 sm:px-6"><div className="mx-auto max-w-6xl space-y-8">
