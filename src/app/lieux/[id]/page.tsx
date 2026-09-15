@@ -77,7 +77,9 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   }
 
   const title = `${lieu.nom} — lieu labellisé`;
-  const description = lieu.description.slice(0, 160);
+  const description = lieu.description.length <= 160
+    ? lieu.description
+    : `${lieu.description.slice(0, 157).replace(/\s+\S*$/, "")}…`;
 
   return {
     title,
