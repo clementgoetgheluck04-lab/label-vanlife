@@ -49,6 +49,8 @@ export default function MemberRoadTripsPage() {
   const [duration, setDuration] = useState(1);
   const [saving, setSaving] = useState(false);
   const [publishingId, setPublishingId] = useState<string | null>(null);
+  const [deleteCandidate, setDeleteCandidate] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<string | null>(null);
 
   useEffect(() => {
@@ -143,6 +145,26 @@ export default function MemberRoadTripsPage() {
       setFeedback(error instanceof Error ? error.message : "Modification impossible");
     } finally {
       setPublishingId(null);
+    }
+  }
+
+  async function deleteRoadTrip(id: string) {
+    if (deleteCandidate !== id) {
+      setDeleteCandidate(id);
+      setFeedback("Cliquez une seconde fois sur « Confirmer la suppression » pour supprimer définitivement ce road trip.");
+      return;
+    }
+    setDeletingId(id);
+    try {
+      const response = await fetch(`/api/member/roadtrips/${id}`, { method: "DELETE" });
+      if (!response.ok) throw new Error("Suppression impossible");
+      setRoadTrips((current) => current.filter((item) => item.id !== id));
+      setDeleteCandidate(null);
+      setFeedback("Road trip supprimé.");
+    } catch (error) {
+      setFeedback(error instanceof Error ? error.message : "Suppression impossible");
+    } finally {
+      setDeletingId(null);
     }
   }
 
@@ -266,6 +288,7 @@ export default function MemberRoadTripsPage() {
                 <div className="flex flex-col gap-2 border-t border-neutral-100 pt-3 sm:flex-row">
                   <button type="button" disabled={publishingId === rt.id} onClick={() => togglePublication(rt)} className="inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-xl border border-neutral-200 px-4 text-sm font-bold text-neutral-700 hover:border-emerald-300 hover:text-emerald-800 disabled:opacity-50">{rt.isPublic ? <Lock className="h-4 w-4" /> : <Globe2 className="h-4 w-4" />}{publishingId === rt.id ? "Modification…" : rt.isPublic ? "Repasser en privé" : "Créer le récap public"}</button>
                   {rt.isPublic && <ShareTripButton tripId={rt.id} title={rt.title} />}
+                  <button type="button" disabled={deletingId === rt.id} onClick={() => deleteRoadTrip(rt.id)} className={`inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border px-4 text-sm font-bold disabled:opacity-50 ${deleteCandidate === rt.id ? "border-red-300 bg-red-50 text-red-700" : "border-neutral-200 text-neutral-500 hover:border-red-200 hover:text-red-600"}`}><Trash2 className="h-4 w-4" />{deletingId === rt.id ? "Suppression…" : deleteCandidate === rt.id ? "Confirmer la suppression" : "Supprimer"}</button>
                 </div>
               </Card>
             ))}

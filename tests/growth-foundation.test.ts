@@ -53,12 +53,14 @@ test("the member card verification is signed and privacy limited", () => {
 test("Vanlife Activity is private by default and never publishes coordinates", () => {
   const api = read("../src/app/api/member/roadtrips/route.ts");
   const publication = read("../src/app/api/member/roadtrips/[id]/publication/route.ts");
+  const deletion = read("../src/app/api/member/roadtrips/[id]/route.ts");
   const publicTrip = read("../src/app/trip/[id]/page.tsx");
   assert.match(api, /isPublic:\s*false/);
   assert.match(publication, /typeof body\.isPublic !== "boolean"/);
   assert.match(publicTrip, /where:\s*\{ id, isPublic: true \}/);
   assert.doesNotMatch(publicTrip, /select:\s*\{[^}]*lat:\s*true|select:\s*\{[^}]*lng:\s*true/);
   assert.match(publicTrip, /Aucune position privée publiée/);
+  assert.match(deletion, /deleteMany\(\{ where: \{ id, userId: member\.id \} \}\)/);
 });
 
 test("Vanlife Activity measures the complete acquisition loop", () => {
