@@ -27,6 +27,7 @@ import {
 import type { LucideIcon } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
+import { FavoriteButton } from "@/components/member/FavoriteButton";
 import AddToRoadTripButton from "@/components/roadtrip/AddToRoadTripButton";
 import { MEMBER_PRICE_TEXT, MEMBER_PRODUCT_NAME, MEMBER_VALIDITY_TEXT } from "@/config/commercial";
 import { ENRICHED_LIEUX } from "@/data/enriched-lieux";
@@ -35,7 +36,8 @@ import { getPlaceMedia } from "@/data/place-media";
 import { cleanSourceActivities, cleanSourceCapacity, cleanSourceOpeningHours, getLabelledSourceDetails } from "@/data/labelled-source-details";
 import { getPublicRichPlaceDetails, getRichPlaceDetails, getVisibleLabelYears } from "@/data/rich-place-details";
 import { getVerifiedPlaceGps } from "@/data/verified-place-gps";
-import { hasActiveMemberAccess } from "@/server/auth";
+import { getOptionalActiveMember, hasActiveMemberAccess } from "@/server/auth";
+import { getPrisma } from "@/lib/prisma";
 
 const SERVICE_ICONS: Record<string, { icon: LucideIcon; label: string }> = {
   wifi: { icon: Wifi, label: "Wi-Fi" },
@@ -63,9 +65,9 @@ const TYPE_LABELS: Record<string, string> = {
 
 export default async function LieuDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const lieu = ENRICHED_LIEUX.find((item) => item.id === id);
+  const sourceLieu = ENRICHED_LIEUX.find((item) => item.id === id);
 
-  if (!lieu) {
+  if (!sourceLieu) {
     return (
       <main className="flex min-h-screen items-center justify-center px-4">
         <div className="space-y-4 text-center">
@@ -77,9 +79,29 @@ export default async function LieuDetailPage({ params }: { params: Promise<{ id:
     );
   }
 
+  const storedPlace = await getPrisma().place.findFirst({
+    where: { slug: id, status: "PUBLISHED", ownerId: { not: null } },
+    select: { name: true, description: true, addressLine1: true, city: true, region: true, mainImageUrl: true, services: true, phone: true, email: true, website: true },
+  });
+  const lieu = storedPlace ? {
+    ...sourceLieu,
+    nom: storedPlace.name,
+    description: storedPlace.description,
+    address: storedPlace.addressLine1 || sourceLieu.address,
+    ville: storedPlace.city,
+    region: storedPlace.region,
+    photoUrl: storedPlace.mainImageUrl || sourceLieu.photoUrl,
+    services: Array.isArray(storedPlace.services) ? storedPlace.services.filter((service): service is string => typeof service === "string") as typeof sourceLieu.services : sourceLieu.services,
+    telephone: storedPlace.phone || sourceLieu.telephone,
+    email: storedPlace.email || sourceLieu.email,
+    siteWeb: storedPlace.website || sourceLieu.siteWeb,
+  } : sourceLieu;
+
   const media = getPlaceMedia(lieu.id);
   const verifiedContact = getPlaceContact(lieu.id);
   const memberHasAccess = await hasActiveMemberAccess();
+  const activeMember = memberHasAccess ? await getOptionalActiveMember() : null;
+  const favorite = activeMember ? await getPrisma().favorite.findFirst({ where: { userId: activeMember.id, place: { slug: lieu.id } }, select: { id: true } }) : null;
   const richDetails = memberHasAccess
     ? getRichPlaceDetails(lieu.id)
     : getPublicRichPlaceDetails(lieu.id);
@@ -197,22 +219,25 @@ export default async function LieuDetailPage({ params }: { params: Promise<{ id:
                 Retrouvez ensuite cette étape dans votre espace Road Trips pour ouvrir l’itinéraire dans Google Maps ou Waze.
               </p>
             </div>
-            <AddToRoadTripButton
-              place={{
-                id: `labelled:${lieu.id}`,
-                name: lieu.nom,
-                city: lieu.ville,
-                region: lieu.region,
-                lat: lieu.coordonnees.lat,
-                lng: lieu.coordonnees.lng,
-                href: `/lieux/${lieu.id}`,
-                kind: "labelled",
-              }}
-              variant="gold"
-              size="lg"
-              showViewLink
-              className="sm:w-64"
-            />
+            <div className="flex flex-col gap-2 sm:w-64">
+              <FavoriteButton slug={lieu.id} initialFavorite={Boolean(favorite)} />
+              <AddToRoadTripButton
+                place={{
+                  id: `labelled:${lieu.id}`,
+                  name: lieu.nom,
+                  city: lieu.ville,
+                  region: lieu.region,
+                  lat: lieu.coordonnees.lat,
+                  lng: lieu.coordonnees.lng,
+                  href: `/lieux/${lieu.id}`,
+                  kind: "labelled",
+                }}
+                variant="gold"
+                size="lg"
+                showViewLink
+                className="w-full"
+              />
+            </div>
           </section>
         )}
 

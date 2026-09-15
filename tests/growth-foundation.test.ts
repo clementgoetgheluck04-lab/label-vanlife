@@ -118,6 +118,22 @@ test("professionals can only edit their own real public places", () => {
   assert.match(endpoint, /getAuthenticatedUser/);
   assert.match(endpoint, /where: \{ id: placeId, ownerId: pro\.id \}/);
   assert.match(endpoint, /\$transaction/);
+  assert.match(read("../src/app/lieux/[id]/page.tsx"), /ownerId: \{ not: null \}/);
+});
+
+test("member favorites are persisted and removable", () => {
+  const endpoint = read("../src/app/api/member/favorites/route.ts");
+  const detail = read("../src/app/lieux/[id]/page.tsx");
+  const favorites = read("../src/app/member/lieux/page.tsx");
+
+  assert.match(endpoint, /assertSameOrigin/);
+  assert.match(endpoint, /requireActiveMember/);
+  assert.match(endpoint, /ensureLabelledPlaces/);
+  assert.match(endpoint, /createMany\([\s\S]+skipDuplicates: true/);
+  assert.match(endpoint, /deleteMany\(\{ where: \{ userId: member\.id, placeId: place\.id \} \}\)/);
+  assert.match(endpoint, /name: "favorite_add"/);
+  assert.match(detail, /FavoriteButton/);
+  assert.match(favorites, /initialFavorite compact/);
 });
 
 test("passport visits require a signed place QR and an active member", () => {

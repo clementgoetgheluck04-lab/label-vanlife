@@ -3,6 +3,7 @@ import { ArrowLeft, Compass, Heart, MapPin } from "lucide-react";
 
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
+import { FavoriteButton } from "@/components/member/FavoriteButton";
 import { getMemberData } from "@/server/member-data";
 
 export default async function MemberLieuxPage() {
@@ -21,9 +22,10 @@ export default async function MemberLieuxPage() {
         ) : (
           <div className="space-y-3">
             {favorites.map(({ place }) => (
-              <Link key={place.id} href={`/lieux/${place.slug}`} className="block">
-                <Card variant="interactive" className="flex items-center gap-4 p-4"><span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-sage/10"><MapPin className="h-6 w-6 text-sage" /></span><div className="min-w-0 flex-1"><h2 className="truncate text-sm font-semibold text-charcoal">{place.name}</h2><p className="truncate text-xs text-stone">{place.city}, {place.region}</p>{place.discountPercent ? <p className="mt-1 text-xs font-bold text-amber">Avantage membre : −{place.discountPercent}%</p> : <p className="mt-1 text-xs text-stone">Voir l’avantage sur la fiche</p>}</div></Card>
-              </Link>
+              <Card key={place.id} variant="interactive" className="flex flex-col gap-4 p-4 sm:flex-row sm:items-center">
+                <Link href={`/lieux/${place.slug}`} className="flex min-w-0 flex-1 items-center gap-4"><span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-sage/10"><MapPin className="h-6 w-6 text-sage" /></span><span className="min-w-0 flex-1"><span className="block truncate text-sm font-semibold text-charcoal">{place.name}</span><span className="block truncate text-xs text-stone">{place.city}, {place.region}</span>{place.discountPercent ? <span className="mt-1 block text-xs font-bold text-amber">Avantage membre : −{place.discountPercent}%</span> : <span className="mt-1 block text-xs text-stone">Voir l’avantage sur la fiche</span>}</span></Link>
+                <FavoriteButton slug={place.slug} initialFavorite compact />
+              </Card>
             ))}
           </div>
         )}

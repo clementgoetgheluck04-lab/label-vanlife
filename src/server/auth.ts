@@ -60,17 +60,25 @@ export async function hasActiveMemberAccess(): Promise<boolean> {
   const store = await cookies();
   if (isAdminPreviewCookie(store.get(ADMIN_PREVIEW_COOKIE)?.value)) return true;
 
+  return Boolean(await getOptionalActiveMember());
+}
+
+export async function getOptionalActiveMember(): Promise<User | null> {
+  const store = await cookies();
+  if (isAdminPreviewCookie(store.get(ADMIN_PREVIEW_COOKIE)?.value)) return null;
+
   const supabase = await createClient();
   const { data, error } = await supabase.auth.getUser();
-  if (error || !data.user) return false;
+  if (error || !data.user) return null;
 
   const membership = await getPrisma().membership.findUnique({
     where: { userId: data.user.id },
     select: { status: true, expiresAt: true },
   });
 
-  return membership?.status === "ACTIVE"
+  const active = membership?.status === "ACTIVE"
     && (!membership.expiresAt || membership.expiresAt > new Date());
+  return active ? data.user : null;
 }
 
 export async function requirePageRole(allowed: UserRole[]): Promise<void> {
