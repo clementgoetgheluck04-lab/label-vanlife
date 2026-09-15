@@ -42,6 +42,17 @@ test("the fake marketplace and backup page are not routable", () => {
   assert.match(read("../next.config.ts"), /source:\s*["']\/marketplace["'][\s\S]+destination:\s*["']\/ecosysteme["']/);
 });
 
+test("redirected legacy marketing and simulated AI code are removed", () => {
+  const sitemap = read("../src/app/sitemap.ts");
+  const vercelIgnore = read("../.vercelignore");
+
+  assert.equal(existsSync(new URL("../src/app/membre/page.tsx", import.meta.url)), false);
+  assert.equal(existsSync(new URL("../src/components/roadtrip/IaAssistant.tsx", import.meta.url)), false);
+  assert.equal(existsSync(new URL("../src/data/mock-roadtrips.ts", import.meta.url)), false);
+  assert.doesNotMatch(sitemap, /\$\{baseUrl\}\/membre|\$\{baseUrl\}\/manifeste/);
+  assert.doesNotMatch(vercelIgnore, /dignamik/i);
+});
+
 test("the member card verification is signed and privacy limited", () => {
   const signer = read("../src/server/member-card-token.ts");
   const verifier = read("../src/app/verifier-carte/page.tsx");
