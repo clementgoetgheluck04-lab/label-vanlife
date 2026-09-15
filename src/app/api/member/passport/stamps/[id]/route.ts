@@ -19,7 +19,14 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     const body = await readJsonRequest(request, 4_096) as Record<string, unknown>;
     const note = body.note === null ? null : typeof body.note === "number" && Number.isInteger(body.note) && body.note >= 1 && body.note <= 5 ? body.note : undefined;
     const comment = typeof body.comment === "string" ? body.comment.trim().replace(/\s+/g, " ") : undefined;
-    if (note === undefined || comment === undefined || comment.length > 800) throw new RequestBodyError("La note ou le souvenir est invalide", 400);
+    const amountSavedCents = body.amountSaved === "" || body.amountSaved === null
+      ? null
+      : typeof body.amountSaved === "string" && /^\d{1,4}([.,]\d{1,2})?$/.test(body.amountSaved.trim())
+        ? Math.round(Number(body.amountSaved.replace(",", ".")) * 100)
+        : undefined;
+    if (note === undefined || comment === undefined || comment.length > 800 || amountSavedCents === undefined || (amountSavedCents !== null && amountSavedCents > 100_000)) {
+      throw new RequestBodyError("La note, le souvenir ou l’économie est invalide", 400);
+    }
 
     const prisma = getPrisma();
     const stamp = await prisma.passportStamp.findFirst({
@@ -29,7 +36,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     if (!stamp) return NextResponse.json({ error: "Tampon introuvable" }, { status: 404 });
 
     await prisma.$transaction([
-      prisma.passportStamp.update({ where: { id: stamp.id }, data: { note, comment: comment || null } }),
+      prisma.passportStamp.update({ where: { id: stamp.id }, data: { note, comment: comment || null, amountSavedCents } }),
       prisma.analyticsEvent.create({
         data: {
           name: "review_submit",
@@ -37,7 +44,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
           entityType: "lieux",
           entityId: stamp.place.slug,
           path: "/member/passeport",
-          properties: { hasComment: Boolean(comment), note },
+          properties: { hasComment: Boolean(comment), note, hasReportedSavings: amountSavedCents !== null },
         },
       }),
     ]);

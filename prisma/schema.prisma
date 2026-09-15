@@ -506,13 +506,14 @@ model UserBadge {
 }
 
 model PassportStamp {
-  id        String   @id @default(cuid())
-  userId    String
-  placeId   String
-  visitedAt DateTime @default(now())
-  note      Int?
-  comment   String?
-  photoUrl  String?
+  id               String   @id @default(cuid())
+  userId           String
+  placeId          String
+  visitedAt        DateTime @default(now())
+  note             Int?
+  comment          String?
+  photoUrl         String?
+  amountSavedCents Int?
 
   user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
   place Place @relation(fields: [placeId], references: [id])

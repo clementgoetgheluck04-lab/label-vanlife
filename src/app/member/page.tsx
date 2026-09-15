@@ -10,6 +10,7 @@ import {
   QrCode,
   Route,
   Stamp,
+  WalletCards,
 } from "lucide-react";
 
 import { Card } from "@/components/ui/Card";
@@ -37,6 +38,7 @@ export default async function MemberDashboard() {
   const fullName = [profile?.firstName, profile?.lastName].filter(Boolean).join(" ") || "Membre Label Vanlife";
   const cardNumber = member.memberCard?.cardNumber ?? "Carte en préparation";
   const unreadNotifications = member.notifications.filter((notification) => !notification.isRead).length;
+  const totalSavingsCents = member.passportStamps.reduce((total, stamp) => total + (stamp.amountSavedCents ?? 0), 0);
   const counts: Record<string, number> = {
     favorites: member.favorites.length,
     roadTrips: member.roadTrips.length,
@@ -118,6 +120,12 @@ export default async function MemberDashboard() {
             </Card>
           </Link>
         </section>
+
+        <Link href="/member/passeport" className="block">
+          <Card variant="interactive" className="border-emerald-200 bg-emerald-50/60 p-5">
+            <div className="flex items-center gap-4"><span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-emerald-700 text-white"><WalletCards className="h-7 w-7" /></span><div className="min-w-0 flex-1"><p className="text-xs font-black uppercase tracking-[0.16em] text-emerald-700">Valeur de ma carte</p><p className="mt-1 text-2xl font-black text-forest">{(totalSavingsCents / 100).toLocaleString("fr-FR", { style: "currency", currency: "EUR" })} économisés</p><p className="mt-1 text-xs leading-5 text-stone">Total déclaré après vos visites. Complétez une visite dans votre passeport pour le mettre à jour.</p></div><ArrowRight className="h-5 w-5 shrink-0 text-emerald-700" /></div>
+          </Card>
+        </Link>
 
         <section className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           {shortcuts.map(({ href, label, icon: Icon, ...shortcut }) => {

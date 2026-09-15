@@ -188,6 +188,20 @@ test("passport memories are owner-scoped and feed the private journal", () => {
   assert.match(journal, /passportStamps\.filter\(\(stamp\) => Boolean\(stamp\.comment\)\)/);
 });
 
+test("members can report real savings and see their membership value", () => {
+  const schema = read("../prisma/schema.prisma");
+  const endpoint = read("../src/app/api/member/passport/stamps/[id]/route.ts");
+  const form = read("../src/components/member/StampMemoryForm.tsx");
+  const dashboard = read("../src/app/member/page.tsx");
+
+  assert.match(schema, /amountSavedCents Int\?/);
+  assert.match(endpoint, /where: \{ id, userId: member\.id \}/);
+  assert.match(endpoint, /amountSavedCents !== null && amountSavedCents > 100_000/);
+  assert.match(form, /Économie réellement obtenue/);
+  assert.match(dashboard, /Valeur de ma carte/);
+  assert.match(dashboard, /totalSavingsCents/);
+});
+
 test("member notifications are marked read only by their owner after opening", () => {
   const endpoint = read("../src/app/api/member/notifications/read/route.ts");
   const page = read("../src/app/member/notifications/page.tsx");
