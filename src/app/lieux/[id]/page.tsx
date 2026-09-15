@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import type { Metadata } from "next";
 import {
   Activity,
   ArrowLeft,
@@ -63,6 +64,39 @@ const TYPE_LABELS: Record<string, string> = {
   restaurant: "Restaurant",
   activite: "Activité",
 };
+
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+  const { id } = await params;
+  const lieu = ENRICHED_LIEUX.find((item) => item.id === id);
+
+  if (!lieu) {
+    return {
+      title: "Lieu non trouvé",
+      robots: { index: false, follow: false },
+    };
+  }
+
+  const title = `${lieu.nom} — lieu labellisé`;
+  const description = lieu.description.slice(0, 160);
+
+  return {
+    title,
+    description,
+    alternates: { canonical: `/lieux/${lieu.id}` },
+    openGraph: {
+      title: `${lieu.nom} | Label Vanlife`,
+      description,
+      type: "website",
+      images: [{ url: lieu.photoUrl, alt: `Vue de ${lieu.nom}` }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${lieu.nom} | Label Vanlife`,
+      description,
+      images: [lieu.photoUrl],
+    },
+  };
+}
 
 async function findStoredPublishedPlace(slug: string) {
   try {

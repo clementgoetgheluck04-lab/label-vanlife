@@ -90,6 +90,8 @@ test("known internal broken links and the missing RSS reference are removed", ()
 
 test("public labelled place pages survive a database outage", () => {
   const page = read("src/app/lieux/[id]/page.tsx");
+  assert.match(page, /export async function generateMetadata/);
+  assert.match(page, /alternates: \{ canonical: `\/lieux\/\$\{lieu\.id\}` \}/);
   assert.match(page, /using the verified catalogue fallback/);
   assert.match(page, /rendering the public place view/);
   assert.match(page, /return null;/);
