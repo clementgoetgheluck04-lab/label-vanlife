@@ -52,12 +52,14 @@ test("the member card verification is signed and privacy limited", () => {
 
 test("Vanlife Activity is private by default and never publishes coordinates", () => {
   const api = read("../src/app/api/member/roadtrips/route.ts");
+  const labelledPlaces = read("../src/server/labelled-place.ts");
   const publication = read("../src/app/api/member/roadtrips/[id]/publication/route.ts");
   const deletion = read("../src/app/api/member/roadtrips/[id]/route.ts");
   const publicTrip = read("../src/app/trip/[id]/page.tsx");
   assert.match(api, /isPublic:\s*false/);
-  assert.match(api, /ENRICHED_LIEUX/);
-  assert.match(api, /status:\s*"PUBLISHED"/);
+  assert.match(api, /ensureLabelledPlaces/);
+  assert.match(labelledPlaces, /ENRICHED_LIEUX/);
+  assert.match(labelledPlaces, /status:\s*"PUBLISHED"/);
   assert.match(publication, /typeof body\.isPublic !== "boolean"/);
   assert.match(publicTrip, /where:\s*\{ id, isPublic: true \}/);
   assert.doesNotMatch(publicTrip, /select:\s*\{[^}]*lat:\s*true|select:\s*\{[^}]*lng:\s*true/);
@@ -81,7 +83,7 @@ test("the professional kit route uses the real secured 2027 kit", () => {
 
   assert.match(legacyProKit, /redirect\("\/kit-communication-2027"\)/);
   assert.doesNotMatch(legacyProKit, /download:\s*"#"|disabled/);
-  assert.match(securedKit, /hasValidKitAccess/);
+  assert.match(securedKit, /verifyKitAccessToken/);
   assert.match(securedKit, /profile\?\.status === "CERTIFIED" \|\| profile\?\.status === "ACTIVE"/);
 });
 
@@ -101,4 +103,21 @@ test("the professional dashboard reports measured place activity", () => {
     assert.match(surface, /data-analytics-entity-id/);
   }
   assert.match(publicPlace, /data-analytics-event=\{memberHasAccess \? "benefit_view"/);
+});
+
+test("passport visits require a signed place QR and an active member", () => {
+  const endpoint = read("../src/app/api/member/passport/stamp/route.ts");
+  const visitPage = read("../src/app/visite/[slug]/page.tsx");
+  const kit = read("../src/app/kit-communication-2027/page.tsx");
+
+  assert.match(endpoint, /assertSameOrigin/);
+  assert.match(endpoint, /enforceRateLimit/);
+  assert.match(endpoint, /requireActiveMember/);
+  assert.match(endpoint, /verifyPlaceCheckInToken/);
+  assert.match(endpoint, /createMany\([\s\S]+skipDuplicates: true/);
+  assert.match(endpoint, /firstConfirmation: inserted\.count === 1/);
+  assert.match(visitPage, /Aucune position GPS personnelle n’est collectée ou publiée/);
+  assert.match(kit, /createPlaceCheckInToken/);
+  assert.match(kit, /Télécharger le QR de visite/);
+  assert.equal(isAnalyticsEventName("visit_confirmed"), true);
 });

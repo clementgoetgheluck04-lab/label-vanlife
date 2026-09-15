@@ -23,3 +23,9 @@ Métriques : activités éligibles, taux de génération, taux de partage, visit
 ## Prospection
 
 L'automatisation reste désactivée tant que les contrôles RLS, la mesure, les suppressions et le suivi de délivrabilité ne sont pas validés en production. Une activation future suit une montée progressive avec arrêt immédiat en cas de plainte, rebond anormal ou défaut de webhook.
+
+## Boucle Passeport partenaire
+
+Le kit sécurisé de chaque lieu contient un QR de visite signé. Un membre actif le scanne sur place et confirme volontairement sa visite. La première confirmation crée un seul tampon, crédite 25 points et alimente les preuves d'usage du lieu ; les scans répétés ne recréditent ni tampon ni points.
+
+Métriques : confirmations uniques, établissements visités, membres actifs ayant au moins un tampon, répartition des visites par lieu. Aucune position GPS personnelle n'est collectée.

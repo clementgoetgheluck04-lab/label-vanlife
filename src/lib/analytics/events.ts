@@ -26,6 +26,7 @@ export const ANALYTICS_EVENTS = [
   "public_trip_place_click",
   "public_trip_signup",
   "public_trip_membership_conversion",
+  "visit_confirmed",
 ] as const;
 
 export type AnalyticsEventName = (typeof ANALYTICS_EVENTS)[number];

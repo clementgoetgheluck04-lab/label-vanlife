@@ -27,3 +27,7 @@ La première activité partageable réutilise les vrais `RoadTrip` et `RoadTripE
 ## 2026-09-15 — Pool PostgreSQL adapté au serverless
 
 Chaque instance Vercel utilise au maximum une connexion PostgreSQL et libère rapidement toute connexion inactive. Le projet Supabase actuel est limité à 15 sessions ; la configuration par défaut de dix connexions par instance épuisait ce quota lors d'une navigation entre plusieurs fonctions.
+
+## 2026-09-15 — Visites confirmées sans géolocalisation
+
+Le Passeport utilise un QR signé, propre au lieu et distribué uniquement dans son kit partenaire. Une confirmation exige un compte membre actif, est idempotente par couple membre-lieu et n'enregistre que le lieu et la date. Le dispositif ne collecte ni trace, ni position GPS du membre. Il fournit une preuve d'usage utile au membre et au professionnel sans transformer Label Vanlife en outil de surveillance.
