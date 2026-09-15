@@ -19,3 +19,11 @@ La marketplace et la page de conseil sauvegardée sont retirées du routage. Une
 ## 2026-09-15 — Première boucle de croissance
 
 La recommandation de lieu précède Vanlife Activity : elle sert directement l'expansion du réseau de confiance avec moins de dépendance à une base importante de membres actifs. Vanlife Activity reste la prochaine boucle d'acquisition après la persistance réelle des voyages.
+
+## 2026-09-15 — Vanlife Activity privée par défaut
+
+La première activité partageable réutilise les vrais `RoadTrip` et `RoadTripEtape`. La publication exige une action explicite du membre et n'expose que des fiches d'établissements déjà publiques. Les coordonnées exactes, le domicile, la position courante et les lieux repérés ne sont jamais rendus publics dans cette version. L'identifiant technique du voyage sert de lien opaque ; la page peut être dépubliée à tout moment.
+
+## 2026-09-15 — Pool PostgreSQL adapté au serverless
+
+Chaque instance Vercel utilise au maximum une connexion PostgreSQL et libère rapidement toute connexion inactive. Le projet Supabase actuel est limité à 15 sessions ; la configuration par défaut de dix connexions par instance épuisait ce quota lors d'une navigation entre plusieurs fonctions.

@@ -14,6 +14,10 @@ export default function AnalyticsProvider() {
     previousPath.current = pathname;
     if (pathname === "/") trackEvent("landing_view");
     else if (pathname === "/explorer" || pathname === "/member/map") trackEvent("map_open");
+    else if (pathname.startsWith("/trip/")) {
+      const tripId = pathname.split("/").filter(Boolean)[1];
+      trackEvent("public_trip_view", { entityType: "road_trip", entityId: tripId });
+    }
     else if (pathname.startsWith("/lieux/") || pathname.startsWith("/lieux-reperes/")) {
       const parts = pathname.split("/").filter(Boolean);
       trackEvent("place_view", { entityType: parts[0], entityId: parts[1] });

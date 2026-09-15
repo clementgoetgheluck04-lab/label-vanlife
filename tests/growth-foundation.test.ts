@@ -49,3 +49,24 @@ test("the member card verification is signed and privacy limited", () => {
   assert.match(signer, /timingSafeEqual/);
   assert.doesNotMatch(verifier, /\.email|\.phone/);
 });
+
+test("Vanlife Activity is private by default and never publishes coordinates", () => {
+  const api = read("../src/app/api/member/roadtrips/route.ts");
+  const publication = read("../src/app/api/member/roadtrips/[id]/publication/route.ts");
+  const publicTrip = read("../src/app/trip/[id]/page.tsx");
+  assert.match(api, /isPublic:\s*false/);
+  assert.match(publication, /typeof body\.isPublic !== "boolean"/);
+  assert.match(publicTrip, /where:\s*\{ id, isPublic: true \}/);
+  assert.doesNotMatch(publicTrip, /select:\s*\{[^}]*lat:\s*true|select:\s*\{[^}]*lng:\s*true/);
+  assert.match(publicTrip, /Aucune position privée publiée/);
+});
+
+test("Vanlife Activity measures the complete acquisition loop", () => {
+  const provider = read("../src/components/AnalyticsProvider.tsx");
+  const share = read("../src/components/roadtrip/ShareTripButton.tsx");
+  assert.match(provider, /public_trip_view/);
+  assert.match(share, /recap_shared/);
+  for (const event of ["activity_created", "recap_generated", "public_trip_place_click", "public_trip_signup"]) {
+    assert.equal(isAnalyticsEventName(event), true);
+  }
+});

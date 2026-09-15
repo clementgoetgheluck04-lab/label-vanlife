@@ -2,10 +2,11 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Route, Star, Plus, ArrowLeft, MapPin, Navigation, Trash2, ExternalLink } from "lucide-react";
+import { Route, Star, Plus, ArrowLeft, MapPin, Navigation, Trash2, ExternalLink, Globe2, Lock, Save } from "lucide-react";
 import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
+import ShareTripButton from "@/components/roadtrip/ShareTripButton";
 
 type PersistedRoadTrip = {
   id: string;
@@ -16,6 +17,7 @@ type PersistedRoadTrip = {
   budget: number | null;
   tags: string[];
   likes: number;
+  isPublic: boolean;
   etapes: Array<{ id: string; order: number; place: { name: string; slug: string; city: string } }>;
 };
 
@@ -43,6 +45,11 @@ function wazeUrl(place: RoadTripDraftPlace) {
 export default function MemberRoadTripsPage() {
   const [draftPlaces, setDraftPlaces] = useState<RoadTripDraftPlace[]>([]);
   const [roadTrips, setRoadTrips] = useState<PersistedRoadTrip[]>([]);
+  const [title, setTitle] = useState("");
+  const [duration, setDuration] = useState(1);
+  const [saving, setSaving] = useState(false);
+  const [publishingId, setPublishingId] = useState<string | null>(null);
+  const [feedback, setFeedback] = useState<string | null>(null);
 
   useEffect(() => {
     let nextDraft: RoadTripDraftPlace[] = [];
@@ -81,6 +88,61 @@ export default function MemberRoadTripsPage() {
       window.localStorage.removeItem(ROADTRIP_DRAFT_STORAGE_KEY);
     } catch {
       // Sans effet si le stockage local est indisponible.
+    }
+  }
+
+  async function saveRoadTrip() {
+    const labelled = draftPlaces.filter((place) => place.kind === "labelled");
+    if (labelled.length === 0 || title.trim().length < 3) return;
+    setSaving(true);
+    setFeedback(null);
+    try {
+      const response = await fetch("/api/member/roadtrips", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title,
+          duration,
+          placeSlugs: labelled.map((place) => place.id.replace(/^labelled:/, "")),
+        }),
+      });
+      const payload = await response.json() as { roadTrip?: PersistedRoadTrip; error?: string };
+      if (!response.ok || !payload.roadTrip) throw new Error(payload.error || "Enregistrement impossible");
+      setRoadTrips((current) => [payload.roadTrip!, ...current]);
+      const remaining = draftPlaces.filter((place) => place.kind !== "labelled");
+      setDraftPlaces(remaining);
+      window.localStorage.setItem(ROADTRIP_DRAFT_STORAGE_KEY, JSON.stringify(remaining));
+      setTitle("");
+      setDuration(1);
+      setFeedback(remaining.length > 0
+        ? "Road trip enregistré. Les lieux repérés restent dans le brouillon car ils ne sont pas encore labellisés."
+        : "Road trip enregistré en privé.");
+    } catch (error) {
+      setFeedback(error instanceof Error ? error.message : "Enregistrement impossible");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function togglePublication(roadTrip: PersistedRoadTrip) {
+    setPublishingId(roadTrip.id);
+    setFeedback(null);
+    try {
+      const response = await fetch(`/api/member/roadtrips/${roadTrip.id}/publication`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ isPublic: !roadTrip.isPublic }),
+      });
+      const payload = await response.json() as { isPublic?: boolean; error?: string };
+      if (!response.ok || typeof payload.isPublic !== "boolean") throw new Error(payload.error || "Modification impossible");
+      setRoadTrips((current) => current.map((item) => item.id === roadTrip.id ? { ...item, isPublic: payload.isPublic! } : item));
+      setFeedback(payload.isPublic
+        ? "Récapitulatif public créé. Seuls les lieux publics sont visibles."
+        : "Road trip repassé en privé.");
+    } catch (error) {
+      setFeedback(error instanceof Error ? error.message : "Modification impossible");
+    } finally {
+      setPublishingId(null);
     }
   }
 
@@ -147,8 +209,23 @@ export default function MemberRoadTripsPage() {
                 </Card>
               ))}
             </div>
+            <Card className="space-y-4 border-emerald-200 bg-emerald-50/60 p-5">
+              <div>
+                <p className="text-xs font-black uppercase tracking-[0.16em] text-emerald-700">Créer une Vanlife Activity</p>
+                <h2 className="mt-1 text-lg font-black text-neutral-950">Enregistrer ce road trip</h2>
+                <p className="mt-1 text-xs leading-5 text-neutral-500">Privé par défaut. Vous déciderez ensuite si vous souhaitez créer une page publique.</p>
+              </div>
+              <div className="grid gap-3 sm:grid-cols-[1fr_120px]">
+                <label className="text-xs font-bold text-neutral-700">Nom du voyage<input value={title} onChange={(event) => setTitle(event.target.value)} maxLength={80} placeholder="Week-end dans les Pyrénées" className="mt-1 min-h-11 w-full rounded-xl border border-neutral-200 bg-white px-3 text-sm font-medium outline-none focus:border-emerald-500" /></label>
+                <label className="text-xs font-bold text-neutral-700">Nombre de jours<input type="number" min={1} max={90} value={duration} onChange={(event) => setDuration(Math.min(90, Math.max(1, Number(event.target.value) || 1)))} className="mt-1 min-h-11 w-full rounded-xl border border-neutral-200 bg-white px-3 text-sm font-medium outline-none focus:border-emerald-500" /></label>
+              </div>
+              <Button type="button" variant="cta" className="w-full gap-2" disabled={saving || title.trim().length < 3 || !draftPlaces.some((place) => place.kind === "labelled")} onClick={saveRoadTrip}><Save className="h-4 w-4" />{saving ? "Enregistrement…" : "Enregistrer en privé"}</Button>
+              {!draftPlaces.some((place) => place.kind === "labelled") && <p className="text-xs text-amber-700">Ajoutez au moins un lieu labellisé pour enregistrer le voyage. Les lieux repérés restent utilisables dans le brouillon local.</p>}
+            </Card>
           </section>
         )}
+
+        {feedback && <p role="status" className="rounded-xl border border-emerald-100 bg-white px-4 py-3 text-sm text-neutral-700 shadow-sm">{feedback}</p>}
 
         {/* Road trips list */}
         {roadTrips.length === 0 ? (
@@ -173,6 +250,7 @@ export default function MemberRoadTripsPage() {
                     <h3 className="font-semibold text-neutral-900 text-base">{rt.title}</h3>
                     <p className="text-xs text-neutral-500 mt-1 line-clamp-2">{rt.description}</p>
                   </div>
+                  <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-black uppercase tracking-wider ${rt.isPublic ? "bg-emerald-50 text-emerald-700" : "bg-neutral-100 text-neutral-500"}`}>{rt.isPublic ? <Globe2 className="h-3 w-3" /> : <Lock className="h-3 w-3" />}{rt.isPublic ? "Public" : "Privé"}</span>
                 </div>
                 <div className="flex flex-wrap gap-2">
                   <Badge variant="info">{rt.duration} jours</Badge>
@@ -184,6 +262,10 @@ export default function MemberRoadTripsPage() {
                   {rt.tags.slice(0, 4).map((tag) => (
                     <span key={tag} className="text-[10px] text-neutral-400 bg-neutral-50 px-2 py-0.5 rounded-full">#{tag}</span>
                   ))}
+                </div>
+                <div className="flex flex-col gap-2 border-t border-neutral-100 pt-3 sm:flex-row">
+                  <button type="button" disabled={publishingId === rt.id} onClick={() => togglePublication(rt)} className="inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-xl border border-neutral-200 px-4 text-sm font-bold text-neutral-700 hover:border-emerald-300 hover:text-emerald-800 disabled:opacity-50">{rt.isPublic ? <Lock className="h-4 w-4" /> : <Globe2 className="h-4 w-4" />}{publishingId === rt.id ? "Modification…" : rt.isPublic ? "Repasser en privé" : "Créer le récap public"}</button>
+                  {rt.isPublic && <ShareTripButton tripId={rt.id} title={rt.title} />}
                 </div>
               </Card>
             ))}

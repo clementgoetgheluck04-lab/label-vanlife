@@ -14,7 +14,9 @@ Métriques : recommandations valides, taux de doublon, délai de vérification, 
 
 ## Boucle Vanlife Activity
 
-Vanlife Activity sera livrée après la persistance réelle des road trips et visites. Elle produit un récapitulatif privé par défaut, partageable uniquement après choix explicite des étapes publiques ou approximatives.
+La première version est reliée aux road trips persistés. Un membre enregistre les lieux labellisés de son brouillon dans un voyage privé, puis choisit explicitement de créer une page publique `/trip/{id}`. Cette page ne publie ni trace GPS, ni position actuelle, ni adresse privée : uniquement les établissements déjà publics et une distance indicative entre eux.
+
+Les lieux repérés restent dans le brouillon local tant qu'ils ne sont pas labellisés. Les photos, traces GPS, positions approximatives et cartes exportables ne seront ajoutées qu'avec des consentements et niveaux de visibilité explicites.
 
 Métriques : activités éligibles, taux de génération, taux de partage, visites des pages publiques, inscriptions attribuées, conversions membre attribuées.
 
