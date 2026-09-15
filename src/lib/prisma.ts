@@ -28,7 +28,7 @@ export function getPrisma(): PrismaClient {
       connectionString,
       max: 1,
       connectionTimeoutMillis: 10_000,
-      idleTimeoutMillis: 10_000,
+      idleTimeoutMillis: 250,
     }),
   });
 
