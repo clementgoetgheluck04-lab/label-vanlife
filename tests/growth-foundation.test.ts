@@ -136,6 +136,16 @@ test("member favorites are persisted and removable", () => {
   assert.match(favorites, /initialFavorite compact/);
 });
 
+test("legacy place links resolve to the canonical real place page", () => {
+  const legacyPlace = read("../src/app/map/[id]/page.tsx");
+  const timeline = read("../src/components/roadtrip/RoadTripTimeline.tsx");
+
+  assert.match(legacyPlace, /redirect\(`\/lieux\/\$\{encodeURIComponent\(id\)\}`\)/);
+  assert.doesNotMatch(legacyPlace, /Avis récents|Superbe étape|Alex L\./);
+  assert.match(timeline, /href=\{`\/lieux\/\$\{etape\.lieuId\}`\}/);
+  assert.doesNotMatch(timeline, /href=\{`\/map\//);
+});
+
 test("passport visits require a signed place QR and an active member", () => {
   const endpoint = read("../src/app/api/member/passport/stamp/route.ts");
   const visitPage = read("../src/app/visite/[slug]/page.tsx");

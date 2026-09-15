@@ -87,7 +87,7 @@ function TimelineStep({
         </div>
 
         <Link
-          href={`/map/${etape.lieuId}`}
+          href={`/lieux/${etape.lieuId}`}
           className="group inline-flex items-center gap-1 text-sm font-semibold text-charcoal hover:text-sage transition-colors mb-2"
         >
           <MapPin className="h-3.5 w-3.5 shrink-0" />
