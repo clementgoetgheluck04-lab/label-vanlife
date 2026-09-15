@@ -185,3 +185,16 @@ test("passport memories are owner-scoped and feed the private journal", () => {
   assert.match(passport, /StampMemoryForm/);
   assert.match(journal, /passportStamps\.filter\(\(stamp\) => Boolean\(stamp\.comment\)\)/);
 });
+
+test("member notifications are marked read only by their owner after opening", () => {
+  const endpoint = read("../src/app/api/member/notifications/read/route.ts");
+  const page = read("../src/app/member/notifications/page.tsx");
+  const marker = read("../src/components/member/MarkNotificationsRead.tsx");
+
+  assert.match(endpoint, /assertSameOrigin/);
+  assert.match(endpoint, /requireActiveMember/);
+  assert.match(endpoint, /where: \{ userId: member\.id, isRead: false \}/);
+  assert.match(page, /MarkNotificationsRead enabled=\{!member\.preview && unread > 0\}/);
+  assert.match(marker, /method: "POST"/);
+  assert.match(marker, /router\.refresh\(\)/);
+});
