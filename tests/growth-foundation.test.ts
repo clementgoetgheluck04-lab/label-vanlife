@@ -121,3 +121,15 @@ test("passport visits require a signed place QR and an active member", () => {
   assert.match(kit, /Télécharger le QR de visite/);
   assert.equal(isAnalyticsEventName("visit_confirmed"), true);
 });
+
+test("passport memories are owner-scoped and feed the private journal", () => {
+  const endpoint = read("../src/app/api/member/passport/stamps/[id]/route.ts");
+  const passport = read("../src/app/member/passeport/page.tsx");
+  const journal = read("../src/app/member/journal/page.tsx");
+
+  assert.match(endpoint, /where: \{ id, userId: member\.id \}/);
+  assert.match(endpoint, /comment\.length > 800/);
+  assert.match(endpoint, /name: "review_submit"/);
+  assert.match(passport, /StampMemoryForm/);
+  assert.match(journal, /passportStamps\.filter\(\(stamp\) => Boolean\(stamp\.comment\)\)/);
+});
