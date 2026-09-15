@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { LABELLISATION_CRITERIA } from "@/config/labellisation-criteria";
 import { getSpottedPlace, normalizeExternalWebsite } from "@/data/spotted-places";
+import { trackEvent } from "@/lib/analytics/browser";
 
 const STEPS = [
   { title: "Contact", icon: Building2 },
@@ -176,6 +177,10 @@ export default function CandidaturePage() {
 
   const handlePreAudit = async () => {
     if (!canContinue) return;
+    trackEvent("place_application_submit", {
+      entityType: "place",
+      entityId: new URLSearchParams(window.location.search).get("claim") || undefined,
+    });
     setLoading(true);
     setSubmitError("");
     try {

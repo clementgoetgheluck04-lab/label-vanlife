@@ -129,6 +129,11 @@ const nextConfig: NextConfig = {
   async redirects() {
     return [
       {
+        source: "/marketplace",
+        destination: "/ecosysteme",
+        permanent: true,
+      },
+      {
         source: "/manifeste",
         destination: "/le-label",
         permanent: true,

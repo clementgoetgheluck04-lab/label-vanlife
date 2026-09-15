@@ -1,13 +1,23 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Route, Star, Plus, ArrowLeft, MapPin, Navigation, Trash2, ExternalLink } from "lucide-react";
 import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
-import { MOCK_MEMBRES } from "@/data/mock-membres";
-import { MOCK_ROADTRIPS } from "@/data/mock-roadtrips";
+
+type PersistedRoadTrip = {
+  id: string;
+  title: string;
+  description: string;
+  duration: number;
+  distance: number | null;
+  budget: number | null;
+  tags: string[];
+  likes: number;
+  etapes: Array<{ id: string; order: number; place: { name: string; slug: string; city: string } }>;
+};
 
 type RoadTripDraftPlace = {
   id: string;
@@ -31,14 +41,8 @@ function wazeUrl(place: RoadTripDraftPlace) {
 }
 
 export default function MemberRoadTripsPage() {
-  const membre = MOCK_MEMBRES[0];
   const [draftPlaces, setDraftPlaces] = useState<RoadTripDraftPlace[]>([]);
-
-  const roadTrips = useMemo(() => {
-    return membre.roadTrips
-      .map((id) => MOCK_ROADTRIPS.find((r) => r.id === id))
-      .filter((r): r is NonNullable<typeof r> => r !== null);
-  }, [membre]);
+  const [roadTrips, setRoadTrips] = useState<PersistedRoadTrip[]>([]);
 
   useEffect(() => {
     let nextDraft: RoadTripDraftPlace[] = [];
@@ -52,6 +56,11 @@ export default function MemberRoadTripsPage() {
       nextDraft = [];
     }
     queueMicrotask(() => setDraftPlaces(nextDraft));
+
+    fetch("/api/member/roadtrips", { cache: "no-store" })
+      .then((response) => response.ok ? response.json() : { roadTrips: [] })
+      .then((payload: { roadTrips?: PersistedRoadTrip[] }) => setRoadTrips(payload.roadTrips ?? []))
+      .catch(() => setRoadTrips([]));
   }, []);
 
   function removeDraftPlace(id: string) {
@@ -161,14 +170,14 @@ export default function MemberRoadTripsPage() {
               <Card key={rt.id} variant="interactive" className="p-5 space-y-3">
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <h3 className="font-semibold text-neutral-900 text-base">{rt.titre}</h3>
+                    <h3 className="font-semibold text-neutral-900 text-base">{rt.title}</h3>
                     <p className="text-xs text-neutral-500 mt-1 line-clamp-2">{rt.description}</p>
                   </div>
                 </div>
                 <div className="flex flex-wrap gap-2">
-                  <Badge variant="info">{rt.duree} jours</Badge>
-                  <Badge variant="info">{rt.distance} km</Badge>
-                  <Badge variant="info">{rt.budget}€</Badge>
+                  <Badge variant="info">{rt.duration} jours</Badge>
+                  {rt.distance !== null && <Badge variant="info">{rt.distance} km</Badge>}
+                  {rt.budget !== null && <Badge variant="info">{rt.budget}€</Badge>}
                   <Badge variant="premium"><Star className="h-3 w-3 fill-amber" /> {rt.likes}</Badge>
                 </div>
                 <div className="flex flex-wrap gap-1.5">

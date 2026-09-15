@@ -179,7 +179,7 @@ export default function Home() {
             {[
               { icon: <Compass className="w-6 h-6" />, title: "Liberté vraie", desc: "Pas de réservation obligatoire. Tu arrives, tu montres ta carte, tu es le bienvenu — et tu bénéficies de réductions." },
               { icon: <Heart className="w-6 h-6" />, title: "Confiance mutuelle", desc: "Les hôtes aiment la vanlife et t'accueillent en conséquence et en connaissance. Tu sais ce qui t'attend. Fini les mauvaises surprises." },
-              { icon: <Star className="w-6 h-6" />, title: "Authenticité", desc: "Des lieux labellisés Label Vanlife, contrôlés par des vanlifers qui respectent la philosophie vanlife." },
+              { icon: <Star className="w-6 h-6" />, title: "Authenticité", desc: "Des lieux sélectionnés qui s’engagent à respecter la charte d’accueil Label Vanlife." },
               { icon: <Moon className="w-6 h-6" />, title: "Nuit tranquille", desc: "Zéro parking sauvage. Zéro voisin mécontent. Juste le silence et les étoiles." },
             ].map((item) => (
               <Card key={item.title} className="micro-card border-white/15 bg-neutral-950/45 p-5 text-center text-white shadow-xl backdrop-blur-md space-y-2">
@@ -207,7 +207,7 @@ export default function Home() {
               <h2 className="text-2xl sm:text-3xl font-bold text-neutral-900" style={{ fontFamily: "Outfit, sans-serif" }}>Les lieux labellisés Label Vanlife</h2>
             </div>
           </div>
-          <p className="text-sm text-neutral-500 mb-8">Ces campings et lieux d'accueil ont été contrôlés et validés par la communauté vanlife. Réductions exclusives, accueil premium et expériences authentiques garanties.</p>
+          <p className="text-sm text-neutral-500 mb-8">Ces campings et lieux d’accueil ont rejoint la charte Label Vanlife et déclaré un avantage pour les membres. Consultez chaque fiche pour connaître les conditions à jour.</p>
           <p className="text-xs text-neutral-400 mb-8">{SITE_STATS.labelledPlacesCount} lieux labellisés — présente ta Carte membre pour profiter des avantages 🎁</p>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">

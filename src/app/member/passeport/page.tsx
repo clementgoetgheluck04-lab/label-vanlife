@@ -1,124 +1,17 @@
-"use client";
-
-import { useMemo } from "react";
 import Link from "next/link";
-import { Stamp, ArrowLeft, MapPin, Star, Quote } from "lucide-react";
+import { ArrowLeft, Quote, Stamp, Star } from "lucide-react";
+
 import { Card } from "@/components/ui/Card";
-import { Badge } from "@/components/ui/Badge";
-import { MOCK_MEMBRES } from "@/data/mock-membres";
-import { ENRICHED_LIEUX } from "@/data/enriched-lieux";
+import { getMemberData } from "@/server/member-data";
 
-function formatDate(dateStr: string): string {
-  const d = new Date(dateStr);
-  return d.toLocaleDateString("fr-FR", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  });
-}
-
-export default function MemberPasseportPage() {
-  const membre = MOCK_MEMBRES[0];
-
-  const stamps = useMemo(() => {
-    return membre.passeport.map((entry) => ({
-      ...entry,
-      lieu: ENRICHED_LIEUX.find((l) => l.id === entry.lieuId),
-    }));
-  }, [membre]);
+export default async function MemberPasseportPage() {
+  const member = await getMemberData();
+  const stamps = member.preview ? [] : member.passportStamps;
 
   return (
-    <div className="pb-24 px-4 lg:px-0 pt-4 lg:pt-0">
-      <div className="max-w-2xl mx-auto space-y-6">
-        {/* Header */}
-        <div className="flex items-center gap-3">
-          <Link href="/member" className="flex min-h-10 min-w-10 items-center justify-center rounded-full text-stone transition-colors hover:bg-neutral-100 hover:text-neutral-700" aria-label="Retour à l’espace membre">
-            <ArrowLeft className="h-5 w-5" />
-          </Link>
-          <div>
-            <h1 className="text-2xl font-bold text-charcoal flex items-center gap-2">
-              <Stamp className="h-6 w-6 text-amber" />
-              Mon Passeport
-            </h1>
-            <p className="text-sm text-stone">
-              {stamps.length} timbre{stamps.length !== 1 ? "s" : ""} récolté{stamps.length !== 1 ? "s" : ""}
-            </p>
-          </div>
-        </div>
-
-        {stamps.length === 0 ? (
-          <Card variant="default" className="text-center py-12">
-            <Stamp className="h-12 w-12 text-stone/30 mx-auto" />
-            <p className="text-stone text-base font-medium mt-4">Aucun timbre pour l&apos;instant</p>
-            <p className="text-sm text-stone/60 mt-1">
-              Visite des lieux labellisés pour collectionner les timbres de ton passeport
-            </p>
-          </Card>
-        ) : (
-          <div className="space-y-4">
-            <div className="flex items-center gap-2 bg-amber/5 border border-amber/10 rounded-xl px-4 py-3">
-              <MapPin className="h-4 w-4 text-amber" />
-              <p className="text-xs text-stone">
-                {stamps.length} lieu{stamps.length !== 1 ? "x" : ""} visité{stamps.length !== 1 ? "s" : ""} sur {ENRICHED_LIEUX.length}
-              </p>
-            </div>
-
-            <div className="space-y-3">
-              {stamps.map((entry, i) => (
-                <div key={i} className="bg-white rounded-xl border border-border/40 overflow-hidden">
-                  {/* Stamp card */}
-                  <div className="p-4 flex items-start gap-4">
-                    {/* Timbre visuel */}
-                    <div className="h-16 w-16 rounded-full bg-gradient-to-br from-sage/20 to-amber/20 flex items-center justify-center shrink-0 border-2 border-sage/20">
-                      <span className="text-2xl">📍</span>
-                    </div>
-
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-charcoal text-sm">
-                        {entry.lieu?.nom ?? "Lieu inconnu"}
-                      </h3>
-                      <p className="text-xs text-stone">
-                        {entry.lieu?.ville}, {entry.lieu?.region}
-                      </p>
-                      <p className="text-xs text-sage mt-0.5">
-                        {formatDate(entry.dateVisite)}
-                      </p>
-
-                      {entry.note && (
-                        <div className="flex items-center gap-0.5 mt-1">
-                          {Array.from({ length: 5 }).map((_, j) => (
-                            <Star
-                              key={j}
-                              className={`h-3 w-3 ${
-                                j < entry.note!
-                                  ? "text-amber fill-amber"
-                                  : "text-stone/20"
-                              }`}
-                            />
-                          ))}
-                        </div>
-                      )}
-                    </div>
-
-                    <Badge variant="success" className="text-[10px] shrink-0">
-                      Visité
-                    </Badge>
-                  </div>
-
-                  {entry.avis && (
-                    <div className="px-4 pb-4">
-                      <div className="bg-cream rounded-lg p-3 flex items-start gap-2">
-                        <Quote className="h-3.5 w-3.5 text-sage shrink-0 mt-0.5" />
-                        <p className="text-xs text-stone italic">&ldquo;{entry.avis}&rdquo;</p>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
+    <main className="px-4 pb-24 pt-4 lg:px-0 lg:pt-0"><div className="mx-auto max-w-2xl space-y-6">
+      <header className="flex items-center gap-3"><Link href="/member" aria-label="Retour à l’espace membre" className="rounded-full p-2 text-stone hover:bg-neutral-100"><ArrowLeft className="h-5 w-5" /></Link><div><h1 className="flex items-center gap-2 text-2xl font-bold text-charcoal"><Stamp className="h-6 w-6 text-amber" />Mon passeport</h1><p className="text-sm text-stone">{stamps.length} visite{stamps.length > 1 ? "s" : ""} enregistrée{stamps.length > 1 ? "s" : ""}</p></div></header>
+      {stamps.length === 0 ? <Card className="py-12 text-center"><Stamp className="mx-auto h-12 w-12 text-stone/30" /><p className="mt-3 font-medium text-stone">Votre passeport attend sa première visite</p><p className="mt-1 text-sm text-stone/60">Une visite confirmée dans un lieu labellisé apparaîtra ici.</p></Card> : <div className="space-y-3">{stamps.map((stamp) => <Card key={stamp.id} className="p-5"><div className="flex gap-4"><span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-sage/20 to-amber/20 text-2xl">📍</span><div className="flex-1"><h2 className="font-bold text-charcoal">{stamp.place.name}</h2><p className="text-xs text-stone">{stamp.place.city}, {stamp.place.region}</p><p className="mt-1 text-xs font-medium text-sage">{stamp.visitedAt.toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" })}</p>{stamp.note ? <div className="mt-2 flex gap-0.5">{Array.from({ length: 5 }, (_, index) => <Star key={index} className={`h-3 w-3 ${index < stamp.note! ? "fill-amber text-amber" : "text-stone/20"}`} />)}</div> : null}</div></div>{stamp.comment ? <p className="mt-4 flex gap-2 rounded-xl bg-cream p-3 text-sm italic text-stone"><Quote className="h-4 w-4 shrink-0 text-sage" />{stamp.comment}</p> : null}</Card>)}</div>}
+    </div></main>
   );
 }

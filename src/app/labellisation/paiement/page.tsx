@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { ArrowRight, Check, ChevronLeft, Loader2, RotateCcw, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
+import { trackEvent } from "@/lib/analytics/browser";
 
 type Draft = Record<string, unknown> & {
   establishmentName?: string;
@@ -31,6 +32,7 @@ export default function LabellisationPaymentPage() {
 
   const handlePay = async () => {
     if (!draft) return;
+    trackEvent("place_application_submit", { properties: { resumedCheckout: true } });
     setLoading(true);
     setError("");
     try {

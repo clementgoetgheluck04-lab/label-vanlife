@@ -6,9 +6,11 @@ import { KIT_ACCESS_COOKIE, hasValidKitAccess } from "@/lib/kit-access-token";
 const PUBLIC_ROUTES = [
   "/", "/explorer", "/le-label", "/labellisation", "/devenir-membre",
   "/member-login", "/membre", "/lieux", "/lieux-reperes", "/mentions-legales",
-  "/politique-confidentialite", "/blog", "/evenements", "/marketplace",
+  "/politique-confidentialite", "/blog", "/evenements",
   "/road-trips", "/offline",
   "/desinscription",
+  "/recommander-un-lieu",
+  "/verifier-carte",
   "/kit-communication-2027",
 ];
 

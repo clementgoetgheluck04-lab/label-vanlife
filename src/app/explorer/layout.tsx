@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Lieux Label Vanlife — La carte des accueils labellisés",
     description:
-      "Explorez les campings et accueils contrôlés par Label Vanlife partout en France.",
+      "Explorez les campings et accueils engagés dans la charte Label Vanlife partout en France.",
     type: "website",
   },
 };

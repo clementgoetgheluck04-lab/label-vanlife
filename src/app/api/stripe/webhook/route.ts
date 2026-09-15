@@ -250,7 +250,14 @@ async function claimEvent(event: Stripe.Event): Promise<"claimed" | "duplicate" 
   const prisma = getPrisma();
   const existing = await prisma.stripeEvent.findUnique({ where: { id: event.id } });
   if (existing?.status === "PROCESSED") return "duplicate";
-  if (existing?.status === "PROCESSING") return "busy";
+  if (existing?.status === "PROCESSING") {
+    const leaseExpiredBefore = new Date(Date.now() - 5 * 60 * 1_000);
+    const reclaimed = await prisma.stripeEvent.updateMany({
+      where: { id: event.id, status: "PROCESSING", updatedAt: { lt: leaseExpiredBefore } },
+      data: { status: "PROCESSING", error: null },
+    });
+    return reclaimed.count === 1 ? "claimed" : "busy";
+  }
   if (existing?.status === "FAILED") {
     await prisma.stripeEvent.update({
       where: { id: event.id },
@@ -345,6 +352,17 @@ async function activatePaidOrder(session: Stripe.Checkout.Session): Promise<void
         update: {},
       });
     }
+
+    await tx.analyticsEvent.create({
+      data: {
+        name: order.product === "MEMBERSHIP" ? "membership_purchase" : "label_purchase",
+        userId: order.userId,
+        entityType: "checkout_order",
+        entityId: order.id,
+        source: "stripe",
+        properties: { amount: order.amount, currency: order.currency, product: order.product },
+      },
+    });
   });
   await sendLabellisationPaymentConfirmation(orderId);
   await sendMembershipActivation(orderId);

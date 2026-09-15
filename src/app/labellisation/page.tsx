@@ -220,7 +220,7 @@ export default function LabellisationPage() {
                   <p className="text-xs text-neutral-600 mt-1 leading-relaxed">
                     Chaque voyageur porteur de la carte membre LABEL VANLIFE signe une charte de bonne conduite. En cas de manquement, vous pouvez signaler le voyageur directement. Après vérification, nous pouvons retirer sa carte membre.
                   </p>
-                  <p className="text-xs text-emerald-600 font-semibold mt-2">Excellence garantie : des voyageurs et des lieux de qualité, toujours.</p>
+                  <p className="text-xs text-emerald-600 font-semibold mt-2">Une exigence partagée : accueil clair, informations à jour et amélioration continue.</p>
                 </div>
               </div>
             </Card>

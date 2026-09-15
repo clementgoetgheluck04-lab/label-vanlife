@@ -13,7 +13,7 @@ export default function SpiritSection() {
     {
       title: "Authenticité",
       description:
-        "Des lieux labellisés Label Vanlife, contrôlés par des vanlifers qui respectent la philosophie vanlife.",
+        "Des lieux sélectionnés qui s’engagent à respecter la charte d’accueil Label Vanlife.",
     },
     {
       title: "Nuit tranquille",

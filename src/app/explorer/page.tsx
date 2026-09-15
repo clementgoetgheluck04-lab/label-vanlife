@@ -82,6 +82,9 @@ export default function ExplorerPage() {
           <p className="text-sm text-neutral-500 leading-relaxed">
             Consultez librement les lieux et leur pourcentage d&apos;avantage. Les modalités et éventuels codes restent réservés aux membres connectés.
           </p>
+          <Link href="/recommander-un-lieu" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-emerald-700 px-5 text-sm font-bold text-white transition hover:bg-emerald-800">
+            Recommander un lieu <ArrowRight className="h-4 w-4" />
+          </Link>
 
         </div>
 

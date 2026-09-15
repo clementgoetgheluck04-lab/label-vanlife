@@ -1,98 +1,33 @@
-"use client";
-
-import { useMemo } from "react";
 import Link from "next/link";
-import { Heart, MapPin, ArrowLeft, Compass } from "lucide-react";
+import { ArrowLeft, Compass, Heart, MapPin } from "lucide-react";
+
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
-import AddToRoadTripButton from "@/components/roadtrip/AddToRoadTripButton";
-import { MOCK_MEMBRES } from "@/data/mock-membres";
-import { ENRICHED_LIEUX } from "@/data/enriched-lieux";
+import { getMemberData } from "@/server/member-data";
 
-export default function MemberLieuxPage() {
-  const membre = MOCK_MEMBRES[0];
-
-  const favoris = useMemo(() => {
-    return membre.favoris
-      .map((id) => ENRICHED_LIEUX.find((l) => l.id === id))
-      .filter((l): l is NonNullable<typeof l> => l !== null);
-  }, [membre]);
+export default async function MemberLieuxPage() {
+  const member = await getMemberData();
+  const favorites = member.preview ? [] : member.favorites;
 
   return (
-    <div className="pb-24 px-4 lg:px-0 pt-4 lg:pt-0">
-      <div className="max-w-2xl mx-auto space-y-6">
-        {/* Header */}
-        <div className="flex items-center gap-3">
-          <Link href="/member" className="flex min-h-10 min-w-10 items-center justify-center rounded-full text-stone transition-colors hover:bg-neutral-100 hover:text-neutral-700" aria-label="Retour à l’espace membre">
-            <ArrowLeft className="h-5 w-5" />
-          </Link>
-          <div>
-            <h1 className="text-2xl font-bold text-charcoal flex items-center gap-2">
-              <Heart className="h-6 w-6 text-red-400" />
-              Mes lieux favoris
-            </h1>
-            <p className="text-sm text-stone">
-              {favoris.length} lieu{favoris.length !== 1 ? "x" : ""} sauvegardé{favoris.length !== 1 ? "s" : ""}
-            </p>
-          </div>
-        </div>
-
-        {favoris.length === 0 ? (
-          <Card variant="default" className="text-center py-12 space-y-4">
-            <Compass className="h-12 w-12 text-stone/30 mx-auto" />
-            <div>
-              <p className="text-stone text-base font-medium">Aucun favori pour l&apos;instant</p>
-              <p className="text-sm text-stone/60 mt-1">
-                Explore la carte et ajoute tes premiers lieux en favoris
-              </p>
-            </div>
-            <Link href="/member/map">
-              <Button variant="primary" size="sm">
-                Explorer les lieux
-              </Button>
-            </Link>
-          </Card>
+    <main className="px-4 pb-24 pt-4 lg:px-0 lg:pt-0">
+      <div className="mx-auto max-w-2xl space-y-6">
+        <header className="flex items-center gap-3">
+          <Link href="/member" aria-label="Retour à l’espace membre" className="rounded-full p-2 text-stone hover:bg-neutral-100"><ArrowLeft className="h-5 w-5" /></Link>
+          <div><h1 className="flex items-center gap-2 text-2xl font-bold text-charcoal"><Heart className="h-6 w-6 text-red-400" />Mes favoris</h1><p className="text-sm text-stone">{favorites.length} lieu{favorites.length > 1 ? "x" : ""} sauvegardé{favorites.length > 1 ? "s" : ""}</p></div>
+        </header>
+        {favorites.length === 0 ? (
+          <Card className="space-y-4 py-12 text-center"><Compass className="mx-auto h-12 w-12 text-stone/30" /><div><p className="font-medium text-stone">Aucun favori pour l’instant</p><p className="mt-1 text-sm text-stone/60">Ajoutez vos lieux depuis la MAP.</p></div><Link href="/member/map"><Button variant="primary" size="sm">Explorer la MAP</Button></Link></Card>
         ) : (
           <div className="space-y-3">
-            {favoris.map((lieu) => (
-              <article key={lieu.id} className="space-y-2">
-                <Link href={`/lieux/${lieu.id}`} className="block">
-                  <Card variant="interactive" className="flex items-center gap-4 p-4">
-                    <div className="h-14 w-14 rounded-xl bg-sage/10 flex items-center justify-center shrink-0 overflow-hidden">
-                      <MapPin className="h-6 w-6 text-sage" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-charcoal text-sm truncate">{lieu.nom}</h3>
-                      <p className="text-xs text-stone truncate">{lieu.ville}, {lieu.region}</p>
-                      <div className="flex items-center gap-2 mt-1">
-                        <span className="text-[10px] font-medium text-amber bg-amber/10 px-2 py-0.5 rounded-full">
-                          -{lieu.discountPercent}%
-                        </span>
-                        <span className="text-[10px] text-stone/60">★ {lieu.note}</span>
-                      </div>
-                    </div>
-                  </Card>
-                </Link>
-                <AddToRoadTripButton
-                  place={{
-                    id: `labelled:${lieu.id}`,
-                    name: lieu.nom,
-                    city: lieu.ville,
-                    region: lieu.region,
-                    lat: lieu.coordonnees.lat,
-                    lng: lieu.coordonnees.lng,
-                    href: `/lieux/${lieu.id}`,
-                    kind: "labelled",
-                  }}
-                  size="sm"
-                  variant="white"
-                  showViewLink
-                />
-              </article>
+            {favorites.map(({ place }) => (
+              <Link key={place.id} href={`/lieux/${place.slug}`} className="block">
+                <Card variant="interactive" className="flex items-center gap-4 p-4"><span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-sage/10"><MapPin className="h-6 w-6 text-sage" /></span><div className="min-w-0 flex-1"><h2 className="truncate text-sm font-semibold text-charcoal">{place.name}</h2><p className="truncate text-xs text-stone">{place.city}, {place.region}</p>{place.discountPercent ? <p className="mt-1 text-xs font-bold text-amber">Avantage membre : −{place.discountPercent}%</p> : <p className="mt-1 text-xs text-stone">Voir l’avantage sur la fiche</p>}</div></Card>
+              </Link>
             ))}
           </div>
         )}
       </div>
-    </div>
+    </main>
   );
 }

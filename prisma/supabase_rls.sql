@@ -178,3 +178,17 @@ using ((select public.is_admin()));
 
 -- stripe_events and newsletter_subscribers intentionally have no client policies.
 -- They are accessible only through trusted server connections that bypass RLS.
+
+-- CRM and product analytics are strictly server-only. Admin access goes through
+-- authenticated API routes, never through the public Supabase data API.
+alter table public.prospects enable row level security;
+alter table public.prospect_messages enable row level security;
+alter table public.prospect_suppressions enable row level security;
+alter table public.analytics_events enable row level security;
+alter table public.place_recommendations enable row level security;
+
+revoke all on table public.prospects from anon, authenticated;
+revoke all on table public.prospect_messages from anon, authenticated;
+revoke all on table public.prospect_suppressions from anon, authenticated;
+revoke all on table public.analytics_events from anon, authenticated;
+revoke all on table public.place_recommendations from anon, authenticated;

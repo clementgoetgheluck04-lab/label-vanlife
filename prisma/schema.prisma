@@ -70,6 +70,13 @@ enum ProspectMessageStatus {
   FAILED
 }
 
+enum PlaceRecommendationStatus {
+  PENDING
+  VALIDATED
+  REJECTED
+  CONVERTED
+}
+
 model User {
   id               String   @id @default(cuid())
   email            String   @unique
@@ -93,6 +100,8 @@ model User {
   payments       Payment[]
   checkoutOrders CheckoutOrder[]
   blogPosts      BlogPost[]
+  analyticsEvents AnalyticsEvent[]
+  placeRecommendations PlaceRecommendation[]
 
   establishmentProfile EstablishmentProfile?
   placeApplications    PlaceApplication[]
@@ -784,4 +793,58 @@ model ProspectSuppression {
 
   @@index([createdAt])
   @@map("prospect_suppressions")
+}
+
+// ─── RECOMMANDATIONS DE LIEUX ─────────────────────────────
+
+model PlaceRecommendation {
+  id                String                    @id @default(cuid())
+  userId            String?
+  placeName         String
+  placeType         String
+  city              String
+  region            String?
+  country           String                    @default("France")
+  website           String?
+  placeContactEmail String?
+  recommenderEmail  String?
+  reason             String
+  matchedSourceId   String?
+  status             PlaceRecommendationStatus @default(PENDING)
+  reviewedAt         DateTime?
+  reviewedBy         String?
+  createdAt          DateTime                  @default(now())
+  updatedAt          DateTime                  @updatedAt
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([status, createdAt])
+  @@index([city, placeName])
+  @@index([userId, createdAt])
+  @@map("place_recommendations")
+}
+
+// ─── ANALYTICS PRODUIT (DONNEES MINIMISEES) ──────────────
+
+model AnalyticsEvent {
+  id          String   @id @default(cuid())
+  name        String
+  userId      String?
+  anonymousId String?
+  sessionId   String?
+  path        String?
+  entityType  String?
+  entityId    String?
+  source      String?
+  medium      String?
+  campaign    String?
+  properties  Json?
+  createdAt   DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([name, createdAt])
+  @@index([userId, createdAt])
+  @@index([entityType, entityId, createdAt])
+  @@map("analytics_events")
 }

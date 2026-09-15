@@ -7,6 +7,7 @@ import PwaInstall from "@/components/PwaInstall";
 import { BRAND_ASSETS } from "@/config/brand-assets";
 import RouteScrollToTop from "@/components/RouteScrollToTop";
 import { OrganizationJsonLd, WebSiteJsonLd } from "@/components/seo/JsonLd";
+import AnalyticsProvider from "@/components/AnalyticsProvider";
 
 const BASE_URL = "https://www.labelvanlife.fr";
 
@@ -115,6 +116,7 @@ export default function RootLayout({
       </head>
       <body className="min-h-full flex flex-col antialiased">
         <RouteScrollToTop />
+        <AnalyticsProvider />
         <Navbar />
         <main className="flex-1">{children}</main>
         <Footer />

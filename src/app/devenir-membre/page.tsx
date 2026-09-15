@@ -30,6 +30,7 @@ import { MembershipCardPreview, MembershipJourneyNav } from "@/components/Member
 import { CONTACT_EMAIL, CONTACT_MAILTO } from "@/config/contact";
 import { CURRENT_YEAR, MEMBER_CTA_LABEL, MEMBER_DISCOUNT_TEXT, MEMBER_PRICE_TEXT, MEMBER_VALIDITY_TEXT } from "@/config/commercial";
 import { SITE_STATS } from "@/config/site-stats";
+import { trackEvent } from "@/lib/analytics/browser";
 
 const AVANTAGES = [
   {
@@ -90,6 +91,7 @@ export default function DevenirMembrePage() {
   const autoCheckoutStarted = useRef(false);
 
   const handleCheckout = useCallback(async () => {
+    trackEvent("membership_checkout_start");
     setLoading(true);
     setCheckoutError("");
     try {

@@ -1,5 +1,11 @@
 # Sécurité
 
+## Données CRM et analytics
+
+Les tables `prospects`, `prospect_messages`, `prospect_suppressions`, `place_recommendations` et `analytics_events` sont réservées au serveur. La migration `20260915000100_secure_prospection_and_analytics` active RLS et révoque tous les droits directs des rôles Supabase navigateur. Les écrans d'administration passent par des routes API qui vérifient le rôle `ADMIN`.
+
+Les QR de carte membre contiennent uniquement un jeton HMAC temporaire. La page de vérification relit le statut actif en base et n'expose ni email ni téléphone.
+
 ## État du durcissement (3 septembre 2026)
 
 - L'endpoint public de création de membres par code admin a été supprimé.
