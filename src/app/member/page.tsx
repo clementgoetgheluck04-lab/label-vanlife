@@ -67,7 +67,7 @@ export default async function MemberDashboard() {
             <div className="relative flex h-full min-h-40 flex-col justify-between">
               <div className="flex items-start justify-between gap-4">
                 <div>
-                  <p className="text-xs uppercase tracking-[0.18em] text-white/70">Carte membre 2027</p>
+                  <p className="text-xs uppercase tracking-[0.18em] text-white/70">Carte membre</p>
                   <p className="mt-1 font-mono text-sm">{cardNumber}</p>
                 </div>
                 <span className="rounded-full bg-white/15 px-3 py-1 text-xs">
