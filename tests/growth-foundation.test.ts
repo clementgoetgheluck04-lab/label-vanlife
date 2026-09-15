@@ -105,6 +105,21 @@ test("the professional dashboard reports measured place activity", () => {
   assert.match(publicPlace, /data-analytics-event=\{memberHasAccess \? "benefit_view"/);
 });
 
+test("professionals can only edit their own real public places", () => {
+  const page = read("../src/app/pro/fiche/page.tsx");
+  const editor = read("../src/app/pro/fiche/ProProfileEditor.tsx");
+  const endpoint = read("../src/app/api/pro/profile/route.ts");
+
+  assert.match(page, /managedPlaces/);
+  assert.doesNotMatch(page, /createClient|\.from\("establishment_profiles"\)/);
+  assert.doesNotMatch(editor, /bientôt|Glisse tes photos ici/);
+  assert.match(endpoint, /assertSameOrigin/);
+  assert.match(endpoint, /enforceRateLimit/);
+  assert.match(endpoint, /getAuthenticatedUser/);
+  assert.match(endpoint, /where: \{ id: placeId, ownerId: pro\.id \}/);
+  assert.match(endpoint, /\$transaction/);
+});
+
 test("passport visits require a signed place QR and an active member", () => {
   const endpoint = read("../src/app/api/member/passport/stamp/route.ts");
   const visitPage = read("../src/app/visite/[slug]/page.tsx");
