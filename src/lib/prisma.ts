@@ -20,7 +20,16 @@ export function getPrisma(): PrismaClient {
   if (!connectionString) throw new DatabaseConfigurationError();
 
   const client = new PrismaClient({
-    adapter: new PrismaPg({ connectionString }),
+    // Every Vercel function instance owns its own pg pool. The adapter default
+    // is 10 connections, which can exhaust a small pooled database after only
+    // a few routes. One connection per warm instance is enough because Prisma
+    // queues concurrent queries on the pool.
+    adapter: new PrismaPg({
+      connectionString,
+      max: 1,
+      connectionTimeoutMillis: 10_000,
+      idleTimeoutMillis: 10_000,
+    }),
   });
 
   if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = client;
