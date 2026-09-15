@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     template: "%s | Label Vanlife",
   },
   description:
-    "Label Vanlife est le 1er label pour vanlifers en France. Découvrez des lieux calmes, respectueux et vraiment adaptés à la vanlife — sélectionnés et labellisés, avec 10 à 20% de réduction pour nos membres. Rejoignez la communauté.",
+    "Label Vanlife relie les vanlifers à des lieux engagés dans une charte d’accueil, avec 10 à 20 % d’avantages déclarés pour les membres.",
   keywords: [
     "vanlife",
     "vanlife france",
@@ -59,7 +59,7 @@ export const metadata: Metadata = {
     },
   },
   openGraph: {
-    title: "Label Vanlife | Vanlife France : le 1er label pour vanlifers",
+    title: "Label Vanlife | Des lieux engagés pour accueillir les vanlifers",
     description:
       "La vanlife a enfin son label. Des lieux calmes, respectueux et vraiment adaptés à la vanlife — sélectionnés et labellisés, avec 10 à 20% de réduction pour nos membres.",
     url: BASE_URL,
@@ -71,7 +71,7 @@ export const metadata: Metadata = {
         url: `${BASE_URL}${BRAND_ASSETS.socialCover}`,
         width: 1640,
         height: 924,
-        alt: "Label Vanlife — Le 1er label pour vanlifers en France",
+        alt: "Label Vanlife — Des lieux engagés pour accueillir les vanlifers",
       },
     ],
   },

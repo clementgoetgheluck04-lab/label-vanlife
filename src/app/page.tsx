@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowRight, Star, Shield, Heart, Moon, Quote, Compass, ChevronDown, MapPin, Smartphone, Percent, Check } from "lucide-react";
+import { ArrowRight, Star, Shield, Heart, Moon, Compass, ChevronDown, MapPin, Smartphone, Percent, Check } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { ENRICHED_LIEUX } from "@/data/enriched-lieux";
@@ -39,7 +39,7 @@ export default function Home() {
         <div className="relative z-10 w-full px-6 sm:px-8 lg:px-12">
           <div className="max-w-4xl mx-auto text-center">
             <div className="inline-block bg-white/10 backdrop-blur-sm rounded-full px-4 py-1.5 mb-6 border border-white/20">
-              <span className="text-xs font-semibold tracking-[0.15em] uppercase text-white/80">1er label pour vanlifers</span>
+              <span className="text-xs font-semibold tracking-[0.15em] uppercase text-white/80">Le label pour vanlifers</span>
             </div>
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-6 max-w-3xl mx-auto leading-tight" style={{ fontFamily: "Outfit, sans-serif" }}>
               La vanlife a enfin<br />{" "}son label.
@@ -257,16 +257,6 @@ export default function Home() {
           <p className="text-center text-xs text-neutral-400 mt-3">
             {SITE_STATS.spottedPlacesCount} lieux repérés à travers la France, pas encore labellisés et disponibles sur notre MAP
           </p>
-        </div>
-      </section>
-
-      {/* ===== TÉMOIGNAGE ===== */}
-      <section className="py-16 bg-emerald-600">
-        <div className="max-w-2xl mx-auto px-6 text-center space-y-4">
-          <Image src="/images/people/helene-family-vanlifers.png" alt="Helene Family Vanlifers en voyage" width={72} height={72} className="mx-auto h-18 w-18 rounded-full border-2 border-white/70 object-cover shadow-lg" />
-          <Quote className="h-8 w-8 text-emerald-200 mx-auto" />
-          <p className="text-xl text-white italic leading-relaxed">&ldquo;LABEL VANLIFE a changé notre façon de voyager. Plus de stress, plus de mauvaises surprises.&rdquo;</p>
-          <p className="text-sm text-emerald-200 font-semibold">— Helene Family Vanlifers</p>
         </div>
       </section>
 
