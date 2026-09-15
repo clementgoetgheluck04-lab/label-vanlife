@@ -3,6 +3,7 @@ export const ANALYTICS_EVENTS = [
   "landing_view",
   "map_open",
   "place_view",
+  "place_share",
   "place_search",
   "filter_use",
   "membership_checkout_start",

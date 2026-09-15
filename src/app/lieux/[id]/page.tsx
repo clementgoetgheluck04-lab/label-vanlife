@@ -28,6 +28,7 @@ import type { LucideIcon } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { FavoriteButton } from "@/components/member/FavoriteButton";
+import SharePlaceButton from "@/components/places/SharePlaceButton";
 import AddToRoadTripButton from "@/components/roadtrip/AddToRoadTripButton";
 import { MEMBER_PRICE_TEXT, MEMBER_PRODUCT_NAME, MEMBER_VALIDITY_TEXT } from "@/config/commercial";
 import { ENRICHED_LIEUX } from "@/data/enriched-lieux";
@@ -195,6 +196,7 @@ export default async function LieuDetailPage({ params }: { params: Promise<{ id:
               <span>· {lieu.avisCount} avis Google</span>
             </div>
           </div>
+          <SharePlaceButton slug={lieu.id} name={lieu.nom} />
         </section>
 
         {quickServices.length > 0 && (

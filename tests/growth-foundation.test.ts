@@ -198,3 +198,15 @@ test("member notifications are marked read only by their owner after opening", (
   assert.match(marker, /method: "POST"/);
   assert.match(marker, /router\.refresh\(\)/);
 });
+
+test("public place profiles have a measurable referral share action", () => {
+  const detail = read("../src/app/lieux/[id]/page.tsx");
+  const share = read("../src/components/places/SharePlaceButton.tsx");
+
+  assert.equal(isAnalyticsEventName("place_share"), true);
+  assert.match(detail, /SharePlaceButton slug=\{lieu\.id\} name=\{lieu\.nom\}/);
+  assert.match(share, /navigator\.share/);
+  assert.match(share, /navigator\.clipboard\.writeText/);
+  assert.match(share, /utm_source=place_share/);
+  assert.match(share, /trackEvent\("place_share"/);
+});
