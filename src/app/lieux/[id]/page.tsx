@@ -378,8 +378,8 @@ export default async function LieuDetailPage({ params }: { params: Promise<{ id:
         <section>
           <h2 className="mb-4 text-xl font-bold text-neutral-900">S’y rendre</h2>
           <div className="grid grid-cols-2 gap-3 sm:max-w-xl">
-            <a href={`https://www.google.com/maps/dir/?api=1&destination=${lieu.coordonnees.lat},${lieu.coordonnees.lng}&travelmode=driving`} target="_blank" rel="noreferrer" className="flex min-h-12 items-center justify-center gap-2 rounded-xl bg-emerald-50 px-4 py-3 text-sm font-bold text-emerald-800 transition hover:bg-emerald-100"><Navigation className="h-4 w-4" /> Y aller avec Maps</a>
-            <a href={`https://waze.com/ul?ll=${lieu.coordonnees.lat}%2C${lieu.coordonnees.lng}&navigate=yes`} target="_blank" rel="noreferrer" className="flex min-h-12 items-center justify-center gap-2 rounded-xl bg-blue-50 px-4 py-3 text-sm font-bold text-blue-700 transition hover:bg-blue-100"><Navigation className="h-4 w-4" /> Waze</a>
+            <a href={`https://www.google.com/maps/dir/?api=1&destination=${lieu.coordonnees.lat},${lieu.coordonnees.lng}&travelmode=driving`} target="_blank" rel="noreferrer" data-analytics-event="route_start" data-analytics-entity-type="lieux" data-analytics-entity-id={lieu.id} className="flex min-h-12 items-center justify-center gap-2 rounded-xl bg-emerald-50 px-4 py-3 text-sm font-bold text-emerald-800 transition hover:bg-emerald-100"><Navigation className="h-4 w-4" /> Y aller avec Maps</a>
+            <a href={`https://waze.com/ul?ll=${lieu.coordonnees.lat}%2C${lieu.coordonnees.lng}&navigate=yes`} target="_blank" rel="noreferrer" data-analytics-event="route_start" data-analytics-entity-type="lieux" data-analytics-entity-id={lieu.id} className="flex min-h-12 items-center justify-center gap-2 rounded-xl bg-blue-50 px-4 py-3 text-sm font-bold text-blue-700 transition hover:bg-blue-100"><Navigation className="h-4 w-4" /> Waze</a>
           </div>
           {verifiedGps && <p className="mt-3 text-xs text-neutral-500">Point GPS exact de l&apos;établissement vérifié sur Google Maps le 18 juillet 2026 · {lieu.coordonnees.lat}, {lieu.coordonnees.lng}.</p>}
         </section>
@@ -473,7 +473,7 @@ export default async function LieuDetailPage({ params }: { params: Promise<{ id:
                 ? `-${lieu.discountPercent}% ici avec la Carte membre`
                 : `${MEMBER_PRICE_TEXT} · ${MEMBER_VALIDITY_TEXT}`}
           </p>
-          <Link href={memberHasAccess ? "#avantage-membre" : "/devenir-membre"} className="shrink-0">
+          <Link href={memberHasAccess ? "#avantage-membre" : "/devenir-membre"} data-analytics-event={memberHasAccess ? "benefit_view" : undefined} data-analytics-entity-type={memberHasAccess ? "lieux" : undefined} data-analytics-entity-id={memberHasAccess ? lieu.id : undefined} className="shrink-0">
             <Button variant="cta" size="sm">{memberHasAccess ? "Voir" : "Devenir membre"}</Button>
           </Link>
         </div>

@@ -187,8 +187,8 @@ export default function MapContainer({
             <p class="popup-benefit">${lieu.discountPercent > 0 ? `Avantage membre : <strong>-${lieu.discountPercent}%</strong>` : escapeHtml(lieu.priceHighlight || "Accueil Label Vanlife")}</p>
             <a class="popup-cta" href="/lieux/${encodeURIComponent(lieu.id)}?member=1">Voir la fiche complète</a>
             <div class="popup-navigation">
-              <a href="${escapeHtml(navigation.maps)}" target="_blank" rel="noreferrer" aria-label="Ouvrir l'itinéraire dans Google Maps">Google Maps</a>
-              <a href="${escapeHtml(navigation.waze)}" target="_blank" rel="noreferrer" aria-label="Ouvrir l'itinéraire dans Waze">Waze</a>
+              <a href="${escapeHtml(navigation.maps)}" target="_blank" rel="noreferrer" data-analytics-event="route_start" data-analytics-entity-type="lieux" data-analytics-entity-id="${escapeHtml(lieu.id)}" aria-label="Ouvrir l'itinéraire dans Google Maps">Google Maps</a>
+              <a href="${escapeHtml(navigation.waze)}" target="_blank" rel="noreferrer" data-analytics-event="route_start" data-analytics-entity-type="lieux" data-analytics-entity-id="${escapeHtml(lieu.id)}" aria-label="Ouvrir l'itinéraire dans Waze">Waze</a>
             </div>
           </div>`);
         labelledCluster.addLayer(marker);

@@ -84,3 +84,21 @@ test("the professional kit route uses the real secured 2027 kit", () => {
   assert.match(securedKit, /hasValidKitAccess/);
   assert.match(securedKit, /profile\?\.status === "CERTIFIED" \|\| profile\?\.status === "ACTIVE"/);
 });
+
+test("the professional dashboard reports measured place activity", () => {
+  const dashboard = read("../src/app/pro/dashboard/page.tsx");
+  const publicPlace = read("../src/app/lieux/[id]/page.tsx");
+  const memberMap = read("../src/app/member/map/page.tsx");
+  const map = read("../src/components/explorer/MapContainer.tsx");
+
+  assert.match(dashboard, /analyticsEvent\.groupBy/);
+  assert.match(dashboard, /favorite\.count/);
+  assert.match(dashboard, /Données réelles/);
+  assert.doesNotMatch(dashboard, /const stats = \{ vues: 0, favoris: 0, clics: 0 \}/);
+  for (const surface of [publicPlace, memberMap, map]) {
+    assert.match(surface, /data-analytics-event="route_start"/);
+    assert.match(surface, /data-analytics-entity-type/);
+    assert.match(surface, /data-analytics-entity-id/);
+  }
+  assert.match(publicPlace, /data-analytics-event=\{memberHasAccess \? "benefit_view"/);
+});

@@ -386,10 +386,10 @@ export default function LieuDetailPage() {
 
               {/* GPS buttons */}
               <div className="grid grid-cols-2 gap-2">
-                <a href={`https://www.google.com/maps/dir/?api=1&destination=${lieu.coordonnees.lat},${lieu.coordonnees.lng}`} target="_blank" rel="noopener noreferrer">
+                <a href={`https://www.google.com/maps/dir/?api=1&destination=${lieu.coordonnees.lat},${lieu.coordonnees.lng}`} target="_blank" rel="noopener noreferrer" data-analytics-event="route_start" data-analytics-entity-type="lieux" data-analytics-entity-id={lieu.id}>
                   <Button variant="secondary-dark" className="w-full" size="sm"><Navigation className="h-4 w-4" /> Google Maps</Button>
                 </a>
-                <a href={`https://waze.com/ul?ll=${lieu.coordonnees.lat}%2C${lieu.coordonnees.lng}&navigate=yes`} target="_blank" rel="noopener noreferrer">
+                <a href={`https://waze.com/ul?ll=${lieu.coordonnees.lat}%2C${lieu.coordonnees.lng}&navigate=yes`} target="_blank" rel="noopener noreferrer" data-analytics-event="route_start" data-analytics-entity-type="lieux" data-analytics-entity-id={lieu.id}>
                   <Button variant="secondary-dark" className="w-full border-blue-500 text-blue-600 hover:bg-blue-50" size="sm"><Navigation className="h-4 w-4" /> Waze</Button>
                 </a>
               </div>
