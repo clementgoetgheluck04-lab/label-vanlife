@@ -7,7 +7,6 @@ import { ArrowLeft, ArrowRight, Building2, Check, ClipboardCheck, FileText, Load
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { LABELLISATION_CRITERIA } from "@/config/labellisation-criteria";
-import { getSpottedPlace, normalizeExternalWebsite } from "@/data/spotted-places";
 import { trackEvent } from "@/lib/analytics/browser";
 
 const STEPS = [
@@ -91,17 +90,18 @@ export default function CandidaturePage() {
           sessionStorage.removeItem("labellisation-form-progress");
         }
       }
-      const claimId = new URLSearchParams(window.location.search).get("claim");
-      const claimedPlace = claimId ? getSpottedPlace(claimId) : undefined;
-      const claimPrefill: Partial<typeof initialForm> = claimedPlace ? {
-        establishmentName: claimedPlace.name,
-        address: claimedPlace.address,
-        postalCode: claimedPlace.postalCode,
-        city: claimedPlace.city,
-        region: claimedPlace.region,
-        website: normalizeExternalWebsite(claimedPlace.website) || "",
+      const params = new URLSearchParams(window.location.search);
+      const claimId = params.get("claim");
+      const establishmentName = params.get("establishmentName")?.trim() || "";
+      const claimPrefill: Partial<typeof initialForm> = claimId ? {
+        establishmentName,
+        address: params.get("address")?.trim() || "",
+        postalCode: params.get("postalCode")?.trim() || "",
+        city: params.get("city")?.trim() || "",
+        region: params.get("region")?.trim() || "",
+        website: params.get("website")?.trim() || "",
       } : {};
-      if (claimedPlace) setClaimedPlaceName(claimedPlace.name);
+      if (establishmentName) setClaimedPlaceName(establishmentName);
       setForm((current) => ({
         ...current,
         ...restored,

@@ -44,3 +44,27 @@ test("the founder role migration targets one exact account and fails closed", ()
   assert.match(migration, /RAISE EXCEPTION/);
   assert.match(migration, /SET "role" = 'ADMIN'/);
 });
+
+test("member-only place data is enforced server-side", () => {
+  const memberLayout = readFileSync(new URL("../src/app/member/layout.tsx", import.meta.url), "utf8");
+  const memberNetwork = readFileSync(new URL("../src/app/api/member/camping-network/route.ts", import.meta.url), "utf8");
+  const explorer = readFileSync(new URL("../src/app/explorer/page.tsx", import.meta.url), "utf8");
+  const spottedPage = readFileSync(new URL("../src/app/lieux-reperes/[id]/page.tsx", import.meta.url), "utf8");
+  const roadTripButton = readFileSync(new URL("../src/components/roadtrip/AddToRoadTripButton.tsx", import.meta.url), "utf8");
+
+  assert.match(memberLayout, /requireActiveMember\(\)/);
+  assert.match(memberNetwork, /hasActiveMemberAccess\(\)/);
+  assert.match(memberNetwork, /status: 403/);
+  assert.doesNotMatch(explorer, /@\/data\/(?:enriched-lieux|spotted-places)/);
+  assert.match(spottedPage, /memberHasAccess && <MemberRoadTripPanel/);
+  assert.doesNotMatch(spottedPage, /member=1|member-query/);
+  assert.doesNotMatch(roadTripButton, /member-query/);
+});
+
+test("the navigation reflects an authenticated session and hides the purchase CTA", () => {
+  const navbar = readFileSync(new URL("../src/components/Navbar.tsx", import.meta.url), "utf8");
+  assert.match(navbar, /\/api\/auth\/status/);
+  assert.match(navbar, /Vous êtes connecté/);
+  assert.match(navbar, /authenticated === true/);
+  assert.match(navbar, /authenticated === false/);
+});

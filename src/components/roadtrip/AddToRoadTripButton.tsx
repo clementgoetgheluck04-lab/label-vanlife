@@ -25,7 +25,6 @@ type AddToRoadTripButtonProps = {
   showViewLink?: boolean;
   size?: "sm" | "md" | "lg";
   variant?: "white" | "gold" | "dark" | "outline";
-  visibility?: "always" | "member-query";
 };
 
 function readDraft(): RoadTripDraftPlace[] {
@@ -63,13 +62,7 @@ export default function AddToRoadTripButton({
   showViewLink = false,
   size = "md",
   variant = "white",
-  visibility = "always",
 }: AddToRoadTripButtonProps) {
-  const [canRender] = useState(() => {
-    if (visibility === "always") return true;
-    if (typeof window === "undefined") return false;
-    return new URLSearchParams(window.location.search).get("member") === "1";
-  });
   const [isAdded, setIsAdded] = useRoadTripPlaceState(place.id);
 
   function addPlace() {
@@ -81,8 +74,6 @@ export default function AddToRoadTripButton({
     writeDraft([...current, place]);
     setIsAdded(true);
   }
-
-  if (!canRender) return null;
 
   return (
     <div className={cn("flex flex-col gap-2", showViewLink && isAdded ? "items-stretch" : "", className)}>

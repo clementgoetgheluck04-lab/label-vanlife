@@ -997,13 +997,22 @@ export function getPublicRichPlaceDetails(placeId: string): RichPlaceDetails | u
   if (!details) return undefined;
 
   const promoCode = details.promoCode?.trim();
-  if (!promoCode) return { ...details, promoCode: undefined };
-
-  const promoCodePattern = new RegExp(escapeRegExp(promoCode), "gi");
-  const redact = (value: string): string => value.replace(promoCodePattern, "code réservé aux membres");
+  const promoCodePattern = promoCode ? new RegExp(escapeRegExp(promoCode), "gi") : null;
+  const redact = (value: string): string => {
+    const withoutCode = promoCodePattern ? value.replace(promoCodePattern, "code réservé aux membres") : value;
+    return withoutCode
+      .replace(/\bréduction(?:\s+de)?\s+(?:−|-)?\s?\d{1,2}\s?%(?:\s+pour\s+les\s+membres(?:\s+Label Vanlife)?)?/gi, "avantage accessible dans l’espace membre")
+      .replace(/(?:−|-)?\s?\d{1,2}\s?%/g, "avantage membre")
+      .replace(/\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/gi, "coordonnée réservée aux membres")
+      .replace(/(?:\+33|0)[\s.-]?(?:\d[\s.-]?){9}/g, "coordonnée téléphonique réservée aux membres")
+      .replace(/https?:\/\/[^\s)]+/gi, "site réservé aux membres");
+  };
 
   return {
     ...details,
+    displayAddress: undefined,
+    contactName: undefined,
+    facebookUrl: undefined,
     promoCode: undefined,
     discountInstructions: details.discountInstructions?.map(redact),
     venueQuote: details.venueQuote ? redact(details.venueQuote) : undefined,
@@ -1020,5 +1029,8 @@ export function getPublicRichPlaceDetails(placeId: string): RichPlaceDetails | u
     })),
     bookingMethods: details.bookingMethods?.map(redact),
     reservationLabel: details.reservationLabel ? redact(details.reservationLabel) : undefined,
+    reservationUrl: undefined,
+    planUrl: undefined,
+    tourismUrl: undefined,
   };
 }

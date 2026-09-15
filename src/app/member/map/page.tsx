@@ -4,14 +4,34 @@ import { useState, useMemo, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/browser";
 import { X, Filter, MapPin, Percent, ArrowLeft, BadgeCheck, TentTree, Building2, ExternalLink, Navigation, Route, Plus, CheckCircle2 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { ENRICHED_LIEUX } from "@/data/enriched-lieux";
 import Filters, { type FilterValues } from "@/components/explorer/Filters";
 import LieuCard from "@/components/explorer/LieuCard";
 import type { MemberCampingPoint } from "@/components/explorer/MapContainer";
-import { classifySpottedPlace, normalizeExternalWebsite, PLACE_UNIVERSE_LABELS, type PlaceUniverse } from "@/data/spotted-places";
+import type { Lieu } from "@/lib/types";
+
+type PlaceUniverse = "tous" | "camping" | "ferme" | "vignoble" | "activite" | "hebergement" | "autre";
+const PLACE_UNIVERSE_LABELS: Record<PlaceUniverse, string> = {
+  tous: "Tous", camping: "Campings", ferme: "Fermes", vignoble: "Vignobles",
+  activite: "Activités", hebergement: "Hébergements", autre: "Autres",
+};
+
+function classifyPlace(place: { name: string; network: string }): Exclude<PlaceUniverse, "tous"> {
+  const value = `${place.name} ${place.network}`.normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase();
+  if (/camping|camp |aire naturelle|emplacement|van |caravan/.test(value)) return "camping";
+  if (/vignoble|vigner|viticul|domaine vit|cave|chai|vin |oenolog/.test(value)) return "vignoble";
+  if (/activite|equestre|ecurie|randon|nautique|kayak|velo|location|parc/.test(value)) return "activite";
+  if (/gite|chambre|yourte|chalet|hebergement|auberge/.test(value)) return "hebergement";
+  if (/ferme|gaec|earl|agri|elevage|bienvenue a la ferme/.test(value)) return "ferme";
+  return "autre";
+}
+
+function normalizeExternalWebsite(value: string | null | undefined) {
+  const website = value?.trim();
+  if (!website) return null;
+  return /^https?:\/\//i.test(website) ? website : `https://${website}`;
+}
 
 const MapContainer = dynamic(
   () => import("@/components/explorer/MapContainer"),
@@ -41,23 +61,11 @@ const ROADTRIP_DRAFT_STORAGE_KEY = "label-vanlife-roadtrip-draft";
 
 export default function MemberMapPage() {
   const router = useRouter();
-  const [authed, setAuthed] = useState(false);
-
-  useEffect(() => {
-    const supabase = createClient();
-    supabase.auth.getUser().then(async ({ data: { user } }) => {
-      if (user) { setAuthed(true); return; }
-      const response = await fetch("/api/auth/admin-preview", { cache: "no-store" });
-      const preview = response.ok ? await response.json() as { active?: boolean } : {};
-      if (preview.active) setAuthed(true);
-      else router.replace("/member-login?redirect=/member/map");
-    });
-  }, [router]);
-
   const [filters, setFilters] = useState<FilterValues>(DEFAULT_FILTERS);
   const [showFilters, setShowFilters] = useState(false);
   const [showLabelled, setShowLabelled] = useState(true);
   const [showMemberAddresses, setShowMemberAddresses] = useState(true);
+  const [labelledPlaces, setLabelledPlaces] = useState<Lieu[]>([]);
   const [memberOnlyPlaces, setMemberOnlyPlaces] = useState<MemberCampingPoint[]>([]);
   const [universe, setUniverse] = useState<PlaceUniverse>("tous");
   const [visibleMemberPlaces, setVisibleMemberPlaces] = useState(24);
@@ -66,15 +74,15 @@ export default function MemberMapPage() {
 
   // Compute available regions from data
   const regions = useMemo(() => {
-    const unique = new Set(ENRICHED_LIEUX.map((l) => l.region));
+    const unique = new Set(labelledPlaces.map((l) => l.region));
     memberOnlyPlaces.forEach((place) => unique.add(place.region));
     return Array.from(unique).sort();
-  }, [memberOnlyPlaces]);
+  }, [labelledPlaces, memberOnlyPlaces]);
 
   const filteredLieux = useMemo(() => {
-    return ENRICHED_LIEUX.filter((lieu) => {
+    return labelledPlaces.filter((lieu) => {
       if (universe !== "tous") {
-        const inferred = classifySpottedPlace({ name: lieu.nom, network: "" });
+        const inferred = classifyPlace({ name: lieu.nom, network: "" });
         const labelledUniverse = lieu.type === "camping" ? "camping"
           : lieu.type === "activite" ? "activite"
           : lieu.type === "hebergement_insolite" ? "hebergement"
@@ -88,10 +96,10 @@ export default function MemberMapPage() {
       if (filters.search && !lieu.nom.toLowerCase().includes(filters.search.toLowerCase()) && !lieu.ville.toLowerCase().includes(filters.search.toLowerCase())) return false;
       return true;
     });
-  }, [filters, universe]);
+  }, [filters, labelledPlaces, universe]);
 
   const filteredMemberPlaces = useMemo(() => memberOnlyPlaces.filter((place) => {
-    if (universe !== "tous" && classifySpottedPlace(place) !== universe) return false;
+    if (universe !== "tous" && classifyPlace(place) !== universe) return false;
     if (filters.region && place.region !== filters.region) return false;
     if (filters.search) {
       const query = filters.search.toLocaleLowerCase("fr");
@@ -101,15 +109,24 @@ export default function MemberMapPage() {
   }), [filters.region, filters.search, memberOnlyPlaces, universe]);
 
   useEffect(() => {
-    if (!authed) return;
     fetch("/api/member/camping-network", { cache: "no-store" })
       .then(async (response) => {
-        if (!response.ok) throw new Error("Accès aux adresses membres refusé");
-        return response.json() as Promise<{ places: MemberCampingPoint[] }>;
+        if (response.status === 403) {
+          router.replace("/devenir-membre");
+          throw new Error("Accès membre expiré");
+        }
+        if (!response.ok) throw new Error("Accès aux données membres refusé");
+        return response.json() as Promise<{ labelledPlaces: Lieu[]; places: MemberCampingPoint[] }>;
       })
-      .then(({ places }) => setMemberOnlyPlaces(places))
-      .catch(() => setMemberOnlyPlaces([]));
-  }, [authed]);
+      .then(({ labelledPlaces: nextLabelledPlaces, places }) => {
+        setLabelledPlaces(nextLabelledPlaces);
+        setMemberOnlyPlaces(places);
+      })
+      .catch(() => {
+        setLabelledPlaces([]);
+        setMemberOnlyPlaces([]);
+      });
+  }, [router]);
 
   useEffect(() => {
     let nextDraft: RoadTripDraftPlace[] = [];
@@ -148,8 +165,6 @@ export default function MemberMapPage() {
   function isDestinationAdded(id: string) {
     return roadTripDraft.some((place) => place.id === id);
   }
-
-  if (!authed) return null;
 
   return (
     <div className="min-h-screen bg-white">
@@ -330,7 +345,7 @@ export default function MemberMapPage() {
                       region: lieu.region,
                       lat: lieu.coordonnees.lat,
                       lng: lieu.coordonnees.lng,
-                      href: `/lieux/${lieu.id}?member=1`,
+                      href: `/lieux/${lieu.id}`,
                       kind: "labelled",
                     })}
                     disabled={added}
@@ -376,9 +391,9 @@ export default function MemberMapPage() {
                       </div>
                       <h4 className="mt-4 line-clamp-2 font-bold text-neutral-800">{place.name}</h4>
                       <p className="mt-2 flex items-start gap-1.5 text-sm text-neutral-500"><MapPin className="mt-0.5 h-4 w-4 shrink-0" />{place.city} · {place.region}</p>
-                      <p className="mt-2 text-xs text-neutral-400">{PLACE_UNIVERSE_LABELS[classifySpottedPlace(place)]} · Repéré par Label Vanlife</p>
+                      <p className="mt-2 text-xs text-neutral-400">{PLACE_UNIVERSE_LABELS[classifyPlace(place)]} · Repéré par Label Vanlife</p>
                       <div className="mt-auto flex flex-col gap-2 pt-5">
-                        <Link href={`/lieux-reperes/${place.id}?member=1`} className="flex min-h-11 items-center justify-center rounded-xl border border-neutral-300 bg-white px-3 py-2 text-center text-xs font-bold text-neutral-700 hover:border-neutral-400">Voir la fiche</Link>
+                        <Link href={`/lieux-reperes/${place.id}`} className="flex min-h-11 items-center justify-center rounded-xl border border-neutral-300 bg-white px-3 py-2 text-center text-xs font-bold text-neutral-700 hover:border-neutral-400">Voir la fiche</Link>
                         <button
                           type="button"
                           onClick={() => addDestination({
@@ -388,7 +403,7 @@ export default function MemberMapPage() {
                             region: place.region,
                             lat: place.lat,
                             lng: place.lng,
-                            href: `/lieux-reperes/${place.id}?member=1`,
+                            href: `/lieux-reperes/${place.id}`,
                             kind: "spotted",
                           })}
                           disabled={added}

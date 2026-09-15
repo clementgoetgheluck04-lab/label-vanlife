@@ -4,12 +4,19 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Activity, ArrowLeft, Building2, CalendarDays, CircleAlert, ExternalLink, Mail, MapPin, Navigation, Phone, ShieldCheck, Users } from "lucide-react";
 import MemberRoadTripPanel from "@/components/roadtrip/MemberRoadTripPanel";
-import { buildClaimHref, buildRemovalMailto, classifySpottedPlace, getSpottedPlace, normalizeExternalWebsite, PLACE_UNIVERSE_LABELS, SPOTTED_PLACES } from "@/data/spotted-places";
+import { buildClaimHref, buildRemovalMailto, classifySpottedPlace, getSpottedPlace, normalizeExternalWebsite, PLACE_UNIVERSE_LABELS } from "@/data/spotted-places";
+import { hasActiveMemberAccess } from "@/server/auth";
 
 type PageProps = { params: Promise<{ id: string }> };
 
-export function generateStaticParams() {
-  return SPOTTED_PLACES.map((place) => ({ id: place.id }));
+export const dynamic = "force-dynamic";
+
+async function safelyHasActiveMemberAccess() {
+  try {
+    return await hasActiveMemberAccess();
+  } catch {
+    return false;
+  }
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
@@ -25,9 +32,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function SpottedPlacePage({ params }: PageProps) {
   const place = getSpottedPlace((await params).id);
   if (!place) notFound();
-  const website = normalizeExternalWebsite(place.website);
+  const memberHasAccess = await safelyHasActiveMemberAccess();
+  const website = memberHasAccess ? normalizeExternalWebsite(place.website) : null;
   const category = PLACE_UNIVERSE_LABELS[classifySpottedPlace(place)];
-  const phones = [...new Set([place.phone, ...(place.phones ?? [])].filter((value): value is string => Boolean(value)))];
+  const phones = memberHasAccess ? [...new Set([place.phone, ...(place.phones ?? [])].filter((value): value is string => Boolean(value)))] : [];
+  const claimHref = memberHasAccess
+    ? buildClaimHref(place)
+    : `/labellisation/candidature?${new URLSearchParams({ claim: place.id, establishmentName: place.name, city: place.city, region: place.region }).toString()}`;
 
   return (
     <main className="min-h-screen bg-neutral-50 pb-20 pt-24">
@@ -52,13 +63,13 @@ export default async function SpottedPlacePage({ params }: PageProps) {
                 <h1 className="text-3xl font-bold text-neutral-950 sm:text-4xl">{place.name}</h1>
                 <p className="mt-3 flex items-start gap-2 text-neutral-600">
                   <MapPin className="mt-0.5 h-5 w-5 shrink-0 text-[#c39960]" />
-                  <span>{place.address}<br />{place.postalCode} {place.city}{place.region ? ` · ${place.region}` : ""}</span>
+                  <span>{memberHasAccess ? <>{place.address}<br />{place.postalCode} {place.city}</> : place.city}{place.region ? ` · ${place.region}` : ""}</span>
                 </p>
               </div>
             </div>
           </div>
 
-          <MemberRoadTripPanel
+          {memberHasAccess && <MemberRoadTripPanel
             place={{
               id: `spotted:${place.id}`,
               name: place.name,
@@ -66,14 +77,13 @@ export default async function SpottedPlacePage({ params }: PageProps) {
               region: place.region,
               lat: place.lat,
               lng: place.lng,
-              href: `/lieux-reperes/${place.id}?member=1`,
+              href: `/lieux-reperes/${place.id}`,
               kind: "spotted",
             }}
             title="Ajouter ce lieu repéré à mon road trip"
             description="Utilisez-le comme étape indicative. Aucun avantage membre n’est garanti tant que le lieu n’est pas labellisé."
             variant="spotted"
-            visibility="member-query"
-          />
+          />}
 
           <div className="grid gap-8 p-6 sm:p-10 lg:grid-cols-[1fr_0.9fr]">
             <div>
@@ -91,7 +101,7 @@ export default async function SpottedPlacePage({ params }: PageProps) {
                 </section>
               )}
 
-              {place.description && (
+              {memberHasAccess && place.description && (
                 <section className="mb-8">
                   <h2 className="text-xl font-bold text-neutral-900">Présentation du lieu</h2>
                   <p className="mt-3 text-sm leading-7 text-neutral-700">{place.description}</p>
@@ -103,19 +113,19 @@ export default async function SpottedPlacePage({ params }: PageProps) {
                 <div className="rounded-2xl bg-neutral-50 p-4"><dt className="text-xs font-bold uppercase tracking-wider text-neutral-400">Statut</dt><dd className="mt-1 font-semibold text-neutral-800">Lieu repéré par Label Vanlife</dd></div>
                 <div className="rounded-2xl bg-neutral-50 p-4"><dt className="text-xs font-bold uppercase tracking-wider text-neutral-400">Type de lieu</dt><dd className="mt-1 font-semibold text-neutral-800">{category}</dd></div>
                 <div className="rounded-2xl bg-neutral-50 p-4"><dt className="text-xs font-bold uppercase tracking-wider text-neutral-400">Localisation</dt><dd className="mt-1 font-semibold text-neutral-800">{place.city} · {place.region}</dd></div>
-                {place.contactName && <div className="rounded-2xl bg-neutral-50 p-4"><dt className="text-xs font-bold uppercase tracking-wider text-neutral-400">Contact indiqué</dt><dd className="mt-1 font-semibold text-neutral-800">{place.contactName}</dd></div>}
+                {memberHasAccess && place.contactName && <div className="rounded-2xl bg-neutral-50 p-4"><dt className="text-xs font-bold uppercase tracking-wider text-neutral-400">Contact indiqué</dt><dd className="mt-1 font-semibold text-neutral-800">{place.contactName}</dd></div>}
                 {place.capacity && <div className="rounded-2xl bg-neutral-50 p-4"><dt className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-neutral-400"><Users className="h-3.5 w-3.5" /> Capacité</dt><dd className="mt-1 font-semibold text-neutral-800">{place.capacity}</dd></div>}
-                {place.openingHours && <div className="rounded-2xl bg-neutral-50 p-4"><dt className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-neutral-400"><CalendarDays className="h-3.5 w-3.5" /> Ouverture annoncée</dt><dd className="mt-1 font-semibold text-neutral-800">{place.openingHours}</dd></div>}
+                {memberHasAccess && place.openingHours && <div className="rounded-2xl bg-neutral-50 p-4"><dt className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-neutral-400"><CalendarDays className="h-3.5 w-3.5" /> Ouverture annoncée</dt><dd className="mt-1 font-semibold text-neutral-800">{place.openingHours}</dd></div>}
               </dl>
 
-              {(phones.length > 0 || (place.emails?.length ?? 0) > 0) && (
+              {memberHasAccess && (phones.length > 0 || (place.emails?.length ?? 0) > 0) && (
                 <div className="mt-5 grid gap-3 sm:grid-cols-2">
                   {phones.map((phone) => <a key={phone} href={`tel:${phone}`} className="flex min-h-12 items-center gap-2 rounded-xl border border-neutral-200 px-4 text-sm font-semibold text-neutral-700 hover:border-emerald-300"><Phone className="h-4 w-4 text-emerald-700" /> {phone}</a>)}
                   {place.emails?.map((email) => <a key={email} href={`mailto:${email}`} className="flex min-h-12 items-center gap-2 rounded-xl border border-neutral-200 px-4 text-sm font-semibold text-neutral-700 hover:border-emerald-300"><Mail className="h-4 w-4 text-emerald-700" /> <span className="truncate">{email}</span></a>)}
                 </div>
               )}
 
-              {place.details && place.details.length > 0 && (
+              {memberHasAccess && place.details && place.details.length > 0 && (
                 <section className="mt-8">
                   <h2 className="text-xl font-bold text-neutral-900">Accueil et prestations indiqués</h2>
                   <div className="mt-4 space-y-3">
@@ -124,7 +134,7 @@ export default async function SpottedPlacePage({ params }: PageProps) {
                 </section>
               )}
 
-              {place.activities && place.activities.length > 0 && (
+              {memberHasAccess && place.activities && place.activities.length > 0 && (
                 <section className="mt-8">
                   <h2 className="flex items-center gap-2 text-xl font-bold text-neutral-900"><Activity className="h-5 w-5 text-emerald-700" /> Loisirs et activités indiqués</h2>
                   <div className="mt-4 flex flex-wrap gap-2">
@@ -133,32 +143,42 @@ export default async function SpottedPlacePage({ params }: PageProps) {
                 </section>
               )}
 
-              {website && (
+              {memberHasAccess && website && (
                 <a href={website} target="_blank" rel="noreferrer nofollow" className="mt-5 inline-flex min-h-12 items-center gap-2 rounded-xl bg-emerald-700 px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-emerald-800">
                   Réserver ou visiter le site de l&apos;établissement <ExternalLink className="h-4 w-4" />
                 </a>
               )}
-              {!website && place.googleMapsUrl && (
+              {memberHasAccess && !website && place.googleMapsUrl && (
                 <a href={place.googleMapsUrl} target="_blank" rel="noreferrer nofollow" className="mt-5 inline-flex min-h-12 items-center gap-2 rounded-xl bg-emerald-700 px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-emerald-800">
                   Ouvrir la fiche GPS du lieu <ExternalLink className="h-4 w-4" />
                 </a>
               )}
-              <div className="mt-4 grid grid-cols-2 gap-3">
+              {memberHasAccess && <div className="mt-4 grid grid-cols-2 gap-3">
                 <a href={`https://www.google.com/maps/dir/?api=1&destination=${place.lat},${place.lng}&travelmode=driving`} target="_blank" rel="noreferrer" className="flex min-h-12 items-center justify-center gap-2 rounded-xl bg-emerald-50 px-3 py-3 text-center text-sm font-bold text-emerald-800 hover:bg-emerald-100"><Navigation className="h-4 w-4" /> Y aller avec Maps</a>
                 <a href={`https://waze.com/ul?ll=${place.lat}%2C${place.lng}&navigate=yes`} target="_blank" rel="noreferrer" className="flex min-h-12 items-center justify-center gap-2 rounded-xl bg-blue-50 px-3 py-3 text-center text-sm font-bold text-blue-700 hover:bg-blue-100"><Navigation className="h-4 w-4" /> Waze</a>
-              </div>
+              </div>}
+              {!memberHasAccess && (
+                <div className="mt-6 rounded-2xl border border-emerald-200 bg-emerald-50 p-5">
+                  <h2 className="font-bold text-emerald-950">Détails réservés aux membres</h2>
+                  <p className="mt-2 text-sm leading-6 text-emerald-900">La MAP, le site internet, les coordonnées exactes et l&apos;ajout au road trip sont accessibles avec une Carte membre active.</p>
+                  <div className="mt-4 flex flex-wrap gap-3">
+                    <Link href="/member-login" className="inline-flex min-h-11 items-center rounded-xl bg-emerald-800 px-4 text-sm font-bold text-white">Se connecter</Link>
+                    <Link href="/devenir-membre" className="inline-flex min-h-11 items-center rounded-xl bg-[#d0ad7d] px-4 text-sm font-bold text-neutral-950">Découvrir la Carte membre</Link>
+                  </div>
+                </div>
+              )}
               <div className="mt-6 rounded-2xl border border-amber-200 bg-amber-50 p-5 text-sm leading-6 text-amber-950">
                 <strong>Aucun partenariat ni avantage membre n&apos;est garanti.</strong>
                 <p className="mt-1">Label Vanlife n&apos;a pas encore audité cet établissement. La présence de cette fiche ne vaut ni labellisation, ni recommandation commerciale.</p>
               </div>
-              <p className="mt-4 text-xs leading-5 text-neutral-400">Lieu repéré par Label Vanlife. Informations publiques à vérifier directement auprès de l&apos;établissement. Point GPS : {place.lat}, {place.lng} · repéré le {place.gpsVerifiedAt ?? "1er août 2026"}.</p>
+              <p className="mt-4 text-xs leading-5 text-neutral-400">Lieu repéré par Label Vanlife. Informations à vérifier directement auprès de l&apos;établissement.{memberHasAccess ? ` Point GPS : ${place.lat}, ${place.lng} · repéré le ${place.gpsVerifiedAt ?? "1er août 2026"}.` : " Les coordonnées exactes sont réservées aux membres."}</p>
             </div>
 
             <aside className="rounded-3xl bg-neutral-950 p-6 text-white sm:p-7">
               <ShieldCheck className="h-8 w-8 text-[#c39960]" />
               <h2 className="mt-5 text-2xl font-bold">Vous gérez cet établissement ?</h2>
               <p className="mt-3 text-sm leading-6 text-neutral-300">Revendiquez cette fiche pour préremplir votre candidature, vérifier les informations et demander la labellisation.</p>
-              <Link href={buildClaimHref(place)} className="mt-6 flex min-h-14 w-full items-center justify-center rounded-xl bg-[#d0ad7d] px-5 py-4 text-center text-sm font-extrabold uppercase tracking-wide text-neutral-950 shadow-lg transition-transform hover:-translate-y-0.5 hover:bg-[#dfc59f]">
+              <Link href={claimHref} className="mt-6 flex min-h-14 w-full items-center justify-center rounded-xl bg-[#d0ad7d] px-5 py-4 text-center text-sm font-extrabold uppercase tracking-wide text-neutral-950 shadow-lg transition-transform hover:-translate-y-0.5 hover:bg-[#dfc59f]">
                 Revendiquer cet établissement
               </Link>
               <div className="my-6 h-px bg-white/10" />

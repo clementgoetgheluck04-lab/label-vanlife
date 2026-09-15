@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { LogIn, Menu, X } from "lucide-react";
+import { CheckCircle2, LogIn, Menu, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
@@ -22,6 +22,7 @@ export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [visible, setVisible] = useState(true);
+  const [authenticated, setAuthenticated] = useState<boolean | null>(null);
   const lastScrollY = useRef(0);
 
   useEffect(() => {
@@ -37,6 +38,25 @@ export default function Navbar() {
     window.addEventListener("scroll", updateHeader, { passive: true });
     return () => window.removeEventListener("scroll", updateHeader);
   }, []);
+
+  useEffect(() => {
+    let mounted = true;
+    const refreshSession = async () => {
+      try {
+        const response = await fetch("/api/auth/status", { cache: "no-store" });
+        const status = response.ok ? await response.json() as { authenticated?: boolean } : {};
+        if (mounted) setAuthenticated(Boolean(status.authenticated));
+      } catch {
+        if (mounted) setAuthenticated(false);
+      }
+    };
+    void refreshSession();
+    window.addEventListener("focus", refreshSession);
+    return () => {
+      mounted = false;
+      window.removeEventListener("focus", refreshSession);
+    };
+  }, [pathname]);
 
   const overlaysHero = pathname === "/" && !scrolled && !open;
   const isActive = (href: string) => href === "/" ? pathname === "/" : pathname.startsWith(href);
@@ -93,16 +113,26 @@ export default function Navbar() {
               </Link>
             ))}
 
-            <Link href="/member-login" className="ml-2">
-              <Button variant="primary" size="sm" className="gap-1.5 uppercase">
-                <LogIn className="h-4 w-4" /> Connexion
-              </Button>
-            </Link>
-            <Link href="/devenir-membre" className="ml-1">
-              <Button variant="cta" size="sm" className="gap-1.5">
-                {MEMBER_SHORT_LABEL}
-              </Button>
-            </Link>
+            {authenticated === true ? (
+              <Link href="/member" className="ml-2">
+                <Button variant="primary" size="sm" className="gap-1.5">
+                  <CheckCircle2 className="h-4 w-4" /> Vous êtes connecté
+                </Button>
+              </Link>
+            ) : authenticated === false ? (
+              <>
+                <Link href="/member-login" className="ml-2">
+                  <Button variant="primary" size="sm" className="gap-1.5 uppercase">
+                    <LogIn className="h-4 w-4" /> Connexion
+                  </Button>
+                </Link>
+                <Link href="/devenir-membre" className="ml-1">
+                  <Button variant="cta" size="sm" className="gap-1.5">
+                    {MEMBER_SHORT_LABEL}
+                  </Button>
+                </Link>
+              </>
+            ) : null}
           </nav>
 
           {/* Mobile Menu Button */}
@@ -139,16 +169,26 @@ export default function Navbar() {
               </Link>
             ))}
             <div className="pt-3">
-              <Link href="/member-login" onClick={() => setOpen(false)}>
-                <Button variant="primary" className="w-full gap-2 uppercase">
-                  <LogIn className="h-4 w-4" /> Connexion
-                </Button>
-              </Link>
-              <Link href="/devenir-membre" onClick={() => setOpen(false)} className="mt-2 block">
-                <Button variant="cta" className="w-full gap-2">
-                  {MEMBER_SHORT_LABEL}
-                </Button>
-              </Link>
+              {authenticated === true ? (
+                <Link href="/member" onClick={() => setOpen(false)}>
+                  <Button variant="primary" className="w-full gap-2">
+                    <CheckCircle2 className="h-4 w-4" /> Vous êtes connecté
+                  </Button>
+                </Link>
+              ) : authenticated === false ? (
+                <>
+                  <Link href="/member-login" onClick={() => setOpen(false)}>
+                    <Button variant="primary" className="w-full gap-2 uppercase">
+                      <LogIn className="h-4 w-4" /> Connexion
+                    </Button>
+                  </Link>
+                  <Link href="/devenir-membre" onClick={() => setOpen(false)} className="mt-2 block">
+                    <Button variant="cta" className="w-full gap-2">
+                      {MEMBER_SHORT_LABEL}
+                    </Button>
+                  </Link>
+                </>
+              ) : null}
             </div>
           </div>
         </div>

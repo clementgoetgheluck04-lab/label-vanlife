@@ -31,7 +31,7 @@ import { Button } from "@/components/ui/Button";
 import { FavoriteButton } from "@/components/member/FavoriteButton";
 import SharePlaceButton from "@/components/places/SharePlaceButton";
 import AddToRoadTripButton from "@/components/roadtrip/AddToRoadTripButton";
-import { MEMBER_PRICE_TEXT, MEMBER_PRODUCT_NAME, MEMBER_VALIDITY_TEXT } from "@/config/commercial";
+import { MEMBER_PRODUCT_NAME, MEMBER_VALIDITY_TEXT } from "@/config/commercial";
 import { ENRICHED_LIEUX } from "@/data/enriched-lieux";
 import { getPlaceContact } from "@/data/place-contacts";
 import { getPlaceMedia } from "@/data/place-media";
@@ -40,6 +40,7 @@ import { getPublicRichPlaceDetails, getRichPlaceDetails, getVisibleLabelYears } 
 import { getVerifiedPlaceGps } from "@/data/verified-place-gps";
 import { getOptionalActiveMember, hasActiveMemberAccess } from "@/server/auth";
 import { getPrisma } from "@/lib/prisma";
+import { redactPublicPlaceText } from "@/server/public-place";
 
 const SERVICE_ICONS: Record<string, { icon: LucideIcon; label: string }> = {
   wifi: { icon: Wifi, label: "Wi-Fi" },
@@ -65,6 +66,8 @@ const TYPE_LABELS: Record<string, string> = {
   activite: "Activité",
 };
 
+export const dynamic = "force-dynamic";
+
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const { id } = await params;
   const lieu = ENRICHED_LIEUX.find((item) => item.id === id);
@@ -77,9 +80,10 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   }
 
   const title = `${lieu.nom} — lieu labellisé`;
-  const description = lieu.description.length <= 160
-    ? lieu.description
-    : `${lieu.description.slice(0, 157).replace(/\s+\S*$/, "")}…`;
+  const publicDescription = redactPublicPlaceText(lieu.description);
+  const description = publicDescription.length <= 160
+    ? publicDescription
+    : `${publicDescription.slice(0, 157).replace(/\s+\S*$/, "")}…`;
 
   return {
     title,
@@ -164,11 +168,11 @@ export default async function LieuDetailPage({ params }: { params: Promise<{ id:
     : getPublicRichPlaceDetails(lieu.id);
   const sourceDetails = getLabelledSourceDetails(lieu.id);
   const visibleLabelYears = richDetails ? getVisibleLabelYears(richDetails) : [];
-  const phones = [...new Set([verifiedContact.phone, lieu.telephone, ...sourceDetails.flatMap((source) => source.phones ?? [])].filter((value): value is string => Boolean(value)))];
-  const emails = [...new Set([verifiedContact.email, lieu.email, ...sourceDetails.flatMap((source) => source.emails ?? [])].filter((value): value is string => Boolean(value)))];
-  const contactNames = [...new Set([richDetails?.contactName, ...sourceDetails.map((source) => source.contactName)].filter((value): value is string => Boolean(value)))];
-  const website = verifiedContact.website || lieu.siteWeb || sourceDetails.find((source) => source.website)?.website;
-  const verifiedGps = getVerifiedPlaceGps(lieu.id);
+  const phones = memberHasAccess ? [...new Set([verifiedContact.phone, lieu.telephone, ...sourceDetails.flatMap((source) => source.phones ?? [])].filter((value): value is string => Boolean(value)))] : [];
+  const emails = memberHasAccess ? [...new Set([verifiedContact.email, lieu.email, ...sourceDetails.flatMap((source) => source.emails ?? [])].filter((value): value is string => Boolean(value)))] : [];
+  const contactNames = memberHasAccess ? [...new Set([richDetails?.contactName, ...sourceDetails.map((source) => source.contactName)].filter((value): value is string => Boolean(value)))] : [];
+  const website = memberHasAccess ? verifiedContact.website || lieu.siteWeb || sourceDetails.find((source) => source.website)?.website : undefined;
+  const verifiedGps = memberHasAccess ? getVerifiedPlaceGps(lieu.id) : undefined;
   const supplementaryDescriptions = sourceDetails
     .map((source) => source.description?.trim())
     .filter((description): description is string => Boolean(description && !lieu.description.includes(description)));
@@ -180,10 +184,10 @@ export default async function LieuDetailPage({ params }: { params: Promise<{ id:
     ...(richDetails?.activities ?? []),
   ])];
   const allPhotos = [...new Set([...media.photos, ...sourceDetails.flatMap((source) => source.images ?? [])])];
-  const displayAddress = richDetails?.displayAddress || lieu.address;
+  const displayAddress = memberHasAccess ? richDetails?.displayAddress || lieu.address : undefined;
   const quickServices = [
-    ...(lieu.discountPercent > 0 ? [`🎁 Avantage membre : -${lieu.discountPercent}%`] : []),
-    ...(lieu.priceHighlight ? [`💚 ${lieu.priceHighlight}`] : []),
+    ...(lieu.discountPercent > 0 ? [memberHasAccess ? `🎁 Avantage membre : -${lieu.discountPercent}%` : "🎁 Avantage réservé aux membres"] : []),
+    ...(lieu.priceHighlight ? [memberHasAccess ? `💚 ${lieu.priceHighlight}` : "💚 Tarif réservé aux membres"] : []),
     ...lieu.services.slice(0, 7).map((service) => {
       const serviceData = SERVICE_ICONS[service];
       return `${serviceData?.label ?? service}`;
@@ -219,13 +223,13 @@ export default async function LieuDetailPage({ params }: { params: Promise<{ id:
               <MapPin className="h-4 w-4" /> {lieu.ville}, {lieu.region}
             </p>
           </div>
-          {lieu.discountPercent > 0 && (
+          {memberHasAccess && lieu.discountPercent > 0 && (
             <div className="shrink-0 rounded-2xl bg-[#8c673e] px-4 py-2 text-center text-white shadow-lg">
               <span className="text-xs font-medium">Avantage membre</span>
               <p className="text-2xl font-bold">−{lieu.discountPercent}%</p>
             </div>
           )}
-          {lieu.discountPercent === 0 && lieu.priceHighlight && (
+          {memberHasAccess && lieu.discountPercent === 0 && lieu.priceHighlight && (
             <div className="shrink-0 rounded-2xl bg-[#8c673e] px-4 py-2 text-center text-white shadow-lg">
               <span className="text-xs font-medium">Tarif public accessible</span>
               <p className="text-lg font-bold">{lieu.priceHighlight}</p>
@@ -299,7 +303,7 @@ export default async function LieuDetailPage({ params }: { params: Promise<{ id:
           </section>
         )}
 
-        {richDetails?.discountInstructions && richDetails.discountInstructions.length > 0 && (
+        {memberHasAccess && richDetails?.discountInstructions && richDetails.discountInstructions.length > 0 && (
           <section id="avantage-membre" className="overflow-hidden rounded-3xl border border-[#c39960]/35 bg-[#f7f1e8]">
             <div className="grid gap-6 p-6 sm:grid-cols-[180px_1fr] sm:p-8">
               <div>
@@ -309,13 +313,6 @@ export default async function LieuDetailPage({ params }: { params: Promise<{ id:
               <div className="space-y-3">
                 <h2 className="text-xl font-bold text-neutral-900">{lieu.discountPercent > 0 ? "Comment profiter de l’avantage" : "Conditions et tarifs"}</h2>
                 {memberHasAccess && richDetails.promoCode && <p className="inline-flex rounded-xl border border-[#c39960]/40 bg-white px-4 py-2 text-sm text-neutral-700">Code de réservation : <strong className="ml-2 font-mono text-neutral-950">{richDetails.promoCode}</strong></p>}
-                {!memberHasAccess && lieu.discountPercent > 0 && (
-                  <div className="rounded-xl border border-emerald-200 bg-white px-4 py-3 text-sm text-neutral-700">
-                    <p className="font-semibold text-emerald-800">Modalités réservées aux membres</p>
-                    <p className="mt-1 text-neutral-500">Connectez-vous à votre espace membre pour consulter le code ou les modalités privées de réservation.</p>
-                    <Link href="/member-login" className="mt-3 inline-flex font-bold text-emerald-700 underline underline-offset-2">Connexion membre</Link>
-                  </div>
-                )}
                 {richDetails.discountInstructions.map((instruction) => (
                   <p key={instruction} className="flex gap-3 text-sm leading-6 text-neutral-700"><span className="font-bold text-[#8b673d]">→</span><span>{instruction}</span></p>
                 ))}
@@ -326,9 +323,9 @@ export default async function LieuDetailPage({ params }: { params: Promise<{ id:
 
         <section>
           <h2 className="mb-3 text-xl font-bold text-neutral-900">À propos du lieu</h2>
-          <p className="max-w-4xl leading-7 text-neutral-600">{lieu.description}</p>
+          <p className="max-w-4xl leading-7 text-neutral-600">{memberHasAccess ? lieu.description : redactPublicPlaceText(lieu.description)}</p>
           {supplementaryDescriptions.map((description) => (
-            <p key={description} className="mt-4 max-w-4xl leading-7 text-neutral-600">{description}</p>
+            <p key={description} className="mt-4 max-w-4xl leading-7 text-neutral-600">{memberHasAccess ? description : redactPublicPlaceText(description)}</p>
           ))}
         </section>
 
@@ -443,7 +440,7 @@ export default async function LieuDetailPage({ params }: { params: Promise<{ id:
           </section>
         )}
 
-        {(phones.length > 0 || emails.length > 0 || contactNames.length > 0 || website || richDetails?.facebookUrl || lieu.horaires || displayAddress) && (
+        {memberHasAccess && (phones.length > 0 || emails.length > 0 || contactNames.length > 0 || website || richDetails?.facebookUrl || lieu.horaires || displayAddress) && (
           <section>
             <h2 className="mb-4 text-xl font-bold text-neutral-900">Informations pratiques</h2>
             <div className="grid gap-3 sm:grid-cols-2">
@@ -458,16 +455,25 @@ export default async function LieuDetailPage({ params }: { params: Promise<{ id:
           </section>
         )}
 
-        <section>
+        {memberHasAccess ? <section>
           <h2 className="mb-4 text-xl font-bold text-neutral-900">S’y rendre</h2>
           <div className="grid grid-cols-2 gap-3 sm:max-w-xl">
             <a href={`https://www.google.com/maps/dir/?api=1&destination=${lieu.coordonnees.lat},${lieu.coordonnees.lng}&travelmode=driving`} target="_blank" rel="noreferrer" data-analytics-event="route_start" data-analytics-entity-type="lieux" data-analytics-entity-id={lieu.id} className="flex min-h-12 items-center justify-center gap-2 rounded-xl bg-emerald-50 px-4 py-3 text-sm font-bold text-emerald-800 transition hover:bg-emerald-100"><Navigation className="h-4 w-4" /> Y aller avec Maps</a>
             <a href={`https://waze.com/ul?ll=${lieu.coordonnees.lat}%2C${lieu.coordonnees.lng}&navigate=yes`} target="_blank" rel="noreferrer" data-analytics-event="route_start" data-analytics-entity-type="lieux" data-analytics-entity-id={lieu.id} className="flex min-h-12 items-center justify-center gap-2 rounded-xl bg-blue-50 px-4 py-3 text-sm font-bold text-blue-700 transition hover:bg-blue-100"><Navigation className="h-4 w-4" /> Waze</a>
           </div>
           {verifiedGps && <p className="mt-3 text-xs text-neutral-500">Point GPS exact de l&apos;établissement vérifié sur Google Maps le 18 juillet 2026 · {lieu.coordonnees.lat}, {lieu.coordonnees.lng}.</p>}
-        </section>
+        </section> : (
+          <section className="rounded-3xl border border-emerald-200 bg-emerald-50 p-6 sm:p-8">
+            <h2 className="text-xl font-bold text-emerald-950">Informations réservées aux membres</h2>
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-emerald-900">Connectez-vous avec une Carte membre active pour voir le montant exact de l&apos;avantage, le site internet, les coordonnées et les itinéraires vers ce lieu.</p>
+            <div className="mt-5 flex flex-wrap gap-3">
+              <Link href="/member-login"><Button variant="primary">Se connecter</Button></Link>
+              <Link href="/devenir-membre"><Button variant="cta">Découvrir la Carte membre</Button></Link>
+            </div>
+          </section>
+        )}
 
-        {(richDetails?.reservationUrl || richDetails?.tourismUrl || richDetails?.regionLink) && (
+        {memberHasAccess && (richDetails?.reservationUrl || richDetails?.tourismUrl || richDetails?.regionLink) && (
           <section>
             <h2 className="mb-4 text-xl font-bold text-neutral-900">Réservation et activités aux alentours</h2>
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -499,7 +505,7 @@ export default async function LieuDetailPage({ params }: { params: Promise<{ id:
           </section>
         )}
 
-        {(media.documents.length > 0 || richDetails?.planUrl) && (
+        {memberHasAccess && (media.documents.length > 0 || richDetails?.planUrl) && (
           <section>
             <h2 className="mb-4 text-xl font-bold text-neutral-900">Plans et documents utiles</h2>
             <div className="grid gap-3 sm:grid-cols-2">
@@ -534,9 +540,7 @@ export default async function LieuDetailPage({ params }: { params: Promise<{ id:
           </div>
           <p className="mt-2 text-sm font-semibold text-emerald-50">{MEMBER_VALIDITY_TEXT}</p>
           <p className="mx-auto mt-3 max-w-lg text-sm leading-6 text-emerald-50">
-            {lieu.discountPercent > 0
-              ? <>Devenez membre pour profiter de <strong className="text-white">−{lieu.discountPercent}%</strong> chez {lieu.nom} et des avantages de tous les lieux labellisés.</>
-              : <>Repérez {lieu.nom} et tous les lieux labellisés depuis votre espace membre et la carte interactive Label Vanlife.</>}
+            Devenez membre pour découvrir l&apos;avantage proposé par {lieu.nom}, ses coordonnées et tous les lieux depuis la MAP privée Label Vanlife.
           </p>
           <Link href="/devenir-membre" className="mt-5 inline-block">
             <Button variant="primary" className="gap-2 bg-white px-8 text-emerald-800 hover:bg-emerald-50">{MEMBER_PRODUCT_NAME} <ArrowRight className="h-4 w-4" /></Button>
@@ -552,9 +556,7 @@ export default async function LieuDetailPage({ params }: { params: Promise<{ id:
           <p className="min-w-0 flex-1 text-xs font-semibold text-neutral-700">
             {memberHasAccess
               ? "Voir mon avantage membre"
-              : lieu.discountPercent > 0
-                ? `-${lieu.discountPercent}% ici avec la Carte membre`
-                : `${MEMBER_PRICE_TEXT} · ${MEMBER_VALIDITY_TEXT}`}
+              : `Avantage et coordonnées dans l’espace membre`}
           </p>
           <Link href={memberHasAccess ? "#avantage-membre" : "/devenir-membre"} data-analytics-event={memberHasAccess ? "benefit_view" : undefined} data-analytics-entity-type={memberHasAccess ? "lieux" : undefined} data-analytics-entity-id={memberHasAccess ? lieu.id : undefined} className="shrink-0">
             <Button variant="cta" size="sm">{memberHasAccess ? "Voir" : "Devenir membre"}</Button>

@@ -1,13 +1,12 @@
-"use client";
-
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight, Star, Shield, Heart, Moon, Compass, ChevronDown, MapPin, Smartphone, Percent, Check } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { ENRICHED_LIEUX } from "@/data/enriched-lieux";
-import { LABEL_NORMAL_PRICE, LABEL_PRICE, MEMBER_CTA_LABEL, MEMBER_DISCOUNT_TEXT, MEMBER_PRICE_TEXT, MEMBER_VALIDITY_TEXT } from "@/config/commercial";
+import { LABEL_NORMAL_PRICE, LABEL_PRICE, MEMBER_CTA_LABEL, MEMBER_PRICE_TEXT, MEMBER_VALIDITY_TEXT } from "@/config/commercial";
 import { SITE_STATS } from "@/config/site-stats";
+import { redactPublicPlaceText } from "@/server/public-place";
 
 function getTypeLabel(type: string): string {
   const labels: Record<string, string> = {
@@ -45,7 +44,7 @@ export default function Home() {
               La vanlife a enfin<br />{" "}son label.
             </h1>
             <p className="text-lg text-white/70 max-w-2xl mx-auto mb-10 leading-relaxed">
-              Des lieux calmes, respectueux et vraiment adaptés à la vanlife — sélectionnés et labellisés, avec <strong className="text-amber-300">{MEMBER_DISCOUNT_TEXT} d&apos;avantages</strong> pour nos membres.
+              Des lieux calmes, respectueux et vraiment adaptés à la vanlife — sélectionnés et labellisés, avec <strong className="text-amber-300">des avantages exclusifs</strong> pour nos membres.
             </p>
             <div className="flex justify-center">
               <Link href="/devenir-membre">
@@ -73,7 +72,7 @@ export default function Home() {
             <article className="rounded-3xl border border-white bg-white p-6 shadow-sm sm:p-8">
               <p className="text-xs font-bold uppercase tracking-[0.18em] text-emerald-700">Je voyage en van</p>
               <h2 className="mt-2 text-2xl font-bold text-neutral-900">La Carte membre 2027, active dès aujourd&apos;hui.</h2>
-              <p className="mt-3 text-sm leading-relaxed text-neutral-600">MAP privée, lieux labellisés, informations détaillées et {MEMBER_DISCOUNT_TEXT} d&apos;avantages jusqu&apos;au 31 décembre 2027.</p>
+              <p className="mt-3 text-sm leading-relaxed text-neutral-600">MAP privée, lieux labellisés, informations détaillées et avantages exclusifs jusqu&apos;au 31 décembre 2027.</p>
               <div className="mt-6 flex flex-wrap items-center gap-4">
                 <Link href="/devenir-membre"><Button variant="cta">Je prends ma carte — 29 € <ArrowRight className="h-4 w-4" /></Button></Link>
                 <span className="text-sm text-neutral-400"><span className="line-through">39 €</span> · paiement unique</span>
@@ -113,7 +112,7 @@ export default function Home() {
           <div className="grid gap-4 sm:grid-cols-2">
             {[
               { icon: MapPin, value: String(SITE_STATS.labelledPlacesCount), title: "lieux déjà labellisés", text: `Des fiches complètes avec photos, services et informations pratiques. Et nous avons repéré ${SITE_STATS.spottedPlacesCount} lieux pas encore labellisés, disponibles aussi sur notre MAP.` },
-              { icon: Percent, value: MEMBER_DISCOUNT_TEXT, title: "de réduction membre", text: "Le pourcentage est public ; le code éventuel reste dans ton espace privé." },
+              { icon: Percent, value: "Avantages", title: "réservés aux membres", text: "Le montant exact, les conditions et les éventuels codes restent dans ton espace privé." },
               { icon: Shield, value: "Vérifiés", title: "selon une vraie charte", text: "Accueil, environnement, confort et tranquillité sont évalués." },
               { icon: Smartphone, value: "Partout", title: "sur internet puis prochainement en application mobile", text: "Ta Carte membre numérique et la MAP te suivent partout sur ton téléphone." },
             ].map((item) => { const Icon = item.icon; return (
@@ -217,8 +216,8 @@ export default function Home() {
                 <Link href={`/lieux/${lieu.id}`} className="relative block h-44 bg-gradient-to-br from-emerald-50 to-neutral-50 overflow-hidden" aria-label={`Découvrir ${lieu.nom}`}>
                   <div className="w-full h-full bg-cover bg-center transition-transform duration-500 ease-out group-hover:scale-[1.04]" style={{ backgroundImage: `url(${lieu.photoUrl})` }} />
                   <span className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm text-[10px] font-semibold px-2.5 py-1 rounded-full shadow-sm text-emerald-700">{getTypeLabel(lieu.type)}</span>
-                  {lieu.discountPercent > 0 && (
-                    <span className="absolute top-3 right-3 bg-amber-500 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-sm">-{lieu.discountPercent}%</span>
+                  {(lieu.discountPercent > 0 || lieu.priceHighlight) && (
+                    <span className="absolute top-3 right-3 bg-amber-500 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-sm">Avantage membre</span>
                   )}
                 </Link>
                 <div className="p-4 space-y-2">
@@ -233,10 +232,10 @@ export default function Home() {
                       <p className="text-xs text-neutral-400">{lieu.ville} · {lieu.region}</p>
                     </div>
                   </div>
-                  <p className="text-xs text-neutral-500 line-clamp-2 leading-relaxed">{lieu.description}</p>
+                  <p className="text-xs text-neutral-500 line-clamp-2 leading-relaxed">{redactPublicPlaceText(lieu.description)}</p>
                   <div className="pt-2 border-t border-neutral-100">
                     <div className="flex items-center justify-between">
-                      <span className="text-xs text-emerald-600 font-semibold">-{lieu.discountPercent}% pour les membres</span>
+                      <span className="text-xs text-emerald-600 font-semibold">Avantage réservé aux membres</span>
                       <Link href="/devenir-membre">
                         <Button variant="cta" size="sm" className="min-h-11 px-3 text-xs gap-1">Carte membre <ArrowRight className="h-3 w-3" /></Button>
                       </Link>

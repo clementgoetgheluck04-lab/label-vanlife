@@ -1,23 +1,27 @@
-import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
+import { ENRICHED_LIEUX } from "@/data/enriched-lieux";
 import { SPOTTED_PLACES } from "@/data/spotted-places";
-import { createClient } from "@/lib/supabase/server";
-import { ADMIN_PREVIEW_COOKIE, isAdminPreviewCookie } from "@/server/admin-preview";
+import { hasActiveMemberAccess } from "@/server/auth";
 
 export async function GET() {
-  const cookieStore = await cookies();
-  const isAdminPreview = isAdminPreviewCookie(cookieStore.get(ADMIN_PREVIEW_COOKIE)?.value);
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  let authorized = false;
+  try {
+    authorized = await hasActiveMemberAccess();
+  } catch {
+    authorized = false;
+  }
 
-  if (!user && !isAdminPreview) {
+  if (!authorized) {
     return NextResponse.json({ error: "Accès membre requis" }, {
-      status: 401,
+      status: 403,
       headers: { "Cache-Control": "private, no-store" },
     });
   }
 
-  return NextResponse.json({ places: SPOTTED_PLACES }, {
+  return NextResponse.json({
+    labelledPlaces: ENRICHED_LIEUX.filter((place) => place.status === "actif"),
+    places: SPOTTED_PLACES,
+  }, {
     headers: { "Cache-Control": "private, no-store" },
   });
 }

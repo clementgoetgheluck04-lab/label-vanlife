@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import AddToRoadTripButton, { type RoadTripDraftPlace } from "@/components/roadtrip/AddToRoadTripButton";
 import { cn } from "@/lib/utils";
 
@@ -9,7 +8,6 @@ type MemberRoadTripPanelProps = {
   title: string;
   description: string;
   variant?: "labelled" | "spotted";
-  visibility?: "always" | "member-query";
   className?: string;
 };
 
@@ -18,17 +16,8 @@ export default function MemberRoadTripPanel({
   title,
   description,
   variant = "labelled",
-  visibility = "always",
   className,
 }: MemberRoadTripPanelProps) {
-  const [canRender] = useState(() => {
-    if (visibility === "always") return true;
-    if (typeof window === "undefined") return false;
-    return new URLSearchParams(window.location.search).get("member") === "1";
-  });
-
-  if (!canRender) return null;
-
   const isSpotted = variant === "spotted";
 
   return (

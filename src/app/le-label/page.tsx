@@ -1,5 +1,3 @@
-"use client";
-
 import Link from "next/link";
 import { ArrowRight, Shield, Leaf, Heart, X, Check, MapPin, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/Button";

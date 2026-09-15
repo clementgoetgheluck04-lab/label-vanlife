@@ -4,17 +4,31 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Search, MapPin, ChevronLeft, Sparkles, Building2, ArrowRight, ShieldQuestion } from "lucide-react";
-import { ENRICHED_LIEUX } from "@/data/enriched-lieux";
-import { SPOTTED_PLACES } from "@/data/spotted-places";
 import { SITE_STATS } from "@/config/site-stats";
 
 type FilterTab = "tous" | "camping" | "etape_nature" | "hebergement_insolite" | "activite";
+type PublicLabelledPlace = {
+  id: string;
+  nom: string;
+  type: string;
+  description: string;
+  photoUrl?: string;
+  logoUrl?: string;
+  region: string;
+  ville: string;
+  services: string[];
+  hasMemberBenefit: boolean;
+};
+type PublicSpottedPlace = { id: string; name: string; city: string; region: string };
 
 export default function ExplorerPage() {
   const [search, setSearch] = useState("");
   const [tab, setTab] = useState<FilterTab>("tous");
   const [visibleSpottedPlaces, setVisibleSpottedPlaces] = useState(12);
   const [mainMenuVisible, setMainMenuVisible] = useState(true);
+  const [labelledPlaces, setLabelledPlaces] = useState<PublicLabelledPlace[]>([]);
+  const [publicSpottedPlaces, setPublicSpottedPlaces] = useState<PublicSpottedPlace[]>([]);
+  const [catalogLoading, setCatalogLoading] = useState(true);
   const lastScrollY = useRef(0);
 
   useEffect(() => {
@@ -30,7 +44,30 @@ export default function ExplorerPage() {
     return () => window.removeEventListener("scroll", updatePosition);
   }, []);
 
-  const ALL_LIEUX = ENRICHED_LIEUX.filter((lieu) => lieu.status === "actif");
+  useEffect(() => {
+    let mounted = true;
+    fetch("/api/public/catalog")
+      .then(async (response) => {
+        if (!response.ok) throw new Error("Catalogue indisponible");
+        return response.json() as Promise<{ labelledPlaces: PublicLabelledPlace[]; spottedPlaces: PublicSpottedPlace[] }>;
+      })
+      .then((catalog) => {
+        if (!mounted) return;
+        setLabelledPlaces(catalog.labelledPlaces);
+        setPublicSpottedPlaces(catalog.spottedPlaces);
+      })
+      .catch(() => {
+        if (!mounted) return;
+        setLabelledPlaces([]);
+        setPublicSpottedPlaces([]);
+      })
+      .finally(() => {
+        if (mounted) setCatalogLoading(false);
+      });
+    return () => { mounted = false; };
+  }, []);
+
+  const ALL_LIEUX = labelledPlaces;
 
   const lieuxFiltres = ALL_LIEUX.filter((lieu) => {
     if (tab !== "tous" && lieu.type !== tab) return false;
@@ -39,7 +76,7 @@ export default function ExplorerPage() {
   });
 
   const normalizedSearch = search.trim().toLocaleLowerCase("fr");
-  const spottedPlaces = SPOTTED_PLACES.filter((place) => {
+  const spottedPlaces = publicSpottedPlaces.filter((place) => {
     if (!normalizedSearch) return true;
     return [place.name, place.city, place.region]
       .some((value) => value.toLocaleLowerCase("fr").includes(normalizedSearch));
@@ -80,7 +117,7 @@ export default function ExplorerPage() {
           </div>
           <h2 className="text-xl font-bold text-neutral-800 font-serif">Des lieux vérifiés, accueillants et engagés</h2>
           <p className="text-sm text-neutral-500 leading-relaxed">
-            Consultez librement les lieux et leur pourcentage d&apos;avantage. Les modalités et éventuels codes restent réservés aux membres connectés.
+            Consultez librement les lieux. Le montant exact des avantages, la MAP et les coordonnées sont réservés aux membres connectés avec une carte active.
           </p>
           <Link href="/recommander-un-lieu" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-emerald-700 px-5 text-sm font-bold text-white transition hover:bg-emerald-800">
             Recommander un lieu <ArrowRight className="h-4 w-4" />
@@ -142,15 +179,9 @@ export default function ExplorerPage() {
                   <span className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm text-[10px] font-semibold uppercase tracking-wider text-emerald-700 px-2.5 py-1 rounded-full shadow-sm">
                     {typeLabel[lieu.type] || lieu.type}
                   </span>
-                  {/* Discount badge */}
-                  {lieu.discountPercent > 0 && (
+                  {lieu.hasMemberBenefit && (
                     <span className="absolute top-3 right-3 bg-amber-500 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-sm">
-                      -{lieu.discountPercent}%
-                    </span>
-                  )}
-                  {lieu.discountPercent === 0 && lieu.priceHighlight && (
-                    <span className="absolute top-3 right-3 bg-[#8c673e] text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-sm">
-                      Petit prix
+                      Avantage membre
                     </span>
                   )}
                 </div>
@@ -195,7 +226,7 @@ export default function ExplorerPage() {
                                         })}
                                       </div>
 
-        {lieuxFiltres.length === 0 && (
+        {!catalogLoading && lieuxFiltres.length === 0 && (
           <div className="text-center py-20">
             <MapPin className="h-12 w-12 text-neutral-300 mx-auto mb-4" />
             <p className="text-neutral-500">Aucun lieu trouvé</p>
@@ -219,7 +250,7 @@ export default function ExplorerPage() {
                 </p>
               </div>
               <div className="shrink-0 rounded-2xl bg-white/95 px-5 py-4 text-center shadow-sm ring-1 ring-white/30">
-                <strong className="block text-3xl text-[#8b673d]">{SPOTTED_PLACES.length}</strong>
+                <strong className="block text-3xl text-[#8b673d]">{SITE_STATS.spottedPlacesCount}</strong>
                 <span className="text-xs font-medium text-neutral-600">lieux à vérifier</span>
               </div>
             </div>
