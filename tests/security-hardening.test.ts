@@ -32,3 +32,15 @@ test("the service worker never precaches private account pages", () => {
 test("the former public admin grant endpoint is removed", () => {
   assert.equal(existsSync(new URL("../src/app/api/admin/members/grant/route.ts", import.meta.url)), false);
 });
+
+test("the founder role migration targets one exact account and fails closed", () => {
+  const migration = readFileSync(
+    new URL("../prisma/migrations/20260915000300_founder_admin_role/migration.sql", import.meta.url),
+    "utf8",
+  );
+
+  assert.match(migration, /lower\("email"\) = lower\('clement\.goetgheluck@hotmail\.fr'\)/);
+  assert.match(migration, /matched_count <> 1/);
+  assert.match(migration, /RAISE EXCEPTION/);
+  assert.match(migration, /SET "role" = 'ADMIN'/);
+});
