@@ -8,6 +8,7 @@ import { BRAND_ASSETS } from "@/config/brand-assets";
 import { CONTACT_MAILTO } from "@/config/contact";
 import { MEMBER_DISCOUNT_TEXT, MEMBER_SHORT_LABEL, MEMBER_VALIDITY_TEXT } from "@/config/commercial";
 import { SITE_STATS } from "@/config/site-stats";
+import { OPEN_CONSENT_EVENT } from "@/lib/privacy/consent";
 
 const NAVIGATION = [
   { label: "Accueil", href: "/" },
@@ -73,7 +74,6 @@ export default function Footer() {
                 alt="Label Vanlife"
                 width={936}
                 height={532}
-                unoptimized
                 className="h-auto w-64 object-contain object-left"
               />
             </Link>
@@ -92,12 +92,12 @@ export default function Footer() {
           </div>
 
           <div>
-            <h2 className="text-xs font-semibold uppercase tracking-[0.18em] text-white/45">Navigation</h2>
+            <h2 className="text-xs font-semibold uppercase tracking-[0.18em] text-white/70">Navigation</h2>
             <ul className="mt-5 space-y-3">{NAVIGATION.map((item) => <li key={item.href}><Link href={item.href} className="text-sm text-white/65 transition-colors hover:text-white">{item.label}</Link></li>)}</ul>
           </div>
 
           <div>
-            <h2 className="text-xs font-semibold uppercase tracking-[0.18em] text-white/45">Guides vanlife</h2>
+            <h2 className="text-xs font-semibold uppercase tracking-[0.18em] text-white/70">Guides vanlife</h2>
             <ul className="mt-5 space-y-3">
               {SEO_GUIDES.map((item) => (
                 <li key={item.href}>
@@ -108,15 +108,15 @@ export default function Footer() {
           </div>
 
           <div>
-            <h2 className="text-xs font-semibold uppercase tracking-[0.18em] text-white/45">Rejoindre</h2>
+            <h2 className="text-xs font-semibold uppercase tracking-[0.18em] text-white/70">Rejoindre</h2>
             <ul className="mt-5 space-y-3">{OFFERS.map((item) => <li key={item.href}><Link href={item.href} className="group inline-flex items-start gap-2 text-sm text-white/65 transition-colors hover:text-white">{item.label}<ArrowRight className="mt-0.5 h-3.5 w-3.5 shrink-0 transition-transform group-hover:translate-x-0.5" /></Link></li>)}</ul>
-            <p className="mt-6 text-xs leading-relaxed text-white/40">Carte membre Label Vanlife 2027 — {MEMBER_VALIDITY_TEXT}. Labellisation 2027 active dès validation, sans commission sur les réservations.</p>
+            <p className="mt-6 text-xs leading-relaxed text-white/65">Carte membre Label Vanlife 2027 — {MEMBER_VALIDITY_TEXT}. Labellisation 2027 active dès validation, sans commission sur les réservations.</p>
           </div>
 
           <div>
-            <h2 className="text-xs font-semibold uppercase tracking-[0.18em] text-white/45">Newsletter</h2>
+            <h2 className="text-xs font-semibold uppercase tracking-[0.18em] text-white/70">Newsletter</h2>
             <p className="mt-5 text-sm leading-relaxed text-white/60">Nouveaux lieux, actualités du réseau et conseils vanlife. Sans spam.</p>
-            <form onSubmit={subscribe} className="mt-4 flex gap-2">
+            <form onSubmit={subscribe} className="mt-4 flex flex-col gap-2 sm:flex-row lg:flex-col xl:flex-row">
               <input
                 type="text"
                 name="companyWebsite"
@@ -126,17 +126,17 @@ export default function Footer() {
                 className="pointer-events-none absolute h-px w-px opacity-0"
               />
               <label className="sr-only" htmlFor="footer-email">Votre email</label>
-              <input id="footer-email" type="email" required value={email} onChange={(event) => setEmail(event.target.value)} placeholder="votre@email.com" className="min-w-0 flex-1 rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-white outline-none placeholder:text-white/30 focus:border-[#c39960]" />
-              <button type="submit" disabled={status === "loading"} className="rounded-xl bg-[#c39960] px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#d0ad7d] disabled:opacity-60" aria-label="S'inscrire à la newsletter">{status === "success" ? <Check className="h-4 w-4" /> : <ArrowRight className="h-4 w-4" />}</button>
+              <input id="footer-email" type="email" required maxLength={254} autoComplete="email" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="votre@email.com" className="min-w-0 flex-1 rounded-xl border border-white/30 bg-white/10 px-4 py-3 text-sm text-white outline-none placeholder:text-white/65 focus:border-[#d0ad7d]" />
+              <button type="submit" disabled={status === "loading"} className="min-h-11 rounded-xl bg-[#d0ad7d] px-4 py-3 text-sm font-bold text-neutral-950 transition-colors hover:bg-[#dfc59f] disabled:opacity-60" aria-label="S'inscrire à la newsletter">{status === "success" ? <Check className="h-4 w-4" /> : <ArrowRight className="h-4 w-4" />}</button>
             </form>
             {status === "success" && <p className="mt-2 text-xs text-emerald-300">Inscription confirmée.</p>}
             {status === "error" && <p className="mt-2 text-xs text-red-300">Impossible de vous inscrire pour le moment.</p>}
           </div>
         </div>
 
-        <div className="flex flex-col gap-4 pt-6 text-xs text-white/40 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-4 pt-6 text-xs text-white/65 sm:flex-row sm:items-center sm:justify-between">
           <p>© {new Date().getFullYear()} Label Vanlife. Tous droits réservés.</p>
-          <div className="flex flex-wrap gap-4"><Link href="/mentions-legales" className="hover:text-white/70">Mentions légales</Link><Link href="/politique-confidentialite" className="hover:text-white/70">Confidentialité</Link></div>
+          <div className="flex flex-wrap gap-4"><Link href="/mentions-legales" className="hover:text-white">Mentions légales</Link><Link href="/conditions-generales-utilisation" className="hover:text-white">CGU &amp; vente</Link><Link href="/politique-confidentialite" className="hover:text-white">Confidentialité</Link><button type="button" onClick={() => window.dispatchEvent(new Event(OPEN_CONSENT_EVENT))} className="hover:text-white">Gérer mes cookies</button></div>
         </div>
       </div>
     </footer>

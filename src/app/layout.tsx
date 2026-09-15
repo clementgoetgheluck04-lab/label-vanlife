@@ -8,6 +8,7 @@ import { BRAND_ASSETS } from "@/config/brand-assets";
 import RouteScrollToTop from "@/components/RouteScrollToTop";
 import { OrganizationJsonLd, WebSiteJsonLd } from "@/components/seo/JsonLd";
 import AnalyticsProvider from "@/components/AnalyticsProvider";
+import CookieConsent from "@/components/CookieConsent";
 
 const BASE_URL = "https://www.labelvanlife.fr";
 
@@ -82,9 +83,6 @@ export const metadata: Metadata = {
       "La vanlife a enfin son label. Des lieux calmes, respectueux et adaptés à la vanlife, avec 10 à 20% de réduction membres.",
     images: [`${BASE_URL}${BRAND_ASSETS.socialCover}`],
   },
-  other: {
-    "google-site-verification": "",
-  },
 };
 
 export const viewport: Viewport = {
@@ -103,14 +101,6 @@ export default function RootLayout({
     <html lang="fr" className="scroll-smooth" data-scroll-behavior="smooth">
       <head>
         <link rel="manifest" href="/manifest.json" />
-        {/* Outfit — Titres */}
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700&display=swap"
-          rel="stylesheet"
-        />
-        <link rel="alternate" type="application/rss+xml" title="Label Vanlife Blog" href="/blog/feed.xml" />
         <OrganizationJsonLd />
         <WebSiteJsonLd />
       </head>
@@ -122,6 +112,7 @@ export default function RootLayout({
         <Footer />
         <ServiceWorkerInit />
         <PwaInstall />
+        <CookieConsent />
       </body>
     </html>
   );

@@ -170,7 +170,7 @@ export default function MemberMapPage() {
           <div className="flex items-center gap-2">
             <Link
               href="/member/roadtrips"
-              className="hidden min-h-10 items-center gap-2 rounded-xl bg-[#c39960] px-4 py-2 text-sm font-bold text-white shadow-sm transition hover:bg-[#ad8250] sm:flex"
+              className="hidden min-h-10 items-center gap-2 rounded-xl bg-[#8c673e] px-4 py-2 text-sm font-bold text-white shadow-sm transition hover:bg-[#705234] sm:flex"
             >
               <Route className="h-4 w-4" />
               Road trip
@@ -402,8 +402,8 @@ export default function MemberMapPage() {
                           {added ? <CheckCircle2 className="h-3.5 w-3.5" /> : <Plus className="h-3.5 w-3.5" />}
                           {added ? "Ajouté au road trip" : "Ajouter au road trip"}
                         </button>
-                        {website && <a href={website} target="_blank" rel="noreferrer nofollow" className="flex min-h-11 items-center justify-center gap-1.5 rounded-xl bg-[#c39960] px-3 py-2 text-center text-xs font-bold text-white hover:bg-[#ad8250]">Réserver sur le site <ExternalLink className="h-3.5 w-3.5" /></a>}
-                        {!website && place.googleMapsUrl && <a href={place.googleMapsUrl} target="_blank" rel="noreferrer nofollow" className="flex min-h-11 items-center justify-center gap-1.5 rounded-xl bg-[#c39960] px-3 py-2 text-center text-xs font-bold text-white hover:bg-[#ad8250]">Ouvrir la fiche GPS <ExternalLink className="h-3.5 w-3.5" /></a>}
+                        {website && <a href={website} target="_blank" rel="noreferrer nofollow" className="flex min-h-11 items-center justify-center gap-1.5 rounded-xl bg-[#8c673e] px-3 py-2 text-center text-xs font-bold text-white hover:bg-[#705234]">Réserver sur le site <ExternalLink className="h-3.5 w-3.5" /></a>}
+                        {!website && place.googleMapsUrl && <a href={place.googleMapsUrl} target="_blank" rel="noreferrer nofollow" className="flex min-h-11 items-center justify-center gap-1.5 rounded-xl bg-[#8c673e] px-3 py-2 text-center text-xs font-bold text-white hover:bg-[#705234]">Ouvrir la fiche GPS <ExternalLink className="h-3.5 w-3.5" /></a>}
                         <div className="grid grid-cols-2 gap-2">
                           <a href={`https://www.google.com/maps/dir/?api=1&destination=${place.lat},${place.lng}&travelmode=driving`} target="_blank" rel="noreferrer" data-analytics-event="route_start" data-analytics-entity-type="lieux-reperes" data-analytics-entity-id={place.id} className="flex min-h-11 items-center justify-center gap-1 rounded-xl bg-emerald-50 px-2 text-xs font-bold text-emerald-800 hover:bg-emerald-100"><Navigation className="h-3.5 w-3.5" /> Maps</a>
                           <a href={`https://waze.com/ul?ll=${place.lat}%2C${place.lng}&navigate=yes`} target="_blank" rel="noreferrer" data-analytics-event="route_start" data-analytics-entity-type="lieux-reperes" data-analytics-entity-id={place.id} className="flex min-h-11 items-center justify-center gap-1 rounded-xl bg-blue-50 px-2 text-xs font-bold text-blue-700 hover:bg-blue-100"><Navigation className="h-3.5 w-3.5" /> Waze</a>

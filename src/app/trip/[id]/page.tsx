@@ -95,7 +95,7 @@ export default async function PublicTripPage({ params }: { params: Promise<{ id:
           <h2 className="mt-4 text-2xl font-black">Créez votre prochain road trip</h2>
           <p className="mx-auto mt-3 max-w-lg text-sm leading-6 text-neutral-300">Préparez vos étapes, retrouvez les lieux qui accueillent vraiment les vans et transformez votre voyage en souvenir partageable.</p>
           <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
-            <Link href={`/devenir-membre?utm_source=public_trip&utm_medium=share&utm_campaign=vanlife_activity`} data-analytics-event="public_trip_signup" data-analytics-entity-type="road_trip" data-analytics-entity-id={trip.id} className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-[#c39960] px-5 text-sm font-black text-white">Découvrir la Carte membre <ArrowRight className="h-4 w-4" /></Link>
+            <Link href={`/devenir-membre?utm_source=public_trip&utm_medium=share&utm_campaign=vanlife_activity`} data-analytics-event="public_trip_signup" data-analytics-entity-type="road_trip" data-analytics-entity-id={trip.id} className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-[#d0ad7d] px-5 text-sm font-black text-neutral-950">Découvrir la Carte membre <ArrowRight className="h-4 w-4" /></Link>
             <Link href="/explorer" className="inline-flex min-h-12 items-center justify-center rounded-xl border border-white/20 px-5 text-sm font-bold text-white">Explorer les lieux</Link>
           </div>
         </section>

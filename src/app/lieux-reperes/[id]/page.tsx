@@ -158,7 +158,7 @@ export default async function SpottedPlacePage({ params }: PageProps) {
               <ShieldCheck className="h-8 w-8 text-[#c39960]" />
               <h2 className="mt-5 text-2xl font-bold">Vous gérez cet établissement ?</h2>
               <p className="mt-3 text-sm leading-6 text-neutral-300">Revendiquez cette fiche pour préremplir votre candidature, vérifier les informations et demander la labellisation.</p>
-              <Link href={buildClaimHref(place)} className="mt-6 flex min-h-14 w-full items-center justify-center rounded-xl bg-[#c39960] px-5 py-4 text-center text-sm font-extrabold uppercase tracking-wide text-white shadow-lg transition-transform hover:-translate-y-0.5 hover:bg-[#ad8250]">
+              <Link href={buildClaimHref(place)} className="mt-6 flex min-h-14 w-full items-center justify-center rounded-xl bg-[#d0ad7d] px-5 py-4 text-center text-sm font-extrabold uppercase tracking-wide text-neutral-950 shadow-lg transition-transform hover:-translate-y-0.5 hover:bg-[#dfc59f]">
                 Revendiquer cet établissement
               </Link>
               <div className="my-6 h-px bg-white/10" />

@@ -2,6 +2,13 @@ import type { MetadataRoute } from "next";
 import { ENRICHED_LIEUX } from "@/data/enriched-lieux";
 import { REGION_GUIDE_SLUGS } from "@/data/region-guides";
 
+const BLOG_POST_SLUGS = [
+  "top-10-lieux-vanlife-bretagne",
+  "preparer-premier-road-trip-van",
+  "charte-vanlife-responsable",
+  "spots-vanlife-provence-ete",
+];
+
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = "https://www.labelvanlife.fr";
 
@@ -22,6 +29,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${baseUrl}/dormir-en-van`, lastModified: new Date(), changeFrequency: "monthly" as const, priority: 0.8 },
     { url: `${baseUrl}/vanlife-solo`, lastModified: new Date(), changeFrequency: "monthly" as const, priority: 0.8 },
     { url: `${baseUrl}/vanlife-regions`, lastModified: new Date(), changeFrequency: "monthly" as const, priority: 0.8 },
+    { url: `${baseUrl}/mentions-legales`, lastModified: new Date("2026-09-15"), changeFrequency: "yearly" as const, priority: 0.2 },
+    { url: `${baseUrl}/conditions-generales-utilisation`, lastModified: new Date("2026-09-15"), changeFrequency: "yearly" as const, priority: 0.2 },
+    { url: `${baseUrl}/politique-confidentialite`, lastModified: new Date("2026-09-15"), changeFrequency: "yearly" as const, priority: 0.2 },
   ];
 
   const lieuPages = ENRICHED_LIEUX.map((lieu) => ({
@@ -38,5 +48,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.8,
   }));
 
-  return [...staticPages, ...regionPages, ...lieuPages];
+  const blogPages = BLOG_POST_SLUGS.map((slug) => ({
+    url: `${baseUrl}/blog/${slug}`,
+    lastModified: new Date("2026-09-15"),
+    changeFrequency: "monthly" as const,
+    priority: 0.6,
+  }));
+
+  return [...staticPages, ...blogPages, ...regionPages, ...lieuPages];
 }

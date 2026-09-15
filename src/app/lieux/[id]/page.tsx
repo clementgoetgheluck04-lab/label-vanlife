@@ -64,6 +64,29 @@ const TYPE_LABELS: Record<string, string> = {
   activite: "Activité",
 };
 
+async function findStoredPublishedPlace(slug: string) {
+  try {
+    return await getPrisma().place.findFirst({
+      where: { slug, status: "PUBLISHED", ownerId: { not: null } },
+      select: { name: true, description: true, addressLine1: true, city: true, region: true, mainImageUrl: true, services: true, phone: true, email: true, website: true },
+    });
+  } catch (error) {
+    const reason = error instanceof Error ? error.name : "UnknownError";
+    console.warn(`Unable to load the stored place ${slug}; using the verified catalogue fallback (${reason}).`);
+    return null;
+  }
+}
+
+async function safelyHasActiveMemberAccess() {
+  try {
+    return await hasActiveMemberAccess();
+  } catch (error) {
+    const reason = error instanceof Error ? error.name : "UnknownError";
+    console.warn(`Unable to verify member access; rendering the public place view (${reason}).`);
+    return false;
+  }
+}
+
 export default async function LieuDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const sourceLieu = ENRICHED_LIEUX.find((item) => item.id === id);
@@ -80,10 +103,7 @@ export default async function LieuDetailPage({ params }: { params: Promise<{ id:
     );
   }
 
-  const storedPlace = await getPrisma().place.findFirst({
-    where: { slug: id, status: "PUBLISHED", ownerId: { not: null } },
-    select: { name: true, description: true, addressLine1: true, city: true, region: true, mainImageUrl: true, services: true, phone: true, email: true, website: true },
-  });
+  const storedPlace = await findStoredPublishedPlace(id);
   const lieu = storedPlace ? {
     ...sourceLieu,
     nom: storedPlace.name,
@@ -100,7 +120,7 @@ export default async function LieuDetailPage({ params }: { params: Promise<{ id:
 
   const media = getPlaceMedia(lieu.id);
   const verifiedContact = getPlaceContact(lieu.id);
-  const memberHasAccess = await hasActiveMemberAccess();
+  const memberHasAccess = await safelyHasActiveMemberAccess();
   const activeMember = memberHasAccess ? await getOptionalActiveMember() : null;
   const favorite = activeMember ? await getPrisma().favorite.findFirst({ where: { userId: activeMember.id, place: { slug: lieu.id } }, select: { id: true } }) : null;
   const richDetails = memberHasAccess
@@ -164,13 +184,13 @@ export default async function LieuDetailPage({ params }: { params: Promise<{ id:
             </p>
           </div>
           {lieu.discountPercent > 0 && (
-            <div className="shrink-0 rounded-2xl bg-[#c39960] px-4 py-2 text-center text-white shadow-lg">
+            <div className="shrink-0 rounded-2xl bg-[#8c673e] px-4 py-2 text-center text-white shadow-lg">
               <span className="text-xs font-medium">Avantage membre</span>
               <p className="text-2xl font-bold">−{lieu.discountPercent}%</p>
             </div>
           )}
           {lieu.discountPercent === 0 && lieu.priceHighlight && (
-            <div className="shrink-0 rounded-2xl bg-[#c39960] px-4 py-2 text-center text-white shadow-lg">
+            <div className="shrink-0 rounded-2xl bg-[#8c673e] px-4 py-2 text-center text-white shadow-lg">
               <span className="text-xs font-medium">Tarif public accessible</span>
               <p className="text-lg font-bold">{lieu.priceHighlight}</p>
             </div>
@@ -415,7 +435,7 @@ export default async function LieuDetailPage({ params }: { params: Promise<{ id:
           <section>
             <h2 className="mb-4 text-xl font-bold text-neutral-900">Réservation et activités aux alentours</h2>
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-              {richDetails.reservationUrl && <a href={richDetails.reservationUrl} target="_blank" rel="noreferrer" className="flex min-h-14 items-center justify-center gap-2 rounded-xl bg-[#c39960] px-5 py-3 text-center text-sm font-bold text-white transition hover:bg-[#ad8250]"><CalendarDays className="h-4 w-4" /> {richDetails.reservationLabel || "Réserver un emplacement"} <ExternalLink className="h-4 w-4" /></a>}
+              {richDetails.reservationUrl && <a href={richDetails.reservationUrl} target="_blank" rel="noreferrer" className="flex min-h-14 items-center justify-center gap-2 rounded-xl bg-[#8c673e] px-5 py-3 text-center text-sm font-bold text-white transition hover:bg-[#705234]"><CalendarDays className="h-4 w-4" /> {richDetails.reservationLabel || "Réserver un emplacement"} <ExternalLink className="h-4 w-4" /></a>}
               {richDetails.tourismUrl && <a href={richDetails.tourismUrl} target="_blank" rel="noreferrer" className="flex min-h-14 items-center justify-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-5 py-3 text-center text-sm font-bold text-emerald-800 transition hover:bg-emerald-100"><Activity className="h-4 w-4" /> Activités et tourisme <ExternalLink className="h-4 w-4" /></a>}
               {richDetails.regionLink && <Link href={richDetails.regionLink.href} className="flex min-h-14 items-center justify-center gap-2 rounded-xl border border-neutral-200 bg-white px-5 py-3 text-center text-sm font-bold text-neutral-700 transition hover:border-emerald-300"><MapPin className="h-4 w-4" /> {richDetails.regionLink.label} <ArrowRight className="h-4 w-4" /></Link>}
             </div>

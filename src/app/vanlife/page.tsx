@@ -27,7 +27,7 @@ export const metadata: Metadata = {
     description,
     type: "article",
     url: "/vanlife",
-    images: [{ url: "/images/hero-label-vanlife.png", width: 1536, height: 1024, alt: "Voyage en van au bord d'un lac" }],
+    images: [{ url: "/images/hero-label-vanlife.webp", width: 1536, height: 1024, alt: "Voyage en van au bord d'un lac" }],
   },
 };
 
@@ -130,7 +130,7 @@ export default function VanlifeGuidePage() {
     "@type": "Article",
     headline: title,
     description,
-    image: "https://www.labelvanlife.fr/images/hero-label-vanlife.png",
+    image: "https://www.labelvanlife.fr/images/hero-label-vanlife.webp",
     author: { "@type": "Organization", name: "Label Vanlife" },
     publisher: { "@type": "Organization", name: "Label Vanlife" },
     mainEntityOfPage: "https://www.labelvanlife.fr/vanlife",
@@ -162,7 +162,7 @@ export default function VanlifeGuidePage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(faqSchema) }} />
 
       <header className="relative isolate min-h-[72vh] overflow-hidden bg-neutral-950 text-white">
-        <Image src="/images/hero-label-vanlife.png" alt="Van aménagé devant un lac au coucher du soleil" fill priority sizes="100vw" className="object-cover" />
+        <Image src="/images/hero-label-vanlife.webp" alt="Van aménagé devant un lac au coucher du soleil" fill priority sizes="100vw" className="object-cover" />
         <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/55 to-black/20" />
         <div className="relative mx-auto flex min-h-[72vh] max-w-6xl items-end px-6 pb-14 pt-24 sm:items-center sm:pb-20">
           <div className="max-w-3xl animate-fade-in-up">

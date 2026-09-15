@@ -4,6 +4,7 @@ export const metadata: Metadata = {
   title: "Devenir membre — Carte membre Label Vanlife 2027 à 29 €",
   description:
     "La Carte membre Label Vanlife 2027 donne accès immédiatement à la MAP, aux lieux labellisés et aux avantages partenaires. 29 € jusqu'au 31 décembre 2027, sans renouvellement automatique.",
+  alternates: { canonical: "/devenir-membre" },
   openGraph: {
     title: "Devenir membre Label Vanlife — Carte membre 2027 à 29 €",
     description:

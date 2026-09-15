@@ -115,7 +115,11 @@ export async function POST(request: NextRequest) {
     if (typeof rawPayload !== "string" || rawPayload.length > 100_000) {
       return NextResponse.json({ error: "Dossier invalide" }, { status: 400 });
     }
-    const payload = parseLabellisationPayload(JSON.parse(rawPayload));
+    const parsedPayload = JSON.parse(rawPayload) as Record<string, unknown>;
+    if (typeof parsedPayload.companyWebsite === "string" && parsedPayload.companyWebsite.trim()) {
+      return NextResponse.json({ error: "Dossier invalide" }, { status: 400 });
+    }
+    const payload = parseLabellisationPayload(parsedPayload);
     if (!payload) return NextResponse.json({
       error: "Dossier incomplet : vérifiez le site internet, le SIRET, les 22 critères, le plan, la photo obligatoire, la réduction, le mode de réservation et la charte.",
     }, { status: 400 });

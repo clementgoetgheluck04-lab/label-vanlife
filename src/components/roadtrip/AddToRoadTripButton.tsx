@@ -97,7 +97,7 @@ export default function AddToRoadTripButton({
           size === "md" && "min-h-11 px-4 py-2.5 text-sm",
           size === "lg" && "min-h-12 px-5 py-3 text-sm",
           variant === "white" && (isAdded ? "border border-emerald-200 bg-emerald-50 text-emerald-700" : "border border-neutral-200 bg-white text-neutral-700 hover:border-emerald-300 hover:text-emerald-800"),
-          variant === "gold" && (isAdded ? "bg-emerald-50 text-emerald-700" : "bg-[#c39960] text-white shadow-sm hover:bg-[#ad8250]"),
+          variant === "gold" && (isAdded ? "bg-emerald-50 text-emerald-700" : "bg-[#d0ad7d] text-neutral-950 shadow-sm hover:bg-[#dfc59f]"),
           variant === "dark" && (isAdded ? "bg-emerald-50 text-emerald-700" : "bg-neutral-950 text-white hover:bg-neutral-800"),
           variant === "outline" && (isAdded ? "border border-emerald-200 bg-emerald-50 text-emerald-700" : "border border-[#c39960]/40 bg-[#f7f1e8] text-[#7d5d38] hover:bg-[#efe2cf]"),
         )}

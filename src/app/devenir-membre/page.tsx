@@ -177,7 +177,7 @@ export default function DevenirMembrePage() {
       <section className="py-20 sm:py-28">
         <div className="mx-auto max-w-6xl px-6">
           <div className="mx-auto max-w-2xl text-center"><p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#9a7445]">Imagine ton prochain road trip</p><h2 className="mt-3 text-3xl font-bold text-neutral-900 sm:text-4xl">En 4 étapes, du canapé à la nuit parfaite.</h2></div>
-          <div className="relative mt-14 grid gap-6 lg:grid-cols-4">{ETAPES_ROAD_TRIP.map(({ icon: Icon, eyebrow, title, text }, index) => <article key={title} className="relative rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm"><span className="absolute -top-3 right-5 grid h-7 w-7 place-items-center rounded-full bg-[#c39960] text-xs font-bold text-white">{index + 1}</span><Icon className="h-7 w-7 text-emerald-600" /><p className="mt-5 text-xs font-bold uppercase tracking-wider text-[#9a7445]">{eyebrow}</p><h3 className="mt-2 font-bold text-neutral-900">{title}</h3><p className="mt-3 text-sm leading-relaxed text-neutral-500">{text}</p></article>)}</div>
+          <div className="relative mt-14 grid gap-6 lg:grid-cols-4">{ETAPES_ROAD_TRIP.map(({ icon: Icon, eyebrow, title, text }, index) => <article key={title} className="relative rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm"><span className="absolute -top-3 right-5 grid h-7 w-7 place-items-center rounded-full bg-[#8c673e] text-xs font-bold text-white">{index + 1}</span><Icon className="h-7 w-7 text-emerald-600" /><p className="mt-5 text-xs font-bold uppercase tracking-wider text-[#9a7445]">{eyebrow}</p><h3 className="mt-2 font-bold text-neutral-900">{title}</h3><p className="mt-3 text-sm leading-relaxed text-neutral-500">{text}</p></article>)}</div>
           <div className="mt-12 rounded-3xl bg-[#f7f1e8] p-8 text-center sm:p-10">
             <h3 className="text-2xl font-bold text-neutral-900">Et si ta prochaine étape devenait plus simple à préparer ?</h3>
             <p className="mt-3 text-neutral-600">Selon les lieux et la durée de ton séjour, ta Carte membre peut rapidement être amortie grâce aux avantages partenaires.</p>
@@ -312,9 +312,9 @@ export default function DevenirMembrePage() {
                           {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : <ArrowRight className="h-5 w-5" />}
                           {MEMBER_CTA_LABEL}
                         </Button>
-                        <p className="text-xs text-neutral-400 mt-3">
-                                            Paiement sécurisé Stripe · {MEMBER_VALIDITY_TEXT}
-                                          </p>
+                        <p className="mt-3 text-xs leading-5 text-neutral-600">
+                          Paiement sécurisé Stripe · {MEMBER_VALIDITY_TEXT}. En poursuivant, vous acceptez les <Link href="/conditions-generales-utilisation" className="font-semibold text-emerald-800 underline underline-offset-2">conditions générales</Link> et reconnaissez avoir lu la <Link href="/politique-confidentialite" className="font-semibold text-emerald-800 underline underline-offset-2">politique de confidentialité</Link>.
+                        </p>
                                         </div>
                                       </div>
                                     </CardContent>

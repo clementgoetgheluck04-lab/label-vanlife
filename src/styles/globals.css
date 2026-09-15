@@ -6,9 +6,9 @@
   /* Backward compat — old names mapped to new Design System */
   --color-cream: #FAFAFA;
   --color-sand: #E5E5E5;
-  --color-sage: #10B981;
-  --color-sage-light: #34D399;
-  --color-sage-dark: #059669;
+  --color-sage: #047857;
+  --color-sage-light: #10B981;
+  --color-sage-dark: #065F46;
   --color-forest: #064E3B;
   --color-amber: #C39960;
   --color-amber-light: #D0AD7D;
@@ -77,8 +77,8 @@
   --color-info-bg: #EFF6FF;
 
   /* Typographie */
-  --font-display: "Outfit", ui-sans-serif, system-ui, sans-serif;
-  --font-body: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Trebuchet MS", "Segoe UI", ui-sans-serif, system-ui, sans-serif;
+  --font-body: "Segoe UI", Arial, ui-sans-serif, system-ui, sans-serif;
 
   /* Espacement (en rem pour rester cohérent) */
   --space-1: 4px;
@@ -116,6 +116,28 @@ body {
   font-family: var(--font-body);
   color: var(--color-neutral-700);
   background: var(--color-neutral-50);
+  overflow-wrap: anywhere;
+}
+
+img,
+svg,
+video {
+  max-width: 100%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 h1, h2, h3, h4, h5, h6 {

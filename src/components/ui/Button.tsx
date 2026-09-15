@@ -13,7 +13,7 @@ const variants = {
     "bg-transparent border-2 border-sage text-sage hover:bg-sage/10 focus-visible:ring-sage",
   ghost:
     "bg-transparent text-stone hover:bg-cream hover:text-charcoal focus-visible:ring-sage",
-  cta: "bg-[#c39960] text-white hover:bg-[#d0ad7d] hover:text-charcoal focus-visible:ring-[#c39960] shadow-sm",
+  cta: "bg-[#d0ad7d] text-neutral-950 hover:bg-[#dfc59f] focus-visible:ring-[#9a7445] shadow-sm",
 } as const;
 
 const sizes = {

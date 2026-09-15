@@ -27,7 +27,20 @@ export default function ShareTripButton({ tripId, title }: { tripId: string; tit
       trackEvent("recap_shared", { entityType: "road_trip", entityId: tripId, properties: { share_channel: "copy" } });
       window.setTimeout(() => setCopied(false), 2_500);
     } catch {
-      window.location.assign(url);
+      const textarea = document.createElement("textarea");
+      textarea.value = url;
+      textarea.setAttribute("readonly", "");
+      textarea.style.position = "fixed";
+      textarea.style.opacity = "0";
+      document.body.appendChild(textarea);
+      textarea.select();
+      const copiedWithFallback = document.execCommand("copy");
+      textarea.remove();
+      if (copiedWithFallback) {
+        setCopied(true);
+        trackEvent("recap_shared", { entityType: "road_trip", entityId: tripId, properties: { share_channel: "copy_fallback" } });
+        window.setTimeout(() => setCopied(false), 2_500);
+      }
     }
   }
 

@@ -1,6 +1,7 @@
 "use client";
 
 import type { HTMLAttributes } from "react";
+import Image from "next/image";
 import { cn } from "@/lib/utils";
 
 const avatarSizes = {
@@ -31,9 +32,12 @@ function Avatar({
   return (
     <div className="relative inline-flex shrink-0">
       {src ? (
-        <img
+        <Image
           src={src}
           alt={alt}
+          width={56}
+          height={56}
+          unoptimized={src.startsWith("data:")}
           className={cn(
             "rounded-full object-cover",
             avatarSizes[size],

@@ -62,7 +62,7 @@ const initialForm = {
   discountPercent: "15", reservationModes: [] as string[], promoCode: "", discountConditions: "",
   totalPitches: "", couplePitchNumbers: "", familyPitchNumbers: "", bookingUrl: "", bookingSoftware: "", bookingChannelManager: "",
   activities: "", discoveryUrl: "", foodOptions: "", practicalInfo: "", photoFileNames: [] as string[],
-  description: "", motivation: "", acceptCharter: false,
+  description: "", motivation: "", acceptCharter: false, companyWebsite: "",
 };
 
 export default function CandidaturePage() {
@@ -228,6 +228,7 @@ export default function CandidaturePage() {
   return (
     <main ref={stepTopRef} tabIndex={-1} id="candidature-top" className="min-h-screen bg-gradient-to-b from-[#f7f1e8] to-white px-4 pb-20 pt-24 outline-none" style={{ overflowAnchor: "none" }}>
       <div className="mx-auto max-w-4xl space-y-8">
+        <input type="text" name="companyWebsite" value={form.companyWebsite} onChange={(event) => update({ companyWebsite: event.target.value })} tabIndex={-1} autoComplete="off" aria-hidden="true" className="pointer-events-none absolute h-px w-px opacity-0" />
         {claimedPlaceName && (
           <div className="rounded-2xl border border-[#c39960]/35 bg-[#f7f1e8] p-4 text-sm text-neutral-700">
             <strong className="text-neutral-950">Revendication de fiche :</strong> les informations connues pour « {claimedPlaceName} » ont été préremplies. Vérifiez-les avant de continuer.
@@ -243,7 +244,7 @@ export default function CandidaturePage() {
         <div className="grid grid-cols-4 gap-2" aria-label={`Étape ${step + 1} sur ${STEPS.length}`}>
           {STEPS.map((item, index) => { const Icon = item.icon; const active = index === step; const done = index < step; return (
             <div key={item.title} className="text-center">
-              <div className={`mx-auto flex h-10 w-10 items-center justify-center rounded-full ${done || active ? "bg-[#c39960] text-white" : "bg-neutral-100 text-neutral-400"}`}>{done ? <Check className="h-5 w-5" /> : <Icon className="h-5 w-5" />}</div>
+              <div className={`mx-auto flex h-10 w-10 items-center justify-center rounded-full ${done || active ? "bg-[#8c673e] text-white" : "bg-neutral-100 text-neutral-500"}`}>{done ? <Check className="h-5 w-5" /> : <Icon className="h-5 w-5" />}</div>
               <p className={`mt-2 text-[11px] sm:text-xs ${active ? "font-semibold text-[#8b673d]" : "text-neutral-400"}`}>{item.title}</p>
             </div>
           ); })}
@@ -305,8 +306,8 @@ export default function CandidaturePage() {
               <h3 className="font-bold text-neutral-900">Vous avez une clause de parité tarifaire ?</h3>
               <p className="mt-2 text-sm leading-relaxed text-neutral-600">Si votre contrat avec un partenaire commercial vous interdit de vendre en dessous d'un certain tarif, ce simulateur vous aide à trouver la réduction maximale que vous pouvez accorder aux membres Label Vanlife sans enfreindre votre clause.</p>
               <div className="mt-5 grid grid-cols-2 gap-3">
-                <button type="button" onClick={() => update({ hasParityClause: true })} className={`rounded-xl border px-4 py-3 text-sm font-semibold ${form.hasParityClause ? "border-[#c39960] bg-[#c39960] text-white" : "border-neutral-200 bg-white text-neutral-600"}`}>Oui</button>
-                <button type="button" onClick={() => update({ hasParityClause: false, publicPrice: "", minimumAllowedPrice: "" })} className={`rounded-xl border px-4 py-3 text-sm font-semibold ${!form.hasParityClause ? "border-[#c39960] bg-[#c39960] text-white" : "border-neutral-200 bg-white text-neutral-600"}`}>Non</button>
+                <button type="button" onClick={() => update({ hasParityClause: true })} className={`rounded-xl border px-4 py-3 text-sm font-semibold ${form.hasParityClause ? "border-[#8c673e] bg-[#8c673e] text-white" : "border-neutral-300 bg-white text-neutral-700"}`}>Oui</button>
+                <button type="button" onClick={() => update({ hasParityClause: false, publicPrice: "", minimumAllowedPrice: "" })} className={`rounded-xl border px-4 py-3 text-sm font-semibold ${!form.hasParityClause ? "border-[#8c673e] bg-[#8c673e] text-white" : "border-neutral-300 bg-white text-neutral-700"}`}>Non</button>
               </div>
               {form.hasParityClause && <div className="mt-5 space-y-4">
                 <div className="grid gap-4 sm:grid-cols-2">
@@ -317,7 +318,7 @@ export default function CandidaturePage() {
               </div>}
             </div>
 
-            <fieldset><legend className="text-sm font-bold text-neutral-900">Réduction accordée aux membres *</legend><p className="mt-1 text-sm text-neutral-500">Entre 10% et 20% — choisissez ce qui correspond à votre situation.</p><div className="mt-4 grid grid-cols-4 gap-2 sm:grid-cols-6">{Array.from({ length: 11 }, (_, i) => i + 10).map((value) => { const unavailable = parityMaximum !== null && value > parityMaximum; return <button type="button" key={value} disabled={unavailable} onClick={() => update({ discountPercent: String(value) })} className={`rounded-xl border py-3 text-sm font-semibold ${Number(form.discountPercent) === value && !unavailable ? "border-[#c39960] bg-[#c39960] text-white" : unavailable ? "cursor-not-allowed border-neutral-100 bg-neutral-100 text-neutral-300 line-through" : "border-neutral-200 text-neutral-600"}`}>{value} %</button>; })}</div></fieldset>
+            <fieldset><legend className="text-sm font-bold text-neutral-900">Réduction accordée aux membres *</legend><p className="mt-1 text-sm text-neutral-500">Entre 10% et 20% — choisissez ce qui correspond à votre situation.</p><div className="mt-4 grid grid-cols-4 gap-2 sm:grid-cols-6">{Array.from({ length: 11 }, (_, i) => i + 10).map((value) => { const unavailable = parityMaximum !== null && value > parityMaximum; return <button type="button" key={value} disabled={unavailable} onClick={() => update({ discountPercent: String(value) })} className={`rounded-xl border py-3 text-sm font-semibold ${Number(form.discountPercent) === value && !unavailable ? "border-[#8c673e] bg-[#8c673e] text-white" : unavailable ? "cursor-not-allowed border-neutral-200 bg-neutral-100 text-neutral-500 line-through" : "border-neutral-300 text-neutral-700"}`}>{value} %</button>; })}</div></fieldset>
 
             <fieldset><legend className="text-sm font-bold text-neutral-900">Comment les membres peuvent-ils réserver ? *</legend><p className="mt-1 text-sm text-neutral-500">Cochez toutes les options disponibles.</p><div className="mt-4 grid gap-3 sm:grid-cols-2">{[["online", "En ligne sur votre site"], ["email", "Par email"], ["phone", "Par téléphone"], ["onsite", "Directement sur place"]].map(([value, label]) => <label key={value} className={`flex cursor-pointer items-center gap-3 rounded-xl border p-4 text-sm text-neutral-700 ${form.reservationModes.includes(value) ? "border-[#c39960] bg-[#f7f1e8]/60" : "border-neutral-200"}`}><input type="checkbox" className="h-4 w-4 accent-[#c39960]" checked={form.reservationModes.includes(value)} onChange={() => toggleReservation(value)} />{label}</label>)}</div></fieldset>
 
@@ -368,7 +369,7 @@ export default function CandidaturePage() {
                 <input id="accept-charter" type="checkbox" className="mt-1 accent-[#c39960]" checked={form.acceptCharter} onChange={(e) => update({ acceptCharter: e.target.checked })} />
                 <div className="text-sm text-neutral-600">
                   <label htmlFor="accept-charter">Je m'engage à respecter </label>
-                  <button type="button" aria-expanded={showCharterDetails} onClick={() => setShowCharterDetails((current) => !current)} className="font-semibold text-[#8b673d] underline decoration-[#c39960]/60 underline-offset-2">la charte Label Vanlife et les conditions d'accueil annoncées</button>. *
+                  <button type="button" aria-expanded={showCharterDetails} onClick={() => setShowCharterDetails((current) => !current)} className="font-semibold text-[#705234] underline decoration-[#c39960]/60 underline-offset-2">la charte Label Vanlife et les conditions d'accueil annoncées</button>, ainsi que les <Link href="/conditions-generales-utilisation" target="_blank" className="font-semibold text-emerald-800 underline underline-offset-2">conditions générales</Link>. *
                 </div>
               </div>
               {showCharterDetails && <div className="mt-4 rounded-xl bg-[#f7f1e8]/70 p-4 text-sm leading-relaxed text-neutral-700"><p className="font-bold text-neutral-900">Ce que cet engagement implique</p><ul className="mt-3 list-disc space-y-2 pl-5"><li>Fournir des informations sincères et tenir à jour les tarifs, horaires, équipements et conditions d'accueil publiés.</li><li>Accueillir les vanlifers avec respect, sans discrimination, dans le respect des règles de sécurité, d'hygiène, de l'environnement et de la réglementation locale.</li><li>Appliquer la réduction annoncée de 10 à 20 % après vérification d'une carte membre Label Vanlife en cours de validité.</li><li>Prévenir Label Vanlife de tout changement important, incident ou indisponibilité affectant l'accueil.</li><li>Accepter que Label Vanlife demande des justificatifs ou contrôle la conformité du lieu et puisse suspendre ou retirer le label en cas de manquement.</li><li>Protéger les données et codes membres communiqués. Le label ne garantit aucun volume de réservation.</li></ul></div>}

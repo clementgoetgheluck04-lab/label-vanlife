@@ -61,12 +61,13 @@ export async function generateMetadata({
   const post = BLOG_POSTS[slug];
 
   if (!post) {
-    return { title: "Article non trouvé | Label Vanlife" };
+    return { title: "Article non trouvé" };
   }
 
   return {
-    title: `${post.title} | Label Vanlife`,
+    title: post.title,
     description: post.excerpt,
+    alternates: { canonical: `/blog/${slug}` },
     openGraph: {
       title: `${post.title} | Label Vanlife`,
       description: post.excerpt,

@@ -42,7 +42,7 @@ export default function ValuesSection() {
               <span className="text-xs font-semibold tracking-[0.2em] uppercase text-sage">Pour les propriétaires & directeurs</span>
               <p className="font-semibold">Accueillez les meilleurs voyageurs. Développez votre activité.</p>
               <Link
-                href="/conseil-camping"
+                href="/campings-van-friendly"
                 className="inline-flex items-center gap-2 text-sm font-semibold text-sage hover:text-sage/80 transition-colors"
               >
                 Voir plus de détails →

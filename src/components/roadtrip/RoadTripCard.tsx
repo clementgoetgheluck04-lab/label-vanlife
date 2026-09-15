@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Route, Star, Clock, MapPin, Euro, Heart, ChevronRight } from "lucide-react";
+import { Route, Clock, MapPin, Euro, Heart, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { RoadTrip } from "@/lib/types";
 import { Badge } from "@/components/ui/Badge";
@@ -13,12 +13,9 @@ interface RoadTripCardProps {
 
 export default function RoadTripCard({ roadtrip, className }: RoadTripCardProps) {
   const difficultyLabel = getDifficultyLabel(roadtrip.difficulte);
-  const difficultyVariant = getDifficultyVariant(roadtrip.difficulte);
-  const stars = renderStarsArray(roadtrip.likes);
-
   return (
     <Link
-      href={`/road-trips/${roadtrip.id}`}
+      href={`/trip/${roadtrip.id}`}
       className={cn(
         "group block bg-white rounded-2xl border border-border/50 overflow-hidden",
         "hover:shadow-lg hover:-translate-y-1 transition-all duration-300",
@@ -107,24 +104,6 @@ function getDifficultyLabel(difficulte: RoadTrip["difficulte"]): string {
     avance: "Avancé",
   };
   return labels[difficulte];
-}
-
-function getDifficultyVariant(difficulte: RoadTrip["difficulte"]): string {
-  const variants: Record<RoadTrip["difficulte"], string> = {
-    facile: "success",
-    moyen: "warning",
-    avance: "premium",
-  };
-  return variants[difficulte];
-}
-
-function renderStarsArray(likes: number): boolean[] {
-  const stars: boolean[] = [];
-  const level = Math.min(5, Math.max(1, Math.round(likes / 100)));
-  for (let i = 1; i <= 5; i++) {
-    stars.push(i <= level);
-  }
-  return stars;
 }
 
 function formatTag(tag: string): string {

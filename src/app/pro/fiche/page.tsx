@@ -29,7 +29,7 @@ export default async function ProFichePage() {
   });
 
   if (!pro) {
-    return <main className="min-h-screen bg-neutral-50 px-4 py-16"><Card className="mx-auto max-w-xl p-8 text-center"><MapPin className="mx-auto h-12 w-12 text-neutral-300" /><h1 className="mt-4 text-2xl font-bold text-neutral-900">Aucun établissement associé</h1><p className="mt-2 text-sm leading-6 text-neutral-500">Votre espace professionnel sera créé après la validation de votre candidature.</p><Link href="/labellisation/candidature" className="mt-6 inline-flex min-h-11 items-center rounded-full bg-[#c39960] px-6 text-sm font-bold text-white">Déposer une candidature</Link></Card></main>;
+    return <main className="min-h-screen bg-neutral-50 px-4 py-16"><Card className="mx-auto max-w-xl p-8 text-center"><MapPin className="mx-auto h-12 w-12 text-neutral-300" /><h1 className="mt-4 text-2xl font-bold text-neutral-900">Aucun établissement associé</h1><p className="mt-2 text-sm leading-6 text-neutral-500">Votre espace professionnel sera créé après la validation de votre candidature.</p><Link href="/labellisation/candidature" className="mt-6 inline-flex min-h-11 items-center rounded-full bg-[#d0ad7d] px-6 text-sm font-bold text-neutral-950">Déposer une candidature</Link></Card></main>;
   }
 
   return (

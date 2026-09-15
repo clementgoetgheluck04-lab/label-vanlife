@@ -1,5 +1,12 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { CONTACT_EMAIL, CONTACT_MAILTO } from "@/config/contact";
+
+export const metadata: Metadata = {
+  title: "Mentions légales",
+  description: "Éditeur, hébergeur, propriété intellectuelle et contact du site Label Vanlife.",
+  alternates: { canonical: "/mentions-legales" },
+};
 
 export default function MentionsLegalesPage() {
   return (
@@ -11,16 +18,16 @@ export default function MentionsLegalesPage() {
           <h2 className="text-xl font-bold text-neutral-800">Éditeur du site</h2>
           <p className="text-sm text-neutral-600 leading-relaxed">
             <strong>Label Vanlife</strong><br />
-            Association Loi 1901<br />
-            SIRET : À venir<br />
-            Siège social : France<br />
+            Projet édité par Clément Goetgheluck<br />
+            Structure juridique en cours de constitution<br />
+            SIREN / SIRET : non attribué à ce jour<br />
             Email : <Link href={CONTACT_MAILTO} className="text-emerald-600 hover:underline">{CONTACT_EMAIL}</Link>
           </p>
         </section>
 
         <section className="space-y-4">
           <h2 className="text-xl font-bold text-neutral-800">Directeur de la publication</h2>
-          <p className="text-sm text-neutral-600">Clément Goetgheluck, Fondateur</p>
+          <p className="text-sm text-neutral-600">Clément Goetgheluck, fondateur</p>
         </section>
 
         <section className="space-y-4">

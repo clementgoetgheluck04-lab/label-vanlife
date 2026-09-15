@@ -13,7 +13,7 @@ export const metadata: Metadata = {
   description,
   alternates: { canonical: "/road-trips" },
   keywords: ["road trip van France", "itinéraire van France", "voyage en van", "road trip Bretagne van", "road trip Alpes van"],
-  openGraph: { title, description, type: "article", url: "/road-trips", images: [{ url: "/images/hero-label-vanlife.png", width: 1536, height: 1024, alt: "Road trip en van en France" }] },
+  openGraph: { title, description, type: "article", url: "/road-trips", images: [{ url: "/images/hero-label-vanlife.webp", width: 1536, height: 1024, alt: "Road trip en van en France" }] },
 };
 
 const trips = [
@@ -32,7 +32,7 @@ const advice: ReadonlyArray<{ icon: typeof ShieldCheck; title: string; text: str
 ] as const;
 
 export default function RoadTripsPage() {
-  const schema = { "@context": "https://schema.org", "@type": "Article", headline: title, description, image: "https://www.labelvanlife.fr/images/hero-label-vanlife.png", author: { "@type": "Organization", name: "Label Vanlife" }, publisher: { "@type": "Organization", name: "Label Vanlife" }, mainEntityOfPage: "https://www.labelvanlife.fr/road-trips", datePublished: "2026-01-01", dateModified: "2026-08-02" };
+  const schema = { "@context": "https://schema.org", "@type": "Article", headline: title, description, image: "https://www.labelvanlife.fr/images/hero-label-vanlife.webp", author: { "@type": "Organization", name: "Label Vanlife" }, publisher: { "@type": "Organization", name: "Label Vanlife" }, mainEntityOfPage: "https://www.labelvanlife.fr/road-trips", datePublished: "2026-01-01", dateModified: "2026-08-02" };
   const breadcrumbSchema = { "@context": "https://schema.org", "@type": "BreadcrumbList", itemListElement: [
     { "@type": "ListItem", position: 1, name: "Accueil", item: "https://www.labelvanlife.fr" },
     { "@type": "ListItem", position: 2, name: "Vanlife France", item: "https://www.labelvanlife.fr/vanlife" },
@@ -49,7 +49,7 @@ export default function RoadTripsPage() {
 
       <header className="mx-auto grid max-w-6xl gap-10 px-6 py-12 lg:grid-cols-[.95fr_1.05fr] lg:items-center lg:py-16">
         <div className="animate-fade-in-up"><p className="text-xs font-bold uppercase tracking-[0.22em] text-[#9a7445]">Itinéraires</p><h1 className="mt-4 text-4xl font-bold leading-[1.08] text-neutral-950 sm:text-6xl">Road trip en van en France : les meilleurs itinéraires</h1><p className="mt-5 text-lg leading-8 text-neutral-600">Des Alpes à la Bretagne, de la Provence à la Corse, chaque région offre une expérience différente. Voici six voyages qui méritent vraiment le détour.</p><div className="mt-7 flex flex-wrap gap-2">{["6 itinéraires", "De 7 à 14 jours", "Conseils pratiques"].map((tag) => <span key={tag} className="rounded-full border border-[#c39960]/30 bg-[#f7f1e8] px-3 py-1.5 text-xs font-semibold text-[#7d5d38]">{tag}</span>)}</div></div>
-        <div className="relative aspect-[4/3] overflow-hidden rounded-[2rem] shadow-2xl shadow-neutral-900/15"><Image src="/images/hero-label-vanlife.png" alt="Van au bord d’un lac, point de départ d’un road trip en France" fill priority sizes="(max-width: 1024px) 100vw, 52vw" className="object-cover" /><div className="absolute inset-0 bg-gradient-to-t from-black/35 to-transparent" /></div>
+        <div className="relative aspect-[4/3] overflow-hidden rounded-[2rem] shadow-2xl shadow-neutral-900/15"><Image src="/images/hero-label-vanlife.webp" alt="Van au bord d’un lac, point de départ d’un road trip en France" fill priority sizes="(max-width: 1024px) 100vw, 52vw" className="object-cover" /><div className="absolute inset-0 bg-gradient-to-t from-black/35 to-transparent" /></div>
       </header>
 
       <article className="mx-auto max-w-5xl space-y-20 px-6">

@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     description,
     type: "article",
     url: "/vanlife-famille",
-    images: [{ url: "/images/people/helene-family-vanlifers.png", width: 1536, height: 1024, alt: "Famille en voyage devant son van aménagé" }],
+    images: [{ url: "/images/people/helene-family-vanlifers.webp", width: 1536, height: 1024, alt: "Famille en voyage devant son van aménagé" }],
   },
 };
 
@@ -46,7 +46,7 @@ const faqs = [
 
 export default function FamilyVanlifePage() {
   const schemas = [
-    { "@context": "https://schema.org", "@type": "Article", headline: title, description, image: "https://www.labelvanlife.fr/images/people/helene-family-vanlifers.png", author: { "@type": "Organization", name: "Label Vanlife" }, publisher: { "@type": "Organization", name: "Label Vanlife" }, mainEntityOfPage: "https://www.labelvanlife.fr/vanlife-famille" },
+    { "@context": "https://schema.org", "@type": "Article", headline: title, description, image: "https://www.labelvanlife.fr/images/people/helene-family-vanlifers.webp", author: { "@type": "Organization", name: "Label Vanlife" }, publisher: { "@type": "Organization", name: "Label Vanlife" }, mainEntityOfPage: "https://www.labelvanlife.fr/vanlife-famille" },
     { "@context": "https://schema.org", "@type": "FAQPage", mainEntity: faqs.map((faq) => ({ "@type": "Question", name: faq.question, acceptedAnswer: { "@type": "Answer", text: faq.answer } })) },
   ];
 
@@ -65,7 +65,7 @@ export default function FamilyVanlifePage() {
           <p className="mt-5 text-lg leading-8 text-neutral-600">Un van, des parents, des enfants qui regardent les étoiles. La vanlife en famille est possible — et les souvenirs construits ensemble changent souvent la manière de voyager.</p>
           <div className="mt-6 flex flex-wrap gap-2">{["Famille avec enfants", "Aménagement van", "Sécurité à bord", "Lieux adaptés"].map((tag) => <span key={tag} className="rounded-full border border-[#c39960]/30 bg-[#f7f1e8] px-3 py-1.5 text-xs font-semibold text-[#7d5d38]">{tag}</span>)}</div>
         </div>
-        <div className="relative aspect-[4/3] overflow-hidden rounded-[2rem] shadow-2xl shadow-neutral-900/15"><Image src="/images/people/helene-family-vanlifers.png" alt="Famille installée devant son van aménagé" fill priority sizes="(max-width: 1024px) 100vw, 48vw" className="object-cover" /><div className="absolute inset-0 bg-gradient-to-t from-black/25 to-transparent" /></div>
+        <div className="relative aspect-[4/3] overflow-hidden rounded-[2rem] shadow-2xl shadow-neutral-900/15"><Image src="/images/people/helene-family-vanlifers.webp" alt="Famille installée devant son van aménagé" fill priority sizes="(max-width: 1024px) 100vw, 48vw" className="object-cover" /><div className="absolute inset-0 bg-gradient-to-t from-black/25 to-transparent" /></div>
       </header>
 
       <article className="mx-auto max-w-4xl space-y-20 px-6">

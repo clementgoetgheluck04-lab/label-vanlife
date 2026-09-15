@@ -50,7 +50,12 @@ export async function POST(request: NextRequest) {
     }
 
     const properties = safeProperties(body.properties);
-    await getPrisma().analyticsEvent.create({
+    const prisma = getPrisma();
+    await prisma.$transaction([
+      prisma.analyticsEvent.deleteMany({
+        where: { createdAt: { lt: new Date(Date.now() - 25 * 30.44 * 24 * 60 * 60 * 1_000) } },
+      }),
+      prisma.analyticsEvent.create({
       data: {
         name: body.name,
         userId,
@@ -64,7 +69,8 @@ export async function POST(request: NextRequest) {
         campaign: shortText(properties?.utm_campaign, 100),
         properties: properties || undefined,
       },
-    });
+      }),
+    ]);
 
     return new NextResponse(null, { status: 202, headers: { "Cache-Control": "no-store" } });
   } catch (error) {

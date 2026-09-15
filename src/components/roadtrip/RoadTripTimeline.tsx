@@ -17,12 +17,10 @@ export default function RoadTripTimeline({ roadtrip, className }: RoadTripTimeli
       <div className="absolute left-5 top-0 bottom-0 w-0.5 bg-gradient-to-b from-sage via-sage/50 to-sage/20" />
 
       <div className="space-y-0">
-        {roadtrip.etapes.map((etape, index) => (
+        {roadtrip.etapes.map((etape) => (
           <TimelineStep
             key={etape.ordre}
             etape={etape}
-            isFirst={index === 0}
-            isLast={index === roadtrip.etapes.length - 1}
           />
         ))}
       </div>
@@ -50,12 +48,8 @@ export default function RoadTripTimeline({ roadtrip, className }: RoadTripTimeli
 
 function TimelineStep({
   etape,
-  isFirst,
-  isLast,
 }: {
   etape: RoadTripEtape;
-  isFirst: boolean;
-  isLast: boolean;
 }) {
   return (
     <div className="relative flex gap-4 pb-8 last:pb-0">

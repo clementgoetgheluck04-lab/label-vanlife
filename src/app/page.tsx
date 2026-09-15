@@ -27,7 +27,7 @@ export default function Home() {
       {/* ===== HERO ===== */}
       <section className="relative min-h-screen flex items-center overflow-hidden">
         <Image
-          src="/images/hero-label-vanlife.png"
+          src="/images/hero-label-vanlife.webp"
           alt="Van aménagé au bord d'un lac au coucher du soleil"
           fill
           priority
@@ -47,25 +47,23 @@ export default function Home() {
             <p className="text-lg text-white/70 max-w-2xl mx-auto mb-10 leading-relaxed">
               Des lieux calmes, respectueux et vraiment adaptés à la vanlife — sélectionnés et labellisés, avec <strong className="text-amber-300">{MEMBER_DISCOUNT_TEXT} d&apos;avantages</strong> pour nos membres.
             </p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <div className="flex justify-center">
               <Link href="/devenir-membre">
                 <Button variant="cta" size="lg" className="text-base px-10 shadow-xl shadow-amber-500/25">
                   {MEMBER_CTA_LABEL} <ArrowRight className="h-4 w-4 ml-2" />
                 </Button>
               </Link>
-              <Link href="/labellisation">
-                <Button variant="primary" className="bg-white/10 backdrop-blur-sm text-white border border-white/30 hover:bg-white/20 text-base px-8 rounded-xl">
-                  Je labellise mon lieu — {LABEL_PRICE} €
-                </Button>
-              </Link>
             </div>
             <p className="mt-4 text-sm text-white/70">{MEMBER_VALIDITY_TEXT}</p>
-            <Link href="/explorer" className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-white/80 underline decoration-white/30 underline-offset-4 hover:text-white">Découvrir les lieux <ArrowRight className="h-3.5 w-3.5" /></Link>
+            <div className="mt-3 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-sm font-semibold text-white/90">
+              <Link href="/explorer" className="inline-flex items-center gap-1 underline decoration-white/50 underline-offset-4 hover:text-white">Découvrir les lieux <ArrowRight className="h-3.5 w-3.5" /></Link>
+              <Link href="/labellisation" className="inline-flex items-center gap-1 underline decoration-white/50 underline-offset-4 hover:text-white">Je labellise mon lieu — {LABEL_PRICE} € <ArrowRight className="h-3.5 w-3.5" /></Link>
+            </div>
           </div>
         </div>
         <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-2">
-          <span className="text-xs tracking-[0.2em] uppercase text-white/30">Découvrir</span>
-          <ChevronDown className="h-5 w-5 text-white/40 animate-bounce" />
+          <span className="text-xs tracking-[0.2em] uppercase text-white/70">Découvrir</span>
+          <ChevronDown className="h-5 w-5 text-white/70 animate-bounce" />
         </div>
       </section>
 
@@ -87,7 +85,7 @@ export default function Home() {
               <p className="mt-3 text-sm leading-relaxed text-white/65">Fiche détaillée, présence sur la MAP, kit de communication et 0 % de commission. Actif dès validation jusqu&apos;au 31 décembre 2027.</p>
               <div className="mt-6 flex flex-wrap items-center gap-4">
                 <Link href="/labellisation"><Button variant="cta">Découvrir l&apos;offre — {LABEL_PRICE} € <ArrowRight className="h-4 w-4" /></Button></Link>
-                <span className="text-sm text-white/45"><span className="line-through">{LABEL_NORMAL_PRICE} €</span> · places limitées</span>
+                <span className="text-sm text-white/70"><span className="line-through">{LABEL_NORMAL_PRICE} €</span> · places limitées</span>
               </div>
             </article>
           </div>
@@ -146,7 +144,7 @@ export default function Home() {
               { num: "03", title: "Je profite de l'avantage", desc: "Sur place, je présente ma carte à jour. En ligne, j'utilise le code privé lorsque le lieu en propose un." },
             ].map((step) => (
               <div key={step.num} className="micro-card relative rounded-2xl border border-neutral-200 bg-white p-6 pt-5 text-center shadow-sm sm:p-8">
-                <span className="micro-icon relative z-10 mx-auto flex h-16 w-16 items-center justify-center rounded-full border-4 border-white bg-[#c39960] text-sm font-bold text-white shadow-md">{step.num}</span>
+                <span className="micro-icon relative z-10 mx-auto flex h-16 w-16 items-center justify-center rounded-full border-4 border-white bg-[#d0ad7d] text-sm font-bold text-neutral-950 shadow-md">{step.num}</span>
                 <h3 className="mt-6 text-lg font-bold text-neutral-900">{step.title}</h3>
                 <p className="mt-3 text-sm leading-relaxed text-neutral-500">{step.desc}</p>
                 <Check className="mx-auto mt-5 h-5 w-5 text-emerald-500" />
@@ -159,7 +157,7 @@ export default function Home() {
       {/* ===== L'ESPRIT LABEL VANLIFE ===== */}
       <section className="relative overflow-hidden py-20 sm:py-24">
         <Image
-          src="/images/home/camping-vanlife.png"
+          src="/images/home/camping-vanlife.webp"
           alt=""
           fill
           sizes="100vw"
@@ -193,7 +191,7 @@ export default function Home() {
             <p className="text-sm text-white/65 italic">— Des lieux qui t'attendent · Des prix adaptés à la vanlife · Des hôtes qui comprennent ta façon de voyager</p>
             <p className="text-sm font-semibold text-[#dfc59f]">👉 Tu arrives. Tu montres ta carte. Tu es chez toi.</p>
             <p className="text-sm font-bold text-white">La vanlife redevient simple.</p>
-            <p className="text-xs text-white/45">— Clément, fondateur</p>
+            <p className="text-xs text-white/75">— Clément, fondateur</p>
           </div>
         </div>
       </section>
@@ -226,7 +224,7 @@ export default function Home() {
                 <div className="p-4 space-y-2">
                   <div className="flex items-start gap-3">
                     {lieu.logoUrl ? (
-                      <Image src={lieu.logoUrl} alt="" width={40} height={40} className="h-10 w-10 rounded-xl object-contain bg-white border border-neutral-200 p-1 shadow-sm shrink-0" />
+                      <Image src={lieu.logoUrl} alt={`Logo de ${lieu.nom}`} width={40} height={40} className="h-10 w-10 rounded-xl object-contain bg-white border border-neutral-200 p-1 shadow-sm shrink-0" />
                     ) : (
                       <div className="h-10 w-10 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600 font-bold shrink-0 shadow-sm border border-emerald-100">{lieu.nom.charAt(0)}</div>
                     )}

@@ -4,6 +4,7 @@ export const metadata: Metadata = {
   title: "Labellisation 2027 — Offre de lancement à 110€",
   description:
     "Candidatez au Label Vanlife 2027. Offre de lancement à 110€ au lieu de 290€, active dès validation, sans commission et remboursée intégralement si le lieu est déclaré non conforme.",
+  alternates: { canonical: "/labellisation" },
   openGraph: {
     title: "Labellisation Label Vanlife 2027 — 110€ au lieu de 290€",
     description:

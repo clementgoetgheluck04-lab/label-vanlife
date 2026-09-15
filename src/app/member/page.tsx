@@ -109,7 +109,7 @@ export default async function MemberDashboard() {
           <Link href="/member/roadtrips" className="group">
             <Card variant="interactive" className="p-5">
               <div className="flex items-center gap-4">
-                <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#c39960] text-white"><Navigation className="h-7 w-7" /></span>
+                <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#8c673e] text-white"><Navigation className="h-7 w-7" /></span>
                 <div className="flex-1">
                   <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#9a7445]">Préparer</p>
                   <h2 className="mt-1 font-bold text-charcoal">Mon road trip</h2>

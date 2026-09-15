@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     description,
     type: "article",
     url: "/slow-travel-vanlife",
-    images: [{ url: "/images/hero-label-vanlife.png", width: 1536, height: 1024, alt: "Van au bord d'un lac au coucher du soleil" }],
+    images: [{ url: "/images/hero-label-vanlife.webp", width: 1536, height: 1024, alt: "Van au bord d'un lac au coucher du soleil" }],
   },
 };
 
@@ -49,7 +49,7 @@ const faqs = [
 
 export default function SlowTravelVanlifePage() {
   const schemas = [
-    { "@context": "https://schema.org", "@type": "Article", headline: title, description, image: "https://www.labelvanlife.fr/images/hero-label-vanlife.png", author: { "@type": "Organization", name: "Label Vanlife" }, publisher: { "@type": "Organization", name: "Label Vanlife" }, mainEntityOfPage: "https://www.labelvanlife.fr/slow-travel-vanlife" },
+    { "@context": "https://schema.org", "@type": "Article", headline: title, description, image: "https://www.labelvanlife.fr/images/hero-label-vanlife.webp", author: { "@type": "Organization", name: "Label Vanlife" }, publisher: { "@type": "Organization", name: "Label Vanlife" }, mainEntityOfPage: "https://www.labelvanlife.fr/slow-travel-vanlife" },
     { "@context": "https://schema.org", "@type": "FAQPage", mainEntity: faqs.map((faq) => ({ "@type": "Question", name: faq.question, acceptedAnswer: { "@type": "Answer", text: faq.answer } })) },
   ];
 
@@ -63,7 +63,7 @@ export default function SlowTravelVanlifePage() {
 
       <header className="mx-auto grid max-w-6xl gap-10 px-6 py-12 lg:grid-cols-[.95fr_1.05fr] lg:items-center lg:py-16">
         <div className="animate-fade-in-up"><p className="text-xs font-bold uppercase tracking-[0.22em] text-[#9a7445]">Philosophie du voyage</p><h1 className="mt-4 text-4xl font-bold leading-[1.08] text-neutral-950 sm:text-6xl">Slow travel vanlife : voyager sans se presser</h1><p className="mt-5 text-lg leading-8 text-neutral-600">Dans un monde qui va trop vite, le van peut devenir un outil de ralentissement. Pas une façon de voir plus — mais de voir mieux.</p><div className="mt-7 flex flex-wrap gap-2">{["Moins de route", "Plus de rencontres", "Économie locale", "Voyage responsable"].map((tag) => <span key={tag} className="rounded-full border border-[#c39960]/30 bg-[#f7f1e8] px-3 py-1.5 text-xs font-semibold text-[#7d5d38]">{tag}</span>)}</div></div>
-        <div className="relative aspect-[4/3] overflow-hidden rounded-[2rem] shadow-2xl shadow-neutral-900/15"><Image src="/images/hero-label-vanlife.png" alt="Van posé au bord d'un lac au coucher du soleil" fill priority sizes="(max-width: 1024px) 100vw, 52vw" className="object-cover" /><div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" /></div>
+        <div className="relative aspect-[4/3] overflow-hidden rounded-[2rem] shadow-2xl shadow-neutral-900/15"><Image src="/images/hero-label-vanlife.webp" alt="Van posé au bord d'un lac au coucher du soleil" fill priority sizes="(max-width: 1024px) 100vw, 52vw" className="object-cover" /><div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" /></div>
       </header>
 
       <article className="mx-auto max-w-5xl space-y-20 px-6">

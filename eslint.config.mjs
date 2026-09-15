@@ -14,6 +14,8 @@ const eslintConfig = defineConfig([
     "next-env.d.ts",
     "src/generated/**",
     "prisma/migrations/**",
+    "artifacts/**",
+    "tmp/**",
   ]),
   {
     rules: {

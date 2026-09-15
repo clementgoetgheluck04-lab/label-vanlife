@@ -149,7 +149,7 @@ export default function ExplorerPage() {
                     </span>
                   )}
                   {lieu.discountPercent === 0 && lieu.priceHighlight && (
-                    <span className="absolute top-3 right-3 bg-[#c39960] text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-sm">
+                    <span className="absolute top-3 right-3 bg-[#8c673e] text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-sm">
                       Petit prix
                     </span>
                   )}
@@ -160,7 +160,7 @@ export default function ExplorerPage() {
                   {/* Logo + Title row */}
                   <div className="flex items-start gap-3">
                     {lieu.logoUrl ? (
-                      <Image src={lieu.logoUrl} alt="" width={40} height={40} className="h-10 w-10 rounded-xl object-contain bg-white border border-neutral-200 p-1 shadow-sm shrink-0" />
+                      <Image src={lieu.logoUrl} alt={`Logo de ${lieu.nom}`} width={40} height={40} className="h-10 w-10 rounded-xl object-contain bg-white border border-neutral-200 p-1 shadow-sm shrink-0" />
                     ) : (
                       <div className="h-10 w-10 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600 font-bold text-base shrink-0 shadow-sm border border-emerald-100">
                         {lieu.nom.charAt(0)}
