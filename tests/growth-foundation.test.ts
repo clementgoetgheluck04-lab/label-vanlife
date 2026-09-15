@@ -56,6 +56,8 @@ test("Vanlife Activity is private by default and never publishes coordinates", (
   const deletion = read("../src/app/api/member/roadtrips/[id]/route.ts");
   const publicTrip = read("../src/app/trip/[id]/page.tsx");
   assert.match(api, /isPublic:\s*false/);
+  assert.match(api, /ENRICHED_LIEUX/);
+  assert.match(api, /status:\s*"PUBLISHED"/);
   assert.match(publication, /typeof body\.isPublic !== "boolean"/);
   assert.match(publicTrip, /where:\s*\{ id, isPublic: true \}/);
   assert.doesNotMatch(publicTrip, /select:\s*\{[^}]*lat:\s*true|select:\s*\{[^}]*lng:\s*true/);

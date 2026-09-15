@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
+import { ENRICHED_LIEUX } from "@/data/enriched-lieux";
 import { getPrisma } from "@/lib/prisma";
 import { requireActiveMember } from "@/server/auth";
 import { apiError } from "@/server/http";
@@ -31,6 +32,14 @@ export async function GET() {
 }
 
 const SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+const PLACE_TYPES = {
+  camping: "CAMPING",
+  parking: "PARKING",
+  etape_nature: "ETAPE_NATURE",
+  hebergement_insolite: "HEBERGEMENT_INSOLITE",
+  restaurant: "RESTAURANT",
+  activite: "ACTIVITE",
+} as const;
 
 function routeDistanceKm(points: Array<{ lat: number; lng: number }>): number | null {
   if (points.length < 2) return null;
@@ -69,6 +78,42 @@ export async function POST(request: NextRequest) {
     if (slugs.length === 0) throw new RequestBodyError("Ajoutez au moins un lieu labellisé", 400);
 
     const prisma = getPrisma();
+    const labelledCatalog = new Map(ENRICHED_LIEUX.map((place) => [place.id, place]));
+    const sourcePlaces = slugs.map((slug) => labelledCatalog.get(slug));
+    if (sourcePlaces.some((place) => !place)) throw new RequestBodyError("Un lieu n’est pas reconnu comme labellisé", 400);
+
+    // The static V1 catalogue remains the approved source while Place records
+    // are progressively migrated. Only missing labelled places are inserted;
+    // existing database records are never overwritten here.
+    await prisma.place.createMany({
+      data: sourcePlaces.map((place) => ({
+        name: place!.nom,
+        slug: place!.id,
+        type: PLACE_TYPES[place!.type],
+        description: place!.description,
+        addressLine1: place!.address,
+        city: place!.ville,
+        region: place!.region,
+        country: place!.pays,
+        lat: place!.coordonnees.lat,
+        lng: place!.coordonnees.lng,
+        mainImageUrl: place!.photoUrl,
+        images: place!.photos ?? [],
+        discountPercent: place!.discountPercent,
+        rating: place!.note,
+        reviewCount: place!.avisCount,
+        tags: place!.tags,
+        services: place!.services,
+        status: "PUBLISHED",
+        favoritesCount: place!.favoris,
+        phone: place!.telephone || null,
+        email: place!.email || null,
+        website: place!.siteWeb || null,
+        hours: place!.horaires || null,
+      })),
+      skipDuplicates: true,
+    });
+
     const places = await prisma.place.findMany({
       where: { slug: { in: slugs }, status: "PUBLISHED" },
       select: { id: true, slug: true, lat: true, lng: true },
