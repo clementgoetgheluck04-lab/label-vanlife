@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { BarChart3, ChevronRight, Download, Eye, Heart, MapPin, Navigation, Settings } from "lucide-react";
+import { BarChart3, ChevronRight, Download, Eye, Heart, MapPin, Navigation, Settings, Share2 } from "lucide-react";
 
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
@@ -58,7 +58,7 @@ export default async function ProDashboard() {
           createdAt: { gte: thirtyDaysAgo },
           entityType: "lieux",
           entityId: { in: placeSlugs },
-          name: { in: ["place_view", "route_start", "benefit_view"] },
+          name: { in: ["place_view", "route_start", "benefit_view", "place_share"] },
         },
         _count: { _all: true },
       })
@@ -70,6 +70,7 @@ export default async function ProDashboard() {
   const stats = [
     { icon: Eye, label: "Vues de fiche", value: byEvent.place_view ?? 0, detail: "30 derniers jours", color: "text-blue-600", bg: "bg-blue-50" },
     { icon: Navigation, label: "Départs GPS", value: byEvent.route_start ?? 0, detail: "Maps + Waze · 30 jours", color: "text-emerald-700", bg: "bg-emerald-50" },
+    { icon: Share2, label: "Partages", value: byEvent.place_share ?? 0, detail: "30 derniers jours", color: "text-violet-700", bg: "bg-violet-50" },
     { icon: Heart, label: "Favoris", value: favorites, detail: "Total enregistré", color: "text-rose-600", bg: "bg-rose-50" },
   ];
 
@@ -91,7 +92,7 @@ export default async function ProDashboard() {
             <div><h2 className="text-lg font-bold text-neutral-900">Résultats mesurés</h2><p className="mt-1 text-xs text-neutral-500">Uniquement les actions enregistrées sur vos fiches Label Vanlife.</p></div>
             <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-neutral-500">Données réelles</span>
           </div>
-          <div className="mt-4 grid gap-4 sm:grid-cols-3">
+          <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {stats.map((stat) => <Card key={stat.label} className="p-5"><div className={`flex h-10 w-10 items-center justify-center rounded-xl ${stat.bg}`}><stat.icon className={`h-5 w-5 ${stat.color}`} /></div><p className="mt-4 text-3xl font-black text-neutral-950">{stat.value}</p><p className="mt-1 text-sm font-bold text-neutral-800">{stat.label}</p><p className="mt-1 text-xs text-neutral-500">{stat.detail}</p></Card>)}
           </div>
         </section>

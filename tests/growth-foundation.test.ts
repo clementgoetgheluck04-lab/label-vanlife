@@ -106,6 +106,8 @@ test("the professional dashboard reports measured place activity", () => {
 
   assert.match(dashboard, /analyticsEvent\.groupBy/);
   assert.match(dashboard, /favorite\.count/);
+  assert.match(dashboard, /place_share/);
+  assert.match(dashboard, /label: "Partages"/);
   assert.match(dashboard, /Données réelles/);
   assert.doesNotMatch(dashboard, /const stats = \{ vues: 0, favoris: 0, clics: 0 \}/);
   for (const surface of [publicPlace, memberMap, map]) {
