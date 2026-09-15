@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, BadgeEuro, Building2, CreditCard, Map, Route, ShieldCheck, Users } from "lucide-react";
+import { ArrowRight, BadgeEuro, Building2, CreditCard, Map, Route, ShieldCheck, Users, WalletCards } from "lucide-react";
 
 import { Card } from "@/components/ui/Card";
 import { getPrisma } from "@/lib/prisma";
@@ -15,7 +15,7 @@ export default async function FounderDashboardPage() {
   const now = new Date();
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
   const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
-  const [revenue, revenueByType, activeMembers, newMembers, labelledPlaces, newPlaces, paidOrders, checkoutOrders, analytics, prospectGroups, pendingRecommendations, pendingApplications, openSupport] = await Promise.all([
+  const [revenue, revenueByType, activeMembers, newMembers, labelledPlaces, newPlaces, paidOrders, checkoutOrders, analytics, memberSavings, prospectGroups, pendingRecommendations, pendingApplications, openSupport] = await Promise.all([
     prisma.payment.aggregate({ where: { status: "SUCCEEDED", createdAt: { gte: monthStart } }, _sum: { amount: true } }),
     prisma.payment.groupBy({ by: ["type"], where: { status: "SUCCEEDED", createdAt: { gte: monthStart } }, _sum: { amount: true } }),
     prisma.membership.count({ where: { status: "ACTIVE", OR: [{ expiresAt: null }, { expiresAt: { gt: now } }] } }),
@@ -25,6 +25,7 @@ export default async function FounderDashboardPage() {
     prisma.checkoutOrder.count({ where: { status: "PAID", createdAt: { gte: thirtyDaysAgo } } }),
     prisma.checkoutOrder.count({ where: { status: { in: ["CHECKOUT_CREATED", "PAID", "FAILED", "CANCELED"] }, createdAt: { gte: thirtyDaysAgo } } }),
     prisma.analyticsEvent.groupBy({ by: ["name"], where: { createdAt: { gte: thirtyDaysAgo }, name: { in: ["map_open", "place_view", "route_start", "qr_scan", "benefit_view"] } }, _count: { _all: true } }),
+    prisma.passportStamp.aggregate({ where: { visitedAt: { gte: thirtyDaysAgo }, amountSavedCents: { not: null } }, _sum: { amountSavedCents: true }, _count: { amountSavedCents: true } }),
     prisma.prospect.groupBy({ by: ["status"], _count: { _all: true } }),
     prisma.placeRecommendation.count({ where: { status: "PENDING" } }),
     prisma.placeApplication.count({ where: { status: { in: ["SUBMITTED", "UNDER_REVIEW"] } } }),
@@ -44,6 +45,7 @@ export default async function FounderDashboardPage() {
     { label: "Conversion checkout", value: checkoutConversion === null ? "—" : `${checkoutConversion} %`, detail: `${paidOrders} paiement(s) / ${checkoutOrders} checkout(s)`, icon: CreditCard },
     { label: "MAP ouverte", value: String(byEvent.map_open ?? 0), detail: `${byEvent.place_view ?? 0} fiches vues sur 30 jours`, icon: Map },
     { label: "Connexions qualifiées", value: String(qualifiedConnections), detail: "Itinéraires + QR + avantages sur 30 jours", icon: Route },
+    { label: "Économies déclarées", value: euros(memberSavings._sum.amountSavedCents ?? 0), detail: `${memberSavings._count.amountSavedCents} visite(s) renseignée(s) sur 30 jours`, icon: WalletCards },
   ];
 
   return <main className="min-h-screen bg-[#f8f6f1] px-4 pb-24 pt-28 sm:px-6"><div className="mx-auto max-w-6xl space-y-8">

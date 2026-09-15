@@ -202,6 +202,14 @@ test("members can report real savings and see their membership value", () => {
   assert.match(dashboard, /totalSavingsCents/);
 });
 
+test("the founder sees only aggregated reported member savings", () => {
+  const dashboard = read("../src/app/admin/page.tsx");
+  assert.match(dashboard, /passportStamp\.aggregate/);
+  assert.match(dashboard, /Économies déclarées/);
+  assert.match(dashboard, /_sum: \{ amountSavedCents: true \}/);
+  assert.doesNotMatch(dashboard, /passportStamp\.findMany/);
+});
+
 test("member notifications are marked read only by their owner after opening", () => {
   const endpoint = read("../src/app/api/member/notifications/read/route.ts");
   const page = read("../src/app/member/notifications/page.tsx");
