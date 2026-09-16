@@ -105,6 +105,22 @@ export async function requirePageRole(allowed: UserRole[]): Promise<void> {
   if (!record || !allowed.includes(record.role)) redirect("/member");
 }
 
+export async function requireAdminPage(): Promise<User> {
+  let user: User;
+  try {
+    user = await getAuthenticatedUser();
+  } catch {
+    redirect("/admin-login");
+  }
+
+  const record = await getPrisma().user.findUnique({
+    where: { id: user.id },
+    select: { role: true },
+  });
+  if (record?.role !== "ADMIN") redirect("/admin-login?error=forbidden");
+  return user;
+}
+
 export async function requireAdminUser(): Promise<User> {
   const user = await getAuthenticatedUser();
   const record = await getPrisma().user.findUnique({ where: { id: user.id }, select: { role: true } });

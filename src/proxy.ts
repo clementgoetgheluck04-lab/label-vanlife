@@ -14,6 +14,7 @@ import {
 const PUBLIC_ROUTES = [
   "/", "/explorer", "/le-label", "/labellisation", "/devenir-membre",
   "/member-login", "/membre", "/lieux", "/lieux-reperes", "/mentions-legales",
+  "/admin-login",
   "/politique-confidentialite", "/blog", "/evenements",
   "/road-trips", "/offline",
   "/desinscription",
@@ -130,7 +131,8 @@ export async function proxy(request: NextRequest) {
   }
 
   const { data: { user } } = await supabase.auth.getUser();
-  const protectedWithoutPreview = pathname.startsWith("/admin") || pathname.startsWith("/pro");
+  const protectedWithoutPreview = pathname === "/admin" || pathname.startsWith("/admin/")
+    || pathname === "/pro" || pathname.startsWith("/pro/");
   const memberPath = pathname === "/member" || pathname.startsWith("/member/");
   const memberWithoutAccess = memberPath && !adminPreview;
   if (!user && (protectedWithoutPreview || memberWithoutAccess)) {

@@ -16,10 +16,11 @@ export async function GET(request: NextRequest) {
   const type = (searchParams.get("type") ?? "magiclink") as EmailOtpType;
   const requestedNext = searchParams.get("next");
   const next = isSafeRedirectPath(requestedNext) ? requestedNext : "/member";
+  const adminDestination = next === "/admin" || next.startsWith("/admin/");
   const rememberMe = searchParams.get("remember") === "1";
 
   if (!tokenHash) {
-    return NextResponse.redirect(`${origin}/member-login?error=auth_failed`);
+    return NextResponse.redirect(`${origin}${adminDestination ? "/admin-login" : "/member-login"}?error=auth_failed`);
   }
 
   const response = NextResponse.redirect(new URL(next, origin));
@@ -47,19 +48,21 @@ export async function GET(request: NextRequest) {
 
   const { data, error } = await supabase.auth.verifyOtp({ token_hash: tokenHash, type });
   if (!error && data.user) {
-    const memberCookieOptions = getMemberSessionCookieOptions(rememberMe);
-    response.cookies.set(
-      MEMBER_SESSION_COOKIE,
-      createMemberSessionToken(data.user.id, rememberMe),
-      memberCookieOptions,
-    );
-    response.cookies.set(
-      MEMBER_SESSION_POLICY_COOKIE,
-      MEMBER_SESSION_POLICY_VALUE,
-      memberCookieOptions,
-    );
+    if (!adminDestination) {
+      const memberCookieOptions = getMemberSessionCookieOptions(rememberMe);
+      response.cookies.set(
+        MEMBER_SESSION_COOKIE,
+        createMemberSessionToken(data.user.id, rememberMe),
+        memberCookieOptions,
+      );
+      response.cookies.set(
+        MEMBER_SESSION_POLICY_COOKIE,
+        MEMBER_SESSION_POLICY_VALUE,
+        memberCookieOptions,
+      );
+    }
     return response;
   }
 
-  return NextResponse.redirect(`${origin}/member-login?error=auth_failed`);
+  return NextResponse.redirect(`${origin}${adminDestination ? "/admin-login" : "/member-login"}?error=auth_failed`);
 }

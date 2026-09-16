@@ -52,6 +52,23 @@ test("the founder role migration targets one exact account and fails closed", ()
   assert.match(migration, /SET "role" = 'ADMIN'/);
 });
 
+test("admin access uses a distinct role-gated login instead of falling back to a member space", () => {
+  const auth = readFileSync(new URL("../src/server/auth.ts", import.meta.url), "utf8");
+  const adminLayout = readFileSync(new URL("../src/app/admin/layout.tsx", import.meta.url), "utf8");
+  const adminLogin = readFileSync(new URL("../src/app/api/auth/admin-login/route.ts", import.meta.url), "utf8");
+  const proxy = readFileSync(new URL("../src/proxy.ts", import.meta.url), "utf8");
+
+  assert.match(auth, /requireAdminPage/);
+  assert.match(auth, /redirect\("\/admin-login\?error=forbidden"\)/);
+  assert.match(adminLayout, /requireAdminPage\(\)/);
+  assert.match(adminLogin, /role: "ADMIN"/);
+  assert.match(adminLogin, /shouldCreateUser: false/);
+  assert.match(adminLogin, /enforceRateLimit\(request, "admin-login"/);
+  assert.match(adminLogin, /signOut\(\{ scope: "local" \}\)/);
+  assert.match(proxy, /"\/admin-login"/);
+  assert.match(proxy, /pathname === "\/admin" \|\| pathname\.startsWith\("\/admin\/"\)/);
+});
+
 test("member-only place data is enforced server-side", () => {
   const memberLayout = readFileSync(new URL("../src/app/member/layout.tsx", import.meta.url), "utf8");
   const memberNetwork = readFileSync(new URL("../src/app/api/member/camping-network/route.ts", import.meta.url), "utf8");

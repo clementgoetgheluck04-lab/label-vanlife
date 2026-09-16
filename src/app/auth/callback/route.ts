@@ -14,6 +14,7 @@ export async function GET(request: NextRequest) {
   const code = searchParams.get("code");
   const requestedNext = searchParams.get("next");
   const next = isSafeRedirectPath(requestedNext) ? requestedNext : "/member";
+  const adminDestination = next === "/admin" || next.startsWith("/admin/");
 
   if (code) {
     const response = NextResponse.redirect(new URL(next, origin));
@@ -38,20 +39,22 @@ export async function GET(request: NextRequest) {
 
     const { data, error } = await supabase.auth.exchangeCodeForSession(code);
     if (!error && data.user) {
-      const memberCookieOptions = getMemberSessionCookieOptions(false);
-      response.cookies.set(
-        MEMBER_SESSION_COOKIE,
-        createMemberSessionToken(data.user.id, false),
-        memberCookieOptions,
-      );
-      response.cookies.set(
-        MEMBER_SESSION_POLICY_COOKIE,
-        MEMBER_SESSION_POLICY_VALUE,
-        memberCookieOptions,
-      );
+      if (!adminDestination) {
+        const memberCookieOptions = getMemberSessionCookieOptions(false);
+        response.cookies.set(
+          MEMBER_SESSION_COOKIE,
+          createMemberSessionToken(data.user.id, false),
+          memberCookieOptions,
+        );
+        response.cookies.set(
+          MEMBER_SESSION_POLICY_COOKIE,
+          MEMBER_SESSION_POLICY_VALUE,
+          memberCookieOptions,
+        );
+      }
       return response;
     }
   }
 
-  return NextResponse.redirect(`${origin}/member-login?error=auth_failed`);
+  return NextResponse.redirect(`${origin}${adminDestination ? "/admin-login" : "/member-login"}?error=auth_failed`);
 }
