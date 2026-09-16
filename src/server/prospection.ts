@@ -694,10 +694,32 @@ export async function runProspectionBatch() {
   } catch {
     // A back-office digest must never block lawful prospect communication.
   }
+  const startOfUtcDay = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+  const alreadySentToday = await prisma.prospectMessage.count({
+    where: {
+      direction: "OUTBOUND",
+      status: "SENT",
+      kind: { not: "AUTO_REPLY" },
+      sentAt: { gte: startOfUtcDay },
+    },
+  });
+  const remainingDailyCapacity = Math.max(0, prospectingDailyLimit() - alreadySentToday);
+  if (remainingDailyCapacity === 0) {
+    return {
+      enabled: true,
+      imported,
+      researchRequested,
+      dailyLimitReached: true,
+      alreadySentToday,
+      sent: 0,
+      failed: 0,
+      skipped: 0,
+    };
+  }
   const prospects = await prisma.prospect.findMany({
     where: { status: { in: ACTIVE_STATUSES }, nextActionAt: { lte: now } },
     orderBy: [{ nextActionAt: "asc" }, { createdAt: "asc" }],
-    take: prospectingDailyLimit(),
+    take: remainingDailyCapacity,
   });
   let sent = 0;
   let failed = 0;

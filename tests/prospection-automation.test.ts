@@ -11,6 +11,10 @@ test("prospection is disabled unless explicitly enabled and caps daily volume", 
   assert.match(engine, /PROSPECTION_AUTOMATION_ENABLED === "true"/);
   assert.match(engine, /Math\.min\(Math\.max\(value, 1\), 25\)/);
   assert.match(engine, /parisWeekday === "Sat" \|\| parisWeekday === "Sun"/);
+  assert.match(engine, /alreadySentToday = await prisma\.prospectMessage\.count/);
+  assert.match(engine, /remainingDailyCapacity = Math\.max\(0, prospectingDailyLimit\(\) - alreadySentToday\)/);
+  assert.match(engine, /dailyLimitReached: true/);
+  assert.match(engine, /take: remainingDailyCapacity/);
 });
 
 test("missing camping contacts are escalated once in manageable research batches", () => {
