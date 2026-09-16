@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 import { getPrisma } from "@/lib/prisma";
 import { labelVanlifeEmail } from "@/server/email-template";
-import { getAppUrl, getTransactionalEmailFrom, requireSecretEnv, requireServerEnv } from "@/server/env";
+import { getAppUrl, getProspectionEmailFrom, requireSecretEnv, requireServerEnv } from "@/server/env";
 import { getProspectionReplyTo, normalizeProspectEmail, sendNeedHumanAlert, suppressProspect } from "@/server/prospection";
 
 export const dynamic = "force-dynamic";
@@ -112,7 +112,7 @@ async function sendSalesReply(prospect: { id: string; sourceId: string | null; n
   });
   const resend = new Resend(requireServerEnv("RESEND_API_KEY"));
   const result = await resend.emails.send({
-    from: getTransactionalEmailFrom(),
+    from: getProspectionEmailFrom(),
     to: prospect.email,
     replyTo: getProspectionReplyTo(),
     subject: replySubject,
@@ -133,6 +133,10 @@ async function sendSalesReply(prospect: { id: string; sourceId: string | null; n
       notice: "Une situation particulière ? Répondez simplement à ce message : Clément prendra le relais si une décision humaine est nécessaire.",
       signature: "Clément — Label Vanlife",
     }),
+    headers: {
+      "List-ID": "Prospection Label Vanlife <prospection.partenaires.labelvanlife.fr>",
+      "Feedback-ID": "prospection:auto-reply:labelvanlife:resend",
+    },
   }, { idempotencyKey: campaignKey });
   await prisma.prospectMessage.update({
     where: { id: message.id },

@@ -43,6 +43,13 @@ export function getTransactionalEmailFrom(): string {
   return "Label Vanlife <onboarding@resend.dev>";
 }
 
+export function getProspectionEmailFrom(): string {
+  const value = process.env.PROSPECTION_FROM_EMAIL;
+  if (value) return value;
+  if (process.env.NODE_ENV === "production") throw new ServerConfigurationError("PROSPECTION_FROM_EMAIL");
+  return getTransactionalEmailFrom();
+}
+
 export function getBackOfficeEmail(): string {
   return getBackOfficeEmails()[0] || CONTACT_EMAIL;
 }

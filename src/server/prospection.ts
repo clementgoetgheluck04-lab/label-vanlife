@@ -5,13 +5,17 @@ import { Prisma, type Prospect, type ProspectStatus } from "@/generated/prisma/c
 import { SPOTTED_PLACES } from "@/data/spotted-places";
 import { getPrisma } from "@/lib/prisma";
 import { labelVanlifeEmail } from "@/server/email-template";
-import { getAppUrl, getBackOfficeEmails, getTransactionalEmailFrom, requireServerEnv } from "@/server/env";
+import { getAppUrl, getBackOfficeEmails, getProspectionEmailFrom, getTransactionalEmailFrom, requireServerEnv } from "@/server/env";
 
 const DAY = 24 * 60 * 60 * 1_000;
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const ACTIVE_STATUSES: ProspectStatus[] = ["NEW", "CONTACTED", "FOLLOW_UP_1", "ENGAGED"];
 const MISSING_CONTACT_DIGEST_ACTION = "PROSPECTION_MISSING_CONTACTS_DIGEST";
 const MISSING_CONTACT_DIGEST_SIZE = 15;
+const DELIVERABILITY_ALERT_ACTION = "PROSPECTION_DELIVERABILITY_ALERT";
+const DELIVERABILITY_WINDOW_DAYS = 30;
+const MINIMUM_SAMPLE_FOR_BOUNCE_PAUSE = 100;
+const MAXIMUM_BOUNCE_RATE = 0.04;
 
 export type ProspectingStage =
   | "INITIAL"
@@ -530,7 +534,7 @@ async function sendOne(prospect: Prospect): Promise<"sent" | "skipped" | "failed
   let result;
   try {
     result = await resend.emails.send({
-      from: getTransactionalEmailFrom(),
+      from: getProspectionEmailFrom(),
       to: prospect.email,
       replyTo: getProspectionReplyTo(),
       subject: content.subject,
@@ -539,6 +543,8 @@ async function sendOne(prospect: Prospect): Promise<"sent" | "skipped" | "failed
       headers: {
         "List-Unsubscribe": `<${getAppUrl()}/api/prospection/unsubscribe?token=${encodeURIComponent(prospect.unsubscribeToken)}>`,
         "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+        "List-ID": "Prospection Label Vanlife <prospection.partenaires.labelvanlife.fr>",
+        "Feedback-ID": `prospection:${stage.toLowerCase()}:labelvanlife:resend`,
       },
       tags: [
         { name: "category", value: "prospection" },
@@ -609,6 +615,54 @@ async function sendOne(prospect: Prospect): Promise<"sent" | "skipped" | "failed
   return "sent";
 }
 
+async function deliverabilitySafetyCheck(): Promise<{
+  paused: boolean;
+  sent: number;
+  bounces: number;
+  complaints: number;
+  bounceRate: number;
+}> {
+  const prisma = getPrisma();
+  const since = new Date(Date.now() - DELIVERABILITY_WINDOW_DAYS * DAY);
+  const [sent, bounces, complaints] = await Promise.all([
+    prisma.prospectMessage.count({
+      where: {
+        direction: "OUTBOUND",
+        status: "SENT",
+        kind: { not: "AUTO_REPLY" },
+        sentAt: { gte: since },
+      },
+    }),
+    prisma.prospectSuppression.count({ where: { reason: "bounce", createdAt: { gte: since } } }),
+    prisma.prospectSuppression.count({ where: { reason: "complaint", createdAt: { gte: since } } }),
+  ]);
+  const bounceRate = sent > 0 ? bounces / sent : 0;
+  const paused = complaints > 0 || (sent >= MINIMUM_SAMPLE_FOR_BOUNCE_PAUSE && bounceRate >= MAXIMUM_BOUNCE_RATE);
+  return { paused, sent, bounces, complaints, bounceRate };
+}
+
+async function alertDeliverabilityPause(metrics: Awaited<ReturnType<typeof deliverabilitySafetyCheck>>): Promise<void> {
+  const prisma = getPrisma();
+  const day = new Date().toISOString().slice(0, 10);
+  const existing = await prisma.adminLog.findFirst({
+    where: { adminId: "system:prospection", action: DELIVERABILITY_ALERT_ACTION, target: day },
+    select: { id: true },
+  });
+  if (existing) return;
+  await sendNeedHumanAlert(
+    "Prospection suspendue pour protéger la délivrabilité",
+    `Les envois du jour ont été suspendus automatiquement. Sur les ${DELIVERABILITY_WINDOW_DAYS} derniers jours : ${metrics.sent} messages, ${metrics.bounces} rebond(s), ${metrics.complaints} plainte(s), taux de rebond ${(metrics.bounceRate * 100).toFixed(1)} %. Vérifiez les adresses et les métriques Resend avant de reprendre.`,
+  );
+  await prisma.adminLog.create({
+    data: {
+      adminId: "system:prospection",
+      action: DELIVERABILITY_ALERT_ACTION,
+      target: day,
+      metadata: metrics,
+    },
+  });
+}
+
 export async function runProspectionBatch() {
   const imported = await syncSpottedProspects();
   if (!isProspectingEnabled()) return { enabled: false, imported, researchRequested: 0, sent: 0, failed: 0, skipped: 0 };
@@ -616,6 +670,21 @@ export async function runProspectionBatch() {
   const parisWeekday = new Intl.DateTimeFormat("en-US", { timeZone: "Europe/Paris", weekday: "short" }).format(now);
   if (parisWeekday === "Sat" || parisWeekday === "Sun") {
     return { enabled: true, weekend: true, imported, researchRequested: 0, sent: 0, failed: 0, skipped: 0 };
+  }
+
+  const deliverability = await deliverabilitySafetyCheck();
+  if (deliverability.paused) {
+    await alertDeliverabilityPause(deliverability);
+    return {
+      enabled: true,
+      safetyPaused: true,
+      imported,
+      researchRequested: 0,
+      sent: 0,
+      failed: 0,
+      skipped: 0,
+      deliverability,
+    };
   }
 
   const prisma = getPrisma();

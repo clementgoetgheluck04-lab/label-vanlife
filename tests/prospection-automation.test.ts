@@ -45,8 +45,20 @@ test("silent prospects stop after message three and opposition controls remain a
   assert.match(engine, /stage === "FOLLOW_UP_1"[\s\S]+"FOLLOW_UP_2"/);
   assert.match(engine, /List-Unsubscribe/);
   assert.match(engine, /List-Unsubscribe-Post/);
+  assert.match(engine, /getProspectionEmailFrom/);
+  assert.match(engine, /List-ID/);
+  assert.match(engine, /Feedback-ID/);
   assert.match(engine, /prospectSuppression/);
   assert.match(engine, /idempotencyKey: campaignKey/);
+});
+
+test("deliverability guard pauses on complaints or a sustained high bounce rate", () => {
+  const engine = source("../src/server/prospection.ts");
+  assert.match(engine, /MINIMUM_SAMPLE_FOR_BOUNCE_PAUSE = 100/);
+  assert.match(engine, /MAXIMUM_BOUNCE_RATE = 0\.04/);
+  assert.match(engine, /complaints > 0 \|\| \(sent >= MINIMUM_SAMPLE_FOR_BOUNCE_PAUSE/);
+  assert.match(engine, /PROSPECTION_DELIVERABILITY_ALERT/);
+  assert.match(engine, /safetyPaused: true/);
 });
 
 test("first contact is designed for decision makers and measures two variants", () => {
