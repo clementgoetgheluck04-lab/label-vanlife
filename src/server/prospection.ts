@@ -10,6 +10,8 @@ import { getAppUrl, getBackOfficeEmails, getTransactionalEmailFrom, requireServe
 const DAY = 24 * 60 * 60 * 1_000;
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const ACTIVE_STATUSES: ProspectStatus[] = ["NEW", "CONTACTED", "FOLLOW_UP_1", "ENGAGED"];
+const MISSING_CONTACT_DIGEST_ACTION = "PROSPECTION_MISSING_CONTACTS_DIGEST";
+const MISSING_CONTACT_DIGEST_SIZE = 15;
 
 export type ProspectingStage =
   | "INITIAL"
@@ -312,10 +314,40 @@ export async function syncSpottedProspects(): Promise<number> {
     unique.set(email, place);
   }
 
-  const existing = await prisma.prospect.findMany({ select: { email: true } });
+  const existing = await prisma.prospect.findMany({
+    select: {
+      id: true,
+      sourceId: true,
+      email: true,
+      status: true,
+      followUpCount: true,
+      firstContactedAt: true,
+    },
+  });
   const known = new Set(existing.map((item) => item.email));
+  const bySourceId = new Map(existing.flatMap((item) => item.sourceId ? [[item.sourceId, item] as const] : []));
+  const suppressed = new Set((await prisma.prospectSuppression.findMany({
+    where: { email: { in: [...unique.keys()] } },
+    select: { email: true },
+  })).map((item) => item.email));
+
+  const updates = [...unique.entries()].flatMap(([email, place]) => {
+    const current = bySourceId.get(place.id);
+    if (
+      !current
+      || current.email === email
+      || current.status !== "NEW"
+      || current.followUpCount !== 0
+      || current.firstContactedAt
+      || known.has(email)
+      || suppressed.has(email)
+    ) return [];
+    known.add(email);
+    return [{ id: current.id, email, place }];
+  });
+
   const rows = [...unique.entries()]
-    .filter(([email]) => !known.has(email))
+    .filter(([email, place]) => !known.has(email) && !bySourceId.has(place.id) && !suppressed.has(email))
     .map(([email, place]) => ({
       sourceId: place.id,
       name: place.name.slice(0, 180),
@@ -329,9 +361,87 @@ export async function syncSpottedProspects(): Promise<number> {
       nextActionAt: new Date(),
       metadata: { network: place.network, postalCode: place.postalCode },
     }));
-  if (!rows.length) return 0;
-  const result = await prisma.prospect.createMany({ data: rows, skipDuplicates: true });
-  return result.count;
+  if (!rows.length && !updates.length) return 0;
+  const operations = updates.map(({ id, email, place }) => prisma.prospect.update({
+    where: { id },
+    data: {
+      email,
+      name: place.name.slice(0, 180),
+      contactName: cleanName(place.contactName),
+      website: place.website,
+      city: place.city || null,
+      region: place.region || null,
+      sourceLabel: place.source || "Repérage Label Vanlife",
+      sourceUrl: place.website,
+    },
+  }));
+  const result = rows.length
+    ? await prisma.$transaction([...operations, prisma.prospect.createMany({ data: rows, skipDuplicates: true })])
+    : await prisma.$transaction(operations);
+  const created = rows.length ? (result.at(-1) as { count: number }).count : 0;
+  return updates.length + created;
+}
+
+function missingContactKey(place: (typeof SPOTTED_PLACES)[number]): string {
+  try {
+    const hostname = new URL(place.website || "").hostname.toLowerCase().replace(/^www\./, "");
+    if (hostname && !/bienvenue-a-la-ferme\.com|facebook\.com/.test(hostname)) return `host:${hostname}`;
+  } catch {
+    // Fall back to the establishment identity below.
+  }
+  const identity = `${place.name}|${place.city}`
+    .normalize("NFD")
+    .replace(/\p{Diacritic}/gu, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-");
+  return `place:${identity}`;
+}
+
+export async function sendMissingProspectContactDigest(): Promise<number> {
+  const prisma = getPrisma();
+  const previousDigests = await prisma.adminLog.findMany({
+    where: { adminId: "system:prospection", action: MISSING_CONTACT_DIGEST_ACTION },
+    select: { metadata: true },
+  });
+  const alreadyNotified = new Set(previousDigests.flatMap((entry) => {
+    if (!entry.metadata || typeof entry.metadata !== "object" || Array.isArray(entry.metadata)) return [];
+    const sourceIds = (entry.metadata as Record<string, unknown>).sourceIds;
+    return Array.isArray(sourceIds) ? sourceIds.filter((value): value is string => typeof value === "string") : [];
+  }));
+
+  const unique = new Map<string, (typeof SPOTTED_PLACES)[number]>();
+  for (const place of SPOTTED_PLACES) {
+    const email = normalizeProspectEmail(place.emails?.[0] || "");
+    const value = `${place.name} ${place.network}`
+      .normalize("NFD")
+      .replace(/\p{Diacritic}/gu, "")
+      .toLowerCase();
+    if (EMAIL_PATTERN.test(email) || !/camping|camp |caravan|bivouac|aire naturelle|glamping/.test(value)) continue;
+    if (/^https?:\/\//i.test(place.name) || alreadyNotified.has(place.id)) continue;
+    const key = missingContactKey(place);
+    if (!unique.has(key)) unique.set(key, place);
+  }
+
+  const batch = [...unique.values()].slice(0, MISSING_CONTACT_DIGEST_SIZE);
+  if (!batch.length) return 0;
+  const details = [
+    "Je n’ai pas trouvé d’adresse email professionnelle fiable pour les campings ci-dessous. Pouvez-vous rechercher leurs coordonnées et répondre à ce message avec les adresses trouvées ?",
+    "",
+    ...batch.flatMap((place, index) => [
+      `${index + 1}. ${place.name}${place.city ? ` — ${place.city}` : ""}${place.website ? `\n${place.website}` : ""}`,
+      "",
+    ]),
+  ].join("\n");
+  await sendNeedHumanAlert(`${batch.length} campings sans adresse email`, details);
+  await prisma.adminLog.create({
+    data: {
+      adminId: "system:prospection",
+      action: MISSING_CONTACT_DIGEST_ACTION,
+      target: batch.map((place) => place.id).join(",").slice(0, 2_000),
+      metadata: { sourceIds: batch.map((place) => place.id) },
+    },
+  });
+  return batch.length;
 }
 
 export async function suppressProspect(email: string, reason: string, source: string): Promise<void> {
@@ -471,14 +581,20 @@ async function sendOne(prospect: Prospect): Promise<"sent" | "skipped" | "failed
 
 export async function runProspectionBatch() {
   const imported = await syncSpottedProspects();
-  if (!isProspectingEnabled()) return { enabled: false, imported, sent: 0, failed: 0, skipped: 0 };
+  if (!isProspectingEnabled()) return { enabled: false, imported, researchRequested: 0, sent: 0, failed: 0, skipped: 0 };
   const now = new Date();
   const parisWeekday = new Intl.DateTimeFormat("en-US", { timeZone: "Europe/Paris", weekday: "short" }).format(now);
   if (parisWeekday === "Sat" || parisWeekday === "Sun") {
-    return { enabled: true, weekend: true, imported, sent: 0, failed: 0, skipped: 0 };
+    return { enabled: true, weekend: true, imported, researchRequested: 0, sent: 0, failed: 0, skipped: 0 };
   }
 
   const prisma = getPrisma();
+  let researchRequested = 0;
+  try {
+    researchRequested = await sendMissingProspectContactDigest();
+  } catch {
+    // A back-office digest must never block lawful prospect communication.
+  }
   const prospects = await prisma.prospect.findMany({
     where: { status: { in: ACTIVE_STATUSES }, nextActionAt: { lte: now } },
     orderBy: [{ nextActionAt: "asc" }, { createdAt: "asc" }],
@@ -497,12 +613,12 @@ export async function runProspectionBatch() {
   if (failed > 0) {
     await sendNeedHumanAlert("La prospection automatique a rencontré des erreurs", `${failed} message(s) n’ont pas pu être envoyés. Consultez le tableau de bord avant de relancer.`);
   }
-  return { enabled: true, imported, selected: prospects.length, sent, failed, skipped };
+  return { enabled: true, imported, researchRequested, selected: prospects.length, sent, failed, skipped };
 }
 
 export async function sendNeedHumanAlert(subject: string, details: string): Promise<void> {
   const resend = new Resend(requireServerEnv("RESEND_API_KEY"));
-  await resend.emails.send({
+  const result = await resend.emails.send({
     from: getTransactionalEmailFrom(),
     to: getBackOfficeEmails(),
     subject: `[ACTION REQUISE] ${subject}`,
@@ -511,9 +627,12 @@ export async function sendNeedHumanAlert(subject: string, details: string): Prom
       preheader: "Une décision humaine est nécessaire dans la prospection Label Vanlife",
       eyebrow: "ACTION REQUISE",
       title: subject,
-      paragraphs: [details],
+      paragraphs: details.split(/\n{2,}/).map((paragraph) => paragraph.trim()).filter(Boolean),
       action: { label: "Ouvrir le tableau de bord", href: `${getAppUrl()}/admin/prospection` },
       notice: "Aucun message automatique supplémentaire n’est envoyé au prospect tant que sa situation n’est pas traitée.",
     }),
   });
+  if (result.error || !result.data?.id) {
+    throw new Error(result.error?.message || result.error?.name || "Échec de l’alerte back-office");
+  }
 }

@@ -13,6 +13,30 @@ test("prospection is disabled unless explicitly enabled and caps daily volume", 
   assert.match(engine, /parisWeekday === "Sat" \|\| parisWeekday === "Sun"/);
 });
 
+test("missing camping contacts are escalated once in manageable research batches", () => {
+  const engine = source("../src/server/prospection.ts");
+  const places = JSON.parse(source("../src/data/member-camping-network.json")) as Array<{
+    id: string;
+    emails?: string[];
+  }>;
+  const goutilier = places.find((place) => place.id === "bienvenue-ferme-camping-le-goutilier");
+
+  assert.equal(goutilier?.emails?.[0], "dufraisse.m@wanadoo.fr");
+  assert.match(engine, /MISSING_CONTACT_DIGEST_SIZE = 15/);
+  assert.match(engine, /PROSPECTION_MISSING_CONTACTS_DIGEST/);
+  assert.match(engine, /alreadyNotified\.has\(place\.id\)/);
+  assert.match(engine, /sendNeedHumanAlert\(`\$\{batch\.length\} campings sans adresse email`/);
+  assert.match(engine, /researchRequested = await sendMissingProspectContactDigest\(\)/);
+});
+
+test("a newly verified email only replaces an untouched prospect contact", () => {
+  const engine = source("../src/server/prospection.ts");
+  assert.match(engine, /current\.status !== "NEW"/);
+  assert.match(engine, /current\.followUpCount !== 0/);
+  assert.match(engine, /current\.firstContactedAt/);
+  assert.match(engine, /suppressed\.has\(email\)/);
+});
+
 test("silent prospects stop after message three and opposition controls remain available", () => {
   const engine = source("../src/server/prospection.ts");
   assert.match(engine, /ACTIVE_STATUSES[^\n]+"NEW", "CONTACTED", "FOLLOW_UP_1", "ENGAGED"/);
