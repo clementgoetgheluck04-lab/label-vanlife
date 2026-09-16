@@ -1,6 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { isSafeRedirectPath } from "@/lib/urls";
+import {
+  createMemberSessionToken,
+  getMemberSessionCookieOptions,
+  MEMBER_SESSION_COOKIE,
+  MEMBER_SESSION_POLICY_COOKIE,
+  MEMBER_SESSION_POLICY_VALUE,
+} from "@/lib/member-session";
 
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url);
@@ -18,16 +25,32 @@ export async function GET(request: NextRequest) {
           getAll() { return request.cookies.getAll(); },
           setAll(cookiesToSet) {
             cookiesToSet.forEach(({ name, value, options }) => {
+              const sessionOptions = { ...options };
+              delete sessionOptions.maxAge;
+              delete sessionOptions.expires;
               request.cookies.set(name, value);
-              response.cookies.set(name, value, options);
+              response.cookies.set(name, value, sessionOptions);
             });
           },
         },
       },
     );
 
-    const { error } = await supabase.auth.exchangeCodeForSession(code);
-    if (!error) return response;
+    const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+    if (!error && data.user) {
+      const memberCookieOptions = getMemberSessionCookieOptions(false);
+      response.cookies.set(
+        MEMBER_SESSION_COOKIE,
+        createMemberSessionToken(data.user.id, false),
+        memberCookieOptions,
+      );
+      response.cookies.set(
+        MEMBER_SESSION_POLICY_COOKIE,
+        MEMBER_SESSION_POLICY_VALUE,
+        memberCookieOptions,
+      );
+      return response;
+    }
   }
 
   return NextResponse.redirect(`${origin}/member-login?error=auth_failed`);

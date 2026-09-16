@@ -6,6 +6,11 @@ import { createClient } from "@/lib/supabase/server";
 import { getPrisma } from "@/lib/prisma";
 import { cookies } from "next/headers";
 import { ADMIN_PREVIEW_COOKIE, isAdminPreviewCookie } from "@/server/admin-preview";
+import {
+  getMemberSessionState,
+  MEMBER_SESSION_COOKIE,
+  MEMBER_SESSION_POLICY_COOKIE,
+} from "@/lib/member-session";
 
 export class AuthenticationError extends Error {
   constructor() {
@@ -49,10 +54,17 @@ export async function requireActiveMember(): Promise<User | null> {
   const store = await cookies();
   if (isAdminPreviewCookie(store.get(ADMIN_PREVIEW_COOKIE)?.value)) return null;
   const user = await requirePageUser();
-  const membership = await getPrisma().membership.findUnique({ where: { userId: user.id } });
+  const prisma = getPrisma();
+  const membership = await prisma.membership.findUnique({ where: { userId: user.id } });
   const active = membership?.status === "ACTIVE"
     && (!membership.expiresAt || membership.expiresAt > new Date());
   if (!active) redirect("/devenir-membre");
+  const sessionState = getMemberSessionState(
+    store.get(MEMBER_SESSION_COOKIE)?.value,
+    store.get(MEMBER_SESSION_POLICY_COOKIE)?.value,
+    user.id,
+  );
+  if (sessionState.kind === "expired") redirect("/auth/session-expired");
   return user;
 }
 
@@ -71,11 +83,14 @@ export async function getOptionalActiveMember(): Promise<User | null> {
   const { data, error } = await supabase.auth.getUser();
   if (error || !data.user) return null;
 
-  const membership = await getPrisma().membership.findUnique({
-    where: { userId: data.user.id },
-    select: { status: true, expiresAt: true },
-  });
+  const sessionState = getMemberSessionState(
+    store.get(MEMBER_SESSION_COOKIE)?.value,
+    store.get(MEMBER_SESSION_POLICY_COOKIE)?.value,
+    data.user.id,
+  );
+  if (sessionState.kind === "expired") return null;
 
+  const membership = await getPrisma().membership.findUnique({ where: { userId: data.user.id } });
   const active = membership?.status === "ACTIVE"
     && (!membership.expiresAt || membership.expiresAt > new Date());
   return active ? data.user : null;

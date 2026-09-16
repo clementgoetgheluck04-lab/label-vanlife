@@ -3,6 +3,13 @@ import { existsSync, readFileSync } from "node:fs";
 import test from "node:test";
 import { isSafeRedirectPath } from "../src/lib/urls.ts";
 import { serializeJsonLd } from "../src/lib/seo/json-ld.ts";
+import {
+  createMemberSessionToken,
+  getMemberSessionCookieOptions,
+  getMemberSessionState,
+  MEMBER_IDLE_TIMEOUT_MS,
+  MEMBER_SESSION_POLICY_VALUE,
+} from "../src/lib/member-session.ts";
 
 test("redirects stay on the application origin", () => {
   assert.equal(isSafeRedirectPath("/member"), true);
@@ -63,10 +70,55 @@ test("member-only place data is enforced server-side", () => {
 
 test("the navigation reflects an authenticated session and hides the purchase CTA", () => {
   const navbar = readFileSync(new URL("../src/components/Navbar.tsx", import.meta.url), "utf8");
+  const status = readFileSync(new URL("../src/app/api/auth/status/route.ts", import.meta.url), "utf8");
   assert.match(navbar, /\/api\/auth\/status/);
   assert.match(navbar, /Vous êtes connecté/);
+  assert.match(navbar, /status\.memberActive/);
+  assert.match(navbar, /Se déconnecter/);
   assert.match(navbar, /authenticated === true/);
   assert.match(navbar, /authenticated === false/);
+  assert.match(status, /getMemberSessionState/);
+  assert.match(status, /supabase\.auth\.signOut/);
+});
+
+test("member sessions are optional, revocable and expire after ten inactive days", () => {
+  const login = readFileSync(new URL("../src/app/member-login/LoginContent.tsx", import.meta.url), "utf8");
+  const verify = readFileSync(new URL("../src/app/api/auth/verify-member-code/route.ts", import.meta.url), "utf8");
+  const confirm = readFileSync(new URL("../src/app/auth/confirm/route.ts", import.meta.url), "utf8");
+  const auth = readFileSync(new URL("../src/server/auth.ts", import.meta.url), "utf8");
+  const proxy = readFileSync(new URL("../src/proxy.ts", import.meta.url), "utf8");
+  const logout = readFileSync(new URL("../src/app/auth/logout/route.ts", import.meta.url), "utf8");
+
+  assert.match(login, /Rester connecté sur cet appareil/);
+  assert.match(login, /rememberMe/);
+  assert.match(verify, /remember=\$\{rememberMe \? "1" : "0"\}/);
+  assert.match(confirm, /rememberMe \? options : sessionOptions/);
+  assert.match(confirm, /createMemberSessionToken/);
+  assert.match(auth, /getMemberSessionState/);
+  assert.match(auth, /\/auth\/session-expired/);
+  assert.match(proxy, /createMemberSessionToken/);
+  assert.match(logout, /MEMBER_SESSION_COOKIE/);
+
+  const now = Date.UTC(2026, 8, 16);
+  const secret = "member-session-test-secret-that-is-long-enough";
+  const token = createMemberSessionToken("member-1", true, now, secret);
+  const active = getMemberSessionState(
+    token,
+    MEMBER_SESSION_POLICY_VALUE,
+    "member-1",
+    now + MEMBER_IDLE_TIMEOUT_MS - 1,
+    secret,
+  );
+  assert.equal(active.kind, "active");
+  assert.equal(active.kind === "active" && active.payload.rememberMe, true);
+  assert.equal(
+    getMemberSessionState(token, MEMBER_SESSION_POLICY_VALUE, "member-1", now + MEMBER_IDLE_TIMEOUT_MS, secret).kind,
+    "expired",
+  );
+  assert.equal(getMemberSessionState(token, MEMBER_SESSION_POLICY_VALUE, "another-member", now, secret).kind, "expired");
+  assert.equal(getMemberSessionState(undefined, undefined, "member-1", now, secret).kind, "legacy");
+  assert.equal("maxAge" in getMemberSessionCookieOptions(false), false);
+  assert.equal("maxAge" in getMemberSessionCookieOptions(true), true);
 });
 
 test("the downloadable member card replaces the personal QR without exposing contact data publicly", () => {

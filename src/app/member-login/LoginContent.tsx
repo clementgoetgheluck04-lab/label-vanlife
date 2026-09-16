@@ -11,6 +11,7 @@ export function LoginContent() {
   const searchParams = useSearchParams();
   const isRegister = searchParams.get("mode") === "register";
   const hasAuthFailed = searchParams.get("error") === "auth_failed";
+  const idleSessionExpired = searchParams.get("expired") === "idle";
   const [email, setEmail] = useState("");
   const [confirmationEmail, setConfirmationEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -25,6 +26,7 @@ export function LoginContent() {
   const [age, setAge] = useState("");
   const [companions, setCompanions] = useState<Array<{ firstName: string; lastName: string; age: string }>>([]);
   const [accessCode, setAccessCode] = useState("");
+  const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -136,7 +138,7 @@ export function LoginContent() {
       const response = await fetch("/api/auth/verify-member-code", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ code: accessCode }),
+        body: JSON.stringify({ code: accessCode, rememberMe }),
       });
       const result = await response.json();
       if (!response.ok || !result.url) throw new Error(result.error || "Code invalide");
@@ -228,6 +230,13 @@ export function LoginContent() {
             </div>
           )}
 
+          {idleSessionExpired && !isRegister ? (
+            <div className="flex gap-3 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-left">
+              <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-amber-700" />
+              <div><p className="text-sm font-bold text-amber-950">Session fermée automatiquement</p><p className="mt-1 text-xs leading-relaxed text-amber-900/80">Votre espace n’a pas été consulté depuis 10 jours. Reconnectez-vous avec votre code membre.</p></div>
+            </div>
+          ) : null}
+
           <form onSubmit={handleSubmit} className="space-y-4">
             {isRegister ? (
               <>
@@ -304,6 +313,7 @@ export function LoginContent() {
                 </label>
               </>
             ) : (
+              <>
               <label className="space-y-2 text-sm font-medium text-neutral-600">
                 <span>Code d’accès</span>
                 <span className="relative block">
@@ -320,6 +330,11 @@ export function LoginContent() {
                   />
                 </span>
               </label>
+              <label className="flex cursor-pointer items-start gap-3 rounded-2xl border border-neutral-200 bg-neutral-50 p-4 text-left">
+                <input type="checkbox" checked={rememberMe} onChange={(event) => setRememberMe(event.target.checked)} className="mt-0.5 h-5 w-5 rounded border-neutral-300 text-emerald-700 focus:ring-emerald-600" />
+                <span><span className="block text-sm font-semibold text-neutral-800">Rester connecté sur cet appareil</span><span className="mt-1 block text-xs leading-relaxed text-neutral-500">À utiliser uniquement sur votre appareil personnel. La session sera fermée après 10 jours sans visite de l’espace membre.</span></span>
+              </label>
+              </>
             )}
 
             {error && (

@@ -3,6 +3,11 @@ import { createServerClient } from "@supabase/ssr";
 import { ADMIN_PREVIEW_COOKIE } from "@/server/admin-preview";
 import { apiError } from "@/server/http";
 import { assertSameOrigin } from "@/server/request-security";
+import {
+  getClearedMemberSessionCookieOptions,
+  MEMBER_SESSION_COOKIE,
+  MEMBER_SESSION_POLICY_COOKIE,
+} from "@/lib/member-session";
 
 export async function POST(request: NextRequest) {
   try {
@@ -32,6 +37,9 @@ export async function POST(request: NextRequest) {
       path: "/",
       maxAge: 0,
     });
+    const clearedMemberCookieOptions = getClearedMemberSessionCookieOptions();
+    response.cookies.set(MEMBER_SESSION_COOKIE, "", clearedMemberCookieOptions);
+    response.cookies.set(MEMBER_SESSION_POLICY_COOKIE, "", clearedMemberCookieOptions);
     response.headers.set("Cache-Control", "private, no-store, max-age=0");
     response.headers.set("Clear-Site-Data", '"cache", "cookies"');
     return response;

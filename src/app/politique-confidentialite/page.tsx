@@ -65,6 +65,7 @@ export default function PolitiqueConfidentialitePage() {
         <section id="cookies" className={`${sectionClass} scroll-mt-28`}>
           <h2 className={titleClass}>Cookies et stockage local</h2>
           <p className={textClass}>Les traceurs indispensables servent à sécuriser la connexion, maintenir une session et mémoriser votre choix de confidentialité. Ils ne peuvent pas être désactivés depuis le bandeau lorsque le service demandé en dépend.</p>
+          <p className={textClass}>Sans l’option « Rester connecté », la connexion membre prend fin à la fermeture du navigateur. Avec cette option, elle peut persister sur l’appareil personnel, mais elle est automatiquement fermée après 10 jours sans consultation de l’espace membre. Une déconnexion manuelle reste disponible à tout moment.</p>
           <p className={textClass}>Les statistiques internes sont facultatives. Elles utilisent un identifiant aléatoire dans le stockage local et un identifiant de session, sans publicité ni suivi entre différents sites. Elles ne démarrent qu’après votre accord et respectent le signal « Do Not Track » de votre navigateur.</p>
           <p className={textClass}>Vous pouvez refuser dès le premier affichage et rouvrir à tout moment le panneau « Gérer mes cookies » présent en bas de chaque page. Le refus n’empêche ni la consultation du site, ni l’achat, ni l’accès membre.</p>
         </section>

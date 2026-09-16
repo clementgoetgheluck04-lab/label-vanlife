@@ -16,6 +16,7 @@ export async function POST(request: NextRequest) {
     enforceRateLimit(request, "member-access-code", 8, 15 * 60 * 1_000);
     const body = await readJsonRequest(request, 4_096) as Record<string, unknown>;
     const rawCode = typeof body.code === "string" ? body.code : "";
+    const rememberMe = body.rememberMe === true;
     const requestHost = (request.headers.get("host") || "").split(":")[0];
     const localAdminPreview = isLocalPreviewHost(request.nextUrl.hostname) || isLocalPreviewHost(requestHost);
     const validAdminPreviewCode = localAdminPreview && adminPreviewCodeMatches(rawCode);
@@ -85,7 +86,7 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    return NextResponse.json({ url: `/auth/confirm?token_hash=${encodeURIComponent(tokenHash)}&type=magiclink&next=/member` }, { headers: { "Cache-Control": "no-store" } });
+    return NextResponse.json({ url: `/auth/confirm?token_hash=${encodeURIComponent(tokenHash)}&type=magiclink&next=/member&remember=${rememberMe ? "1" : "0"}` }, { headers: { "Cache-Control": "no-store" } });
   } catch (error) {
     if (error instanceof SyntaxError) return NextResponse.json({ error: "Données invalides" }, { status: 400 });
     return apiError(error, "verify-member-code");

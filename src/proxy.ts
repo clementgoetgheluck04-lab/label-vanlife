@@ -2,6 +2,14 @@ import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { ADMIN_PREVIEW_COOKIE, isAdminPreviewCookie } from "@/server/admin-preview";
 import { KIT_ACCESS_COOKIE, hasValidKitAccess } from "@/lib/kit-access-token";
+import {
+  createMemberSessionToken,
+  getMemberSessionCookieOptions,
+  getMemberSessionState,
+  MEMBER_SESSION_COOKIE,
+  MEMBER_SESSION_POLICY_COOKIE,
+  MEMBER_SESSION_POLICY_VALUE,
+} from "@/lib/member-session";
 
 const PUBLIC_ROUTES = [
   "/", "/explorer", "/le-label", "/labellisation", "/devenir-membre",
@@ -123,11 +131,40 @@ export async function proxy(request: NextRequest) {
 
   const { data: { user } } = await supabase.auth.getUser();
   const protectedWithoutPreview = pathname.startsWith("/admin") || pathname.startsWith("/pro");
-  const memberWithoutAccess = pathname.startsWith("/member") && !adminPreview;
+  const memberPath = pathname === "/member" || pathname.startsWith("/member/");
+  const memberWithoutAccess = memberPath && !adminPreview;
   if (!user && (protectedWithoutPreview || memberWithoutAccess)) {
     const loginUrl = new URL("/member-login", request.url);
     loginUrl.searchParams.set("redirect", pathname);
     return withDeploymentHeaders(NextResponse.redirect(loginUrl), request, contentSecurityPolicy);
+  }
+
+  if (user && memberWithoutAccess) {
+    const sessionState = getMemberSessionState(
+      request.cookies.get(MEMBER_SESSION_COOKIE)?.value,
+      request.cookies.get(MEMBER_SESSION_POLICY_COOKIE)?.value,
+      user.id,
+    );
+    if (sessionState.kind === "expired") {
+      return withDeploymentHeaders(
+        NextResponse.redirect(new URL("/auth/session-expired", request.url)),
+        request,
+        contentSecurityPolicy,
+      );
+    }
+
+    const rememberMe = sessionState.kind === "active" && sessionState.payload.rememberMe;
+    const memberCookieOptions = getMemberSessionCookieOptions(rememberMe);
+    response.cookies.set(
+      MEMBER_SESSION_COOKIE,
+      createMemberSessionToken(user.id, rememberMe),
+      memberCookieOptions,
+    );
+    response.cookies.set(
+      MEMBER_SESSION_POLICY_COOKIE,
+      MEMBER_SESSION_POLICY_VALUE,
+      memberCookieOptions,
+    );
   }
 
   return withDeploymentHeaders(response, request, contentSecurityPolicy);
