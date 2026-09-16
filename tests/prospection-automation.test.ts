@@ -24,8 +24,10 @@ test("missing camping contacts are escalated once in manageable research batches
     emails?: string[];
   }>;
   const goutilier = places.find((place) => place.id === "bienvenue-ferme-camping-le-goutilier");
+  const labau = places.find((place) => place.id === "bienvenue-ferme-camping-a-la-ferme-labau");
 
   assert.equal(goutilier?.emails?.[0], "dufraisse.m@wanadoo.fr");
+  assert.equal(labau?.emails?.[0], "guydelrieu@dartybox.com");
   assert.match(engine, /MISSING_CONTACT_DIGEST_SIZE = 15/);
   assert.match(engine, /PROSPECTION_MISSING_CONTACTS_DIGEST/);
   assert.match(engine, /alreadyNotified\.has\(place\.id\)/);

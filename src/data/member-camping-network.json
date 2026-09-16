@@ -643,12 +643,14 @@
     "lng": 2.379535,
     "website": "http://campingdelabau.free.fr",
     "description": "Camping à la Ferme aménagé sur un domaine en bord de rivière: le Lauquet. De là vous pourrez partir en randonnées ou bien visiter l'arrière pays audois. Camping à la ferme de 6 emplacements sur une exploitation céréalière en Agriculture Biologique située en moyenne montagne au bord du ruisseau du Lauquet. Productions de la ferme : Ferme céréalière.",
-    "contactName": "Guy DELRIEU",
+    "contactName": "M. et Mme Guy DELRIEU",
     "phones": [
       "04 68 69 44 63",
       "07 80 47 99 87"
     ],
-    "emails": [],
+    "emails": [
+      "guydelrieu@dartybox.com"
+    ],
     "images": [
       "https://api.bienvenue-a-la-ferme.com/media/cache/small_wide/6808a/6808a9f623358349868346.jpg",
       "https://api.bienvenue-a-la-ferme.com/media/cache/small_wide/6808a/6808a9f62361b876444713.jpg",
