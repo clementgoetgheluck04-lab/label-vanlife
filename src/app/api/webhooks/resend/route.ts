@@ -48,7 +48,16 @@ async function handleDeliveryEvent(event: ResendEvent): Promise<void> {
     include: { prospect: true },
   });
   if (!message) return;
-  if (event.type === "email.bounced" || event.type === "email.suppressed") await suppressProspect(message.prospect.email, "bounce", "resend-webhook");
+  if (event.type === "email.bounced" || event.type === "email.suppressed") {
+    const firstInvalidation = message.prospect.status !== "INVALID";
+    await suppressProspect(message.prospect.email, "bounce", "resend-webhook");
+    if (firstInvalidation) {
+      await sendNeedHumanAlert(
+        `Adresse invalide pour ${message.prospect.name}`,
+        `L’adresse ${message.prospect.email} a rejeté notre message. Recherchez si possible une nouvelle adresse professionnelle pour ${message.prospect.name}${message.prospect.website ? ` : ${message.prospect.website}` : "."}`,
+      );
+    }
+  }
   if (event.type === "email.complained") await suppressProspect(message.prospect.email, "complaint", "resend-webhook");
 }
 

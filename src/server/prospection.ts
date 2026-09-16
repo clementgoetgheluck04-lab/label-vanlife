@@ -1,7 +1,7 @@
 import "server-only";
 
 import { Resend } from "resend";
-import type { Prospect, ProspectStatus } from "@/generated/prisma/client";
+import { Prisma, type Prospect, type ProspectStatus } from "@/generated/prisma/client";
 import { SPOTTED_PLACES } from "@/data/spotted-places";
 import { getPrisma } from "@/lib/prisma";
 import { labelVanlifeEmail } from "@/server/email-template";
@@ -322,6 +322,7 @@ export async function syncSpottedProspects(): Promise<number> {
       status: true,
       followUpCount: true,
       firstContactedAt: true,
+      metadata: true,
     },
   });
   const known = new Set(existing.map((item) => item.email));
@@ -333,17 +334,32 @@ export async function syncSpottedProspects(): Promise<number> {
 
   const updates = [...unique.entries()].flatMap(([email, place]) => {
     const current = bySourceId.get(place.id);
+    const untouched = current?.status === "NEW" && current.followUpCount === 0 && !current.firstContactedAt;
+    const bounced = current?.status === "INVALID";
     if (
       !current
       || current.email === email
-      || current.status !== "NEW"
-      || current.followUpCount !== 0
-      || current.firstContactedAt
+      || (!untouched && !bounced)
       || known.has(email)
       || suppressed.has(email)
     ) return [];
     known.add(email);
-    return [{ id: current.id, email, place }];
+    const metadata = current.metadata && typeof current.metadata === "object" && !Array.isArray(current.metadata)
+      ? { ...(current.metadata as Record<string, unknown>) }
+      : {};
+    const currentRevision = typeof metadata.contactRevision === "number" ? metadata.contactRevision : 0;
+    return [{
+      id: current.id,
+      email,
+      place,
+      reactivated: bounced,
+      metadata: {
+        ...metadata,
+        previousEmail: current.email,
+        contactRevision: bounced ? currentRevision + 1 : currentRevision,
+        contactEmailReplacedAt: new Date().toISOString(),
+      } as Prisma.InputJsonObject,
+    }];
   });
 
   const rows = [...unique.entries()]
@@ -362,7 +378,7 @@ export async function syncSpottedProspects(): Promise<number> {
       metadata: { network: place.network, postalCode: place.postalCode },
     }));
   if (!rows.length && !updates.length) return 0;
-  const operations = updates.map(({ id, email, place }) => prisma.prospect.update({
+  const operations = updates.map(({ id, email, place, reactivated, metadata }) => prisma.prospect.update({
     where: { id },
     data: {
       email,
@@ -373,6 +389,14 @@ export async function syncSpottedProspects(): Promise<number> {
       region: place.region || null,
       sourceLabel: place.source || "Repérage Label Vanlife",
       sourceUrl: place.website,
+      metadata,
+      ...(reactivated ? {
+        status: "NEW" as const,
+        followUpCount: 0,
+        firstContactedAt: null,
+        lastContactedAt: null,
+        nextActionAt: new Date(),
+      } : {}),
     },
   }));
   const result = rows.length
@@ -472,7 +496,13 @@ async function sendOne(prospect: Prospect): Promise<"sent" | "skipped" | "failed
     return "skipped";
   }
 
-  const campaignKey = `prospection:${stage.toLowerCase()}:${prospect.id}`;
+  const metadata = prospect.metadata && typeof prospect.metadata === "object" && !Array.isArray(prospect.metadata)
+    ? prospect.metadata as Record<string, unknown>
+    : {};
+  const contactRevision = typeof metadata.contactRevision === "number" && metadata.contactRevision > 0
+    ? `:r${Math.floor(metadata.contactRevision)}`
+    : "";
+  const campaignKey = `prospection:${stage.toLowerCase()}:${prospect.id}${contactRevision}`;
   let record = await prisma.prospectMessage.findUnique({ where: { campaignKey } });
   if (record?.status === "SENT") return "skipped";
 

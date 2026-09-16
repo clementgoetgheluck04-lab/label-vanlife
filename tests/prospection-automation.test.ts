@@ -31,9 +31,10 @@ test("missing camping contacts are escalated once in manageable research batches
 
 test("a newly verified email only replaces an untouched prospect contact", () => {
   const engine = source("../src/server/prospection.ts");
-  assert.match(engine, /current\.status !== "NEW"/);
-  assert.match(engine, /current\.followUpCount !== 0/);
-  assert.match(engine, /current\.firstContactedAt/);
+  assert.match(engine, /current\?\.status === "NEW" && current\.followUpCount === 0 && !current\.firstContactedAt/);
+  assert.match(engine, /current\?\.status === "INVALID"/);
+  assert.match(engine, /contactRevision: bounced \? currentRevision \+ 1 : currentRevision/);
+  assert.match(engine, /campaignKey = `prospection:\$\{stage\.toLowerCase\(\)\}:\$\{prospect\.id\}\$\{contactRevision\}`/);
   assert.match(engine, /suppressed\.has\(email\)/);
 });
 
@@ -80,6 +81,7 @@ test("Resend inbound webhook is signed and escalates ambiguous replies", () => {
   assert.match(webhook, /NEEDS_HUMAN/);
   assert.match(webhook, /sendNeedHumanAlert/);
   assert.match(webhook, /email\.bounced/);
+  assert.match(webhook, /Adresse invalide pour \$\{message\.prospect\.name\}/);
   assert.match(webhook, /email\.complained/);
 });
 
