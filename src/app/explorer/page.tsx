@@ -250,7 +250,7 @@ export default function ExplorerPage() {
                 </p>
               </div>
               <div className="shrink-0 rounded-2xl bg-white/95 px-5 py-4 text-center shadow-sm ring-1 ring-white/30">
-                <strong className="block text-3xl text-[#8b673d]">{SITE_STATS.spottedPlacesCount}</strong>
+                <strong className="block text-3xl text-[#8b673d]">{catalogLoading ? "—" : publicSpottedPlaces.length}</strong>
                 <span className="text-xs font-medium text-neutral-600">lieux à vérifier</span>
               </div>
             </div>

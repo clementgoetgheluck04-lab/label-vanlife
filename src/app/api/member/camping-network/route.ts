@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { ENRICHED_LIEUX } from "@/data/enriched-lieux";
-import { SPOTTED_PLACES } from "@/data/spotted-places";
 import { hasActiveMemberAccess } from "@/server/auth";
+import { getVisibleSpottedPlaces } from "@/server/spotted-visibility";
 
 export async function GET() {
   let authorized = false;
@@ -20,7 +20,7 @@ export async function GET() {
 
   return NextResponse.json({
     labelledPlaces: ENRICHED_LIEUX.filter((place) => place.status === "actif"),
-    places: SPOTTED_PLACES,
+    places: await getVisibleSpottedPlaces(),
   }, {
     headers: { "Cache-Control": "private, no-store" },
   });

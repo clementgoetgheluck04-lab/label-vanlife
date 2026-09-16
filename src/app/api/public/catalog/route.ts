@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
 import { ENRICHED_LIEUX } from "@/data/enriched-lieux";
-import { SPOTTED_PLACES } from "@/data/spotted-places";
 import { redactPublicPlaceText } from "@/server/public-place";
+import { getVisibleSpottedPlaces } from "@/server/spotted-visibility";
+
+export const dynamic = "force-dynamic";
 
 export async function GET() {
   const labelledPlaces = ENRICHED_LIEUX
@@ -18,7 +20,7 @@ export async function GET() {
       services: place.services,
       hasMemberBenefit: place.discountPercent > 0 || Boolean(place.priceHighlight),
     }));
-  const spottedPlaces = SPOTTED_PLACES.map((place) => ({
+  const spottedPlaces = (await getVisibleSpottedPlaces()).map((place) => ({
     id: place.id,
     name: place.name,
     city: place.city,
@@ -26,6 +28,6 @@ export async function GET() {
   }));
 
   return NextResponse.json({ labelledPlaces, spottedPlaces }, {
-    headers: { "Cache-Control": "public, s-maxage=86400, stale-while-revalidate=604800" },
+    headers: { "Cache-Control": "private, no-store" },
   });
 }

@@ -4,8 +4,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Activity, ArrowLeft, Building2, CalendarDays, CircleAlert, ExternalLink, Mail, MapPin, Navigation, Phone, ShieldCheck, Users } from "lucide-react";
 import MemberRoadTripPanel from "@/components/roadtrip/MemberRoadTripPanel";
-import { buildClaimHref, buildRemovalMailto, classifySpottedPlace, getSpottedPlace, normalizeExternalWebsite, PLACE_UNIVERSE_LABELS } from "@/data/spotted-places";
+import { buildClaimHref, buildRemovalMailto, classifySpottedPlace, normalizeExternalWebsite, PLACE_UNIVERSE_LABELS } from "@/data/spotted-places";
 import { hasActiveMemberAccess } from "@/server/auth";
+import { getVisibleSpottedPlace } from "@/server/spotted-visibility";
 
 type PageProps = { params: Promise<{ id: string }> };
 
@@ -20,7 +21,7 @@ async function safelyHasActiveMemberAccess() {
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const place = getSpottedPlace((await params).id);
+  const place = await getVisibleSpottedPlace((await params).id);
   if (!place) return {};
   return {
     title: `${place.name} — lieu repéré, non labellisé`,
@@ -30,7 +31,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export default async function SpottedPlacePage({ params }: PageProps) {
-  const place = getSpottedPlace((await params).id);
+  const place = await getVisibleSpottedPlace((await params).id);
   if (!place) notFound();
   const memberHasAccess = await safelyHasActiveMemberAccess();
   const website = memberHasAccess ? normalizeExternalWebsite(place.website) : null;

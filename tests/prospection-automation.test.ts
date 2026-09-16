@@ -65,3 +65,17 @@ test("labellisation and payment feed the sales pipeline", () => {
   assert.match(draft, /status: "QUALIFIED"/);
   assert.match(stripe, /status: "CONVERTED"/);
 });
+
+test("refusals and opt-outs remove spotted places from every visible catalogue", () => {
+  const visibility = source("../src/server/spotted-visibility.ts");
+  const publicCatalog = source("../src/app/api/public/catalog/route.ts");
+  const memberNetwork = source("../src/app/api/member/camping-network/route.ts");
+  const spottedPage = source("../src/app/lieux-reperes/[id]/page.tsx");
+
+  assert.match(visibility, /"NOT_INTERESTED", "UNSUBSCRIBED"/);
+  assert.match(visibility, /return \[\]/);
+  assert.match(publicCatalog, /getVisibleSpottedPlaces/);
+  assert.match(publicCatalog, /private, no-store/);
+  assert.match(memberNetwork, /getVisibleSpottedPlaces/);
+  assert.match(spottedPage, /getVisibleSpottedPlace/);
+});
