@@ -31,6 +31,11 @@ export type MemberSignupPayload = {
   firstName: string;
   lastName: string;
   phone: string;
+  addressLine1: string;
+  addressLine2: string;
+  postalCode: string;
+  city: string;
+  country: string;
   age: number;
   companions: MemberCompanionPayload[];
 };
@@ -48,10 +53,15 @@ export function parseMemberSignupPayload(value: unknown): MemberSignupPayload | 
   const firstName = parseText(input.firstName, { min: 2, max: 80, required: true });
   const lastName = parseText(input.lastName, { min: 2, max: 100, required: true });
   const phone = parseText(input.phone, { min: 6, max: 30, required: true });
+  const addressLine1 = parseText(input.addressLine1, { min: 2, max: 180, required: true });
+  const addressLine2 = parseText(input.addressLine2, { max: 180 });
+  const postalCode = parseText(input.postalCode, { min: 2, max: 20, required: true });
+  const city = parseText(input.city, { min: 2, max: 100, required: true });
+  const country = parseText(input.country, { min: 2, max: 80, required: true });
   const age = parseIntegerInRange(input.age, 18, 120);
   const rawCompanions = Array.isArray(input.companions) ? input.companions : [];
 
-  if (!email || !firstName || !lastName || !phone || age === null || password.length < 12 || password.length > 128 || rawCompanions.length > 7) {
+  if (!email || !firstName || !lastName || !phone || !addressLine1 || addressLine2 === null || !postalCode || !city || !country || age === null || password.length < 12 || password.length > 128 || rawCompanions.length > 7) {
     return null;
   }
 
@@ -66,7 +76,7 @@ export function parseMemberSignupPayload(value: unknown): MemberSignupPayload | 
     companions.push({ firstName: companionFirstName, lastName: companionLastName, age: companionAge });
   }
 
-  return { email, password, firstName, lastName, phone, age, companions };
+  return { email, password, firstName, lastName, phone, addressLine1, addressLine2, postalCode, city, country, age, companions };
 }
 
 export type LabellisationPayload = {

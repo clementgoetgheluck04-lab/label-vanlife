@@ -68,3 +68,23 @@ test("the navigation reflects an authenticated session and hides the purchase CT
   assert.match(navbar, /authenticated === true/);
   assert.match(navbar, /authenticated === false/);
 });
+
+test("the downloadable member card replaces the personal QR without exposing contact data publicly", () => {
+  const page = readFileSync(new URL("../src/app/member/carte/page.tsx", import.meta.url), "utf8");
+  const interactiveCard = readFileSync(new URL("../src/app/member/carte/MemberCardInteractive.tsx", import.meta.url), "utf8");
+  const profileEndpoint = readFileSync(new URL("../src/app/api/member/profile/route.ts", import.meta.url), "utf8");
+  const schema = readFileSync(new URL("../prisma/schema.prisma", import.meta.url), "utf8");
+
+  assert.doesNotMatch(page, /QRCode|createMemberCardToken|verifier-carte/);
+  assert.match(page, /MemberCardInteractive/);
+  assert.match(interactiveCard, /Télécharger ma carte membre/);
+  assert.match(interactiveCard, /props\.people/);
+  assert.match(interactiveCard, /props\.email/);
+  assert.match(interactiveCard, /props\.phone/);
+  assert.match(interactiveCard, /props\.address/);
+  assert.match(profileEndpoint, /requireActiveMember/);
+  assert.match(profileEndpoint, /assertSameOrigin/);
+  assert.match(profileEndpoint, /enforceRateLimit/);
+  assert.match(schema, /addressLine1 String\?/);
+  assert.match(schema, /postalCode\s+String\?/);
+});

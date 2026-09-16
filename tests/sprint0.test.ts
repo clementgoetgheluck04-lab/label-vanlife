@@ -48,6 +48,11 @@ test("member signup validates the holder and every covered companion", () => {
     firstName: "Marie",
     lastName: "Martin",
     phone: "0612345678",
+    addressLine1: "12 route des Pins",
+    addressLine2: "",
+    postalCode: "74000",
+    city: "Annecy",
+    country: "France",
     age: 38,
     companions: [
       { firstName: "Alex", lastName: "Martin", age: 40 },
@@ -56,7 +61,9 @@ test("member signup validates the holder and every covered companion", () => {
   });
   assert.ok(signup);
   assert.equal(signup.email, "famille@example.com");
+  assert.equal(signup.postalCode, "74000");
   assert.deepEqual(signup.companions.map(({ age }) => age), [40, 7]);
+  assert.equal(parseMemberSignupPayload({ ...signup, addressLine1: "" }), null);
   assert.equal(parseMemberSignupPayload({ ...signup, age: 17 }), null);
   assert.equal(parseMemberSignupPayload({ ...signup, companions: [{ firstName: "Léa", lastName: "Martin", age: -1 }] }), null);
   assert.equal(parseMemberSignupPayload({ ...signup, companions: Array.from({ length: 8 }, () => ({ firstName: "Test", lastName: "Membre", age: 20 })) }), null);

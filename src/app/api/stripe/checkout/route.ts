@@ -23,8 +23,13 @@ async function syncMemberProfileFromMetadata(user: User) {
   const firstName = readMetadataText(user.user_metadata?.firstName, 80);
   const lastName = readMetadataText(user.user_metadata?.lastName, 100);
   const phone = readMetadataText(user.user_metadata?.phone, 30);
+  const addressLine1 = readMetadataText(user.user_metadata?.addressLine1, 180);
+  const addressLine2 = readMetadataText(user.user_metadata?.addressLine2, 180);
+  const postalCode = readMetadataText(user.user_metadata?.postalCode, 20);
+  const city = readMetadataText(user.user_metadata?.city, 100);
+  const country = readMetadataText(user.user_metadata?.country, 80);
   const age = readMetadataInteger(user.user_metadata?.age, 18, 120);
-  if (!firstName || !lastName || !phone || age === null) return;
+  if (!firstName || !lastName || !phone || !addressLine1 || !postalCode || !city || !country || age === null) return;
 
   const rawCompanions = Array.isArray(user.user_metadata?.companions)
     ? user.user_metadata.companions
@@ -43,8 +48,8 @@ async function syncMemberProfileFromMetadata(user: User) {
   await prisma.$transaction(async (tx) => {
     await tx.profile.upsert({
       where: { userId: user.id },
-      create: { userId: user.id, firstName, lastName, phone, age },
-      update: { firstName, lastName, phone, age },
+      create: { userId: user.id, firstName, lastName, phone, addressLine1, addressLine2: addressLine2 || null, postalCode, city, country, age },
+      update: { firstName, lastName, phone, addressLine1, addressLine2: addressLine2 || null, postalCode, city, country, age },
     });
     await tx.memberCompanion.deleteMany({ where: { userId: user.id } });
     if (companions.length > 0) {

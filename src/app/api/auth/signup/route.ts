@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
         { status: 400 },
       );
     }
-    const { email, password, firstName, lastName, phone, age, companions } = signup;
+    const { email, password, firstName, lastName, phone, addressLine1, addressLine2, postalCode, city, country, age, companions } = signup;
 
     const supabase = await createClient();
     const { data, error } = await supabase.auth.signUp({
@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
       password,
       options: {
         emailRedirectTo: `${getAppUrl()}/auth/callback?next=${encodeURIComponent("/devenir-membre?checkout=ready")}`,
-        data: { firstName, lastName, phone },
+        data: { firstName, lastName, phone, addressLine1, addressLine2, postalCode, city, country, age, companions },
       },
     });
     if (error) {
@@ -50,8 +50,8 @@ export async function POST(request: NextRequest) {
         });
         await tx.profile.upsert({
           where: { userId: createdUser.id },
-          create: { userId: createdUser.id, firstName, lastName, phone, age },
-          update: { firstName, lastName, phone, age },
+          create: { userId: createdUser.id, firstName, lastName, phone, addressLine1, addressLine2: addressLine2 || null, postalCode, city, country, age },
+          update: { firstName, lastName, phone, addressLine1, addressLine2: addressLine2 || null, postalCode, city, country, age },
         });
         await tx.memberCompanion.deleteMany({ where: { userId: createdUser.id } });
         if (companions.length > 0) {

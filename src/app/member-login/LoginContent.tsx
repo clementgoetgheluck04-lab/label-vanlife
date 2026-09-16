@@ -17,6 +17,11 @@ export function LoginContent() {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [phone, setPhone] = useState("");
+  const [addressLine1, setAddressLine1] = useState("");
+  const [addressLine2, setAddressLine2] = useState("");
+  const [postalCode, setPostalCode] = useState("");
+  const [city, setCity] = useState("");
+  const [country, setCountry] = useState("France");
   const [age, setAge] = useState("");
   const [companions, setCompanions] = useState<Array<{ firstName: string; lastName: string; age: string }>>([]);
   const [accessCode, setAccessCode] = useState("");
@@ -110,6 +115,11 @@ export function LoginContent() {
             firstName,
             lastName,
             phone,
+            addressLine1,
+            addressLine2,
+            postalCode,
+            city,
+            country,
             age: Number(age),
             companions: companions.map((companion) => ({
               ...companion,
@@ -272,6 +282,19 @@ export function LoginContent() {
                     <input type="tel" value={phone} onChange={(event) => setPhone(event.target.value)} className="h-12 w-full rounded-xl border border-neutral-200 pl-10 pr-4 focus:ring-2 focus:ring-emerald-500" required minLength={6} autoComplete="tel" />
                   </span>
                 </label>
+                <div className="space-y-4 rounded-2xl border border-neutral-200 bg-neutral-50 p-4">
+                  <div>
+                    <p className="text-sm font-semibold text-neutral-800">Adresse postale du titulaire</p>
+                    <p className="mt-1 text-xs text-neutral-500">Elle figurera uniquement sur votre carte personnelle et dans votre espace sécurisé.</p>
+                  </div>
+                  <label className="block space-y-1 text-xs font-medium text-neutral-600"><span>Numéro et voie *</span><input value={addressLine1} onChange={(event) => setAddressLine1(event.target.value)} className="h-11 w-full rounded-lg border border-neutral-200 bg-white px-3" required minLength={2} maxLength={180} autoComplete="address-line1" /></label>
+                  <label className="block space-y-1 text-xs font-medium text-neutral-600"><span>Complément d’adresse</span><input value={addressLine2} onChange={(event) => setAddressLine2(event.target.value)} className="h-11 w-full rounded-lg border border-neutral-200 bg-white px-3" maxLength={180} autoComplete="address-line2" /></label>
+                  <div className="grid gap-3 sm:grid-cols-[120px_1fr]">
+                    <label className="space-y-1 text-xs font-medium text-neutral-600"><span>Code postal *</span><input value={postalCode} onChange={(event) => setPostalCode(event.target.value)} className="h-11 w-full rounded-lg border border-neutral-200 bg-white px-3" required minLength={2} maxLength={20} autoComplete="postal-code" /></label>
+                    <label className="space-y-1 text-xs font-medium text-neutral-600"><span>Ville *</span><input value={city} onChange={(event) => setCity(event.target.value)} className="h-11 w-full rounded-lg border border-neutral-200 bg-white px-3" required minLength={2} maxLength={100} autoComplete="address-level2" /></label>
+                  </div>
+                  <label className="block space-y-1 text-xs font-medium text-neutral-600"><span>Pays *</span><input value={country} onChange={(event) => setCountry(event.target.value)} className="h-11 w-full rounded-lg border border-neutral-200 bg-white px-3" required minLength={2} maxLength={80} autoComplete="country-name" /></label>
+                </div>
                 <label className="space-y-2 text-sm font-medium text-neutral-600">
                   <span>Mot de passe</span>
                   <span className="relative block">
@@ -310,7 +333,7 @@ export function LoginContent() {
               variant="cta"
               size="lg"
               className="w-full gap-2 text-base"
-              disabled={loading || (isRegister ? !email || !password || !firstName || !lastName || !phone || !age || companions.some((companion) => !companion.firstName || !companion.lastName || !companion.age) : accessCode.replace(/[^A-Z0-9]/g, "").length < 14)}
+              disabled={loading || (isRegister ? !email || !password || !firstName || !lastName || !phone || !addressLine1 || !postalCode || !city || !country || !age || companions.some((companion) => !companion.firstName || !companion.lastName || !companion.age) : accessCode.replace(/[^A-Z0-9]/g, "").length < 14)}
             >
               {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : <ArrowRight className="h-5 w-5" />}
               {isRegister ? "Créer mon compte" : "Accéder à mon espace"}
