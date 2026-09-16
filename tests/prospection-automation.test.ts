@@ -24,6 +24,16 @@ test("silent prospects stop after message three and opposition controls remain a
   assert.match(engine, /idempotencyKey: campaignKey/);
 });
 
+test("first contact is designed for decision makers and measures two variants", () => {
+  const engine = source("../src/server/prospection.ts");
+  assert.match(engine, /À l’attention de la direction/);
+  assert.match(engine, /personne chargée du développement commercial/);
+  assert.match(engine, /pourriez-vous simplement le lui transmettre/);
+  assert.match(engine, /initialVariantFor/);
+  assert.match(engine, /name: "variant"/);
+  assert.match(engine, /0 % de commission/);
+});
+
 test("engaged prospects receive the complete ten-message editorial journey", () => {
   const engine = source("../src/server/prospection.ts");
   for (const stage of ["VANLIFE_NEWS", "VANLIFE_STATS", "WILD_SPOTS", "OFFER_7", "DREAM", "TESTIMONIAL", "OFFER_10"]) {

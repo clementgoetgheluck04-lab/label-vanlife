@@ -70,6 +70,13 @@ function greeting(prospect: Prospect): string {
   return prospect.contactName ? `Bonjour ${prospect.contactName},` : "Bonjour,";
 }
 
+type InitialVariant = "direction" | "opportunity";
+
+function initialVariantFor(prospect: Prospect): InitialVariant {
+  const score = [...prospect.email].reduce((total, character) => total + character.charCodeAt(0), 0);
+  return score % 2 === 0 ? "direction" : "opportunity";
+}
+
 function unsubscribeUrl(prospect: Prospect): string {
   return `${getAppUrl()}/desinscription?token=${encodeURIComponent(prospect.unsubscribeToken)}`;
 }
@@ -86,25 +93,29 @@ function messageFor(prospect: Prospect, stage: ProspectingStage) {
   const legal = `Pourquoi cet email ? Les coordonnées professionnelles publiques de ${prospect.name} ont été utilisées uniquement pour présenter une offre en lien direct avec son activité d’accueil. Label Vanlife — 10 chemin des Écoles, 31260 Montsaunès — contact@labelvanlife.com.`;
 
   if (stage === "INITIAL") {
-    const subject = `${prospect.name} : mieux accueillir les voyageurs en van en 2027`;
+    const variant = initialVariantFor(prospect);
+    const subject = variant === "direction"
+      ? `À l’attention de la direction de ${prospect.name}`
+      : `${prospect.name} : les vans de passage peuvent devenir des clients`;
     const paragraphs = [
-      `Nous avons repéré ${prospect.name}${city} parmi les lieux dont l’accueil pourrait correspondre à la philosophie de Label Vanlife : une étape humaine, claire et adaptée aux voyageurs en van.`,
-      "Les vans stationnés sur un parking ou un spot sauvage tout proche représentent souvent des voyageurs qui ne savent simplement pas qu’ils seraient bien accueillis chez vous. Notre rôle est de leur signaler votre présence au bon moment et de leur donner confiance avant leur arrivée.",
-      "Label Vanlife référence des établissements vérifiés sur sa MAP privée, présente leurs services et leurs avantages membres, sans commission sur les réservations. Vous restez libre de votre accueil, de vos tarifs et de vos disponibilités.",
+      "Ce message concerne la direction ou la personne chargée du développement commercial. Si ce n’est pas vous, pourriez-vous simplement le lui transmettre ? Merci.",
+      `Nous avons repéré ${prospect.name}${city} comme un lieu susceptible de bien accueillir les voyageurs en van. Beaucoup dorment encore sur un parking ou un spot sauvage voisin, non parce qu’ils refusent de payer, mais parce qu’ils ignorent qu’une adresse adaptée existe à quelques minutes.`,
+      "Label Vanlife rend les établissements partenaires visibles au moment où ces voyageurs choisissent leur étape : fiche détaillée, présence sur la MAP privée et avantage réservé aux membres. Vous gardez vos tarifs, vos disponibilités et vos outils habituels ; nous ne prenons aucune commission sur les réservations.",
+      "Puis-je vous laisser découvrir le concept en deux minutes et me dire simplement si cette clientèle peut vous intéresser pour 2027 ?",
     ];
     const text = `${greeting(prospect)}\n\n${paragraphs.join("\n\n")}\n\nDécouvrir le concept : ${getAppUrl()}/le-label\nÉtudier la labellisation : ${candidatureUrl(prospect)}\n\n${legal}\nDésinscription : ${unsubscribe}`;
     return {
       subject,
       text,
       html: labelVanlifeEmail({
-        preheader: `Une proposition concrète pour rendre ${prospect.name} visible auprès des vanlifers`,
-        eyebrow: "UN LIEU REPÉRÉ PAR LABEL VANLIFE",
-        title: "Et si les vans garés à proximité devenaient vos prochains visiteurs ?",
+        preheader: `Une proposition concrète à transmettre à la direction de ${prospect.name}`,
+        eyebrow: "À L’ATTENTION DE LA DIRECTION",
+        title: "Les vans qui passent près de chez vous peuvent devenir des clients.",
         greeting: greeting(prospect),
         paragraphs,
         action: { label: "Découvrir le concept", href: `${getAppUrl()}/le-label` },
         secondaryAction: { label: "Étudier la labellisation", href: candidatureUrl(prospect) },
-        notice: "Aucune promesse de réservation : notre engagement porte sur la visibilité, la confiance et les outils mis à votre disposition.",
+        notice: "Aucun changement de logiciel, aucune commission et aucune promesse artificielle de réservation : nous travaillons la visibilité et la confiance.",
         legalFooter: legal,
         unsubscribeHref: unsubscribe,
         signature: "Clément — Label Vanlife",
@@ -113,11 +124,11 @@ function messageFor(prospect: Prospect, stage: ProspectingStage) {
   }
 
   if (stage === "FOLLOW_UP_1") {
-    const subject = `Avez-vous pu découvrir Label Vanlife, ${prospect.name} ?`;
+    const subject = `Direction de ${prospect.name} — dois-je vous présenter Label Vanlife ?`;
     const paragraphs = [
-      `Je me permets un court retour au sujet de ${prospect.name}${city}.`,
-      "Notre objectif pour 2027 est simple : aider les voyageurs en van à choisir des lieux où ils savent qu’ils seront bien accueillis, plutôt que de rester sur un stationnement sauvage à quelques kilomètres.",
-      "La page de présentation explique le fonctionnement du label, la MAP membre et ce que reçoit chaque établissement. Vous pouvez aussi répondre directement à cet email : une question simple reçoit une réponse simple.",
+      `Je me permets un seul rappel au sujet de ${prospect.name}${city}. Mon précédent message était destiné à la direction ou à la personne qui développe les nuitées et les partenariats.`,
+      "L’idée tient en une phrase : montrer votre établissement aux vanlifers avant qu’ils choisissent un parking ou un spot sauvage, sans commission et sans modifier votre façon de travailler.",
+      "Un simple retour suffit : « à étudier », « pas cette année » ou « non merci ». Vous pouvez aussi consulter la présentation en deux minutes.",
     ];
     const text = `${greeting(prospect)}\n\n${paragraphs.join("\n\n")}\n\nDécouvrir Label Vanlife : ${getAppUrl()}/le-label\n\n${legal}\nDésinscription : ${unsubscribe}`;
     return {
@@ -126,7 +137,7 @@ function messageFor(prospect: Prospect, stage: ProspectingStage) {
       html: labelVanlifeEmail({
         preheader: "Un rappel court, sans engagement et sans commission",
         eyebrow: "LABEL VANLIFE 2027",
-        title: "Un rappel, puis je vous laisse décider",
+        title: "Est-ce un sujet utile pour votre direction ?",
         greeting: greeting(prospect),
         paragraphs,
         action: { label: "Découvrir Label Vanlife", href: `${getAppUrl()}/le-label` },
@@ -139,11 +150,11 @@ function messageFor(prospect: Prospect, stage: ProspectingStage) {
   }
 
   if (stage === "OFFER_3") {
-    const subject = `L’offre Label Vanlife 2027 pour ${prospect.name}`;
+    const subject = `${prospect.name} — la proposition Label Vanlife 2027 en chiffres`;
     const paragraphs = [
-      `Voici les conditions proposées à ${prospect.name}${city} pour rejoindre le réseau 2027.`,
-      "La prévente est actuellement à 110 € au lieu de 290 €, dans la limite des places disponibles. Elle comprend la fiche, la présence sur la MAP, le kit de communication et l’accompagnement, sans commission sur vos réservations.",
-      "Pour respecter votre choix, ce sera notre dernier email commercial sans signe d’intérêt de votre part. Un clic vers notre site nous indiquera simplement que vous souhaitez continuer à recevoir les contenus utiles de cette série.",
+      `Pour permettre à la direction de ${prospect.name}${city} de décider rapidement, voici la proposition complète en chiffres.`,
+      "La prévente 2027 est à 110 € au lieu de 290 €, dans la limite des places disponibles. Elle comprend l’étude, la fiche, la présence sur la MAP, le kit de communication et l’accompagnement jusqu’au 31 décembre 2027, avec 0 % de commission sur vos réservations.",
+      "Sans clic ni réponse, je considérerai que le moment n’est pas le bon et les relances s’arrêteront ici. Si le sujet vous intéresse, le dossier se remplit directement en ligne.",
     ];
     const text = `${greeting(prospect)}\n\n${paragraphs.join("\n\n")}\n\nVoir la labellisation : ${getAppUrl()}/labellisation\n\n${legal}\nDésinscription : ${unsubscribe}`;
     return {
@@ -362,8 +373,17 @@ async function sendOne(prospect: Prospect): Promise<"sent" | "skipped" | "failed
   if (!claimed.count) return "skipped";
 
   const content = messageFor(prospect, stage);
+  const variant = stage === "INITIAL" ? initialVariantFor(prospect) : "standard";
   record = record || await prisma.prospectMessage.create({
-    data: { prospectId: prospect.id, direction: "OUTBOUND", kind: stage, campaignKey, subject: content.subject, text: content.text },
+    data: {
+      prospectId: prospect.id,
+      direction: "OUTBOUND",
+      kind: stage,
+      campaignKey,
+      subject: content.subject,
+      text: content.text,
+      metadata: { variant },
+    },
   });
 
   const resend = new Resend(requireServerEnv("RESEND_API_KEY"));
@@ -383,6 +403,7 @@ async function sendOne(prospect: Prospect): Promise<"sent" | "skipped" | "failed
       tags: [
         { name: "category", value: "prospection" },
         { name: "stage", value: stage.toLowerCase() },
+        { name: "variant", value: variant },
         { name: "prospect_id", value: prospect.id.slice(0, 256) },
       ],
     }, { idempotencyKey: campaignKey });
