@@ -7,21 +7,49 @@ import { getProspectionReplyTo, isProspectingEnabled, sendNeedHumanAlert, suppre
 
 export const dynamic = "force-dynamic";
 
+function metadataRecord(value: unknown): Record<string, unknown> {
+  return value && typeof value === "object" && !Array.isArray(value)
+    ? value as Record<string, unknown>
+    : {};
+}
+
 export async function GET() {
   try {
     await requireAdminUser();
     const prisma = getPrisma();
-    const [groups, prospects, sent, replies] = await Promise.all([
+    const [groups, prospects, outboundMessages, replies] = await Promise.all([
       prisma.prospect.groupBy({ by: ["status"], _count: { _all: true } }),
       prisma.prospect.findMany({
         orderBy: [{ updatedAt: "desc" }],
         take: 100,
         include: { messages: { orderBy: { createdAt: "desc" }, take: 1 } },
       }),
-      prisma.prospectMessage.count({ where: { direction: "OUTBOUND", status: "SENT" } }),
+      prisma.prospectMessage.findMany({
+        where: { direction: "OUTBOUND", status: "SENT" },
+        select: { prospectId: true, kind: true, metadata: true, prospect: { select: { status: true } } },
+      }),
       prisma.prospectMessage.count({ where: { direction: "INBOUND", status: "RECEIVED" } }),
     ]);
     const counts = Object.fromEntries(groups.map((group) => [group.status, group._count._all]));
+    const initialSubject = {
+      direction: { sent: 0, engaged: 0 },
+      opportunity: { sent: 0, engaged: 0 },
+    };
+    const clickers = new Set<string>();
+    for (const message of outboundMessages) {
+      const metadata = metadataRecord(message.metadata);
+      const recordedClick = typeof metadata.clickCount === "number" && metadata.clickCount > 0;
+      if (recordedClick) clickers.add(message.prospectId);
+      if (message.kind !== "INITIAL") continue;
+      const variant = metadata.variant === "direction" ? "direction" : metadata.variant === "opportunity" ? "opportunity" : null;
+      if (!variant) continue;
+      initialSubject[variant].sent += 1;
+      const legacyEngagement = message.prospect.status === "ENGAGED";
+      if (recordedClick || legacyEngagement) {
+        initialSubject[variant].engaged += 1;
+        clickers.add(message.prospectId);
+      }
+    }
     return NextResponse.json({
       settings: {
         enabled: isProspectingEnabled(),
@@ -29,7 +57,14 @@ export async function GET() {
         replyTo: getProspectionReplyTo(),
         webhookConfigured: Boolean(process.env.RESEND_WEBHOOK_SECRET),
       },
-      totals: { prospects: groups.reduce((sum, group) => sum + group._count._all, 0), sent, replies, counts },
+      totals: {
+        prospects: groups.reduce((sum, group) => sum + group._count._all, 0),
+        sent: outboundMessages.length,
+        replies,
+        clickers: clickers.size,
+        counts,
+      },
+      experiments: { initialSubject },
       prospects,
     }, { headers: { "Cache-Control": "no-store" } });
   } catch (error) {

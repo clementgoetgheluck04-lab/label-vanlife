@@ -93,9 +93,31 @@ function candidatureUrl(prospect: Prospect): string {
   return url.href;
 }
 
+function trackedProspectionUrl(
+  prospect: Prospect,
+  stage: ProspectingStage,
+  href: string,
+  action: string,
+): string {
+  const url = new URL(href, getAppUrl());
+  const appUrl = new URL(getAppUrl());
+  if (url.origin !== appUrl.origin) return url.href;
+  const variant = stage === "INITIAL" ? initialVariantFor(prospect) : "standard";
+  url.searchParams.set("utm_source", "label_vanlife");
+  url.searchParams.set("utm_medium", "email");
+  url.searchParams.set("utm_campaign", `prospection_2027_${stage.toLowerCase()}`);
+  url.searchParams.set("utm_content", `${variant}_${action}`);
+  return url.href;
+}
+
 function messageFor(prospect: Prospect, stage: ProspectingStage) {
   const city = prospect.city ? ` à ${prospect.city}` : "";
   const unsubscribe = unsubscribeUrl(prospect);
+  const track = (href: string, action: string) => trackedProspectionUrl(prospect, stage, href, action);
+  const concept = track("/le-label", "concept");
+  const labellisation = track("/labellisation", "labellisation");
+  const candidature = track(candidatureUrl(prospect), "candidature");
+  const explorer = track("/explorer", "explorer");
   const legal = `Pourquoi cet email ? Les coordonnées professionnelles publiques de ${prospect.name} ont été utilisées uniquement pour présenter une offre en lien direct avec son activité d’accueil. Label Vanlife — 10 chemin des Écoles, 31260 Montsaunès — contact@labelvanlife.com.`;
 
   if (stage === "INITIAL") {
@@ -109,7 +131,7 @@ function messageFor(prospect: Prospect, stage: ProspectingStage) {
       "Label Vanlife rend les établissements partenaires visibles au moment où ces voyageurs choisissent leur étape : fiche détaillée, présence sur la MAP privée et avantage réservé aux membres. Vous gardez vos tarifs, vos disponibilités et vos outils habituels ; nous ne prenons aucune commission sur les réservations.",
       "Puis-je vous laisser découvrir le concept en deux minutes et me dire simplement si cette clientèle peut vous intéresser pour 2027 ?",
     ];
-    const text = `${greeting(prospect)}\n\n${paragraphs.join("\n\n")}\n\nDécouvrir le concept : ${getAppUrl()}/le-label\nÉtudier la labellisation : ${candidatureUrl(prospect)}\n\n${legal}\nDésinscription : ${unsubscribe}`;
+    const text = `${greeting(prospect)}\n\n${paragraphs.join("\n\n")}\n\nDécouvrir le concept : ${concept}\nÉtudier la labellisation : ${candidature}\n\n${legal}\nDésinscription : ${unsubscribe}`;
     return {
       subject,
       text,
@@ -119,8 +141,8 @@ function messageFor(prospect: Prospect, stage: ProspectingStage) {
         title: "Les vans qui passent près de chez vous peuvent devenir des clients.",
         greeting: greeting(prospect),
         paragraphs,
-        action: { label: "Découvrir le concept", href: `${getAppUrl()}/le-label` },
-        secondaryAction: { label: "Étudier la labellisation", href: candidatureUrl(prospect) },
+        action: { label: "Découvrir le concept", href: concept },
+        secondaryAction: { label: "Étudier la labellisation", href: candidature },
         notice: "Aucun changement de logiciel, aucune commission et aucune promesse artificielle de réservation : nous travaillons la visibilité et la confiance.",
         legalFooter: legal,
         unsubscribeHref: unsubscribe,
@@ -136,7 +158,7 @@ function messageFor(prospect: Prospect, stage: ProspectingStage) {
       "L’idée tient en une phrase : montrer votre établissement aux vanlifers avant qu’ils choisissent un parking ou un spot sauvage, sans commission et sans modifier votre façon de travailler.",
       "Un simple retour suffit : « à étudier », « pas cette année » ou « non merci ». Vous pouvez aussi consulter la présentation en deux minutes.",
     ];
-    const text = `${greeting(prospect)}\n\n${paragraphs.join("\n\n")}\n\nDécouvrir Label Vanlife : ${getAppUrl()}/le-label\n\n${legal}\nDésinscription : ${unsubscribe}`;
+    const text = `${greeting(prospect)}\n\n${paragraphs.join("\n\n")}\n\nDécouvrir Label Vanlife : ${concept}\n\n${legal}\nDésinscription : ${unsubscribe}`;
     return {
       subject,
       text,
@@ -146,8 +168,8 @@ function messageFor(prospect: Prospect, stage: ProspectingStage) {
         title: "Est-ce un sujet utile pour votre direction ?",
         greeting: greeting(prospect),
         paragraphs,
-        action: { label: "Découvrir Label Vanlife", href: `${getAppUrl()}/le-label` },
-        secondaryAction: { label: "Voir la labellisation", href: `${getAppUrl()}/labellisation` },
+        action: { label: "Découvrir Label Vanlife", href: concept },
+        secondaryAction: { label: "Voir la labellisation", href: labellisation },
         legalFooter: legal,
         unsubscribeHref: unsubscribe,
         signature: "Clément — Label Vanlife",
@@ -162,7 +184,7 @@ function messageFor(prospect: Prospect, stage: ProspectingStage) {
       "La prévente 2027 est à 110 € au lieu de 290 €, dans la limite des places disponibles. Elle comprend l’étude, la fiche, la présence sur la MAP, le kit de communication et l’accompagnement jusqu’au 31 décembre 2027, avec 0 % de commission sur vos réservations.",
       "Sans clic ni réponse, je considérerai que le moment n’est pas le bon et les relances s’arrêteront ici. Si le sujet vous intéresse, le dossier se remplit directement en ligne.",
     ];
-    const text = `${greeting(prospect)}\n\n${paragraphs.join("\n\n")}\n\nVoir la labellisation : ${getAppUrl()}/labellisation\n\n${legal}\nDésinscription : ${unsubscribe}`;
+    const text = `${greeting(prospect)}\n\n${paragraphs.join("\n\n")}\n\nVoir la labellisation : ${labellisation}\n\n${legal}\nDésinscription : ${unsubscribe}`;
     return {
       subject,
       text,
@@ -177,8 +199,8 @@ function messageFor(prospect: Prospect, stage: ProspectingStage) {
           { label: "Commission", value: "0 % sur les réservations" },
           { label: "Validité", value: "Jusqu’au 31 décembre 2027" },
         ],
-        action: { label: "Découvrir la labellisation", href: `${getAppUrl()}/labellisation` },
-        secondaryAction: { label: "Déposer ma candidature", href: candidatureUrl(prospect) },
+        action: { label: "Découvrir la labellisation", href: labellisation },
+        secondaryAction: { label: "Déposer ma candidature", href: candidature },
         notice: "Sans clic ni réponse, aucune autre relance automatique ne sera envoyée.",
         legalFooter: legal,
         unsubscribeHref: unsubscribe,
@@ -198,7 +220,7 @@ function messageFor(prospect: Prospect, stage: ProspectingStage) {
         "Label Vanlife travaille précisément sur ce moment de décision, avec une MAP, des fiches claires et une communauté de voyageurs responsables.",
       ],
       action: { label: "Lire l’actualité source", href: "https://ffcc.fr/actualite/le-camping-champion-indetronable-de-lete-2025/" },
-      secondaryAction: { label: "Découvrir notre concept", href: `${getAppUrl()}/le-label` },
+      secondaryAction: { label: "Découvrir notre concept", href: concept },
       notice: "Cette donnée concerne l’hôtellerie de plein air dans son ensemble ; elle ne constitue pas une promesse individuelle de fréquentation.",
     },
     VANLIFE_STATS: {
@@ -211,7 +233,7 @@ function messageFor(prospect: Prospect, stage: ProspectingStage) {
         `C’est cette lisibilité que Label Vanlife veut apporter à des établissements comme ${prospect.name}.`,
       ],
       action: { label: "Consulter la source officielle", href: "https://www.entreprises.gouv.fr/espace-entreprises/s-informer-sur-la-reglementation/les-terrains-de-camping-amenages-et-parcs" },
-      secondaryAction: { label: "Voir Label Vanlife", href: `${getAppUrl()}/le-label` },
+      secondaryAction: { label: "Voir Label Vanlife", href: concept },
       notice: "Chiffres nationaux communiqués par la Direction générale des Entreprises ; aucune fréquentation individuelle n’est garantie.",
     },
     WILD_SPOTS: {
@@ -223,8 +245,8 @@ function messageFor(prospect: Prospect, stage: ProspectingStage) {
         `Pour ${prospect.name}, chaque étape non identifiée peut devenir un manque à gagner discret : une nuitée, un repas, une activité ou une recommandation qui n’aura pas lieu.`,
         "Label Vanlife ne promet pas de supprimer le sauvage. Le label donne une raison claire de choisir votre établissement : accueil vérifié, informations utiles, avantage membre et confiance avant l’arrivée.",
       ],
-      action: { label: "Voir comment le label vous rend visible", href: `${getAppUrl()}/labellisation` },
-      secondaryAction: { label: "Découvrir la MAP", href: `${getAppUrl()}/explorer` },
+      action: { label: "Voir comment le label vous rend visible", href: labellisation },
+      secondaryAction: { label: "Découvrir la MAP", href: explorer },
       notice: "Notre approche valorise un accueil responsable sans dénigrer la liberté de voyager.",
     },
     OFFER_7: {
@@ -236,8 +258,8 @@ function messageFor(prospect: Prospect, stage: ProspectingStage) {
         "Le prix comprend l’étude du dossier, une fiche détaillée, la présence sur la MAP membre, le kit de communication 2027 et l’accompagnement, sans commission sur les réservations.",
         "Le label est actif dès validation jusqu’au 31 décembre 2027. Si le dossier est déclaré non conforme après étude, le paiement est remboursé intégralement.",
       ],
-      action: { label: "Je demande mon label 2027", href: candidatureUrl(prospect) },
-      secondaryAction: { label: "Relire toute l’offre", href: `${getAppUrl()}/labellisation` },
+      action: { label: "Je demande mon label 2027", href: candidature },
+      secondaryAction: { label: "Relire toute l’offre", href: labellisation },
       notice: "Paiement unique · 0 % de commission · Aucun renouvellement automatique.",
     },
     DREAM: {
@@ -249,8 +271,8 @@ function messageFor(prospect: Prospect, stage: ProspectingStage) {
         "Ils ne viennent pas par hasard : ils ont choisi un lieu qui partage leur envie de voyager proprement, calmement et avec respect. De votre côté, vous savez pourquoi ils viennent et ce qu’ils attendent.",
         `C’est la relation que nous voulons construire entre les membres et ${prospect.name} : moins de malentendus, plus de confiance et davantage de recommandations utiles.`,
       ],
-      action: { label: "Projeter mon lieu dans le réseau", href: candidatureUrl(prospect) },
-      secondaryAction: { label: "Découvrir les lieux actuels", href: `${getAppUrl()}/explorer` },
+      action: { label: "Projeter mon lieu dans le réseau", href: candidature },
+      secondaryAction: { label: "Découvrir les lieux actuels", href: explorer },
       notice: "Le label sélectionne et informe ; il ne promet jamais un volume de réservations.",
     },
     TESTIMONIAL: {
@@ -262,8 +284,8 @@ function messageFor(prospect: Prospect, stage: ProspectingStage) {
         "Derrière ce témoignage, le besoin est très simple : savoir avant d’arriver qu’un établissement comprend la vanlife et accueille réellement ce type de voyageur.",
         `Une fiche précise de ${prospect.name}, reliée à une charte et à une Carte membre vérifiable, peut donner cette confiance au moment du choix.`,
       ],
-      action: { label: "Comprendre la philosophie du label", href: `${getAppUrl()}/le-label` },
-      secondaryAction: { label: "Demander mon label", href: candidatureUrl(prospect) },
+      action: { label: "Comprendre la philosophie du label", href: concept },
+      secondaryAction: { label: "Demander mon label", href: candidature },
       notice: "Témoignage déjà publié par Label Vanlife. Les expériences restent personnelles et ne garantissent pas un résultat identique.",
     },
     OFFER_10: {
@@ -275,8 +297,8 @@ function messageFor(prospect: Prospect, stage: ProspectingStage) {
         "Vous bénéficiez de la fiche, de la MAP membre, du kit de communication et de l’accompagnement jusqu’au 31 décembre 2027, avec 0 % de commission sur vos réservations.",
         "Sans réponse de votre part, aucun autre message automatique ne sera envoyé. Vous pourrez naturellement revenir vers nous lorsque le moment sera le bon.",
       ],
-      action: { label: "Je demande mon label 2027", href: candidatureUrl(prospect) },
-      secondaryAction: { label: "Découvrir une dernière fois l’offre", href: `${getAppUrl()}/labellisation` },
+      action: { label: "Je demande mon label 2027", href: candidature },
+      secondaryAction: { label: "Découvrir une dernière fois l’offre", href: labellisation },
       notice: "Fin définitive du parcours automatique après ce message.",
     },
   } satisfies Record<Exclude<ProspectingStage, "INITIAL" | "FOLLOW_UP_1" | "OFFER_3">, {

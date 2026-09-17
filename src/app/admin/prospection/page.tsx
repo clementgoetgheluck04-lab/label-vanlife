@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { AlertTriangle, ArrowUpRight, CheckCircle2, Clock3, Mail, MessageSquareReply, Pause, Play, RefreshCw, Send, ShieldCheck, Target, Users } from "lucide-react";
+import { AlertTriangle, ArrowUpRight, CheckCircle2, Clock3, Mail, MessageSquareReply, MousePointerClick, Pause, Play, RefreshCw, Send, ShieldCheck, Target, Users } from "lucide-react";
 
 type ProspectStatus = "NEW" | "SENDING" | "CONTACTED" | "FOLLOW_UP_1" | "FOLLOW_UP_2" | "ENGAGED" | "INTERESTED" | "QUALIFIED" | "CONVERTED" | "NOT_INTERESTED" | "UNSUBSCRIBED" | "INVALID" | "NEEDS_HUMAN" | "PAUSED" | "ERROR";
 type Prospect = {
@@ -18,7 +18,10 @@ type Prospect = {
 };
 type Dashboard = {
   settings: { enabled: boolean; dailyLimit: number; replyTo: string; webhookConfigured: boolean };
-  totals: { prospects: number; sent: number; replies: number; counts: Partial<Record<ProspectStatus, number>> };
+  totals: { prospects: number; sent: number; replies: number; clickers: number; counts: Partial<Record<ProspectStatus, number>> };
+  experiments: {
+    initialSubject: Record<"direction" | "opportunity", { sent: number; engaged: number }>;
+  };
   prospects: Prospect[];
 };
 
@@ -37,6 +40,10 @@ const STATUS_STYLE: Record<ProspectStatus, string> = {
 
 function Metric({ icon: Icon, label, value, tone = "text-emerald-700" }: { icon: typeof Users; label: string; value: number; tone?: string }) {
   return <div className="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm"><Icon className={`h-5 w-5 ${tone}`} /><p className="mt-4 text-3xl font-black text-neutral-950">{value}</p><p className="mt-1 text-xs font-bold uppercase tracking-wider text-stone-500">{label}</p></div>;
+}
+
+function engagementRate(value: { sent: number; engaged: number }): number {
+  return value.sent ? Math.round((value.engaged / value.sent) * 1_000) / 10 : 0;
 }
 
 export default function AdminProspectionPage() {
@@ -76,6 +83,11 @@ export default function AdminProspectionPage() {
   if (!data) return <main className="min-h-screen bg-[#f8f6f1] px-6 pt-32"><p className="mx-auto max-w-3xl rounded-2xl bg-red-50 p-5 text-red-800">{error}</p></main>;
 
   const attention = (data.totals.counts.INTERESTED || 0) + (data.totals.counts.NEEDS_HUMAN || 0) + (data.totals.counts.ERROR || 0);
+  const direction = data.experiments.initialSubject.direction;
+  const opportunity = data.experiments.initialSubject.opportunity;
+  const directionRate = engagementRate(direction);
+  const opportunityRate = engagementRate(opportunity);
+  const experimentReady = direction.sent >= 30 && opportunity.sent >= 30 && direction.engaged + opportunity.engaged >= 5;
   return (
     <main className="min-h-screen bg-[#f8f6f1] px-4 pb-24 pt-28 sm:px-6">
       <div className="mx-auto max-w-7xl space-y-7">
@@ -89,12 +101,25 @@ export default function AdminProspectionPage() {
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"><div className="flex items-start gap-3">{data.settings.enabled && data.settings.webhookConfigured ? <ShieldCheck className="mt-0.5 h-6 w-6 text-emerald-700" /> : <AlertTriangle className="mt-0.5 h-6 w-6 text-amber-700" />}<div><p className="font-black text-neutral-950">{data.settings.enabled ? "Envois automatiques activés" : "Envois automatiques en attente d’activation"}</p><p className="mt-1 text-sm text-stone-600">{data.settings.dailyLimit} contacts maximum par jour ouvré · réponses vers {data.settings.replyTo} · webhook {data.settings.webhookConfigured ? "connecté" : "à connecter"}</p></div></div>{!data.settings.webhookConfigured && <button onClick={() => action("notify_setup")} className="shrink-0 rounded-full border border-amber-300 bg-white px-4 py-2 text-xs font-bold text-amber-900">M’envoyer les instructions par email</button>}</div>
         </section>
 
-        <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+        <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-6">
           <Metric icon={Users} label="Prospects" value={data.totals.prospects} />
           <Metric icon={Send} label="Emails envoyés" value={data.totals.sent} tone="text-sky-700" />
+          <Metric icon={MousePointerClick} label="Prospects ayant cliqué" value={data.totals.clickers} tone="text-indigo-700" />
           <Metric icon={MessageSquareReply} label="Réponses" value={data.totals.replies} tone="text-violet-700" />
           <Metric icon={Target} label="À traiter" value={attention} tone="text-orange-700" />
           <Metric icon={CheckCircle2} label="Ventes" value={data.totals.counts.CONVERTED || 0} tone="text-emerald-700" />
+        </section>
+
+        <section className="rounded-3xl border border-stone-200 bg-white p-5 shadow-sm">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+            <div><p className="text-xs font-black uppercase tracking-[.18em] text-indigo-700">Test des objets du premier email</p><h2 className="mt-2 text-xl font-black text-neutral-950">Direction ou opportunité commerciale ?</h2></div>
+            <p className={`rounded-full px-3 py-1.5 text-xs font-bold ${experimentReady ? "bg-emerald-100 text-emerald-800" : "bg-amber-100 text-amber-800"}`}>{experimentReady ? "Résultat exploitable" : "Échantillon encore insuffisant"}</p>
+          </div>
+          <div className="mt-5 grid gap-3 md:grid-cols-2">
+            <div className="rounded-2xl border border-stone-200 bg-stone-50 p-4"><p className="text-sm font-black text-neutral-900">« À l’attention de la direction »</p><p className="mt-3 text-3xl font-black text-indigo-800">{directionRate.toLocaleString("fr-FR")} %</p><p className="mt-1 text-xs text-stone-500">{direction.engaged} prospect(s) engagé(s) sur {direction.sent} emails</p></div>
+            <div className="rounded-2xl border border-stone-200 bg-stone-50 p-4"><p className="text-sm font-black text-neutral-900">« Les vans peuvent devenir des clients »</p><p className="mt-3 text-3xl font-black text-indigo-800">{opportunityRate.toLocaleString("fr-FR")} %</p><p className="mt-1 text-xs text-stone-500">{opportunity.engaged} prospect(s) engagé(s) sur {opportunity.sent} emails</p></div>
+          </div>
+          <p className="mt-4 text-sm leading-6 text-stone-600">{experimentReady ? (directionRate > opportunityRate ? "L’objet adressé à la direction est actuellement le plus performant." : opportunityRate > directionRate ? "L’objet centré sur l’opportunité commerciale est actuellement le plus performant." : "Les deux formulations sont actuellement à égalité.") : "Aucun objet ne sera déclaré gagnant avant au moins 30 envois par variante et 5 engagements cumulés."}</p>
         </section>
 
         <section className="overflow-hidden rounded-3xl border border-stone-200 bg-white shadow-sm">

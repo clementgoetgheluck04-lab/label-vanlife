@@ -19,7 +19,7 @@ export default function PolitiqueConfidentialitePage() {
         <header>
           <p className="text-xs font-bold uppercase tracking-[0.18em] text-emerald-800">Vie privée</p>
           <h1 className="mt-3 text-3xl font-bold text-neutral-950 sm:text-4xl">Politique de confidentialité et cookies</h1>
-          <p className="mt-3 text-sm text-neutral-600">Dernière mise à jour : 15 septembre 2026.</p>
+          <p className="mt-3 text-sm text-neutral-600">Dernière mise à jour : 17 septembre 2026.</p>
         </header>
 
         <section className={sectionClass}>
@@ -38,6 +38,7 @@ export default function PolitiqueConfidentialitePage() {
                 <tr><td className="p-4">Candidature, pièces et fiche d’établissement</td><td className="p-4">Évaluer puis publier un lieu avec son accord</td><td className="p-4">Mesures précontractuelles et contrat</td></tr>
                 <tr><td className="p-4">Email de newsletter</td><td className="p-4">Envoyer les actualités demandées</td><td className="p-4">Consentement</td></tr>
                 <tr><td className="p-4">Coordonnées professionnelles publiques</td><td className="p-4">Présenter le label à des lieux dont l’activité est pertinente</td><td className="p-4">Intérêt légitime, avec opposition simple et gratuite</td></tr>
+                <tr><td className="p-4">Événements techniques des emails professionnels</td><td className="p-4">Mesurer la délivrance et les clics sur nos liens afin de limiter les relances inutiles et améliorer la pertinence des messages</td><td className="p-4">Intérêt légitime, avec opposition simple et gratuite</td></tr>
                 <tr><td className="p-4">Parcours et actions sur le site</td><td className="p-4">Mesurer l’usage et améliorer le service</td><td className="p-4">Consentement</td></tr>
               </tbody>
             </table>
@@ -57,6 +58,7 @@ export default function PolitiqueConfidentialitePage() {
             <li>Données de commande et justificatifs : pendant les durées légales comptables et fiscales.</li>
             <li>Candidatures non finalisées et pièces : durée strictement nécessaire à l’étude et au suivi du dossier.</li>
             <li>Prospects professionnels non clients : trois ans au plus après la collecte ou le dernier contact du prospect.</li>
+            <li>Événements de délivrance et de clic des emails de prospection : associés au suivi du prospect pendant cette même durée, sauf opposition plus tôt.</li>
             <li>Oppositions à la prospection : conservation minimale des informations nécessaires pour respecter le refus.</li>
             <li>Statistiques consenties : identifiant navigateur six mois au plus ; événements détaillés vingt-cinq mois au plus.</li>
           </ul>
@@ -67,6 +69,7 @@ export default function PolitiqueConfidentialitePage() {
           <p className={textClass}>Les traceurs indispensables servent à sécuriser la connexion, maintenir une session et mémoriser votre choix de confidentialité. Ils ne peuvent pas être désactivés depuis le bandeau lorsque le service demandé en dépend.</p>
           <p className={textClass}>Sans l’option « Rester connecté », la connexion membre prend fin à la fermeture du navigateur. Avec cette option, elle peut persister sur l’appareil personnel, mais elle est automatiquement fermée après 10 jours sans consultation de l’espace membre. Une déconnexion manuelle reste disponible à tout moment.</p>
           <p className={textClass}>Les statistiques internes sont facultatives. Elles utilisent un identifiant aléatoire dans le stockage local et un identifiant de session, sans publicité ni suivi entre différents sites. Elles ne démarrent qu’après votre accord et respectent le signal « Do Not Track » de votre navigateur.</p>
+          <p className={textClass}>Lorsqu’un destinataire professionnel clique volontairement sur un lien contenu dans un email de prospection, Label Vanlife conserve l’email concerné, la date, la page demandée et la campagne associée. Cette mesure technique, fournie par Resend, ne dépose pas de cookie publicitaire et ne permet pas de suivre la navigation sur d’autres sites. La navigation détaillée sur Label Vanlife reste soumise au choix de statistiques exprimé dans le bandeau.</p>
           <p className={textClass}>Vous pouvez refuser dès le premier affichage et rouvrir à tout moment le panneau « Gérer mes cookies » présent en bas de chaque page. Le refus n’empêche ni la consultation du site, ni l’achat, ni l’accès membre.</p>
         </section>
 

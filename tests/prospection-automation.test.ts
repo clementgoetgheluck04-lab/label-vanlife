@@ -81,12 +81,22 @@ test("deliverability guard pauses on complaints or a sustained high bounce rate"
 
 test("first contact is designed for decision makers and measures two variants", () => {
   const engine = source("../src/server/prospection.ts");
+  const dashboardApi = source("../src/app/api/admin/prospection/route.ts");
+  const dashboardPage = source("../src/app/admin/prospection/page.tsx");
   assert.match(engine, /À l’attention de la direction/);
   assert.match(engine, /personne chargée du développement commercial/);
   assert.match(engine, /pourriez-vous simplement le lui transmettre/);
   assert.match(engine, /initialVariantFor/);
   assert.match(engine, /name: "variant"/);
   assert.match(engine, /0 % de commission/);
+  assert.match(engine, /utm_source", "label_vanlife"/);
+  assert.match(engine, /utm_medium", "email"/);
+  assert.match(engine, /utm_campaign", `prospection_2027_\$\{stage\.toLowerCase\(\)\}`/);
+  assert.match(engine, /utm_content", `\$\{variant\}_\$\{action\}`/);
+  assert.match(dashboardApi, /initialSubject/);
+  assert.match(dashboardApi, /clickers: clickers\.size/);
+  assert.match(dashboardPage, /Test des objets du premier email/);
+  assert.match(dashboardPage, /30 envois par variante et 5 engagements cumulés/);
 });
 
 test("engaged prospects receive the complete ten-message editorial journey", () => {
@@ -106,6 +116,10 @@ test("Resend inbound webhook is signed and escalates ambiguous replies", () => {
   assert.match(webhook, /email\.received/);
   assert.match(webhook, /email\.clicked/);
   assert.match(webhook, /status: "ENGAGED"/);
+  assert.match(webhook, /clickEventIds/);
+  assert.match(webhook, /lastClickedPath/);
+  assert.match(webhook, /lastEmailClickAction/);
+  assert.match(webhook, /webhookEventId/);
   assert.match(webhook, /labelvanlife\\\.\(fr\|com\)/);
   assert.match(webhook, /\["CONTACTED", "FOLLOW_UP_1", "FOLLOW_UP_2"\]/);
   assert.match(webhook, /NEEDS_HUMAN/);
@@ -113,6 +127,14 @@ test("Resend inbound webhook is signed and escalates ambiguous replies", () => {
   assert.match(webhook, /email\.bounced/);
   assert.match(webhook, /Adresse invalide pour \$\{message\.prospect\.name\}/);
   assert.match(webhook, /email\.complained/);
+});
+
+test("professional email click measurement is transparent and distinct from consented site analytics", () => {
+  const privacy = source("../src/app/politique-confidentialite/page.tsx");
+  assert.match(privacy, /Événements techniques des emails professionnels/);
+  assert.match(privacy, /clic des emails de prospection/);
+  assert.match(privacy, /ne dépose pas de cookie publicitaire/);
+  assert.match(privacy, /navigation détaillée[\s\S]+choix de statistiques/);
 });
 
 test("labellisation and payment feed the sales pipeline", () => {

@@ -10,6 +10,7 @@ export const maxDuration = 60;
 
 type ResendEvent = {
   type: string;
+  created_at?: string;
   data?: {
     email_id?: string;
     from?: string;
@@ -18,6 +19,16 @@ type ResendEvent = {
     click?: { link?: string };
   };
 };
+
+function metadataRecord(value: unknown): Record<string, unknown> {
+  return value && typeof value === "object" && !Array.isArray(value)
+    ? value as Record<string, unknown>
+    : {};
+}
+
+function metadataStringArray(value: unknown): string[] {
+  return Array.isArray(value) ? value.filter((item): item is string => typeof item === "string") : [];
+}
 
 function senderAddress(value: string): string {
   const bracketed = value.match(/<([^>]+)>/);
@@ -61,7 +72,7 @@ async function handleDeliveryEvent(event: ResendEvent): Promise<void> {
   if (event.type === "email.complained") await suppressProspect(message.prospect.email, "complaint", "resend-webhook");
 }
 
-async function handleClick(event: ResendEvent): Promise<void> {
+async function handleClick(event: ResendEvent, webhookEventId: string): Promise<void> {
   const providerMessageId = event.data?.email_id;
   const link = event.data?.click?.link || "";
   let clickedUrl: URL;
@@ -76,15 +87,53 @@ async function handleClick(event: ResendEvent): Promise<void> {
     where: { providerMessageId },
     include: { prospect: true },
   });
-  if (!message || message.direction !== "OUTBOUND" || message.prospect.followUpCount >= 10) return;
-  if (!["CONTACTED", "FOLLOW_UP_1", "FOLLOW_UP_2"].includes(message.prospect.status)) return;
-  await prisma.prospect.update({
-    where: { id: message.prospect.id },
-    data: {
-      status: "ENGAGED",
-      nextActionAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1_000),
-    },
-  });
+  if (!message || message.direction !== "OUTBOUND") return;
+
+  const messageMetadata = metadataRecord(message.metadata);
+  const processedEventIds = metadataStringArray(messageMetadata.clickEventIds);
+  if (webhookEventId && processedEventIds.includes(webhookEventId)) return;
+  const prospectMetadata = metadataRecord(message.prospect.metadata);
+  const clickedAt = event.created_at && !Number.isNaN(Date.parse(event.created_at))
+    ? new Date(event.created_at)
+    : new Date();
+  const clickedPath = `${clickedUrl.pathname}${clickedUrl.search}`.slice(0, 500);
+  const clickedAction = (clickedUrl.searchParams.get("utm_content") || clickedUrl.pathname).slice(0, 120);
+  const messageClickCount = typeof messageMetadata.clickCount === "number" ? messageMetadata.clickCount : 0;
+  const prospectClickCount = typeof prospectMetadata.emailClickCount === "number" ? prospectMetadata.emailClickCount : 0;
+  const canEngage = message.prospect.followUpCount < 10
+    && ["CONTACTED", "FOLLOW_UP_1", "FOLLOW_UP_2"].includes(message.prospect.status);
+
+  await prisma.$transaction([
+    prisma.prospectMessage.update({
+      where: { id: message.id },
+      data: {
+        metadata: {
+          ...messageMetadata,
+          clickCount: messageClickCount + 1,
+          clickEventIds: [...processedEventIds, webhookEventId].filter(Boolean).slice(-20),
+          lastClickedAt: clickedAt.toISOString(),
+          lastClickedPath: clickedPath,
+          lastClickedAction: clickedAction,
+        },
+      },
+    }),
+    prisma.prospect.update({
+      where: { id: message.prospect.id },
+      data: {
+        ...(canEngage ? {
+          status: "ENGAGED" as const,
+          nextActionAt: new Date(clickedAt.getTime() + 7 * 24 * 60 * 60 * 1_000),
+        } : {}),
+        metadata: {
+          ...prospectMetadata,
+          emailClickCount: prospectClickCount + 1,
+          lastEmailClickAt: clickedAt.toISOString(),
+          lastEmailClickPath: clickedPath,
+          lastEmailClickAction: clickedAction,
+        },
+      },
+    }),
+  ]);
 }
 
 async function sendSalesReply(prospect: { id: string; sourceId: string | null; name: string; email: string }, subject: string, inboundId: string, kind: "interested" | "question") {
@@ -199,11 +248,12 @@ async function handleInbound(event: ResendEvent): Promise<void> {
 export async function POST(request: NextRequest) {
   try {
     const payload = await request.text();
+    const webhookEventId = request.headers.get("svix-id") || "";
     const resend = new Resend(requireServerEnv("RESEND_API_KEY"));
     const event = resend.webhooks.verify({
       payload,
       headers: {
-        id: request.headers.get("svix-id") || "",
+        id: webhookEventId,
         timestamp: request.headers.get("svix-timestamp") || "",
         signature: request.headers.get("svix-signature") || "",
       },
@@ -211,7 +261,7 @@ export async function POST(request: NextRequest) {
     }) as ResendEvent;
 
     if (event.type === "email.received") await handleInbound(event);
-    if (event.type === "email.clicked") await handleClick(event);
+    if (event.type === "email.clicked") await handleClick(event, webhookEventId);
     if (["email.bounced", "email.complained", "email.suppressed"].includes(event.type)) await handleDeliveryEvent(event);
     return NextResponse.json({ received: true });
   } catch (error) {
