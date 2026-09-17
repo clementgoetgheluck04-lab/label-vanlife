@@ -32,6 +32,7 @@ test("missing camping contacts are escalated once in manageable research batches
   const auzerals = places.find((place) => place.id === "papa-rtenaires-camping-les-auzerals");
   const chesnets = places.find((place) => place.id === "label-repere-camping-mbs-les-chesnets-point-gps");
   const abeilleAuFruit = places.find((place) => place.id === "bienvenue-ferme-de-l-abeille-au-fruit-le-camping-du-verger");
+  const prunay = places.find((place) => place.id === "bienvenue-ferme-camping-nature-ferme-pedagogique-de-prunay");
 
   assert.equal(goutilier?.emails?.[0], "dufraisse.m@wanadoo.fr");
   assert.equal(labau?.emails?.[0], "guydelrieu@dartybox.com");
@@ -42,6 +43,7 @@ test("missing camping contacts are escalated once in manageable research batches
   assert.equal(auzerals?.emails?.[0], "campinglesauzerals@gmail.com");
   assert.equal(chesnets?.emails?.[0], "mbsleschesnets@gmail.com");
   assert.equal(abeilleAuFruit?.emails?.[0], "delabeilleaufruit@gmail.com");
+  assert.equal(prunay?.emails?.[0], "reservation@prunay.com");
   assert.match(engine, /MISSING_CONTACT_DIGEST_SIZE = 15/);
   assert.match(engine, /PROSPECTION_MISSING_CONTACTS_DIGEST/);
   assert.match(engine, /alreadyNotified\.has\(place\.id\)/);
