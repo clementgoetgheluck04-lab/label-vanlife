@@ -9126,13 +9126,12 @@
     "region": "France",
     "lat": 50.4682602,
     "lng": 1.7628211,
-    "emails": [
-      "contact@lafontainedesclercs.fr"
-    ],
     "website": "https://www.lafontainedesclercs.fr/",
     "description": "76 emplacements : 48 emplacements nus, 2 locations et résidentiels",
     "phones": [],
-    "emails": [],
+    "emails": [
+      "contact@lafontainedesclercs.fr"
+    ],
     "details": [
       "76 emplacements : 48 emplacements nus, 2 locations et résidentiels"
     ],

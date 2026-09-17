@@ -27,6 +27,7 @@ test("missing camping contacts are escalated once in manageable research batches
   const labau = places.find((place) => place.id === "bienvenue-ferme-camping-a-la-ferme-labau");
   const roumavagi = places.find((place) => place.id === "bienvenue-ferme-camping-a-la-ferme-roumavagi");
   const fontaine = places.find((place) => place.id === "papa-rtenaires-camping-la-fontaine-des-clercs");
+  const spottedFontaine = places.find((place) => place.id === "label-repere-camping-la-fontaine-des-clercs-point-gps");
   const sorbier = places.find((place) => place.id === "papa-rtenaires-camping-le-sorbier");
   const auzerals = places.find((place) => place.id === "papa-rtenaires-camping-les-auzerals");
   const chesnets = places.find((place) => place.id === "label-repere-camping-mbs-les-chesnets-point-gps");
@@ -35,6 +36,7 @@ test("missing camping contacts are escalated once in manageable research batches
   assert.equal(labau?.emails?.[0], "guydelrieu@dartybox.com");
   assert.equal(roumavagi?.emails?.[0], "camping.roumavagi@gmail.com");
   assert.equal(fontaine?.emails?.[0], "contact@lafontainedesclercs.fr");
+  assert.equal(spottedFontaine?.emails?.[0], "contact@lafontainedesclercs.fr");
   assert.equal(sorbier?.emails?.[0], "campinglesorbier@gmail.com");
   assert.equal(auzerals?.emails?.[0], "campinglesauzerals@gmail.com");
   assert.equal(chesnets?.emails?.[0], "mbsleschesnets@gmail.com");
