@@ -9,6 +9,8 @@ import { labelVanlifeEmail } from "@/server/email-template";
 import { assertSameOrigin, enforceRateLimit, getClientAddress, readJsonRequest } from "@/server/request-security";
 import { getStripe } from "@/server/stripe";
 import { parseText } from "@/server/validation";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { LABEL_REVIEW_CONTROLS, LABEL_STANDARD_VERSION } from "@/config/label-standard";
 
 export const dynamic = "force-dynamic";
 
@@ -20,7 +22,29 @@ export async function GET() {
       orderBy: { createdAt: "desc" },
       select: { id: true, status: true, amount: true, currency: true, payload: true, paidAt: true, createdAt: true },
     });
-    return NextResponse.json({ orders }, { headers: { "Cache-Control": "no-store" } });
+    const supabase = createAdminClient();
+    const reviewedOrders = await Promise.all(orders.map(async (order) => {
+      const payload = order.payload && typeof order.payload === "object" && !Array.isArray(order.payload)
+        ? order.payload as Record<string, unknown>
+        : {};
+      const attachmentPaths = Array.isArray(payload.attachmentPaths)
+        ? payload.attachmentPaths.filter((path): path is string => typeof path === "string" && path.startsWith("pending/"))
+        : [];
+      if (!attachmentPaths.length) return { ...order, evidenceLinks: [] };
+      const { data, error } = await supabase.storage.from("labellisation-attachments").createSignedUrls(attachmentPaths, 15 * 60);
+      if (error) {
+        console.warn(`[admin-labellisations-list:${order.id}] evidence links unavailable`, error.message);
+        return { ...order, evidenceLinks: [] };
+      }
+      return {
+        ...order,
+        evidenceLinks: (data || []).filter((item) => item.signedUrl).map((item) => ({
+          name: item.path?.split("/").at(-1) || "Justificatif",
+          url: item.signedUrl,
+        })),
+      };
+    }));
+    return NextResponse.json({ orders: reviewedOrders }, { headers: { "Cache-Control": "no-store" } });
   } catch (error) {
     return apiError(error, "admin-labellisations-list");
   }
@@ -35,9 +59,18 @@ export async function POST(request: NextRequest) {
     const orderId = parseText(input.orderId, { min: 10, max: 120, required: true });
     const decision = input.decision === "ACCEPTED" || input.decision === "REJECTED" ? input.decision : null;
     const reason = parseText(input.reason, { max: 1_000 });
-    if (!orderId || !decision || reason === null) return NextResponse.json({ error: "Décision invalide" }, { status: 400 });
+    const reviewNote = parseText(input.reviewNote, { min: 10, max: 1_200, required: true });
+    const rawChecklist = input.reviewChecklist && typeof input.reviewChecklist === "object" && !Array.isArray(input.reviewChecklist)
+      ? input.reviewChecklist as Record<string, unknown>
+      : {};
+    const reviewChecklist = Object.fromEntries(LABEL_REVIEW_CONTROLS.map((control) => [control.id, rawChecklist[control.id] === true]));
+    const allControlsConfirmed = LABEL_REVIEW_CONTROLS.every((control) => reviewChecklist[control.id]);
+    if (!orderId || !decision || reason === null || !reviewNote) return NextResponse.json({ error: "Décision invalide ou note de revue trop courte" }, { status: 400 });
     if (decision === "REJECTED" && !reason) {
       return NextResponse.json({ error: "Le motif de non-conformité est obligatoire" }, { status: 400 });
+    }
+    if (decision === "ACCEPTED" && !allControlsConfirmed) {
+      return NextResponse.json({ error: "Tous les contrôles du référentiel doivent être confirmés avant validation" }, { status: 400 });
     }
 
     const prisma = getPrisma();
@@ -103,6 +136,9 @@ export async function POST(request: NextRequest) {
       ...payload,
       reviewStatus: decision,
       reviewReason: reason || "",
+      reviewNote,
+      reviewChecklist,
+      standardVersion: LABEL_STANDARD_VERSION,
       reviewedAt: new Date().toISOString(),
       reviewedBy: admin.id,
     } as Prisma.InputJsonObject;
@@ -114,7 +150,7 @@ export async function POST(request: NextRequest) {
           adminId: admin.id,
           action: `LABELLISATION_${decision}`,
           target: order.id,
-          metadata: { refunded: decision === "REJECTED" },
+          metadata: { refunded: decision === "REJECTED", standardVersion: LABEL_STANDARD_VERSION, reviewChecklist },
           ipAddress: getClientAddress(request),
         },
       }),

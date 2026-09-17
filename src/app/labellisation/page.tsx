@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   ArrowRight, Sparkles, MapPin, BadgeCheck, Percent, Shield, Check, Star, Heart, Users, TreePine, Warehouse, Home
@@ -33,6 +34,9 @@ export default function LabellisationPage() {
               <Button variant="primary" size="lg" className="gap-2 text-base px-8" onClick={() => router.push("/labellisation/candidature")}>
                 Candidater au Label <ArrowRight className="w-5 h-5" />
               </Button>
+              <Link href="/referentiel-label-vanlife" className="inline-flex min-h-12 items-center gap-2 rounded-xl border border-emerald-700 px-6 text-sm font-bold text-emerald-800 hover:bg-emerald-50">
+                Lire le référentiel 2027 <ArrowRight className="h-4 w-4" />
+              </Link>
             </div>
             <div className="mx-auto inline-flex flex-col items-center rounded-2xl border border-amber-200 bg-white px-6 py-4 shadow-sm">
               <span className="text-xs font-bold uppercase tracking-[0.16em] text-amber-700">Prévente 2027 · nombre de places limité</span>
@@ -185,7 +189,7 @@ export default function LabellisationPage() {
               { icon: <Star className="w-5 h-5" />, title: "Mise en avant auprès de la communauté", desc: "Votre lieu est recommandé directement à notre communauté de vanlifers engagés, sur notre carte et nos réseaux." },
               { icon: <Shield className="w-5 h-5" />, title: "Qualité plutôt que quantité", desc: "Vous gardez le contrôle sur le nombre de visiteurs. Nous privilégions les séjours de qualité aux flux de masse." },
               { icon: <TreePine className="w-5 h-5" />, title: "Impact local positif", desc: "Favorisez l'économie locale et les circuits courts. Nos membres consomment local et recommandent les commerces alentour." },
-              { icon: <BadgeCheck className="w-5 h-5" />, title: "Badge de labellisation officiel", desc: "Recevez votre badge numérique LABEL VANLIFE à afficher sur vos supports en ligne." },
+              { icon: <BadgeCheck className="w-5 h-5" />, title: "Badge de labellisation 2027", desc: "Recevez votre badge numérique LABEL VANLIFE à afficher sur vos supports en ligne." },
             ].map((item) => (
               <Card key={item.title} className="p-5">
                 <div className="flex items-start gap-3">
@@ -234,9 +238,9 @@ export default function LabellisationPage() {
           </div>
           <div className="grid sm:grid-cols-2 gap-4 max-w-3xl mx-auto">
             {[
-              "Audit personnalisé de votre lieu par nos experts",
+              "Étude documentée selon le référentiel public 2027",
               "Accompagnement et conseils pour optimiser l'accueil vanlife",
-              "Badge numérique officiel LABEL VANLIFE pour votre établissement",
+              "Badge numérique LABEL VANLIFE 2027 pour votre établissement",
               "Fiche dédiée sur notre carte interactive exclusive",
               "Indiquez des emplacements spécifiques : vanlife couple, vanlife famille, solo...",
               "Système de signalement mutuel pour garantir l'excellence du réseau",
@@ -254,7 +258,7 @@ export default function LabellisationPage() {
           <div className="text-center mb-10 space-y-3">
             <span className="inline-block text-xs font-semibold tracking-[0.2em] uppercase text-emerald-500">Ouvert à tous</span>
             <h2 className="text-3xl sm:text-4xl font-bold text-neutral-800" style={{ fontFamily: "Outfit, sans-serif" }}>À qui s'adresse le label ?</h2>
-            <p className="text-neutral-500 max-w-xl mx-auto">Que vous soyez professionnel ou particulier, si vous avez un lieu de qualité, le label est fait pour vous.</p>
+            <p className="text-neutral-500 max-w-xl mx-auto">Campings, aires, fermes, domaines et autres lieux professionnels peuvent candidater si leur accueil répond au référentiel.</p>
           </div>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">

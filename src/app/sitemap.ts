@@ -15,6 +15,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const staticPages = [
     { url: baseUrl, lastModified: new Date(), changeFrequency: "weekly" as const, priority: 0.9 },
     { url: `${baseUrl}/le-label`, lastModified: new Date(), changeFrequency: "monthly" as const, priority: 0.9 },
+    { url: `${baseUrl}/referentiel-label-vanlife`, lastModified: new Date("2026-09-17"), changeFrequency: "monthly" as const, priority: 0.9 },
     { url: `${baseUrl}/ecosysteme`, lastModified: new Date(), changeFrequency: "monthly" as const, priority: 0.9 },
     { url: `${baseUrl}/explorer`, lastModified: new Date(), changeFrequency: "weekly" as const, priority: 0.9 },
     { url: `${baseUrl}/labellisation`, lastModified: new Date(), changeFrequency: "monthly" as const, priority: 0.8 },

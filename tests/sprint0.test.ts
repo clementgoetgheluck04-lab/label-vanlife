@@ -105,6 +105,7 @@ test("labellisation payload is normalized and allow-listed", () => {
     photoFileNames: ["emplacement.jpg"],
     welcomeMessage: "Nous proposons un accueil familial dans un environnement calme.",
     reservationModes: ["online", "phone"],
+    operatingAuthorization: true,
     acceptCharter: true,
   });
   assert.ok(result);
@@ -115,6 +116,7 @@ test("labellisation payload is normalized and allow-listed", () => {
   assert.equal(parseLabellisationPayload({ ...result, photoFileNames: [] }), null);
   assert.equal(parseLabellisationPayload({ ...result, website: "example.org" })?.website, "https://example.org/");
   assert.equal(parseLabellisationPayload({ ...result, placeType: "ADMIN" }), null);
+  assert.equal(parseLabellisationPayload({ ...result, operatingAuthorization: false }), null);
   assert.equal(parseLabellisationPayload({ ...result, website: "javascript:alert(1)" }), null);
   assert.equal(parseLabellisationPayload({ ...result, hasParityClause: true, publicPrice: 35, minimumAllowedPrice: 33, discountPercent: 10 }), null);
   assert.ok(parseLabellisationPayload({ ...result, hasParityClause: true, publicPrice: 35, minimumAllowedPrice: 19, discountPercent: 20 }));

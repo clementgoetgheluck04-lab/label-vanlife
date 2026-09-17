@@ -118,6 +118,9 @@ export default function LeLabelPage() {
               <Link href="/explorer" className="inline-flex items-center gap-2 text-sm font-semibold text-white/70 transition-colors hover:text-white">
                 Voir les lieux labellisés <ArrowRight className="h-4 w-4" />
               </Link>
+              <Link href="/referentiel-label-vanlife" className="inline-flex items-center gap-2 text-sm font-semibold text-[#dfc59f] transition-colors hover:text-white">
+                Consulter le référentiel 2027 <ArrowRight className="h-4 w-4" />
+              </Link>
             </div>
           </div>
 
@@ -136,7 +139,7 @@ export default function LeLabelPage() {
               </div>
               <div className="mt-4 grid gap-2 sm:grid-cols-2">
                 {[
-                  "Lieux vérifiés",
+                  "Lieux étudiés",
                   "Accueil engagé",
                   "Charte commune",
                   "Voyage plus respectueux",
@@ -273,7 +276,7 @@ export default function LeLabelPage() {
           </h2>
           <p className="text-lg text-neutral-600">
             Nous ne cherchons pas à répertorier tous les spots.<br />
-            <strong className="text-emerald-600">Nous choisissons de certifier les bons.</strong>
+            <strong className="text-emerald-600">Nous choisissons de labelliser des lieux après étude.</strong>
           </p>
           <div className="bg-emerald-50 rounded-2xl p-8 border border-emerald-100 space-y-2">
             <p className="font-semibold text-neutral-800">Des lieux :</p>
@@ -403,6 +406,7 @@ export default function LeLabelPage() {
             ))}
           </div>
           <p className="text-center text-sm font-semibold text-emerald-600 italic">Tous les lieux ne sont pas acceptés.<br />Et c&apos;est exactement ce qui fait la valeur du label.</p>
+          <div className="text-center"><Link href="/referentiel-label-vanlife" className="inline-flex min-h-11 items-center gap-2 rounded-full border border-emerald-700 px-5 text-sm font-bold text-emerald-800 hover:bg-emerald-50">Voir les 22 indicateurs et la méthode de contrôle <ArrowRight className="h-4 w-4" /></Link></div>
         </div>
       </section>
 

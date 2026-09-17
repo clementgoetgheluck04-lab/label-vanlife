@@ -1,65 +1,154 @@
-# Roadmap CTO
+# Roadmap produit Label Vanlife
 
-Les estimations sont des jours d'ingénierie nets et seront recalibrées après accès aux environnements. P0 bloque tout encaissement ou déploiement public.
+Mise à jour : 17 septembre 2026
 
-## Sprint 0 — Sécuriser et rendre déployable
+## Principe
 
-**État au 14 juillet 2026 : implémentation locale en cours, validation des services réels en attente.** La carte membre a un tarif public unique de 39 € TTC, actuellement proposé à 29 € TTC sans renouvellement automatique. La labellisation est proposée à 110 € TTC au lieu de 220 € TTC jusqu'au 31 décembre 2026, avec remboursement intégral si le lieu est déclaré non conforme après étude. Le détail des travaux et réserves figure dans [SPRINT_0_REPORT.md](SPRINT_0_REPORT.md).
+La priorité n’est plus d’accumuler des fonctionnalités. Chaque chantier doit renforcer au moins un actif : confiance, donnée propriétaire, distribution, rétention ou revenu. Aucun prix, service payant ou migration destructive ne change sans décision explicite.
 
-| Titre | Description | Impact | Difficulté | Estimation | Dépendances | Priorité |
-|---|---|---|---|---:|---|---|
-| Décider l'offre commerciale | Fixer les prix, le mode de paiement, la TVA, le remboursement et la durée | Élimine les contradictions légales et techniques | Faible | 0,5 j | Décision fondateur | P0 — fait |
-| Réparer le build | Déclarer la config Prisma correctement, supprimer les erreurs TS/ESLint et migrer `middleware` vers `proxy` | Rétablit CI/CD | Moyenne | 2 j | Aucune | P0 |
-| Refaire Checkout membre | Auth serveur, commande interne, prix serveur, idempotency key, URLs fiables | Restaure les ventes | Élevée | 3 j | Offre décidée, Stripe test | P0 |
-| Refaire Checkout label | Persister la candidature avant paiement et relier la session | Évite les paiements orphelins | Élevée | 3 j | Offre décidée | P0 |
-| Durcir les webhooks | Service role/Prisma, table événements, transactions, retries, logs et tests | Garantit l'activation | Élevée | 3 j | Schéma et accès Stripe | P0 |
-| Autorisation RBAC + RLS | Rôles serveur, politiques par table et tests négatifs | Protège données/admin | Élevée | 4 j | Audit Supabase | P0 |
-| Sécuriser les API publiques | Schémas de validation, limites, rate limiting, erreurs neutres | Réduit abus et injection | Moyenne | 2 j | Choix infra rate limit | P0 |
-| Baseline migrations | Réconcilier base distante et Prisma, créer un historique reproductible | Sécurise les déploiements | Élevée | 3 j | Accès DB + sauvegarde | P0 |
+Label Vanlife est piloté comme un système, pas comme un site :
 
-## Sprint 1 — Tunnel de conversion
+```text
+nouveau voyageur
+  → recherche et prépare un voyage
+    → visite un lieu et apporte une preuve
+      → améliore la fraîcheur et la fiabilité de la fiche
+        → augmente la confiance et la conversion
+          → attire un nouveau lieu de qualité
+            → augmente la valeur de la carte membre
+              → attire de nouveaux voyageurs
+```
 
-| Titre | Description | Impact | Difficulté | Estimation | Dépendances | Priorité |
-|---|---|---|---|---:|---|---|
-| Unifier la vente membre | Une page, une offre, FAQ, preuves, récapitulatif et reprise d'abandon | Conversion | Moyenne | 3 j | Sprint 0 | P1 |
-| Unifier la labellisation | Formulaire multi-étapes persisté, validation, sauvegarde et statut | Conversion pro | Élevée | 4 j | Sprint 0 | P1 |
-| Auth fluide | Confirmation email, OTP, redirection sûre, récupération mot de passe | Activation | Moyenne | 3 j | RBAC | P1 |
-| E2E critiques | Achat membre, achat label, webhook rejoué, login, accès refusé | Réduit les régressions | Élevée | 3 j | Parcours stabilisés | P1 |
-| Conformité achat | CGV, confidentialité, consentement, facturation et support | Confiance/légal | Moyenne | 2 j | Validation juridique | P1 |
+Une fonctionnalité n’entre dans la roadmap que si elle possède quatre éléments : un producteur du signal, une donnée conservée, un bénéficiaire identifiable et une métrique de résultat. Sans cette boucle, elle reste une page ou un effet visuel et n’est pas prioritaire.
 
-## Sprint 2 — Expérience membre et carte
+## Score de priorité
 
-| Titre | Description | Impact | Difficulté | Estimation | Dépendances | Priorité |
-|---|---|---|---|---:|---|---|
-| Remplacer les mocks | Brancher profil, carte, favoris, notifications et passeport sur la DB | Produit réel | Élevée | 6 j | RLS + modèle | P1 |
-| Unifier les routes carte | Choisir une carte publique d'acquisition et une vue membre | Clarté/SEO | Moyenne | 2 j | Décision produit | P1 |
-| API géospatiale | PostGIS, bbox, filtres, pagination curseur et clustering serveur | Scalabilité carte | Élevée | 5 j | Migration DB | P1 |
-| Performance carte | Chargement différé, workers si utile, limites de marqueurs, cache | Core Web Vitals | Élevée | 4 j | API géospatiale | P1 |
-| États UX complets | Skeletons, erreurs, vide, offline et reprise | Qualité perçue | Moyenne | 3 j | Données réelles | P1 |
+Échelle de 1 à 5. La valeur combine impact utilisateur, revenu, confiance, rétention, acquisition et donnée. L’effort et le risque sont pénalisants.
 
-## Sprint 3 — SEO, performance et contenu
+| Chantier | Confiance | Revenu | Rétention | Acquisition | Donnée | Effort | Risque | Priorité |
+|---|---:|---:|---:|---:|---:|---:|---:|---|
+| Référentiel public et décision traçable | 5 | 4 | 3 | 4 | 4 | 2 | 1 | P0 |
+| Registre public des labels valides | 5 | 4 | 3 | 4 | 4 | 3 | 2 | P0 |
+| Mesure du tunnel et preuve de valeur | 4 | 5 | 4 | 4 | 5 | 3 | 2 | P1 |
+| Source de vérité unique des lieux | 5 | 4 | 4 | 4 | 5 | 5 | 4 | P1 |
+| E2E paiements et permissions | 5 | 5 | 3 | 2 | 2 | 3 | 2 | P1 |
+| Partage des road-trips | 2 | 2 | 4 | 5 | 3 | 4 | 2 | P2 |
+| Score public | 4 | 2 | 3 | 3 | 5 | 5 | 5 | En attente |
+| IA road-trip | 2 | 2 | 3 | 3 | 2 | 5 | 4 | En attente |
+| Réseau social complet | 1 | 1 | 2 | 2 | 2 | 5 | 4 | Non prioritaire |
 
-| Titre | Description | Impact | Difficulté | Estimation | Dépendances | Priorité |
-|---|---|---|---|---:|---|---|
-| Architecture SEO | Slugs, canonicals, robots, sitemaps segmentés et noindex privé | Acquisition | Moyenne | 4 j | Routes unifiées | P1 |
-| Pages programmatiques | Pays/région/département/lieu avec contenu utile et breadcrumbs | Croissance organique | Élevée | 7 j | Données propres | P2 |
-| Réduire le client JS | Server Components, `next/font`, `next/image`, lazy map | Performance | Élevée | 5 j | Routes stables | P1 |
-| Budgets Lighthouse | Lighthouse CI, Web Vitals terrain et seuils p75 | Garde-fou | Moyenne | 2 j | URL preview | P1 |
-| Pipeline éditorial | CMS, workflow, auteur, dates, schema Article et maillage | Blog scalable | Élevée | 5 j | Choix CMS | P2 |
+## Phase P0 — Faire du badge une preuve
 
-## Sprint 4+ — PWA, international et croissance
+### Livré dans le présent lot
 
-| Titre | Description | Impact | Difficulté | Estimation | Dépendances | Priorité |
-|---|---|---|---|---:|---|---|
-| PWA sûre | Cache limité, offline utile, icônes PNG maskable, mises à jour | Rétention mobile | Élevée | 4 j | Parcours stables | P2 |
-| i18n FR/EN pilote | Routes locales, contenu, devise, emails et SEO hreflang | International | Élevée | 6 j | Modèle contenu | P2 |
-| Road Trips réels | CRUD, étapes, partage, indexabilité et droits premium | Valeur membre | Élevée | 8 j | Carte + DB | P2 |
-| Cockpit admin | Validation, recherche, audit log, exports et métriques | Opérations | Élevée | 8 j | RBAC | P2 |
+- Référentiel public 2027 versionné.
+- Portée claire : label privé indépendant, distinct d’une certification publique.
+- Six conditions d’éligibilité publiées.
+- 22 indicateurs présentés comme profil d’accueil, sans note opaque.
+- Distinction entre déclaré, contrôlé sur dossier et confirmé sur le terrain.
+- Confirmation d’exploitation obligatoire côté serveur.
+- Revue admin avec pièces temporaires, six contrôles, note et version du référentiel.
+- Suppression des principales formulations « officiel » ou « certifier » non démontrées.
 
-## Indicateurs de sortie du sprint 0
+### Prochain lot P0
 
-- 100 % des paiements test Stripe rattachés à une commande et traités une seule fois.
-- Aucun accès admin/pro avec un rôle inadéquat.
-- Build, lint, TypeScript et E2E critiques verts en CI.
-- Aucun secret dans le client ou le dépôt.
-- Rollback et rejeu webhook documentés et testés.
+1. Créer un registre public des labels valides.
+2. Afficher sur chaque fiche : édition, date d’attribution, échéance, portée du contrôle et statut.
+3. Ajouter une procédure de signalement, correction, suspension et retrait.
+4. Ajouter une vue admin des renouvellements et labels arrivant à échéance.
+5. Effectuer un contrôle documentaire rétrospectif des 26 lieux avant de leur attribuer publiquement un niveau de vérification.
+
+La base actuelle ne possède pas de modèle d’attribution suffisamment structuré. Ce lot nécessitera une migration additive, jamais destructive, soumise à sauvegarde et validation avant application.
+
+## Phase P1 — Prouver la valeur commerciale
+
+### Voyageur
+
+- Mesurer : arrivée → offre → compte → Checkout → paiement → première consultation → première visite.
+- Afficher la valeur constatée de la carte uniquement à partir des économies réellement déclarées.
+- Tester une seule proposition principale par page et comparer les conversions.
+- Ajouter une FAQ courte sur validité, avantages, confidentialité et absence de renouvellement automatique.
+
+### Établissement
+
+- Mesurer : source → clic → candidature → paiement → validation → kit → visites confirmées.
+- Donner au lieu un bilan simple : vues qualifiées, itinéraires lancés, visites confirmées et retours publiables.
+- Ne jamais transformer une vue en réservation ou chiffre d’affaires estimé.
+- Utiliser les refus et objections pour améliorer la page de vente, sans relancer les opposants.
+
+### Fiabilité
+
+- Ajouter des E2E navigateur : adhésion, labellisation, webhook rejoué, refus/remboursement et permissions.
+- Remplacer le rate limit mémoire par un mécanisme distribué avant hausse importante des volumes.
+- Ajouter un contrôle synthétique quotidien des parcours critiques et alertes uniquement sur anomalie.
+
+## Phase P1 — Une source de vérité des lieux
+
+1. Sauvegarder et inventorier la base distante.
+2. Comparer les 26 fiches publiques au contenu PostgreSQL.
+3. Définir l’identifiant canonique et les règles de fusion.
+4. Importer de façon idempotente sans écraser propriétaire, contacts privés ni historique.
+5. Basculer lecture par lecture derrière un drapeau de fonctionnalité.
+6. Retirer le fichier statique seulement après contrôle de parité et rollback testé.
+
+## Phase P2 — Transformer l’usage en actif défendable
+
+- Les visites documentées alimentent la fraîcheur des fiches.
+- Les retours modérés distinguent les expériences confirmées.
+- Les corrections terrain sont datées et sourcées.
+- Les road-trips publics deviennent partageables avec cartes Open Graph.
+- Les badges valorisent une expérience réelle, pas des actions superficielles.
+- Les QR physiques deviennent un canal d’acquisition uniquement lorsque les lieux sont équipés.
+
+## Phase P3 — Score et recommandation
+
+Ne pas publier de score avant :
+
+- une définition publique des dimensions ;
+- un volume minimal de visites et d’avis confirmés ;
+- une pondération explicable ;
+- une résistance au spam ;
+- une gestion de la fraîcheur ;
+- une procédure de contestation ;
+- une différence visible entre déclaration, contrôle et expérience voyageur.
+
+Le modèle `PlaceScore` existant est une structure technique, pas encore une méthodologie publiable.
+
+## Phase P4 — Échelle
+
+- PostGIS et clustering serveur lorsque les volumes le justifient.
+- SEO géographique seulement pour les zones disposant de contenu utile.
+- FR/EN pilote après validation du marché français.
+- IA de road-trip avec retrieval sur les données Label Vanlife, sans lieux inventés.
+- Expansion pays par pays, avec support, fiscalité et réseau local crédibles.
+
+## Indicateurs de pilotage
+
+### North Star
+
+Nombre mensuel d’expériences vanlife utiles confirmées : visite documentée, itinéraire réellement lancé ou avantage utilisé. Une vue de page seule n’est pas une expérience.
+
+### Confiance
+
+- part des labels avec décision versionnée ;
+- part des informations confirmées récemment ;
+- délai médian de correction ;
+- taux de signalements résolus ;
+- renouvellements après contrôle.
+
+### Business
+
+- conversion visite → paiement membre ;
+- conversion prospect → candidature → label ;
+- coût opérationnel par label étudié ;
+- activation à 7 jours ;
+- visites confirmées par lieu ;
+- renouvellement membre et établissement.
+
+## Garde-fous
+
+- Pas de fausses statistiques, faux avis, faux scores ou faux témoignages.
+- Pas de revendication de label public ou officiel.
+- Pas de modification de prix sans décision du fondateur.
+- Pas de migration destructive, suppression massive ou changement Stripe production sans arrêt et validation.
+- Pas d’expansion fonctionnelle si elle ne renforce pas la confiance, la donnée, la distribution, la rétention ou le revenu.

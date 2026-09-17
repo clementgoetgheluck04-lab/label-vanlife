@@ -169,6 +169,7 @@ export function parseLabellisationPayload(value: unknown): LabellisationPayload 
     !address || !postalCode || !city || region === null ||
     !Number.isInteger(capacity) || capacity < 1 || capacity > 10_000 ||
     (!Number.isInteger(discountPercent) || discountPercent < 10 || discountPercent > 20) || !acceptCharter ||
+    input.operatingAuthorization !== true ||
     !description || !motivation || !PLACE_TYPES.has(placeType)
   ) return null;
 
