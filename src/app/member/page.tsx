@@ -9,6 +9,7 @@ import {
   Navigation,
   QrCode,
   Route,
+  ShieldCheck,
   Stamp,
   WalletCards,
 } from "lucide-react";
@@ -39,6 +40,7 @@ export default async function MemberDashboard() {
   const cardNumber = member.memberCard?.cardNumber ?? "Carte en préparation";
   const unreadNotifications = member.notifications.filter((notification) => !notification.isRead).length;
   const totalSavingsCents = member.passportStamps.reduce((total, stamp) => total + (stamp.amountSavedCents ?? 0), 0);
+  const isAdmin = !member.preview && member.role === "ADMIN";
   const counts: Record<string, number> = {
     favorites: member.favorites.length,
     roadTrips: member.roadTrips.length,
@@ -62,6 +64,18 @@ export default async function MemberDashboard() {
             </p>
           )}
         </section>
+
+        {isAdmin && (
+          <Link href="/admin" className="group block" aria-label="Ouvrir le dashboard administrateur">
+            <Card variant="interactive" className="border-[#c39960]/40 bg-gradient-to-r from-neutral-950 to-[#173e32] p-5 text-white shadow-lg">
+              <div className="flex items-center gap-4">
+                <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-white/10"><ShieldCheck className="h-7 w-7 text-[#dfc59f]" /></span>
+                <div className="min-w-0 flex-1"><p className="text-xs font-black uppercase tracking-[0.16em] text-[#dfc59f]">Accès fondateur sécurisé</p><h2 className="mt-1 font-bold text-white">Dashboard administrateur</h2><p className="mt-1 text-xs leading-5 text-white/70">Prospection, candidatures, avis membres et indicateurs commerciaux.</p></div>
+                <ArrowRight className="h-5 w-5 shrink-0 text-[#dfc59f] transition-transform group-hover:translate-x-1" />
+              </div>
+            </Card>
+          </Link>
+        )}
 
         <Link href="/member/carte" className="block" aria-label="Afficher ma carte membre">
           <div className="relative min-h-52 overflow-hidden rounded-3xl bg-gradient-to-br from-sage to-forest p-6 text-white shadow-xl transition-transform hover:-translate-y-0.5">

@@ -69,6 +69,15 @@ test("admin access uses a distinct role-gated login instead of falling back to a
   assert.match(proxy, /pathname === "\/admin" \|\| pathname\.startsWith\("\/admin\/"\)/);
 });
 
+test("only an administrator sees the dashboard entry inside the member space", () => {
+  const member = readFileSync(new URL("../src/app/member/page.tsx", import.meta.url), "utf8");
+  const adminLayout = readFileSync(new URL("../src/app/admin/layout.tsx", import.meta.url), "utf8");
+  assert.match(member, /!member\.preview && member\.role === "ADMIN"/);
+  assert.match(member, /href="\/admin"/);
+  assert.match(member, /Dashboard administrateur/);
+  assert.match(adminLayout, /requireAdminPage/);
+});
+
 test("member-only place data is enforced server-side", () => {
   const memberLayout = readFileSync(new URL("../src/app/member/layout.tsx", import.meta.url), "utf8");
   const memberNetwork = readFileSync(new URL("../src/app/api/member/camping-network/route.ts", import.meta.url), "utf8");
