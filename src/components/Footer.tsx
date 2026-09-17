@@ -78,7 +78,7 @@ export default function Footer() {
               />
             </Link>
             <p className="mt-5 max-w-sm text-sm leading-relaxed text-white/60">
-              Le réseau de lieux vérifiés qui accueille les vanlifers responsables partout en France.{" "}
+              Le réseau de lieux vérifiés qui accueille les vanlifers responsables en France et dans la francophonie.{" "}
               {SITE_STATS.labelledPlacesCount} établissements labellisés et des avantages de {MEMBER_DISCOUNT_TEXT} pour les membres.
             </p>
             <div className="mt-6 flex flex-wrap gap-3">

@@ -3,6 +3,7 @@ import "server-only";
 import { Resend } from "resend";
 import { Prisma, type Prospect, type ProspectStatus } from "@/generated/prisma/client";
 import { SPOTTED_PLACES } from "@/data/spotted-places";
+import { INTERNATIONAL_PROSPECTION_CANDIDATES } from "@/data/international-places";
 import { getPrisma } from "@/lib/prisma";
 import { labelVanlifeEmail } from "@/server/email-template";
 import { getAppUrl, getBackOfficeEmails, getProspectionEmailFrom, getTransactionalEmailFrom, requireServerEnv } from "@/server/env";
@@ -16,6 +17,33 @@ const DELIVERABILITY_ALERT_ACTION = "PROSPECTION_DELIVERABILITY_ALERT";
 const DELIVERABILITY_WINDOW_DAYS = 30;
 const MINIMUM_SAMPLE_FOR_BOUNCE_PAUSE = 100;
 const MAXIMUM_BOUNCE_RATE = 0.04;
+
+type ProspectSourcePlace = {
+  id: string;
+  name: string;
+  contactName?: string | null;
+  emails?: string[];
+  website?: string | null;
+  city?: string;
+  region?: string;
+  network: string;
+  postalCode?: string;
+  source?: string;
+  sourceUrl?: string;
+  country?: string;
+  selectionNote?: string;
+  publishAsSpotted?: boolean;
+};
+
+const internationalSourceIds = new Set(INTERNATIONAL_PROSPECTION_CANDIDATES.map((place) => place.id));
+const PROSPECTION_PLACES: ProspectSourcePlace[] = [
+  ...INTERNATIONAL_PROSPECTION_CANDIDATES.map((place) => ({
+    ...place,
+    emails: [place.email],
+    postalCode: "",
+  })),
+  ...SPOTTED_PLACES.filter((place) => !internationalSourceIds.has(place.id)),
+];
 
 export type ProspectingStage =
   | "INITIAL"
@@ -333,8 +361,8 @@ function messageFor(prospect: Prospect, stage: ProspectingStage) {
 
 export async function syncSpottedProspects(): Promise<number> {
   const prisma = getPrisma();
-  const unique = new Map<string, (typeof SPOTTED_PLACES)[number]>();
-  for (const place of SPOTTED_PLACES) {
+  const unique = new Map<string, ProspectSourcePlace>();
+  for (const place of PROSPECTION_PLACES) {
     const email = normalizeProspectEmail(place.emails?.[0] || "");
     if (!EMAIL_PATTERN.test(email) || unique.has(email)) continue;
     unique.set(email, place);
@@ -399,9 +427,15 @@ export async function syncSpottedProspects(): Promise<number> {
       city: place.city || null,
       region: place.region || null,
       sourceLabel: place.source || "Repérage Label Vanlife",
-      sourceUrl: place.website,
+      sourceUrl: place.sourceUrl || place.website,
       nextActionAt: new Date(),
-      metadata: { network: place.network, postalCode: place.postalCode },
+      metadata: {
+        network: place.network,
+        postalCode: place.postalCode,
+        country: place.country,
+        selectionNote: place.selectionNote,
+        publishAsSpotted: place.publishAsSpotted,
+      },
     }));
   if (!rows.length && !updates.length) return 0;
   const operations = updates.map(({ id, email, place, reactivated, metadata }) => prisma.prospect.update({
@@ -414,7 +448,7 @@ export async function syncSpottedProspects(): Promise<number> {
       city: place.city || null,
       region: place.region || null,
       sourceLabel: place.source || "Repérage Label Vanlife",
-      sourceUrl: place.website,
+      sourceUrl: place.sourceUrl || place.website,
       metadata,
       ...(reactivated ? {
         status: "NEW" as const,

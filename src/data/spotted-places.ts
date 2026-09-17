@@ -1,4 +1,5 @@
 import places from "./member-camping-network.json";
+import { INTERNATIONAL_SPOTTED_PLACES } from "./international-places";
 import { isSpottedDuplicateOfLabelled } from "./place-deduplication";
 import { getVerifiedSpottedGps } from "./verified-spotted-gps";
 import { CONTACT_EMAIL } from "@/config/contact";
@@ -43,7 +44,10 @@ export const PLACE_UNIVERSE_LABELS: Record<PlaceUniverse, string> = {
   autre: "Autres",
 };
 
-export const SPOTTED_PLACES = (places as SpottedPlace[])
+export const SPOTTED_PLACES = ([
+  ...(places as SpottedPlace[]),
+  ...(INTERNATIONAL_SPOTTED_PLACES as SpottedPlace[]),
+])
   .filter((place) => !isSpottedDuplicateOfLabelled(place.id))
   .map((place) => {
     const verified = getVerifiedSpottedGps(place.id);

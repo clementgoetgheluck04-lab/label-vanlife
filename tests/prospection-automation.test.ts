@@ -17,6 +17,23 @@ test("prospection is disabled unless explicitly enabled and caps daily volume", 
   assert.match(engine, /take: remainingDailyCapacity/);
 });
 
+test("international expansion separates the sales list from the public spotted selection", () => {
+  const international = source("../src/data/international-places.ts");
+  const spotted = source("../src/data/spotted-places.ts");
+  const engine = source("../src/server/prospection.ts");
+
+  assert.equal(international.match(/publishAsSpotted: true/g)?.length, 6);
+  assert.equal(international.match(/publishAsSpotted: false/g)?.length, 6);
+  assert.match(international, /Wallonie · Belgique/);
+  assert.match(international, /Valais · Suisse/);
+  assert.match(international, /Haute-Sûre · Luxembourg/);
+  assert.match(international, /Repéré par Label Vanlife · non labellisé/);
+  assert.match(spotted, /INTERNATIONAL_SPOTTED_PLACES/);
+  assert.match(engine, /INTERNATIONAL_PROSPECTION_CANDIDATES/);
+  assert.match(engine, /PROSPECTION_PLACES/);
+  assert.match(engine, /publishAsSpotted: place\.publishAsSpotted/);
+});
+
 test("missing camping contacts are escalated once in manageable research batches", () => {
   const engine = source("../src/server/prospection.ts");
   const places = JSON.parse(source("../src/data/member-camping-network.json")) as Array<{
