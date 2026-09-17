@@ -90,6 +90,8 @@ test("the navigation reflects an authenticated session and hides the purchase CT
   const status = readFileSync(new URL("../src/app/api/auth/status/route.ts", import.meta.url), "utf8");
   assert.match(navbar, /\/api\/auth\/status/);
   assert.match(navbar, /Vous êtes connecté/);
+  assert.match(navbar, /href="\/member"[^>]+aria-label="Vous êtes connecté — ouvrir mon espace membre"/);
+  assert.doesNotMatch(navbar, /<Link href="\/member"><Button/);
   assert.match(navbar, /status\.memberActive/);
   assert.match(navbar, /Se déconnecter/);
   assert.match(navbar, /authenticated === true/);

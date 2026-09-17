@@ -115,7 +115,7 @@ export default function Navbar() {
 
             {authenticated === true ? (
               <div className="ml-2 flex items-center gap-1">
-                <Link href="/member"><Button variant="primary" size="sm" className="gap-1.5"><CheckCircle2 className="h-4 w-4" /> Vous êtes connecté</Button></Link>
+                <Link href="/member" aria-label="Vous êtes connecté — ouvrir mon espace membre" className="inline-flex h-9 items-center justify-center gap-1.5 rounded-lg bg-sage px-3 text-xs font-semibold text-white shadow-sm transition-all hover:bg-sage-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage focus-visible:ring-offset-2"><CheckCircle2 className="h-4 w-4" /> Vous êtes connecté</Link>
                 <form action="/auth/logout" method="post"><button type="submit" className="inline-flex min-h-9 items-center gap-1.5 rounded-lg border border-neutral-200 bg-white px-3 text-xs font-semibold text-neutral-600 transition hover:border-red-200 hover:text-red-700" aria-label="Se déconnecter"><LogOut className="h-4 w-4" /> Déconnexion</button></form>
               </div>
             ) : authenticated === false ? (
@@ -170,7 +170,7 @@ export default function Navbar() {
             <div className="pt-3">
               {authenticated === true ? (
                 <div className="space-y-2">
-                  <Link href="/member" onClick={() => setOpen(false)}><Button variant="primary" className="w-full gap-2"><CheckCircle2 className="h-4 w-4" /> Vous êtes connecté</Button></Link>
+                  <Link href="/member" onClick={() => setOpen(false)} aria-label="Vous êtes connecté — ouvrir mon espace membre" className="flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-sage px-5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-sage-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage focus-visible:ring-offset-2"><CheckCircle2 className="h-4 w-4" /> Vous êtes connecté</Link>
                   <form action="/auth/logout" method="post"><button type="submit" className="flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-red-200 bg-white px-4 text-sm font-semibold text-red-700"><LogOut className="h-4 w-4" /> Se déconnecter</button></form>
                 </div>
               ) : authenticated === false ? (
