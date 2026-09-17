@@ -26,10 +26,18 @@ test("missing camping contacts are escalated once in manageable research batches
   const goutilier = places.find((place) => place.id === "bienvenue-ferme-camping-le-goutilier");
   const labau = places.find((place) => place.id === "bienvenue-ferme-camping-a-la-ferme-labau");
   const roumavagi = places.find((place) => place.id === "bienvenue-ferme-camping-a-la-ferme-roumavagi");
+  const fontaine = places.find((place) => place.id === "papa-rtenaires-camping-la-fontaine-des-clercs");
+  const sorbier = places.find((place) => place.id === "papa-rtenaires-camping-le-sorbier");
+  const auzerals = places.find((place) => place.id === "papa-rtenaires-camping-les-auzerals");
+  const chesnets = places.find((place) => place.id === "label-repere-camping-mbs-les-chesnets-point-gps");
 
   assert.equal(goutilier?.emails?.[0], "dufraisse.m@wanadoo.fr");
   assert.equal(labau?.emails?.[0], "guydelrieu@dartybox.com");
   assert.equal(roumavagi?.emails?.[0], "camping.roumavagi@gmail.com");
+  assert.equal(fontaine?.emails?.[0], "contact@lafontainedesclercs.fr");
+  assert.equal(sorbier?.emails?.[0], "campinglesorbier@gmail.com");
+  assert.equal(auzerals?.emails?.[0], "campinglesauzerals@gmail.com");
+  assert.equal(chesnets?.emails?.[0], "mbsleschesnets@gmail.com");
   assert.match(engine, /MISSING_CONTACT_DIGEST_SIZE = 15/);
   assert.match(engine, /PROSPECTION_MISSING_CONTACTS_DIGEST/);
   assert.match(engine, /alreadyNotified\.has\(place\.id\)/);

@@ -6604,7 +6604,7 @@
     "region": "",
     "lat": 50.4879602,
     "lng": 1.7430532,
-    "website": null,
+    "website": "https://www.lafontainedesclercs.fr/",
     "memberOffer": "Forfait 20,90€ (1 emplacement, 1 nuit, 2 personnes, 1 chien) hors taxe séjour",
     "phone": "03 21 06 07 28 Camping La Fontaine des Clercs - MONTREUIL - FRANCE",
     "activities": [
@@ -6615,7 +6615,10 @@
     ],
     "capacity": "79 emplacements nus - 1 locatif Loisirs & activités • Douches sans jeton • Ping-pong • Concerts gratuits (juin- juillet-aout) • Terrain de pétanque",
     "openingHours": "",
-    "source": "Guide Papa’rtenaires juillet 2026, page 30"
+    "source": "Guide Papa’rtenaires juillet 2026, page 30",
+    "emails": [
+      "contact@lafontainedesclercs.fr"
+    ]
   },
   {
     "id": "papa-rtenaires-camping-dauberoche",
@@ -6972,7 +6975,10 @@
     ],
     "capacity": "25 emplacements nus 1 gîte 4/5 personnes 2 locatifs",
     "openingHours": "Du 1 avril au 1 Novembre 2026 828 chemin de la fontaine - 24290 montignac lascaux  07 67 74 37 64 Camping Le Sorbier à MONTIGNAC-LASCAUX - Lascaux Dordogne Vallée Vézère",
-    "source": "Guide Papa’rtenaires juillet 2026, page 47"
+    "source": "Guide Papa’rtenaires juillet 2026, page 47",
+    "emails": [
+      "campinglesorbier@gmail.com"
+    ]
   },
   {
     "id": "papa-rtenaires-camping-les-catalpas",
@@ -7190,7 +7196,10 @@
     ],
     "capacity": "28 emplacements nus 17 locatifs",
     "openingHours": "06 avril au 04 octobre 2026 Services : Loisirs & Activités • Snack-bar • Jeux de société • Randonnée au départ du camping • Spa privatif • Pêche autour du lac avec ponton handi-pêche • Piscine municipale à 200m",
-    "source": "Guide Papa’rtenaires juillet 2026, page 58"
+    "source": "Guide Papa’rtenaires juillet 2026, page 58",
+    "emails": [
+      "campinglesauzerals@gmail.com"
+    ]
   },
   {
     "id": "papa-rtenaires-camping-du-loup",
@@ -7611,10 +7620,12 @@
     "region": "France",
     "lat": 48.9700031,
     "lng": 1.9608341,
-    "website": "https://www.campingfrance.com/recherchez-votre-camping/ile-de-france/yvelines/verneuil-sur-seine/les-chesnets",
+    "website": "https://www.camping-mbs-leschesnets.fr/",
     "description": "il dispose de 40 emplacements. OUVERT TOUTE L'ANNEE",
     "phones": [],
-    "emails": [],
+    "emails": [
+      "mbsleschesnets@gmail.com"
+    ],
     "details": [
       "il dispose de 40 emplacements. OUVERT TOUTE L'ANNEE"
     ],
@@ -9115,7 +9126,10 @@
     "region": "France",
     "lat": 50.4682602,
     "lng": 1.7628211,
-    "website": "https://campinglafontainedesclercs.ellohaweb.com/",
+    "emails": [
+      "contact@lafontainedesclercs.fr"
+    ],
+    "website": "https://www.lafontainedesclercs.fr/",
     "description": "76 emplacements : 48 emplacements nus, 2 locations et résidentiels",
     "phones": [],
     "emails": [],
