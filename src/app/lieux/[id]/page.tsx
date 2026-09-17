@@ -127,6 +127,21 @@ async function safelyHasActiveMemberAccess() {
   }
 }
 
+async function findApprovedMemberReviews(slug: string) {
+  try {
+    return await getPrisma().placeReview.findMany({
+      where: { place: { slug }, isVerified: true },
+      select: { id: true, rating: true, comment: true, updatedAt: true, user: { select: { profile: { select: { firstName: true, lastName: true } } } } },
+      orderBy: { updatedAt: "desc" },
+      take: 12,
+    });
+  } catch (error) {
+    const reason = error instanceof Error ? error.name : "UnknownError";
+    console.warn(`Unable to load approved member reviews for ${slug} (${reason}).`);
+    return [];
+  }
+}
+
 export default async function LieuDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const sourceLieu = ENRICHED_LIEUX.find((item) => item.id === id);
@@ -162,6 +177,7 @@ export default async function LieuDetailPage({ params }: { params: Promise<{ id:
   const verifiedContact = getPlaceContact(lieu.id);
   const memberHasAccess = await safelyHasActiveMemberAccess();
   const activeMember = memberHasAccess ? await getOptionalActiveMember() : null;
+  const approvedMemberReviews = await findApprovedMemberReviews(lieu.id);
   const favorite = activeMember ? await getPrisma().favorite.findFirst({ where: { userId: activeMember.id, place: { slug: lieu.id } }, select: { id: true } }) : null;
   const richDetails = memberHasAccess
     ? getRichPlaceDetails(lieu.id)
@@ -333,6 +349,20 @@ export default async function LieuDetailPage({ params }: { params: Promise<{ id:
           <section className="rounded-3xl bg-neutral-950 p-7 text-white sm:p-9">
             <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#dfc59f]">Le mot du lieu</p>
             <blockquote className="mt-4 max-w-4xl text-xl font-medium italic leading-8 text-white/90">« {richDetails.venueQuote} »</blockquote>
+          </section>
+        )}
+
+        {approvedMemberReviews.length > 0 && (
+          <section>
+            <p className="text-xs font-bold uppercase tracking-[0.18em] text-emerald-700">Retours vérifiés</p>
+            <h2 className="mt-2 text-2xl font-bold text-neutral-900">L’expérience des membres Label Vanlife</h2>
+            <div className="mt-5 grid gap-4 md:grid-cols-2">
+              {approvedMemberReviews.map((review) => {
+                const firstName = review.user.profile?.firstName || "Membre";
+                const lastInitial = review.user.profile?.lastName?.charAt(0);
+                return <article key={review.id} className="rounded-2xl border border-emerald-100 bg-emerald-50/50 p-5"><div className="flex gap-1" aria-label={`${review.rating} étoiles sur 5`}>{Array.from({ length: 5 }, (_, index) => <Star key={index} className={`h-4 w-4 ${index < review.rating ? "fill-[#c39960] text-[#c39960]" : "text-neutral-200"}`} />)}</div>{review.comment ? <blockquote className="mt-3 text-sm leading-6 text-neutral-700">« {review.comment} »</blockquote> : null}<p className="mt-4 text-xs font-bold text-emerald-800">{firstName}{lastInitial ? ` ${lastInitial}.` : ""} · visite vérifiée</p></article>;
+              })}
+            </div>
           </section>
         )}
 

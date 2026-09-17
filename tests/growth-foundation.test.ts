@@ -188,6 +188,29 @@ test("passport memories are owner-scoped and feed the private journal", () => {
   assert.match(journal, /passportStamps\.filter\(\(stamp\) => Boolean\(stamp\.comment\)\)/);
 });
 
+test("passport visits can be proved with three private photos and moderated feedback", () => {
+  const passport = read("../src/app/member/passeport/page.tsx");
+  const form = read("../src/components/member/VisitProofForm.tsx");
+  const endpoint = read("../src/app/api/member/passport/visit-proof/route.ts");
+  const moderation = read("../src/app/api/admin/reviews/route.ts");
+  const publicPlace = read("../src/app/lieux/[id]/page.tsx");
+
+  assert.doesNotMatch(passport, /Scannez le QR Passeport/);
+  assert.match(form, /photoPlacement/);
+  assert.match(form, /photoTariff/);
+  assert.match(form, /photoChoice/);
+  assert.match(form, /Tarif affiché/);
+  assert.match(form, /Tarif réellement payé/);
+  assert.match(endpoint, /assertSameOrigin/);
+  assert.match(endpoint, /readMultipartFormData/);
+  assert.match(endpoint, /expectedMemberPriceCents/);
+  assert.match(endpoint, /isVerified: false/);
+  assert.match(endpoint, /PREMIERE_ETAPE/);
+  assert.match(moderation, /échange avec le lieu/i);
+  assert.match(moderation, /review\.rating <= 2/);
+  assert.match(publicPlace, /isVerified: true/);
+});
+
 test("members can report real savings and see their membership value", () => {
   const schema = read("../prisma/schema.prisma");
   const endpoint = read("../src/app/api/member/passport/stamps/[id]/route.ts");

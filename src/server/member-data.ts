@@ -24,6 +24,7 @@ export async function getMemberData() {
       roadTrips: [],
       userBadges: [],
       passportStamps: [],
+      reviews: [],
       notifications: [],
     };
   }
@@ -56,6 +57,10 @@ export async function getMemberData() {
       passportStamps: {
         include: { place: true },
         orderBy: { visitedAt: "desc" },
+      },
+      reviews: {
+        include: { place: true },
+        orderBy: { updatedAt: "desc" },
       },
       notifications: {
         orderBy: { createdAt: "desc" },
