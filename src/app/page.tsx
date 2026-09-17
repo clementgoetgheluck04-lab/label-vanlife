@@ -46,6 +46,16 @@ export default function Home() {
             <p className="text-lg text-white/70 max-w-2xl mx-auto mb-10 leading-relaxed">
               Des lieux calmes, respectueux et vraiment adaptés à la vanlife — sélectionnés et labellisés, avec <strong className="text-amber-300">des avantages exclusifs</strong> pour nos membres.
             </p>
+            <p className="mx-auto mb-8 max-w-3xl text-sm leading-6 text-white/85 sm:text-base">
+              Van, fourgon, tente de toit, caravane ou camping-car : la communauté ne se résume pas à un véhicule. Elle rassemble des humains qui partagent une{" "}
+              <Link
+                href="/philosophie-vanlife"
+                className="font-bold text-amber-300 underline decoration-amber-300/70 underline-offset-4 transition-colors hover:text-amber-200 focus-visible:rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300"
+              >
+                Philosophie vanlife
+              </Link>{" "}
+              fondée sur le respect, la nature, les rencontres et la consommation locale.
+            </p>
             <div className="flex justify-center">
               <Link href="/devenir-membre">
                 <Button variant="cta" size="lg" className="text-base px-10 shadow-xl shadow-amber-500/25">

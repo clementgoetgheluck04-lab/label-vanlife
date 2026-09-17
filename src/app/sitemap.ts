@@ -21,6 +21,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${baseUrl}/devenir-membre`, lastModified: new Date(), changeFrequency: "monthly" as const, priority: 0.9 },
     { url: `${baseUrl}/blog`, lastModified: new Date(), changeFrequency: "weekly" as const, priority: 0.6 },
     { url: `${baseUrl}/vanlife`, lastModified: new Date("2026-08-01"), changeFrequency: "weekly" as const, priority: 1.0 },
+    { url: `${baseUrl}/philosophie-vanlife`, lastModified: new Date("2026-09-17"), changeFrequency: "monthly" as const, priority: 0.9 },
     { url: `${baseUrl}/vanlife-famille`, lastModified: new Date(), changeFrequency: "monthly" as const, priority: 0.8 },
     { url: `${baseUrl}/campings-van-friendly`, lastModified: new Date(), changeFrequency: "weekly" as const, priority: 0.8 },
     { url: `${baseUrl}/slow-travel-vanlife`, lastModified: new Date(), changeFrequency: "monthly" as const, priority: 0.8 },

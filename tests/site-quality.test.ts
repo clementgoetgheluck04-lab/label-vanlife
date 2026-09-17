@@ -88,6 +88,19 @@ test("known internal broken links and the missing RSS reference are removed", ()
   assert.doesNotMatch(sources, /\/blog\/feed\.xml/);
 });
 
+test("the home hero explains the inclusive vanlife philosophy and links to its indexed page", () => {
+  const home = read("src/app/page.tsx");
+  const philosophy = read("src/app/philosophie-vanlife/page.tsx");
+  const sitemap = read("src/app/sitemap.ts");
+  assert.match(home, /href="\/philosophie-vanlife"/);
+  assert.match(home, /Philosophie vanlife/);
+  assert.match(home, /Van, fourgon, tente de toit, caravane ou camping-car/);
+  assert.match(philosophy, /La vanlife n’est pas un véhicule/);
+  assert.match(philosophy, /Van rétro/);
+  assert.match(philosophy, /Consommer local/);
+  assert.match(sitemap, /\/philosophie-vanlife/);
+});
+
 test("public labelled place pages survive a database outage", () => {
   const page = read("src/app/lieux/[id]/page.tsx");
   assert.match(page, /export async function generateMetadata/);
