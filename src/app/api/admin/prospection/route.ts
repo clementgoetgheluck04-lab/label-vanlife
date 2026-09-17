@@ -3,7 +3,7 @@ import { getPrisma } from "@/lib/prisma";
 import { requireAdminUser } from "@/server/auth";
 import { apiError } from "@/server/http";
 import { assertSameOrigin, readJsonRequest } from "@/server/request-security";
-import { getProspectionReplyTo, isProspectingEnabled, sendNeedHumanAlert, suppressProspect, syncSpottedProspects } from "@/server/prospection";
+import { getProspectionReplyTo, isProspectingEnabled, prospectingDailyLimit, sendNeedHumanAlert, suppressProspect, syncSpottedProspects } from "@/server/prospection";
 
 export const dynamic = "force-dynamic";
 
@@ -53,7 +53,7 @@ export async function GET() {
     return NextResponse.json({
       settings: {
         enabled: isProspectingEnabled(),
-        dailyLimit: Number.parseInt(process.env.PROSPECTION_DAILY_LIMIT || "8", 10),
+        dailyLimit: prospectingDailyLimit(),
         replyTo: getProspectionReplyTo(),
         webhookConfigured: Boolean(process.env.RESEND_WEBHOOK_SECRET),
       },

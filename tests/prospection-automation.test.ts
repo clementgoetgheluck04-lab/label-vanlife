@@ -9,7 +9,10 @@ function source(path: string) {
 test("prospection is disabled unless explicitly enabled and caps daily volume", () => {
   const engine = source("../src/server/prospection.ts");
   assert.match(engine, /PROSPECTION_AUTOMATION_ENABLED === "true"/);
-  assert.match(engine, /Math\.min\(Math\.max\(value, 1\), 25\)/);
+  assert.match(engine, /PROSPECTION_DAILY_HARD_LIMIT = 90/);
+  assert.match(engine, /Math\.min\(Math\.max\(value, 1\), PROSPECTION_DAILY_HARD_LIMIT\)/);
+  assert.match(engine, /PROSPECTION_SEND_CONCURRENCY = 4/);
+  assert.match(engine, /Promise\.all/);
   assert.match(engine, /parisWeekday === "Sat" \|\| parisWeekday === "Sun"/);
   assert.match(engine, /alreadySentToday = await prisma\.prospectMessage\.count/);
   assert.match(engine, /remainingDailyCapacity = Math\.max\(0, prospectingDailyLimit\(\) - alreadySentToday\)/);

@@ -17,6 +17,8 @@ const DELIVERABILITY_ALERT_ACTION = "PROSPECTION_DELIVERABILITY_ALERT";
 const DELIVERABILITY_WINDOW_DAYS = 30;
 const MINIMUM_SAMPLE_FOR_BOUNCE_PAUSE = 100;
 const MAXIMUM_BOUNCE_RATE = 0.04;
+const PROSPECTION_DAILY_HARD_LIMIT = 90;
+const PROSPECTION_SEND_CONCURRENCY = 4;
 
 type ProspectSourcePlace = {
   id: string;
@@ -66,8 +68,10 @@ export function isProspectingEnabled(): boolean {
 }
 
 export function prospectingDailyLimit(): number {
-  const value = Number.parseInt(process.env.PROSPECTION_DAILY_LIMIT || "8", 10);
-  return Number.isFinite(value) ? Math.min(Math.max(value, 1), 25) : 8;
+  const value = Number.parseInt(process.env.PROSPECTION_DAILY_LIMIT || String(PROSPECTION_DAILY_HARD_LIMIT), 10);
+  return Number.isFinite(value)
+    ? Math.min(Math.max(value, 1), PROSPECTION_DAILY_HARD_LIMIT)
+    : PROSPECTION_DAILY_HARD_LIMIT;
 }
 
 export function getProspectionReplyTo(): string {
@@ -780,11 +784,15 @@ export async function runProspectionBatch() {
   let sent = 0;
   let failed = 0;
   let skipped = 0;
-  for (const prospect of prospects) {
-    const result = await sendOne(prospect);
-    if (result === "sent") sent += 1;
-    else if (result === "failed") failed += 1;
-    else skipped += 1;
+  for (let index = 0; index < prospects.length; index += PROSPECTION_SEND_CONCURRENCY) {
+    const results = await Promise.all(
+      prospects.slice(index, index + PROSPECTION_SEND_CONCURRENCY).map((prospect) => sendOne(prospect)),
+    );
+    for (const result of results) {
+      if (result === "sent") sent += 1;
+      else if (result === "failed") failed += 1;
+      else skipped += 1;
+    }
   }
 
   if (failed > 0) {
