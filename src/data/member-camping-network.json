@@ -7870,7 +7870,10 @@
     "website": "https://www.campingfraiteux.com/",
     "description": "35 emplacements : 29 emplacements nus, 7 emplacements accueil camping-car, 7 locations. OUVVERT TOUTE L'ANNEE",
     "phones": [],
-    "emails": [],
+    "emails": [
+      "contact@campingfraiteux.com"
+    ],
+    "verifiedEmailOverride": true,
     "details": [
       "35 emplacements : 29 emplacements nus, 7 emplacements accueil camping-car, 7 locations. OUVVERT TOUTE L'ANNEE"
     ],
@@ -12152,7 +12155,10 @@
     "website": "https://www.campingfraiteux.com/",
     "description": "Catherine et Alain vous accueillent dans ce Camping convivial et calme niché au cœur des Vosges, à Plombières‑les‑Bains. Emplacements spacieux, chalets et mobil‑homes tout confort, accès à randonnées pédestres et VTT, petite épicerie, dépôt de pain et snack sur place. Idéal pour un séjour nature et détente dans un cadre verdoyant.",
     "phones": [],
-    "emails": [],
+    "emails": [
+      "contact@campingfraiteux.com"
+    ],
+    "verifiedEmailOverride": true,
     "details": [
       "Catherine et Alain vous accueillent dans ce Camping convivial et calme niché au cœur des Vosges, à Plombières‑les‑Bains. Emplacements spacieux, chalets et mobil‑homes tout confort, accès à randonnées pédestres et VTT, petite épicerie, dépôt de pain et snack sur place. Idéal pour un séjour nature et détente dans un cadre verdoyant."
     ],
