@@ -9347,22 +9347,32 @@
     "id": "label-repere-camping-du-traspy-point-gps",
     "name": "Camping du Traspy",
     "network": "Rep?r? par Label Vanlife",
-    "address": "Point GPS rep?r? : 48.988680, -0.469152",
-    "postalCode": "",
-    "city": "Point GPS",
-    "region": "France",
+    "address": "Rue du Pont Benoît, 14220 Thury-Harcourt-le-Hom",
+    "postalCode": "14220",
+    "city": "Thury-Harcourt-le-Hom",
+    "region": "Normandie",
     "lat": 48.9886801,
     "lng": -0.4691525,
-    "website": "http://campingdutraspy.com/wp-content/uploads/2020/04/Plan-du-camping-du-Traspy.png",
-    "description": "84 emplacements : 50 emplacements nus, 9 locations, 4 emplacements accueil camping-car et résidentiels. PLAN DU CAMPING http://campingdutraspy.com/wp-content/uploads/2020/04/Plan-du-camping-du-Traspy.png",
-    "phones": [],
-    "emails": [],
-    "details": [
-      "84 emplacements : 50 emplacements nus, 9 locations, 4 emplacements accueil camping-car et résidentiels. PLAN DU CAMPING http://campingdutraspy.com/wp-content/uploads/2020/04/Plan-du-camping-du-Traspy.png"
+    "website": "https://campingdutraspy.com/",
+    "description": "Camping au cœur de la Suisse Normande avec emplacements de 150 à 200 m², hébergements locatifs et aire de services pour camping-cars. Ouvert du 1er avril au 30 septembre 2026.",
+    "contactName": "Thierry et Christine Arcay",
+    "phones": [
+      "02 31 29 90 86",
+      "07 86 18 60 13"
     ],
-    "source": "Rep?rage Label Vanlife 2026",
-    "gpsSource": "Coordonn?es du rep?rage Label Vanlife",
-    "gpsVerifiedAt": "2026-08-01",
+    "emails": [
+      "contact@campingdutraspy.com"
+    ],
+    "verifiedEmailOverride": true,
+    "details": [
+      "Wi-Fi sur l'ensemble du camping",
+      "Restaurant-pizzeria, bar-glacier et dépôt de pain",
+      "Aire de services pour camping-cars",
+      "Accès direct aux activités de la Suisse Normande et à la Vélo Francette"
+    ],
+    "source": "Site officiel du Camping du Traspy",
+    "gpsSource": "Coordonnées du repérage Label Vanlife, adresse confirmée par le site officiel",
+    "gpsVerifiedAt": "2026-09-18",
     "googleMapsUrl": "https://www.google.com/maps/search/?api=1&query=Camping+du+Traspy%2048.9886801%2C-0.4691525"
   },
   {
