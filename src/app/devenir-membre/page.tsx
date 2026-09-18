@@ -182,9 +182,9 @@ export default function DevenirMembrePage() {
             <h3 className="text-2xl font-bold text-neutral-900">Et si ta prochaine étape devenait plus simple à préparer ?</h3>
             <p className="mt-3 text-neutral-600">Selon les lieux et la durée de ton séjour, ta Carte membre peut rapidement être amortie grâce aux avantages partenaires.</p>
             <div className="mx-auto mt-5 max-w-md rounded-2xl bg-white p-4 text-sm text-neutral-700 shadow-sm">
-              <strong>Exemple :</strong> 4 nuits × 75 € = 300 € · -10 % = 30 € économisés.
+              <strong>Exemple :</strong> 10 nuits × 30 € = 300 € · -10 % = 30 € économisés.
               <br />
-              <span className="text-emerald-700">Une Carte membre à 29 € peut ainsi être amortie sur un seul séjour.</span>
+              <span className="text-emerald-700">Une Carte membre à 29 € peut ainsi être amortie au cours d’un séjour de 10 nuits, selon l’avantage appliqué par le lieu.</span>
             </div>
             <Button variant="cta" size="lg" className="mt-6" onClick={handleCheckout} disabled={loading}>{MEMBER_CTA_LABEL} <ArrowRight className="h-5 w-5" /></Button>
           </div>
