@@ -9047,22 +9047,27 @@
     "id": "label-repere-camping-de-la-becquerelle-point-gps",
     "name": "Camping de la Becquerelle",
     "network": "Rep?r? par Label Vanlife",
-    "address": "Point GPS rep?r? : 50.710589, 2.400517",
-    "postalCode": "",
-    "city": "Point GPS",
-    "region": "France",
+    "address": "1396 rue du Becquerel, 59173 Lynde",
+    "postalCode": "59173",
+    "city": "Lynde",
+    "region": "Hauts-de-France",
     "lat": 50.7105889,
     "lng": 2.400517,
     "website": "https://www.campingbecquerelle.fr/",
     "description": "piscine de plein-air, de 62 emplacements : 60 emplacements nus et de 2 locations.",
-    "phones": [],
-    "emails": [],
+    "phones": [
+      "03 28 43 20 37"
+    ],
+    "emails": [
+      "campingbecquerelle@free.fr"
+    ],
+    "verifiedEmailOverride": true,
     "details": [
       "piscine de plein-air, de 62 emplacements : 60 emplacements nus et de 2 locations."
     ],
-    "source": "Rep?rage Label Vanlife 2026",
-    "gpsSource": "Coordonn?es du rep?rage Label Vanlife",
-    "gpsVerifiedAt": "2026-08-01",
+    "source": "Site officiel du Camping de la Becquerelle",
+    "gpsSource": "Coordonnées du repérage Label Vanlife, adresse confirmée par le site officiel",
+    "gpsVerifiedAt": "2026-09-18",
     "googleMapsUrl": "https://www.google.com/maps/search/?api=1&query=Camping+de+la+Becquerelle%2050.7105889%2C2.4005170"
   },
   {
