@@ -8948,24 +8948,29 @@
   },
   {
     "id": "label-repere-camping-le-val-d-oise-point-gps",
-    "name": "Camping le Val d'Oise",
+    "name": "Camping du Val d'Oise",
     "network": "Rep?r? par Label Vanlife",
-    "address": "Point GPS rep?r? : 49.907681, 3.919390",
-    "postalCode": "",
-    "city": "Point GPS",
-    "region": "France",
+    "address": "3 rue du Mont d'Origny, 02580 Étréaupont",
+    "postalCode": "02580",
+    "city": "Étréaupont",
+    "region": "Hauts-de-France",
     "lat": 49.907681,
     "lng": 3.9193897,
-    "website": "https://www.evasion-aisne.com/fr/Sejourner-dans-l-Aisne/Votre-hebergement/Camping-du-Val-d-Oise-ETREAUPONT",
+    "website": "https://sites.google.com/view/camping-le-val-doise/accueil",
     "description": "40 emplacements dont 4 emplacements pour camping-car avec borne Euro-relais située à l'intérieur du terrain.",
-    "phones": [],
-    "emails": [],
+    "phones": [
+      "03 23 97 48 04"
+    ],
+    "emails": [
+      "camping-etreaupont@orange.fr"
+    ],
+    "verifiedEmailOverride": true,
     "details": [
       "40 emplacements dont 4 emplacements pour camping-car avec borne Euro-relais située à l'intérieur du terrain."
     ],
-    "source": "Rep?rage Label Vanlife 2026",
-    "gpsSource": "Coordonn?es du rep?rage Label Vanlife",
-    "gpsVerifiedAt": "2026-08-01",
+    "source": "Site officiel du Camping du Val d'Oise",
+    "gpsSource": "Coordonnées du repérage Label Vanlife, adresse confirmée par le site officiel",
+    "gpsVerifiedAt": "2026-09-18",
     "googleMapsUrl": "https://www.google.com/maps/search/?api=1&query=Camping+le+Val+d%27Oise%2049.9076810%2C3.9193897"
   },
   {
