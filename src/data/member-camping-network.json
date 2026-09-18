@@ -8377,7 +8377,10 @@
     "website": null,
     "description": "52 emplacements : 45 emplacements nus, pour tente, caravane ou camping-car et 9 locations. Plus emplacements d'accueil pour camping cars. OUVERT du 10/04 au 31/10",
     "phones": [],
-    "emails": [],
+    "emails": [
+      "campingduperchebellemois@gmail.com"
+    ],
+    "verifiedEmailOverride": true,
     "details": [
       "52 emplacements : 45 emplacements nus, pour tente, caravane ou camping-car et 9 locations. Plus emplacements d'accueil pour camping cars. OUVERT du 10/04 au 31/10"
     ],
