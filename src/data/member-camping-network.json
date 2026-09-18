@@ -7943,7 +7943,10 @@
     "website": "https://campingdestetes.e-monsite.com/",
     "description": "piscine de plein-air, de 60 emplacements : 58 emplacements nus, 2 locations. OUVERT TOUTE L'ANNEE",
     "phones": [],
-    "emails": [],
+    "emails": [
+      "campingdestetes@gmail.com"
+    ],
+    "verifiedEmailOverride": true,
     "details": [
       "piscine de plein-air, de 60 emplacements : 58 emplacements nus, 2 locations. OUVERT TOUTE L'ANNEE"
     ],
