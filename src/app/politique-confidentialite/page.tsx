@@ -19,7 +19,7 @@ export default function PolitiqueConfidentialitePage() {
         <header>
           <p className="text-xs font-bold uppercase tracking-[0.18em] text-emerald-800">Vie privée</p>
           <h1 className="mt-3 text-3xl font-bold text-neutral-950 sm:text-4xl">Politique de confidentialité et cookies</h1>
-          <p className="mt-3 text-sm text-neutral-600">Dernière mise à jour : 17 septembre 2026.</p>
+          <p className="mt-3 text-sm text-neutral-600">Dernière mise à jour : 18 septembre 2026.</p>
         </header>
 
         <section className={sectionClass}>
@@ -36,6 +36,7 @@ export default function PolitiqueConfidentialitePage() {
                 <tr><td className="p-4">Compte, identité et coordonnées</td><td className="p-4">Créer le compte et fournir les services membre ou professionnel</td><td className="p-4">Exécution du contrat</td></tr>
                 <tr><td className="p-4">Commande et statut Stripe</td><td className="p-4">Traiter le paiement, activer l’accès et tenir les justificatifs</td><td className="p-4">Contrat et obligations légales</td></tr>
                 <tr><td className="p-4">Candidature, pièces et fiche d’établissement</td><td className="p-4">Évaluer puis publier un lieu avec son accord</td><td className="p-4">Mesures précontractuelles et contrat</td></tr>
+                <tr><td className="p-4">Photos de visite, lieu, note, avis et tarifs déclarés</td><td className="p-4">Confirmer un passage, calculer une économie déclarée, vérifier les informations du lieu et modérer un retour avant toute publication</td><td className="p-4">Exécution du service membre et intérêt légitime de contrôle qualité</td></tr>
                 <tr><td className="p-4">Email de newsletter</td><td className="p-4">Envoyer les actualités demandées</td><td className="p-4">Consentement</td></tr>
                 <tr><td className="p-4">Coordonnées professionnelles publiques</td><td className="p-4">Présenter le label à des lieux dont l’activité est pertinente</td><td className="p-4">Intérêt légitime, avec opposition simple et gratuite</td></tr>
                 <tr><td className="p-4">Événements techniques des emails professionnels</td><td className="p-4">Mesurer la délivrance et les clics sur nos liens afin de limiter les relances inutiles et améliorer la pertinence des messages</td><td className="p-4">Intérêt légitime, avec opposition simple et gratuite</td></tr>
@@ -57,11 +58,18 @@ export default function PolitiqueConfidentialitePage() {
             <li>Compte et accès : pendant la relation, puis le temps nécessaire aux obligations ou litiges applicables.</li>
             <li>Données de commande et justificatifs : pendant les durées légales comptables et fiscales.</li>
             <li>Candidatures non finalisées et pièces : durée strictement nécessaire à l’étude et au suivi du dossier.</li>
+            <li>Preuves de visite et photos privées : pendant la durée nécessaire à la vérification et au traitement d’un éventuel litige, puis suppression ou anonymisation. Les avis publiés peuvent être conservés tant qu’ils restent utiles et exacts.</li>
             <li>Prospects professionnels non clients : trois ans au plus après la collecte ou le dernier contact du prospect.</li>
             <li>Événements de délivrance et de clic des emails de prospection : associés au suivi du prospect pendant cette même durée, sauf opposition plus tôt.</li>
             <li>Oppositions à la prospection : conservation minimale des informations nécessaires pour respecter le refus.</li>
             <li>Statistiques consenties : identifiant navigateur six mois au plus ; événements détaillés vingt-cinq mois au plus.</li>
           </ul>
+        </section>
+
+        <section className={sectionClass}>
+          <h2 className={titleClass}>Photos et retours de visite</h2>
+          <p className={textClass}>Les trois photos demandées dans le Passeport sont privées et accessibles uniquement aux personnes habilitées de Label Vanlife ainsi qu’aux prestataires techniques nécessaires au stockage. Elles ne sont jamais publiées automatiquement. L’avis textuel et la note ne deviennent publics qu’après modération.</p>
+          <p className={textClass}>Ne photographiez pas de visages, d’enfants, de plaques d’immatriculation, de documents personnels ou de personnes identifiables sans leur accord. Vous pouvez demander la suppression de vos preuves et retours en écrivant à <Link href={CONTACT_MAILTO} className="font-semibold text-emerald-800 underline underline-offset-2">{CONTACT_EMAIL}</Link>, sous réserve des éléments devant temporairement être conservés pour traiter un litige.</p>
         </section>
 
         <section id="cookies" className={`${sectionClass} scroll-mt-28`}>

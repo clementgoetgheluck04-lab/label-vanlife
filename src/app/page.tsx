@@ -4,7 +4,7 @@ import { ArrowRight, Star, Shield, Heart, Moon, Compass, ChevronDown, MapPin, Sm
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { ENRICHED_LIEUX } from "@/data/enriched-lieux";
-import { LABEL_NORMAL_PRICE, LABEL_PRICE, MEMBER_CTA_LABEL, MEMBER_PRICE_TEXT, MEMBER_VALIDITY_TEXT } from "@/config/commercial";
+import { LABEL_NORMAL_PRICE, LABEL_PRICE, MEMBER_CTA_LABEL, MEMBER_VALIDITY_TEXT } from "@/config/commercial";
 import { SITE_STATS } from "@/config/site-stats";
 import { redactPublicPlaceText } from "@/server/public-place";
 
@@ -83,10 +83,7 @@ export default function Home() {
               <p className="text-xs font-bold uppercase tracking-[0.18em] text-emerald-700">Je voyage en van</p>
               <h2 className="mt-2 text-2xl font-bold text-neutral-900">La Carte membre 2027, active dès aujourd&apos;hui.</h2>
               <p className="mt-3 text-sm leading-relaxed text-neutral-600">MAP privée, lieux labellisés, informations détaillées et avantages exclusifs jusqu&apos;au 31 décembre 2027.</p>
-              <div className="mt-6 flex flex-wrap items-center gap-4">
-                <Link href="/devenir-membre"><Button variant="cta">Je prends ma carte — 29 € <ArrowRight className="h-4 w-4" /></Button></Link>
-                <span className="text-sm text-neutral-400"><span className="line-through">39 €</span> · paiement unique</span>
-              </div>
+              <div className="mt-6"><Link href="/devenir-membre"><Button variant="cta">Découvrir l&apos;offre voyageur <ArrowRight className="h-4 w-4" /></Button></Link></div>
             </article>
             <article className="rounded-3xl bg-neutral-950 p-6 text-white shadow-sm sm:p-8">
               <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#dfc59f]">J&apos;accueille des voyageurs</p>
@@ -114,14 +111,11 @@ export default function Home() {
             <p className="mt-5 max-w-xl leading-relaxed text-white/60">
               La MAP, ta Carte membre, les avantages et les fiches détaillées des lieux labellisés. Tout ce qu&apos;il faut pour savoir où aller, quoi réserver et comment être bien accueilli.
             </p>
-            <div className="mt-8 flex flex-wrap items-center gap-4">
-              <Link href="/devenir-membre"><Button variant="cta" size="lg">{MEMBER_CTA_LABEL} <ArrowRight className="h-4 w-4" /></Button></Link>
-              <p className="text-sm text-white/60"><span className="mr-2 line-through">39 €</span><strong className="text-white">{MEMBER_PRICE_TEXT}</strong><br /><span className="text-xs">{MEMBER_VALIDITY_TEXT}</span></p>
-            </div>
+            <div className="mt-8"><Link href="/devenir-membre" className="inline-flex items-center gap-2 font-bold text-[#dfc59f] underline decoration-[#dfc59f]/50 underline-offset-4">Voir tout ce que l&apos;espace membre permet <ArrowRight className="h-4 w-4" /></Link></div>
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
             {[
-              { icon: MapPin, value: String(SITE_STATS.labelledPlacesCount), title: "lieux déjà labellisés", text: `Des fiches complètes avec photos, services et informations pratiques. Et nous avons repéré ${SITE_STATS.spottedPlacesCount} lieux pas encore labellisés, disponibles aussi sur notre MAP.` },
+              { icon: MapPin, value: String(SITE_STATS.labelledPlacesCount), title: "lieux déjà labellisés", text: "Des partenaires identifiés séparément, avec fiche, services et avantage membre. Les lieux seulement repérés ne sont jamais présentés comme labellisés." },
               { icon: Percent, value: "Avantages", title: "réservés aux membres", text: "Le montant exact, les conditions et les éventuels codes restent dans ton espace privé." },
               { icon: Shield, value: "Vérifiés", title: "selon une vraie charte", text: "Accueil, environnement, confort et tranquillité sont évalués." },
               { icon: Smartphone, value: "Partout", title: "sur internet puis prochainement en application mobile", text: "Ta Carte membre numérique et la MAP te suivent partout sur ton téléphone." },
@@ -246,9 +240,7 @@ export default function Home() {
                   <div className="pt-2 border-t border-neutral-100">
                     <div className="flex items-center justify-between">
                       <span className="text-xs text-emerald-600 font-semibold">Avantage réservé aux membres</span>
-                      <Link href="/devenir-membre">
-                        <Button variant="cta" size="sm" className="min-h-11 px-3 text-xs gap-1">Carte membre <ArrowRight className="h-3 w-3" /></Button>
-                      </Link>
+                      <Link href={`/lieux/${lieu.id}`} className="inline-flex min-h-11 items-center gap-1 text-xs font-bold text-emerald-800 underline underline-offset-4">Voir la fiche <ArrowRight className="h-3 w-3" /></Link>
                     </div>
                   </div>
                 </div>
@@ -261,8 +253,8 @@ export default function Home() {
               <Button variant="secondary-dark" size="lg" className="gap-2">Découvrir tous les lieux <ArrowRight className="h-4 w-4" /></Button>
             </Link>
           </div>
-          <p className="text-center text-xs text-neutral-400 mt-3">
-            {SITE_STATS.spottedPlacesCount} lieux repérés à travers la France, pas encore labellisés et disponibles sur notre MAP
+          <p className="mx-auto mt-5 max-w-2xl rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-3 text-center text-xs leading-5 text-neutral-600">
+            Répertoire séparé : {SITE_STATS.spottedPlacesCount} lieux ont été repérés mais ne sont pas labellisés. Leur accueil, leurs conditions et leurs éventuels avantages ne sont pas garantis par Label Vanlife.
           </p>
         </div>
       </section>
@@ -361,7 +353,7 @@ export default function Home() {
       <section className="py-20 bg-gradient-to-br from-emerald-500 via-emerald-600 to-emerald-700">
         <div className="max-w-2xl mx-auto px-6 text-center space-y-6">
           <h2 className="text-3xl sm:text-4xl font-bold text-white" style={{ fontFamily: "Outfit, sans-serif" }}>Prêt pour ta prochaine étape ?</h2>
-          <p className="text-emerald-100"><span className="line-through opacity-70">39 €</span> <strong>{MEMBER_PRICE_TEXT}</strong><br /><span className="text-sm">{MEMBER_VALIDITY_TEXT}</span></p>
+          <p className="text-emerald-100">Découvre d&apos;abord les lieux, puis choisis librement si l&apos;édition membre correspond à tes voyages.</p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link href="/devenir-membre">
               <Button variant="primary" className="bg-white text-emerald-700 hover:bg-emerald-50 text-base px-8 py-3 rounded-xl font-semibold shadow-lg">

@@ -59,14 +59,14 @@ function formatApplication(payload: NonNullable<ReturnType<typeof parseLabellisa
     "ÉTABLISSEMENT ET CONTACT",
     `Nom : ${payload.establishmentName}`,
     `Type : ${payload.placeType}`,
-    `Adresse : ${payload.address}, ${payload.postalCode} ${payload.city}, ${payload.region}`,
+    `Adresse : ${payload.address}, ${payload.postalCode} ${payload.city}, ${payload.region}, ${payload.country}`,
     `Site : ${payload.website || "Non renseigné"}`,
     `Facebook : ${payload.facebook || "Non renseigné"}`,
     `Contact : ${payload.contactName}`,
     `Fonction : ${payload.jobTitle || "Non renseignée"}`,
     `Email : ${payload.email}`,
     `Téléphone : ${payload.phone || "Non renseigné"}`,
-    `SIRET : ${payload.siret || "Non renseigné"}`,
+    `Identifiant professionnel : ${payload.siret || "Non renseigné"}`,
     `Autorisation d'exploitation confirmée : ${payload.operatingAuthorization ? "Oui" : "Non"}`,
     `Suit la page Facebook : ${payload.followFacebook ? "Oui" : "Non"}`,
     `Commentaires : ${payload.comments || "Aucun"}`,
@@ -121,7 +121,7 @@ export async function POST(request: NextRequest) {
     }
     const payload = parseLabellisationPayload(parsedPayload);
     if (!payload) return NextResponse.json({
-      error: "Dossier incomplet : vérifiez le site internet, le SIRET, les 22 critères, le plan, la photo obligatoire, la réduction, le mode de réservation et la charte.",
+      error: "Dossier incomplet : vérifiez le site internet, l’identifiant professionnel, l’autorisation d’exploitation, les 22 critères, le plan, la photo obligatoire, la réduction, le mode de réservation et la charte.",
     }, { status: 400 });
 
     const plan = formData.get("plan");

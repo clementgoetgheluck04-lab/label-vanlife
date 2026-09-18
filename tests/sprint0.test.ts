@@ -94,6 +94,7 @@ test("labellisation payload is normalized and allow-listed", () => {
     postalCode: "74000",
     city: "Annecy",
     region: "Auvergne-Rhône-Alpes",
+    country: "France",
     capacity: 25,
     services: ["eau", "electricite", "sanitaires", "vidange", "wifi"],
     discountPercent: 10,
@@ -112,6 +113,7 @@ test("labellisation payload is normalized and allow-listed", () => {
   assert.equal(result.establishmentName, "Camping des Pins");
   assert.equal(result.email, "pro@example.com");
   assert.equal(result.website, "https://example.com/");
+  assert.equal(result.country, "France");
   assert.equal(parseLabellisationPayload({ ...result, website: "" }), null);
   assert.equal(parseLabellisationPayload({ ...result, photoFileNames: [] }), null);
   assert.equal(parseLabellisationPayload({ ...result, website: "example.org" })?.website, "https://example.org/");
@@ -120,4 +122,5 @@ test("labellisation payload is normalized and allow-listed", () => {
   assert.equal(parseLabellisationPayload({ ...result, website: "javascript:alert(1)" }), null);
   assert.equal(parseLabellisationPayload({ ...result, hasParityClause: true, publicPrice: 35, minimumAllowedPrice: 33, discountPercent: 10 }), null);
   assert.ok(parseLabellisationPayload({ ...result, hasParityClause: true, publicPrice: 35, minimumAllowedPrice: 19, discountPercent: 20 }));
+  assert.ok(parseLabellisationPayload({ ...result, country: "Belgique", siret: "BCE 0123.456.789" }));
 });

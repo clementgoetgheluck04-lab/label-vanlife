@@ -43,7 +43,7 @@ const AVANTAGES = [
   {
     icone: CreditCard,
     titre: `${MEMBER_DISCOUNT_TEXT} de réduction chez les partenaires`,
-    desc: "Réductions exclusives membres dans tous les campings, étapes nature et hébergements labellisés.",
+    desc: "Avantage indiqué sur chaque fiche : réduction pouvant aller jusqu’à 20 %, petit prix ou autre formule selon le partenaire.",
     color: "text-amber-500",
     bg: "bg-amber-50",
   },

@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     template: "%s | Label Vanlife",
   },
   description:
-    "Label Vanlife relie les vanlifers à des lieux engagés dans une charte d’accueil, avec 10 à 20 % d’avantages déclarés pour les membres.",
+    "Label Vanlife relie les voyageurs à des lieux engagés dans une charte d’accueil, avec des avantages membres indiqués clairement selon chaque partenaire.",
   keywords: [
     "vanlife",
     "vanlife france",
@@ -62,7 +62,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Label Vanlife | Des lieux engagés pour accueillir les vanlifers",
     description:
-      "La vanlife a enfin son label. Des lieux calmes, respectueux et vraiment adaptés à la vanlife — sélectionnés et labellisés, avec 10 à 20% de réduction pour nos membres.",
+      "Des lieux calmes, respectueux et adaptés à la vanlife, sélectionnés et labellisés, avec un avantage membre précisé sur chaque fiche.",
     url: BASE_URL,
     siteName: "Label Vanlife",
     locale: "fr_FR",
@@ -80,7 +80,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Label Vanlife | Vanlife France",
     description:
-      "La vanlife a enfin son label. Des lieux calmes, respectueux et adaptés à la vanlife, avec 10 à 20% de réduction membres.",
+      "La vanlife a son label : des lieux engagés, une MAP privée et un avantage membre précisé selon chaque partenaire.",
     images: [`${BASE_URL}${BRAND_ASSETS.socialCover}`],
   },
 };

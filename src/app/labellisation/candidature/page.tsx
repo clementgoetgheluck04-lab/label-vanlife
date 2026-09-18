@@ -10,7 +10,7 @@ import { LABELLISATION_CRITERIA } from "@/config/labellisation-criteria";
 import { trackEvent } from "@/lib/analytics/browser";
 
 const STEPS = [
-  { title: "Contact", icon: Building2 },
+  { title: "Identité du lieu", icon: Building2 },
   { title: "Accueil & engagement", icon: ClipboardCheck },
   { title: "Réduction", icon: Percent },
   { title: "Fiche", icon: FileText },
@@ -53,7 +53,7 @@ const initialCriteria = Object.fromEntries(
 ) as Record<string, CriterionAnswer>;
 
 const initialForm = {
-  establishmentName: "", placeType: "CAMPING", address: "", postalCode: "", city: "", region: "",
+  establishmentName: "", placeType: "CAMPING", address: "", postalCode: "", city: "", region: "", country: "France",
   website: "", facebook: "", contactName: "", jobTitle: "", email: "", phone: "", siret: "",
   operatingAuthorization: false, followFacebook: false, comments: "",
   criteria: initialCriteria, planFileName: "", welcomeMessage: "",
@@ -81,13 +81,13 @@ export default function CandidaturePage() {
 
   useEffect(() => {
     const timeout = window.setTimeout(() => {
-      const saved = sessionStorage.getItem("labellisation-form-progress");
+      const saved = localStorage.getItem("labellisation-form-progress");
       let restored: Partial<typeof initialForm> = {};
       if (saved) {
         try {
           restored = JSON.parse(saved) as Partial<typeof initialForm>;
         } catch {
-          sessionStorage.removeItem("labellisation-form-progress");
+          localStorage.removeItem("labellisation-form-progress");
         }
       }
       const params = new URLSearchParams(window.location.search);
@@ -116,7 +116,7 @@ export default function CandidaturePage() {
   }, []);
 
   useEffect(() => {
-    if (progressRestored) sessionStorage.setItem("labellisation-form-progress", JSON.stringify(form));
+    if (progressRestored) localStorage.setItem("labellisation-form-progress", JSON.stringify(form));
   }, [form, progressRestored]);
 
   useEffect(() => {
@@ -157,14 +157,14 @@ export default function CandidaturePage() {
     : null;
   const discountIsParitySafe = parityMaximum === null || Number(form.discountPercent) <= parityMaximum;
   const canContinue = [
-    Boolean(form.establishmentName.trim() && form.address.trim() && form.postalCode.trim() && form.city.trim() && isValidWebsite(form.website) && form.contactName.trim() && form.email.includes("@") && /^\d{14}$/.test(form.siret.replace(/\s/g, ""))),
+    Boolean(form.establishmentName.trim() && form.address.trim() && form.postalCode.trim() && form.city.trim() && form.country.trim() && isValidWebsite(form.website) && form.contactName.trim() && form.email.includes("@") && /^[A-Za-z0-9 ./-]{3,30}$/.test(form.siret.trim()) && form.operatingAuthorization),
     answeredCriteria === LABELLISATION_CRITERIA.length && Boolean(form.planFileName) && form.welcomeMessage.trim().length >= 20,
     form.reservationModes.length > 0 && Number(form.discountPercent) >= 10 && Number(form.discountPercent) <= 20 && discountIsParitySafe && (!form.hasParityClause || parityMaximum !== null),
     Boolean(Number(form.totalPitches) > 0 && photoFiles.length >= 1 && photoFiles.length <= 3 && form.acceptCharter),
   ][step];
 
   const missingMessage = [
-    "Renseignez le nom, l'adresse, la ville, un site internet valide, le contact, l'email et le SIRET à 14 chiffres.",
+    "Renseignez l’identité du lieu, le pays, un site internet valide, le contact, l’identifiant professionnel et confirmez votre autorisation d’exploitation.",
     `Renseignez les ${LABELLISATION_CRITERIA.length} critères, ajoutez le plan et décrivez votre accueil en au moins 20 caractères.`,
     "Choisissez un mode de réservation et une réduction valide entre 10 % et 20 % compatible avec votre éventuelle clause de parité.",
     "Indiquez le nombre d'emplacements, ajoutez au moins une photo et acceptez la charte Label Vanlife.",
@@ -203,7 +203,7 @@ export default function CandidaturePage() {
       if (!response.ok) throw new Error(result.error || "Impossible d'envoyer la candidature.");
       const finalizedDraft = { ...draft, draftId: result.draftId, attachmentPaths: result.attachmentPaths, draftToken: result.draftToken };
       sessionStorage.setItem("labellisation-draft", JSON.stringify(finalizedDraft));
-      sessionStorage.removeItem("labellisation-form-progress");
+      localStorage.removeItem("labellisation-form-progress");
       sessionStorage.setItem("labellisation-confirmation", JSON.stringify({ establishmentName: form.establishmentName, email: form.email, draftId: result.draftId }));
       const checkoutResponse = await fetch("/api/stripe/checkout-labellisation", {
         method: "POST",
@@ -238,7 +238,8 @@ export default function CandidaturePage() {
         <header className="text-center">
           <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#9a7445]">Candidature partenaire</p>
           <h1 className="mt-3 text-3xl font-bold text-neutral-900 sm:text-4xl">Devenir un lieu Label Vanlife</h1>
-          <p className="mx-auto mt-3 max-w-2xl text-sm leading-relaxed text-neutral-600">Un dossier complet nous permet d'évaluer votre accueil et de créer une fiche vraiment utile aux membres.</p>
+          <p className="mx-auto mt-3 max-w-2xl text-sm leading-relaxed text-neutral-600">Un dossier complet nous permet d'évaluer votre accueil et de créer votre fiche sans vous redemander les mêmes informations.</p>
+          <p className="mx-auto mt-4 max-w-2xl rounded-xl border border-[#c39960]/25 bg-white px-4 py-3 text-xs leading-5 text-neutral-600"><strong className="text-neutral-900">4 étapes · environ 12 à 15 minutes.</strong> Votre progression textuelle est enregistrée sur cet appareil. Les questions recommandées servent directement à enrichir votre future fiche ; elles restent facultatives lorsqu’elles ne sont pas nécessaires à l’étude.</p>
         </header>
 
         <div className="grid grid-cols-4 gap-2" aria-label={`Étape ${step + 1} sur ${STEPS.length}`}>
@@ -261,6 +262,7 @@ export default function CandidaturePage() {
               <label className="block text-sm font-medium text-neutral-700">Ville *<input autoComplete="address-level2" className={fieldClass} value={form.city} onChange={(e) => update({ city: e.target.value })} /></label>
               <label className="block text-sm font-medium text-neutral-700">Région<input autoComplete="address-level1" className={fieldClass} value={form.region} onChange={(e) => update({ region: e.target.value })} /></label>
             </div>
+            <label className="block text-sm font-medium text-neutral-700">Pays *<select className={fieldClass} value={form.country} onChange={(e) => update({ country: e.target.value })}><option>France</option><option>Belgique</option><option>Suisse</option><option>Luxembourg</option><option>Autre pays francophone</option></select></label>
             <div className="grid gap-4 sm:grid-cols-2">
               <label className="block text-sm font-medium text-neutral-700">Type de lieu *<select className={fieldClass} value={form.placeType} onChange={(e) => update({ placeType: e.target.value })}>{PLACE_TYPES.map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label>
               <label className="block text-sm font-medium text-neutral-700">Site internet *<input type="text" inputMode="url" autoComplete="url" required className={fieldClass} value={form.website} onChange={(e) => update({ website: e.target.value })} onBlur={(e) => update({ website: normalizeWebsite(e.target.value) })} placeholder="www.votrelieu.fr" /></label>
@@ -269,7 +271,7 @@ export default function CandidaturePage() {
               <label className="block text-sm font-medium text-neutral-700">Poste / Fonction<input className={fieldClass} value={form.jobTitle} onChange={(e) => update({ jobTitle: e.target.value })} /></label>
               <label className="block text-sm font-medium text-neutral-700">Email *<input type="email" autoComplete="email" className={fieldClass} value={form.email} onChange={(e) => update({ email: e.target.value })} /></label>
               <label className="block text-sm font-medium text-neutral-700">Téléphone<input type="tel" autoComplete="tel" className={fieldClass} value={form.phone} onChange={(e) => update({ phone: e.target.value })} /></label>
-              <label className="block text-sm font-medium text-neutral-700">Numéro SIRET *<input className={fieldClass} inputMode="numeric" maxLength={17} value={form.siret} onChange={(e) => update({ siret: e.target.value })} placeholder="14 chiffres" /></label>
+              <label className="block text-sm font-medium text-neutral-700">Identifiant professionnel *<span className="mt-1 block text-xs font-normal text-neutral-500">SIRET (France), BCE (Belgique), IDE (Suisse) ou numéro équivalent.</span><input className={fieldClass} maxLength={30} value={form.siret} onChange={(e) => update({ siret: e.target.value })} placeholder="Ex : 123 456 789 00012" /></label>
             </div>
             <label className="flex gap-3 rounded-xl border border-neutral-200 p-4 text-sm text-neutral-600"><input type="checkbox" className="mt-0.5 accent-[#c39960]" checked={form.operatingAuthorization} onChange={(e) => update({ operatingAuthorization: e.target.checked })} /> Je confirme disposer des autorisations nécessaires à l'exploitation de mon établissement.</label>
             <label className="flex gap-3 rounded-xl border border-neutral-200 p-4 text-sm text-neutral-600"><input type="checkbox" className="mt-0.5 accent-[#c39960]" checked={form.followFacebook} onChange={(e) => update({ followFacebook: e.target.checked })} /> Je suis ou souhaite suivre la page Facebook Label Vanlife.</label>
@@ -381,7 +383,7 @@ export default function CandidaturePage() {
 
           <div className="mt-8 flex flex-col-reverse gap-3 border-t border-neutral-100 pt-6 sm:flex-row sm:justify-between">
             <Button variant="ghost" onClick={() => setStep((current) => Math.max(0, current - 1))} disabled={step === 0 || loading}><ArrowLeft className="h-4 w-4" /> Étape précédente</Button>
-            {step < STEPS.length - 1 ? <Button variant="cta" onClick={next} disabled={!canContinue}>Continuer <ArrowRight className="h-4 w-4" /></Button> : <Button variant="cta" onClick={handlePreAudit} disabled={!canContinue || loading}>{loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <ArrowRight className="h-4 w-4" />} Envoyer ma candidature</Button>}
+            {step < STEPS.length - 1 ? <Button variant="cta" onClick={next} disabled={!canContinue}>Continuer <ArrowRight className="h-4 w-4" /></Button> : <Button variant="cta" onClick={handlePreAudit} disabled={!canContinue || loading}>{loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <ArrowRight className="h-4 w-4" />} Enregistrer et passer au paiement</Button>}
           </div>
           {!canContinue && <p className="mt-3 text-center text-xs text-neutral-500">{missingMessage}</p>}
         </Card>

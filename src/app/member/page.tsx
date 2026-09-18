@@ -7,7 +7,6 @@ import {
   Heart,
   Map,
   Navigation,
-  QrCode,
   Route,
   ShieldCheck,
   Stamp,
@@ -97,9 +96,9 @@ export default async function MemberDashboard() {
                 </p>
               </div>
               <div className="flex items-end justify-between">
-                <p className="text-xs text-white/70">Touchez pour afficher et vérifier la carte</p>
+                <p className="text-xs text-white/70">Touchez pour afficher les personnes couvertes</p>
                 <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-white text-forest">
-                  <QrCode className="h-7 w-7" />
+                  <WalletCards className="h-7 w-7" />
                 </span>
               </div>
             </div>

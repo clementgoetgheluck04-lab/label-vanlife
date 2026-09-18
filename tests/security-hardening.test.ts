@@ -159,11 +159,12 @@ test("the downloadable member card replaces the personal QR without exposing con
 
   assert.doesNotMatch(page, /QRCode|createMemberCardToken|verifier-carte/);
   assert.match(page, /MemberCardInteractive/);
-  assert.match(interactiveCard, /Télécharger ma carte membre/);
+  assert.match(interactiveCard, /Télécharger ma carte sans coordonnées privées/);
   assert.match(interactiveCard, /props\.people/);
-  assert.match(interactiveCard, /props\.email/);
-  assert.match(interactiveCard, /props\.phone/);
-  assert.match(interactiveCard, /props\.address/);
+  assert.doesNotMatch(interactiveCard, /props\.email/);
+  assert.doesNotMatch(interactiveCard, /props\.phone/);
+  assert.doesNotMatch(interactiveCard, /props\.address/);
+  assert.match(interactiveCard, /Aucune coordonnée personnelle exportée/);
   assert.match(profileEndpoint, /requireActiveMember/);
   assert.match(profileEndpoint, /assertSameOrigin/);
   assert.match(profileEndpoint, /enforceRateLimit/);

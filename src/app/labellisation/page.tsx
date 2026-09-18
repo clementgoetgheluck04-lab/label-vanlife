@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
-  ArrowRight, Sparkles, MapPin, BadgeCheck, Percent, Shield, Check, Star, Heart, Users, TreePine, Warehouse, Home
+  ArrowRight, Sparkles, MapPin, BadgeCheck, Percent, Shield, Check, Star, Heart, TreePine, Warehouse, Home, Users
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
@@ -32,7 +32,7 @@ export default function LabellisationPage() {
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Button variant="primary" size="lg" className="gap-2 text-base px-8" onClick={() => router.push("/labellisation/candidature")}>
-                Candidater au Label <ArrowRight className="w-5 h-5" />
+                Préparer mon dossier <ArrowRight className="w-5 h-5" />
               </Button>
               <Link href="/referentiel-label-vanlife" className="inline-flex min-h-12 items-center gap-2 rounded-xl border border-emerald-700 px-6 text-sm font-bold text-emerald-800 hover:bg-emerald-50">
                 Lire le référentiel 2027 <ArrowRight className="h-4 w-4" />
@@ -92,8 +92,8 @@ export default function LabellisationPage() {
               <p className="text-xs text-neutral-500 mt-1">Lieux labellisés</p>
             </div>
             <div>
-              <p className="text-3xl sm:text-4xl font-bold text-neutral-900">{SITE_STATS.spottedPlacesCount}</p>
-              <p className="text-xs text-neutral-500 mt-1">Lieux repérés</p>
+              <p className="text-xl sm:text-2xl font-bold text-[#8b673d]">Mesure en cours</p>
+              <p className="text-xs text-neutral-500 mt-1">clics, visites et séjours</p>
             </div>
             <div>
               <p className="text-3xl sm:text-4xl font-bold text-emerald-600">0%</p>
@@ -105,6 +105,10 @@ export default function LabellisationPage() {
         {/* ===== RÉSEAU EN CROISSANCE ===== */}
         <section className="py-12 text-center">
           <span className="inline-block text-xs font-semibold tracking-[0.2em] uppercase text-emerald-500">Réseau en croissance</span>
+          <div className="mx-auto mt-5 max-w-3xl rounded-2xl border border-[#c39960]/30 bg-[#f7f1e8] p-5 text-left">
+            <p className="text-sm font-bold text-neutral-900">Cohorte fondatrice 2027 : nous publions uniquement des preuves réellement mesurées.</p>
+            <p className="mt-2 text-sm leading-6 text-neutral-600">Le réseau est en phase de croissance. Nous ne promettons ni volume de réservations ni chiffre d’affaires. Les vues de fiches, clics vers les sites, itinéraires et séjours déclarés seront affichés progressivement dès que l’échantillon sera suffisamment fiable.</p>
+          </div>
         </section>
 
         {/* ===== BÉNÉFICES ===== */}
@@ -261,12 +265,11 @@ export default function LabellisationPage() {
             <p className="text-neutral-500 max-w-xl mx-auto">Campings, aires, fermes, domaines et autres lieux professionnels peuvent candidater si leur accueil répond au référentiel.</p>
           </div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid sm:grid-cols-3 gap-4">
             {[
               { icon: <TreePine className="w-6 h-6" />, title: "Campings Nature", desc: "Établissements à taille humaine privilégiant le calme et l'authenticité." },
               { icon: <Warehouse className="w-6 h-6" />, title: "Fermes & Domaines", desc: "Producteurs et propriétaires ouvrant leurs terres aux voyageurs." },
-              { icon: <Home className="w-6 h-6" />, title: "Gîtes & Chambres", desc: "Hébergements souhaitant accueillir une clientèle vanlife de qualité." },
-              { icon: <Users className="w-6 h-6" />, title: "Particuliers", desc: "Propriétaires d'un terrain souhaitant partager leur coin de paradis." },
+              { icon: <Home className="w-6 h-6" />, title: "Aires & Hébergements", desc: "Structures professionnelles autorisées à accueillir des voyageurs et leurs véhicules." },
             ].map((item) => (
               <Card key={item.title} className="p-5 text-center">
                 <div className="inline-flex h-12 w-12 rounded-xl bg-emerald-50 items-center justify-center text-emerald-500 mb-3">{item.icon}</div>
@@ -283,7 +286,7 @@ export default function LabellisationPage() {
                 <span key={item} className="px-3 py-1.5 bg-white rounded-full border border-neutral-200">{item}</span>
               ))}
             </div>
-            <p className="text-sm font-semibold text-emerald-600 mt-4">En bref, presque tous ceux qui le souhaitent peuvent candidater !</p>
+            <p className="text-sm font-semibold text-emerald-700 mt-4">Chaque candidat doit exercer légalement son activité d’accueil et respecter le référentiel public 2027.</p>
           </div>
         </section>
 
@@ -316,14 +319,14 @@ export default function LabellisationPage() {
           <div className="relative z-10 text-center px-6 max-w-lg mx-auto">
             <span className="inline-block px-4 py-1.5 bg-white/10 rounded-full text-white/80 text-xs font-semibold tracking-wide mb-4">Prévente 2027 · nombre de places limité</span>
             <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4" style={{ fontFamily: "Outfit, sans-serif" }}>Prêt à développer votre activité ?</h2>
-            <p className="text-white/70 mb-8">Candidatez dès maintenant. Notre équipe vous recontactera sous 10 jours pour échanger sur votre lieu.</p>
+            <p className="text-white/70 mb-8">Préparez votre dossier complet. Après son enregistrement, le paiement sécurisé de 110 € lance l’étude ; en cas de non-conformité, il est remboursé intégralement.</p>
             <div className="flex flex-wrap justify-center gap-3 mb-8">
-              <span className="inline-flex items-center gap-1 px-3 py-1.5 bg-white/10 rounded-full text-white/80 text-xs"><Check className="w-3 h-3" /> Sans engagement</span>
+              <span className="inline-flex items-center gap-1 px-3 py-1.5 bg-white/10 rounded-full text-white/80 text-xs"><Check className="w-3 h-3" /> Parcours et prix annoncés avant paiement</span>
               <span className="inline-flex items-center gap-1 px-3 py-1.5 bg-white/10 rounded-full text-white/80 text-xs"><Check className="w-3 h-3" /> 0% de commission</span>
               <span className="inline-flex items-center gap-1 px-3 py-1.5 bg-white/10 rounded-full text-white/80 text-xs"><Check className="w-3 h-3" /> Jusqu&apos;au 31/12/2027</span>
             </div>
             <Button variant="cta" size="lg" className="text-base px-10 shadow-xl shadow-amber-500/25" onClick={() => router.push("/labellisation/candidature")}>
-              Remplir le formulaire de candidature <ArrowRight className="h-4 w-4 ml-2" />
+              Préparer mon dossier complet <ArrowRight className="h-4 w-4 ml-2" />
             </Button>
             <p className="mt-5 text-white"><strong className="text-3xl">{LABEL_PRICE} €</strong> <span className="text-sm text-white/70">paiement unique</span></p>
             <p className="mt-1 text-xs font-semibold text-[#f0d6ad]"><span className="line-through">{LABEL_NORMAL_PRICE} €</span> · vous économisez {LABEL_NORMAL_PRICE - LABEL_PRICE} €</p>

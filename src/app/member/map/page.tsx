@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import { X, Filter, MapPin, Percent, ArrowLeft, BadgeCheck, TentTree, Building2, ExternalLink, Navigation, Route, Plus, CheckCircle2 } from "lucide-react";
+import { X, Filter, MapPin, Percent, ArrowLeft, BadgeCheck, TentTree, Building2, ExternalLink, Navigation, Route, Plus, CheckCircle2, AlertTriangle, RefreshCw } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Filters, { type FilterValues } from "@/components/explorer/Filters";
 import LieuCard from "@/components/explorer/LieuCard";
@@ -64,9 +64,11 @@ export default function MemberMapPage() {
   const [filters, setFilters] = useState<FilterValues>(DEFAULT_FILTERS);
   const [showFilters, setShowFilters] = useState(false);
   const [showLabelled, setShowLabelled] = useState(true);
-  const [showMemberAddresses, setShowMemberAddresses] = useState(true);
+  const [showMemberAddresses, setShowMemberAddresses] = useState(false);
   const [labelledPlaces, setLabelledPlaces] = useState<Lieu[]>([]);
   const [memberOnlyPlaces, setMemberOnlyPlaces] = useState<MemberCampingPoint[]>([]);
+  const [dataState, setDataState] = useState<"loading" | "ready" | "error">("loading");
+  const [dataError, setDataError] = useState("");
   const [universe, setUniverse] = useState<PlaceUniverse>("tous");
   const [visibleMemberPlaces, setVisibleMemberPlaces] = useState(24);
   const [roadTripDraft, setRoadTripDraft] = useState<RoadTripDraftPlace[]>([]);
@@ -108,25 +110,29 @@ export default function MemberMapPage() {
     return true;
   }), [filters.region, filters.search, memberOnlyPlaces, universe]);
 
-  useEffect(() => {
-    fetch("/api/member/camping-network", { cache: "no-store" })
-      .then(async (response) => {
+  const loadMemberPlaces = useCallback(async () => {
+    setDataState("loading");
+    setDataError("");
+    try {
+      const response = await fetch("/api/member/camping-network", { cache: "no-store" });
         if (response.status === 403) {
           router.replace("/devenir-membre");
           throw new Error("Accès membre expiré");
         }
-        if (!response.ok) throw new Error("Accès aux données membres refusé");
-        return response.json() as Promise<{ labelledPlaces: Lieu[]; places: MemberCampingPoint[] }>;
-      })
-      .then(({ labelledPlaces: nextLabelledPlaces, places }) => {
-        setLabelledPlaces(nextLabelledPlaces);
-        setMemberOnlyPlaces(places);
-      })
-      .catch(() => {
-        setLabelledPlaces([]);
-        setMemberOnlyPlaces([]);
-      });
+      if (!response.ok) throw new Error("La MAP ne peut pas charger les lieux pour le moment.");
+      const data = await response.json() as { labelledPlaces: Lieu[]; places: MemberCampingPoint[] };
+      setLabelledPlaces(data.labelledPlaces);
+      setMemberOnlyPlaces(data.places);
+      setDataState("ready");
+    } catch (error) {
+      setDataState("error");
+      setDataError(error instanceof Error ? error.message : "La MAP ne peut pas charger les lieux pour le moment.");
+    }
   }, [router]);
+
+  useEffect(() => {
+    queueMicrotask(() => void loadMemberPlaces());
+  }, [loadMemberPlaces]);
 
   useEffect(() => {
     let nextDraft: RoadTripDraftPlace[] = [];
@@ -178,7 +184,11 @@ export default function MemberMapPage() {
             <div>
               <h1 className="text-lg font-bold text-neutral-900">MAP des lieux</h1>
               <p className="text-xs text-neutral-500">
-                {filteredLieux.length} lieux labellisés · {filteredMemberPlaces.length} lieux repérés disponibles
+                {dataState === "loading"
+                  ? "Chargement des lieux…"
+                  : dataState === "error"
+                    ? "Données temporairement indisponibles"
+                    : `${filteredLieux.length} lieux labellisés · ${filteredMemberPlaces.length} lieux repérés disponibles`}
               </p>
             </div>
           </div>
@@ -226,13 +236,22 @@ export default function MemberMapPage() {
         <div className="max-w-6xl mx-auto px-4 py-2.5 flex items-center justify-center gap-2 text-sm">
           <Percent className="h-4 w-4 text-amber-500" />
           <span className="text-neutral-700">
-            Réductions membres de <strong className="text-emerald-600">-10% à -20%</strong> chez tous les partenaires labellisés
+            Avantage indiqué sur chaque fiche : <strong className="text-emerald-600">jusqu&apos;à -20 % selon le lieu</strong>. Certains partenaires proposent plutôt un petit prix ou une autre formule.
           </span>
         </div>
       </div>
 
       {/* Map + Cards */}
       <div className="max-w-6xl mx-auto px-4 py-6 space-y-6">
+        {dataState === "error" && (
+          <div role="alert" className="flex flex-col gap-4 rounded-2xl border border-red-200 bg-red-50 p-5 text-red-950 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex gap-3"><AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-red-700" /><div><p className="font-bold">La MAP est temporairement indisponible</p><p className="mt-1 text-sm text-red-800">{dataError} Vos lieux ne sont pas supprimés : il s’agit d’une erreur de chargement.</p></div></div>
+            <button type="button" onClick={() => void loadMemberPlaces()} className="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-xl bg-red-800 px-4 text-sm font-bold text-white hover:bg-red-900"><RefreshCw className="h-4 w-4" /> Réessayer</button>
+          </div>
+        )}
+        {dataState === "loading" && (
+          <div role="status" className="flex items-center justify-center gap-3 rounded-2xl border border-neutral-200 bg-neutral-50 p-5 text-sm font-semibold text-neutral-600"><RefreshCw className="h-4 w-4 animate-spin" /> Chargement des lieux labellisés…</div>
+        )}
         <div className="rounded-3xl border border-emerald-100 bg-gradient-to-r from-emerald-50 to-[#f7f1e8] p-5 shadow-sm">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-start gap-3">
@@ -282,7 +301,7 @@ export default function MemberMapPage() {
             <span className="h-4 w-4 shrink-0 rounded-full bg-[#c39960] ring-4 ring-white shadow" />
             <span>
               <span className="flex items-center gap-1.5 font-bold text-neutral-900"><TentTree className="h-4 w-4 text-[#9a7547]" /> Lieux repérés</span>
-              <span className="text-xs text-neutral-600">Optionnels · plus discrets · site visible pour réserver directement</span>
+              <span className="text-xs text-neutral-600">Masqués par défaut · non contrôlés · aucun avantage membre garanti</span>
             </span>
           </button>
         </div>
@@ -363,7 +382,7 @@ export default function MemberMapPage() {
               );
             })}
           </div>
-          {filteredLieux.length === 0 && (
+          {dataState === "ready" && filteredLieux.length === 0 && (
             <div className="text-center py-12 text-neutral-400">
               <MapPin className="h-12 w-12 mx-auto mb-3 opacity-30" />
               <p className="font-medium">Aucun lieu trouvé</p>

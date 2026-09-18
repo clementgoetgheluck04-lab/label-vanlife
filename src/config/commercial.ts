@@ -23,4 +23,4 @@ export const LABEL_PRICE = 110;
 export const LABEL_NORMAL_PRICE = 290;
 export const LABEL_PRICE_CENTS = LABEL_PRICE * 100;
 export const LABEL_NORMAL_PRICE_CENTS = LABEL_NORMAL_PRICE * 100;
-export const LABEL_VALIDITY_TEXT = "Candidature gratuite · Prévente 2027 : 110 € au lieu de 290 € · Active dès validation jusqu'au 31 décembre 2027 · Nombre de places limité · 0 % de commission";
+export const LABEL_VALIDITY_TEXT = "Dossier enregistré avant paiement · Étude 2027 : 110 € au lieu de 290 € · Label actif dès validation jusqu'au 31 décembre 2027 · Nombre de places limité · 0 % de commission";

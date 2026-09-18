@@ -28,26 +28,19 @@ export default async function MemberCardPage() {
     { id: member.id, name: fullName, number: `${card.cardNumber}-01`, role: "Titulaire" },
     ...member.memberCompanions.map((person, index) => ({ id: person.id, name: `${person.firstName} ${person.lastName}`, number: `${card.cardNumber}-${String(index + 2).padStart(2, "0")}`, role: "Accompagnant" })),
   ];
-  const address = [
-    profile?.addressLine1,
-    profile?.addressLine2,
-    [profile?.postalCode, profile?.city].filter(Boolean).join(" "),
-    profile?.country,
-  ].filter((line): line is string => Boolean(line));
-
   return (
     <main className="min-h-screen bg-gradient-to-b from-sage/10 to-white px-4 py-8 pb-24">
       <div className="mx-auto max-w-md space-y-7">
         <Link href="/member" className="inline-flex items-center gap-2 text-sm text-stone"><ArrowLeft className="h-4 w-4" />Retour à l’espace membre</Link>
-        <header className="text-center"><span className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-sage/10"><Sparkles className="h-7 w-7 text-sage" /></span><h1 className="mt-3 text-2xl font-bold text-charcoal">Ma carte membre</h1><p className="mt-2 text-sm text-stone">Touchez la carte pour afficher les personnes couvertes et vos coordonnées.</p></header>
+        <header className="text-center"><span className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-sage/10"><Sparkles className="h-7 w-7 text-sage" /></span><h1 className="mt-3 text-2xl font-bold text-charcoal">Ma carte membre</h1><p className="mt-2 text-sm text-stone">Touchez la carte pour afficher les personnes couvertes. Vos coordonnées restent séparées et privées.</p></header>
 
-        <MemberCardInteractive cardNumber={card.cardNumber} year={year} fullName={fullName} email={member.email} phone={profile?.phone ?? ""} address={address} level={profile?.level ?? "EXPLORATEUR"} points={profile?.points ?? 0} people={people.map(({ name, number, role }) => ({ name, number, role }))} />
+        <MemberCardInteractive cardNumber={card.cardNumber} year={year} fullName={fullName} level={profile?.level ?? "EXPLORATEUR"} points={profile?.points ?? 0} people={people.map(({ name, number, role }) => ({ name, number, role }))} />
 
         <MemberContactEditor initial={{ phone: profile?.phone ?? "", addressLine1: profile?.addressLine1 ?? "", addressLine2: profile?.addressLine2 ?? "", postalCode: profile?.postalCode ?? "", city: profile?.city ?? "", country: profile?.country ?? "France" }} />
 
         <Card className="overflow-hidden p-0"><div className="flex items-center gap-3 border-b border-border bg-sage/5 px-5 py-4"><Users className="h-5 w-5 text-sage" /><div><h2 className="text-sm font-bold text-charcoal">Personnes couvertes</h2><p className="text-xs text-stone">Un numéro distinct par personne.</p></div></div><div className="divide-y divide-border">{people.map((person) => <div key={person.id} className="flex items-center gap-3 px-5 py-4"><span className="flex h-10 w-10 items-center justify-center rounded-full bg-sage/10"><UserRound className="h-5 w-5 text-sage" /></span><div className="min-w-0 flex-1"><p className="font-semibold text-charcoal">{person.name}</p><p className="text-xs text-stone">{person.role}</p></div><span className="rounded-lg bg-neutral-100 px-2 py-1 font-mono text-[10px] text-stone">{person.number}</span></div>)}</div></Card>
 
-        <Card className="flex items-start gap-3 border-sage/20 bg-sage/5"><ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-sage" /><div><h2 className="text-sm font-bold text-charcoal">Carte personnelle et privée</h2><p className="mt-1 text-xs leading-relaxed text-stone">Vos coordonnées apparaissent uniquement dans votre espace membre connecté et dans l’image que vous choisissez de télécharger.</p></div></Card>
+        <Card className="flex items-start gap-3 border-sage/20 bg-sage/5"><ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-sage" /><div><h2 className="text-sm font-bold text-charcoal">Carte personnelle et privée</h2><p className="mt-1 text-xs leading-relaxed text-stone">L’image téléchargée contient uniquement votre identité, les personnes couvertes, les numéros de carte et la validité. Email, téléphone et adresse ne sont jamais exportés.</p></div></Card>
       </div>
     </main>
   );

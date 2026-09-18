@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { BRAND_ASSETS } from "@/config/brand-assets";
-import { CURRENT_YEAR, MEMBER_CTA_LABEL, MEMBER_DISCOUNT_TEXT, MEMBER_VALIDITY_TEXT } from "@/config/commercial";
+import { CURRENT_YEAR, MEMBER_CTA_LABEL, MEMBER_DISCOUNT_MAX, MEMBER_VALIDITY_TEXT } from "@/config/commercial";
 
 const CARDS = [
   {
@@ -10,7 +10,7 @@ const CARDS = [
     price: "29 €",
     period: `édition ${CURRENT_YEAR}`,
     badge: "OFFRE ACTUELLE",
-    features: [`${MEMBER_DISCOUNT_TEXT} de réduction`, "MAP Label Vanlife", "Road trip planner", "Carte membre numérique"],
+    features: [`Avantage pouvant aller jusqu’à ${MEMBER_DISCOUNT_MAX} %`, "MAP Label Vanlife", "Road trip planner", "Carte membre numérique"],
     image: BRAND_ASSETS.memberCardCouple,
   },
 ];
@@ -27,8 +27,8 @@ export default function MemberCards() {
             Une seule carte, tous les avantages
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Bénéficiez d&apos;avantages exclusifs réservés à notre communauté : entre 10% et 20% d&apos;avantages sur les
-            séjours et services chez nos partenaires labellisés.
+            Chaque fiche indique précisément l&apos;avantage proposé : réduction pouvant aller jusqu&apos;à 20 %, petit prix
+            ou autre formule validée avec le partenaire.
           </p>
         </div>
 

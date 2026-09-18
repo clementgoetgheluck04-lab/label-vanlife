@@ -294,7 +294,7 @@ export function LoginContent() {
                 <div className="space-y-4 rounded-2xl border border-neutral-200 bg-neutral-50 p-4">
                   <div>
                     <p className="text-sm font-semibold text-neutral-800">Adresse postale du titulaire</p>
-                    <p className="mt-1 text-xs text-neutral-500">Elle figurera uniquement sur votre carte personnelle et dans votre espace sécurisé.</p>
+                    <p className="mt-1 text-xs text-neutral-500">Elle reste dans votre profil privé et n’est jamais inscrite sur la carte membre téléchargée.</p>
                   </div>
                   <label className="block space-y-1 text-xs font-medium text-neutral-600"><span>Numéro et voie *</span><input value={addressLine1} onChange={(event) => setAddressLine1(event.target.value)} className="h-11 w-full rounded-lg border border-neutral-200 bg-white px-3" required minLength={2} maxLength={180} autoComplete="address-line1" /></label>
                   <label className="block space-y-1 text-xs font-medium text-neutral-600"><span>Complément d’adresse</span><input value={addressLine2} onChange={(event) => setAddressLine2(event.target.value)} className="h-11 w-full rounded-lg border border-neutral-200 bg-white px-3" maxLength={180} autoComplete="address-line2" /></label>
@@ -310,6 +310,7 @@ export function LoginContent() {
                     <Lock className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
                     <input type="password" value={password} onChange={(event) => setPassword(event.target.value)} placeholder="12 caractères minimum" className="h-12 w-full rounded-xl border border-neutral-200 pl-10 pr-4 focus:ring-2 focus:ring-emerald-500" required minLength={12} autoComplete="new-password" />
                   </span>
+                  <span className="block text-xs font-normal leading-5 text-neutral-500">Il sécurise la création de votre compte. Une fois la carte activée, votre code membre devient le moyen de connexion principal.</span>
                 </label>
               </>
             ) : (

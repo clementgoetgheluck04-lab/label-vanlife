@@ -90,6 +90,7 @@ export type LabellisationPayload = {
   postalCode: string;
   city: string;
   region: string;
+  country: string;
   capacity: number;
   services: string[];
   discountPercent: number;
@@ -154,6 +155,7 @@ export function parseLabellisationPayload(value: unknown): LabellisationPayload 
   const address = parseText(input.address, { min: 2, max: 200, required: true });
   const postalCode = parseText(input.postalCode, { min: 2, max: 20, required: true });
   const region = parseText(input.region, { max: 120 });
+  const country = parseText(input.country, { min: 2, max: 80, required: true });
   const description = parseText(input.description, { min: 20, max: 2_000, required: true });
   const motivation = parseText(input.motivation, { min: 20, max: 2_000, required: true });
   const placeType = typeof input.placeType === "string" ? input.placeType : "";
@@ -166,7 +168,7 @@ export function parseLabellisationPayload(value: unknown): LabellisationPayload 
 
   if (
     !establishmentName || !contactName || !email || phone === null || !website ||
-    !address || !postalCode || !city || region === null ||
+    !address || !postalCode || !city || region === null || !country ||
     !Number.isInteger(capacity) || capacity < 1 || capacity > 10_000 ||
     (!Number.isInteger(discountPercent) || discountPercent < 10 || discountPercent > 20) || !acceptCharter ||
     input.operatingAuthorization !== true ||
@@ -209,10 +211,10 @@ export function parseLabellisationPayload(value: unknown): LabellisationPayload 
   const planFileName = parseText(input.planFileName, { min: 1, max: 255, required: true });
   if ([jobTitle, comments, welcomeMessage, promoCode, discountConditions, surfaceEmplacement, bookingSoftware, bookingChannelManager, couplePitchNumbers, familyPitchNumbers, activities, foodOptions, practicalInfo, planFileName].some((item) => item === null)) return null;
 
-  const siretRaw = optionalText("siret", 20);
+  const siretRaw = optionalText("siret", 30);
   if (siretRaw === null) return null;
-  const siret = siretRaw?.replace(/\s/g, "") || "";
-  if (!/^\d{14}$/.test(siret)) return null;
+  const siret = siretRaw?.trim() || "";
+  if (!/^[A-Za-z0-9 ./-]{3,30}$/.test(siret)) return null;
 
   const allowedReservationModes = new Set(["online", "email", "phone", "onsite"]);
   const reservationModes = Array.isArray(input.reservationModes)
@@ -259,7 +261,7 @@ export function parseLabellisationPayload(value: unknown): LabellisationPayload 
 
   return {
     establishmentName, contactName, email, phone, website: safeWebsite, placeType, address,
-    postalCode, city, region, capacity, services, discountPercent, description,
+    postalCode, city, region, country, capacity, services, discountPercent, description,
     motivation, acceptCharter: true, facebook, jobTitle: jobTitle || "", siret,
     operatingAuthorization: input.operatingAuthorization === true,
     followFacebook: input.followFacebook === true, comments: comments || "", criteria,
