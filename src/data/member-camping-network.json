@@ -8594,7 +8594,10 @@
     "website": "https://www.campingcarpark.com/fr_FR/sejour/camping/grand-est/54-meurthe-et-moselle/luneville",
     "description": "18 emplacements : 14 emplacements nus et 4 locations. 23 aires de service pour les camping-car. OUVERT du 01/05 au 29/09 aire du service toute l'année",
     "phones": [],
-    "emails": [],
+    "emails": [
+      "camping@delunevilleabaccarat.fr"
+    ],
+    "verifiedEmailOverride": true,
     "details": [
       "18 emplacements : 14 emplacements nus et 4 locations. 23 aires de service pour les camping-car. OUVERT du 01/05 au 29/09 aire du service toute l'année"
     ],
