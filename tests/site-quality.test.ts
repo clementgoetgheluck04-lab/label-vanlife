@@ -101,6 +101,13 @@ test("the home hero explains the inclusive vanlife philosophy and links to its i
   assert.match(sitemap, /\/philosophie-vanlife/);
 });
 
+test("the homepage presents labellisation value before revealing its price", () => {
+  const publicHome = `${read("src/app/page.tsx")}\n${read("src/components/Footer.tsx")}`;
+  assert.doesNotMatch(publicHome, /LABEL_(?:NORMAL_)?PRICE/);
+  assert.doesNotMatch(publicHome, /110\s*€|290\s*€/);
+  assert.match(publicHome, /Découvrir la labellisation/);
+});
+
 test("public labelled place pages survive a database outage", () => {
   const page = read("src/app/lieux/[id]/page.tsx");
   assert.match(page, /export async function generateMetadata/);

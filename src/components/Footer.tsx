@@ -20,7 +20,7 @@ const NAVIGATION = [
 
 const OFFERS = [
   { label: `${MEMBER_SHORT_LABEL} au lieu de 39 €`, href: "/devenir-membre" },
-  { label: "Labelliser mon lieu en 2027 — 110€ au lieu de 290€", href: "/labellisation/candidature" },
+  { label: "Demander mon Label Vanlife 2027", href: "/labellisation/candidature" },
 ] as const;
 
 const SEO_GUIDES = [

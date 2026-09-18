@@ -4,7 +4,7 @@ import { ArrowRight, Star, Shield, Heart, Moon, Compass, ChevronDown, MapPin, Sm
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { ENRICHED_LIEUX } from "@/data/enriched-lieux";
-import { LABEL_NORMAL_PRICE, LABEL_PRICE, MEMBER_CTA_LABEL, MEMBER_VALIDITY_TEXT } from "@/config/commercial";
+import { MEMBER_CTA_LABEL, MEMBER_VALIDITY_TEXT } from "@/config/commercial";
 import { SITE_STATS } from "@/config/site-stats";
 import { redactPublicPlaceText } from "@/server/public-place";
 
@@ -66,7 +66,7 @@ export default function Home() {
             <p className="mt-4 text-sm text-white/70">{MEMBER_VALIDITY_TEXT}</p>
             <div className="mt-3 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-sm font-semibold text-white/90">
               <Link href="/explorer" className="inline-flex items-center gap-1 underline decoration-white/50 underline-offset-4 hover:text-white">Découvrir les lieux <ArrowRight className="h-3.5 w-3.5" /></Link>
-              <Link href="/labellisation" className="inline-flex items-center gap-1 underline decoration-white/50 underline-offset-4 hover:text-white">Je labellise mon lieu — {LABEL_PRICE} € <ArrowRight className="h-3.5 w-3.5" /></Link>
+              <Link href="/labellisation" className="inline-flex items-center gap-1 underline decoration-white/50 underline-offset-4 hover:text-white">Je labellise mon lieu <ArrowRight className="h-3.5 w-3.5" /></Link>
             </div>
           </div>
         </div>
@@ -90,8 +90,8 @@ export default function Home() {
               <h2 className="mt-2 text-2xl font-bold">Je DEMANDE mon label 2027.</h2>
               <p className="mt-3 text-sm leading-relaxed text-white/65">Fiche détaillée, présence sur la MAP, kit de communication et 0 % de commission. Actif dès validation jusqu&apos;au 31 décembre 2027.</p>
               <div className="mt-6 flex flex-wrap items-center gap-4">
-                <Link href="/labellisation"><Button variant="cta">Découvrir l&apos;offre — {LABEL_PRICE} € <ArrowRight className="h-4 w-4" /></Button></Link>
-                <span className="text-sm text-white/70"><span className="line-through">{LABEL_NORMAL_PRICE} €</span> · places limitées</span>
+                <Link href="/labellisation"><Button variant="cta">Découvrir la labellisation <ArrowRight className="h-4 w-4" /></Button></Link>
+                <span className="text-sm text-white/70">Candidatures 2027 · places limitées</span>
               </div>
             </article>
           </div>
