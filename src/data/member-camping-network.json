@@ -8921,23 +8921,30 @@
     "id": "label-repere-camping-les-sapins-point-gps",
     "name": "Camping les Sapins",
     "network": "Rep?r? par Label Vanlife",
-    "address": "Point GPS rep?r? : 49.002995, 1.035826",
-    "postalCode": "",
-    "city": "Point GPS",
-    "region": "France",
-    "lat": 49.0029947,
-    "lng": 1.0358263,
-    "website": null,
-    "description": "35 emplacements nus pour campeurs tente caravane et camping-car",
-    "phones": [],
-    "emails": [],
-    "details": [
-      "35 emplacements nus pour campeurs tente caravane et camping-car"
+    "address": "14 rue de la Paix, 67260 Keskastel",
+    "postalCode": "67260",
+    "city": "Keskastel",
+    "region": "Grand Est",
+    "lat": 48.9759,
+    "lng": 7.05093,
+    "website": "https://www.camping-keskastel.fr/",
+    "description": "Camping 3 étoiles dans un cadre calme et naturel autour d'un plan d'eau, avec emplacements touristiques, chalets, baignade, pêche et accueil des camping-cars.",
+    "phones": [
+      "03 88 00 19 25"
     ],
-    "source": "Rep?rage Label Vanlife 2026",
-    "gpsSource": "Coordonn?es du rep?rage Label Vanlife",
-    "gpsVerifiedAt": "2026-08-01",
-    "googleMapsUrl": "https://www.google.com/maps/search/?api=1&query=Camping+les+Sapins%2049.0029947%2C1.0358263"
+    "emails": [
+      "camping.keskastel@orange.fr"
+    ],
+    "verifiedEmailOverride": true,
+    "details": [
+      "150 emplacements répartis autour de l'étang, dont 53 emplacements touristiques et 14 chalets.",
+      "Baignade surveillée en juillet et août, pêche, aire de vidange pour camping-car et wifi gratuit.",
+      "Ouvert du 1er avril au 31 octobre."
+    ],
+    "source": "Site officiel du Camping Les Sapins de Keskastel",
+    "gpsSource": "Adresse officielle du camping et coordonnées ADAC PiNCAMP",
+    "gpsVerifiedAt": "2026-09-18",
+    "googleMapsUrl": "https://www.google.com/maps/search/?api=1&query=Camping+Les+Sapins%2C+14+rue+de+la+Paix%2C+67260+Keskastel"
   },
   {
     "id": "label-repere-camping-le-val-d-oise-point-gps",
