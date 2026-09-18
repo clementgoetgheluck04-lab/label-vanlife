@@ -7968,7 +7968,10 @@
     "website": "https://www.campingfrance.com/recherchez-votre-camping/hauts-de-france/aisne/le-nouvion-en-thierache/camping-de-marlemperche",
     "description": "Le camping dispose de 60 emplacements et 2 locations. OUVERT TOUTE L'ANNEE https://www.campingfrance.com/recherchez-votre-camping/hauts-de-france/aisne/le-nouvion-en-thierache/camping-de-marlemperche",
     "phones": [],
-    "emails": [],
+    "emails": [
+      "campingdubeletang@gmail.com"
+    ],
+    "verifiedEmailOverride": true,
     "details": [
       "Le camping dispose de 60 emplacements et 2 locations. OUVERT TOUTE L'ANNEE https://www.campingfrance.com/recherchez-votre-camping/hauts-de-france/aisne/le-nouvion-en-thierache/camping-de-marlemperche"
     ],
