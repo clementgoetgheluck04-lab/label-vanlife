@@ -9194,22 +9194,29 @@
     "id": "label-repere-p-tit-camping-les-tamaris-point-gps",
     "name": "P'Tit Camping les Tamaris",
     "network": "Rep?r? par Label Vanlife",
-    "address": "Point GPS rep?r? : 50.986464, 2.056690",
-    "postalCode": "",
-    "city": "Point GPS",
-    "region": "France",
+    "address": "649 rue Marcel Dalle, 62215 Oye-Plage",
+    "postalCode": "62215",
+    "city": "Oye-Plage",
+    "region": "Hauts-de-France",
     "lat": 50.9864637,
     "lng": 2.0566904,
     "website": "https://campingtamaris.e-monsite.com/",
     "description": "30 emplacements : 30 emplacements nus et 1 location.",
-    "phones": [],
-    "emails": [],
+    "contactName": "Pascal et Mireille Riquembourg",
+    "phones": [
+      "03 21 85 87 07",
+      "06 52 40 31 08"
+    ],
+    "emails": [
+      "campinglestamaris@gmail.com"
+    ],
+    "verifiedEmailOverride": true,
     "details": [
       "30 emplacements : 30 emplacements nus et 1 location."
     ],
-    "source": "Rep?rage Label Vanlife 2026",
-    "gpsSource": "Coordonn?es du rep?rage Label Vanlife",
-    "gpsVerifiedAt": "2026-08-01",
+    "source": "Site officiel du P'Tit Camping Les Tamaris",
+    "gpsSource": "Coordonnées du repérage Label Vanlife, adresse confirmée par le site officiel",
+    "gpsVerifiedAt": "2026-09-18",
     "googleMapsUrl": "https://www.google.com/maps/search/?api=1&query=P%27Tit+Camping+les+Tamaris%2050.9864637%2C2.0566904"
   },
   {
