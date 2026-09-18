@@ -8643,7 +8643,10 @@
     "website": null,
     "description": "60 emplacements : 60 emplacements nus avec électricité, 18 locations. Animaux non acceptés OUVERT 1er mai au 30 septembre",
     "phones": [],
-    "emails": [],
+    "emails": [
+      "contact.chaumousey@amis-nature-vosges.org"
+    ],
+    "verifiedEmailOverride": true,
     "details": [
       "60 emplacements : 60 emplacements nus avec électricité, 18 locations. Animaux non acceptés OUVERT 1er mai au 30 septembre"
     ],
