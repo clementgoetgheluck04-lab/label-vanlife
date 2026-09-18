@@ -40,3 +40,21 @@ test("a label cannot be granted without traced controls and evidence access", ()
   assert.match(admin, /six contrôles tracés/);
   assert.match(validation, /input\.operatingAuthorization !== true/);
 });
+
+test("vanlifer managers describe their travel experience after choosing a vehicle", () => {
+  const criterion = LABELLISATION_CRITERIA.find((item) => item.id === "vanliferManager");
+  assert.ok(criterion);
+  assert.doesNotMatch(criterion.examples.join(" "), /Dernier road trip/);
+  assert.deepEqual(criterion.examples, [
+    "Fourgon aménagé",
+    "Camping-car",
+    "Van de série aménagé",
+    "Combi VW",
+    "Van utilitaire aménagé maison",
+  ]);
+
+  const candidature = source("../src/app/labellisation/candidature/page.tsx");
+  assert.match(candidature, /criterion\.id === "vanliferManager" && answer\.examples\.length > 0/);
+  assert.match(candidature, /Où êtes-vous déjà allé \?/);
+  assert.match(candidature, /animate-fade-in-up/);
+});

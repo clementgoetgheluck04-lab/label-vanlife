@@ -290,7 +290,16 @@ export default function CandidaturePage() {
                   {criterion.examples.map((example) => <button key={example} type="button" onClick={() => toggleExample(criterion.id, example)} className={`rounded-full border px-3 py-2 text-xs transition ${answer.examples.includes(example) ? "border-[#c39960] bg-[#f7f1e8] text-[#7c5a34]" : "border-neutral-200 text-neutral-600 hover:border-[#c39960]"}`}>{answer.examples.includes(example) && "✓ "}{example}</button>)}
                   <button type="button" onClick={() => setCriterion(criterion.id, { status: "no", examples: [], detail: "" })} className={`rounded-full border px-3 py-2 text-xs ${answer.status === "no" ? "border-neutral-700 bg-neutral-800 text-white" : "border-neutral-200 text-neutral-600"}`}>Non</button>
                 </div>
-                {answer.status !== "no" && <input className={`${fieldClass} h-11`} value={answer.detail} onFocus={() => setCriterion(criterion.id, { status: "yes" })} onChange={(e) => setCriterion(criterion.id, { status: "yes", detail: e.target.value })} placeholder="+ Autres" />}
+                {answer.status !== "no" && criterion.id !== "vanliferManager" && <input className={`${fieldClass} h-11`} value={answer.detail} onFocus={() => setCriterion(criterion.id, { status: "yes" })} onChange={(e) => setCriterion(criterion.id, { status: "yes", detail: e.target.value })} placeholder="+ Autres" />}
+                {criterion.id === "vanliferManager" && answer.examples.length > 0 && (
+                  <div key={answer.examples.join("|")} className="animate-fade-in-up rounded-2xl border border-[#c39960]/35 bg-[#f7f1e8]/70 p-4 motion-reduce:animate-none" aria-live="polite">
+                    <label className="block text-sm font-bold text-neutral-900">
+                      Où êtes-vous déjà allé ?
+                      <span className="mt-1 block text-xs font-normal leading-5 text-neutral-600">Quelques destinations suffisent pour nous raconter votre expérience de la route.</span>
+                      <input className={`${fieldClass} h-11 bg-white`} value={answer.detail} onChange={(e) => setCriterion(criterion.id, { status: "yes", detail: e.target.value })} placeholder="Ex. Bretagne, Portugal, Alpes…" />
+                    </label>
+                  </div>
+                )}
               </fieldset>
               </div>
             ); })}
