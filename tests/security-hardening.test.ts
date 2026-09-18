@@ -100,6 +100,8 @@ test("the navigation reflects an authenticated session and hides the purchase CT
   assert.match(navbar, /\/api\/auth\/status/);
   assert.match(navbar, /Vous êtes connecté/);
   assert.match(navbar, /href="\/member"[^>]+aria-label="Vous êtes connecté — ouvrir mon espace membre"/);
+  assert.match(navbar, /<a href="\/member"[^>]+aria-label="Vous êtes connecté — ouvrir mon espace membre"/);
+  assert.doesNotMatch(navbar, /<Link href="\/member"[^>]+aria-label="Vous êtes connecté — ouvrir mon espace membre"/);
   assert.doesNotMatch(navbar, /<Link href="\/member"><Button/);
   assert.match(navbar, /status\.memberActive/);
   assert.match(navbar, /Se déconnecter/);
