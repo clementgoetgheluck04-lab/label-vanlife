@@ -9271,22 +9271,28 @@
     "id": "label-repere-camping-paradis-le-val-de-trie-point-gps",
     "name": "Camping Paradis le Val de Trie",
     "network": "Rep?r? par Label Vanlife",
-    "address": "Point GPS rep?r? : 50.085587, 1.715090",
-    "postalCode": "",
-    "city": "Point GPS",
-    "region": "France",
+    "address": "1 rue des Sources, 80870 Bouillancourt-sous-Miannay",
+    "postalCode": "80870",
+    "city": "Bouillancourt-sous-Miannay",
+    "region": "Hauts-de-France",
     "lat": 50.0855868,
     "lng": 1.7150903,
     "website": "https://www.camping-levaldetrie.fr/",
     "description": "piscine couverte, d'un étang de pêche. De 85 emplacements dont 41 hébergements locatifs : « cottages et chalets ».",
-    "phones": [],
-    "emails": [],
+    "contactName": "Raphaël",
+    "phones": [
+      "03 22 31 48 88"
+    ],
+    "emails": [
+      "raphael@camping-levaldetrie.fr"
+    ],
+    "verifiedEmailOverride": true,
     "details": [
       "piscine couverte, d'un étang de pêche. De 85 emplacements dont 41 hébergements locatifs : « cottages et chalets »."
     ],
-    "source": "Rep?rage Label Vanlife 2026",
-    "gpsSource": "Coordonn?es du rep?rage Label Vanlife",
-    "gpsVerifiedAt": "2026-08-01",
+    "source": "Site officiel du Camping Paradis Le Val de Trie",
+    "gpsSource": "Coordonnées du repérage Label Vanlife, adresse confirmée par le site officiel",
+    "gpsVerifiedAt": "2026-09-18",
     "googleMapsUrl": "https://www.google.com/maps/search/?api=1&query=Camping+Paradis+le+Val+de+Trie%2050.0855868%2C1.7150903"
   },
   {
