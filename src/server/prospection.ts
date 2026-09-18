@@ -35,6 +35,7 @@ type ProspectSourcePlace = {
   country?: string;
   selectionNote?: string;
   publishAsSpotted?: boolean;
+  verifiedEmailOverride?: boolean;
 };
 
 const internationalSourceIds = new Set(INTERNATIONAL_PROSPECTION_CANDIDATES.map((place) => place.id));
@@ -397,7 +398,7 @@ export async function syncSpottedProspects(): Promise<number> {
     if (
       !current
       || current.email === email
-      || (!untouched && !bounced)
+      || (!untouched && !bounced && !place.verifiedEmailOverride)
       || known.has(email)
       || suppressed.has(email)
     ) return [];
@@ -414,6 +415,7 @@ export async function syncSpottedProspects(): Promise<number> {
       metadata: {
         ...metadata,
         previousEmail: current.email,
+        contactEmailSource: place.verifiedEmailOverride ? "founder_verified" : "catalog_sync",
         contactRevision: bounced ? currentRevision + 1 : currentRevision,
         contactEmailReplacedAt: new Date().toISOString(),
       } as Prisma.InputJsonObject,

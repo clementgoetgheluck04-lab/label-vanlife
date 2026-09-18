@@ -3809,6 +3809,7 @@
       "info@camping-la-chevauchee.fr",
       "ferme-equestre@la-chevauchee.fr"
     ],
+    "verifiedEmailOverride": true,
     "images": [
       "https://api.bienvenue-a-la-ferme.com/media/cache/small_wide/6808b/6808b5dcdc2f5184010451.jpg",
       "https://api.bienvenue-a-la-ferme.com/media/cache/small_wide/6808b/6808b5dcdc7e9060953639.jpg",
