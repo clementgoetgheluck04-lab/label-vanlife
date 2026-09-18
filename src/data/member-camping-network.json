@@ -9475,22 +9475,31 @@
     "id": "label-repere-camping-bel-sito-point-gps",
     "name": "Camping Bel Sito",
     "network": "Rep?r? par Label Vanlife",
-    "address": "Point GPS rep?r? : 49.429669, -1.804805",
-    "postalCode": "",
-    "city": "Point GPS",
-    "region": "France",
+    "address": "13 village de l'Église, 50270 Baubigny",
+    "postalCode": "50270",
+    "city": "Baubigny",
+    "region": "Normandie",
     "lat": 49.4296689,
     "lng": -1.8048052,
-    "website": null,
-    "description": "85 emplacements : 60 emplacements nus 6 locations et résidentiels.",
-    "phones": [],
-    "emails": [],
-    "details": [
-      "85 emplacements : 60 emplacements nus 6 locations et résidentiels."
+    "website": "https://www.camping-normandie-belsito.com/",
+    "description": "Camping familial de 6 hectares et 85 emplacements dans le Cotentin, avec vue sur les dunes et la mer de Baubigny à 900 mètres. Ouvert du 15 avril au 15 septembre 2026.",
+    "phones": [
+      "02 33 04 32 74",
+      "06 75 80 72 80"
     ],
-    "source": "Rep?rage Label Vanlife 2026",
-    "gpsSource": "Coordonn?es du rep?rage Label Vanlife",
-    "gpsVerifiedAt": "2026-08-01",
+    "emails": [
+      "camping@bel-sito.com"
+    ],
+    "verifiedEmailOverride": true,
+    "details": [
+      "60 emplacements nus et 8 chalets locatifs",
+      "Camping calme sans animation, axé sur la simplicité, la convivialité et les grands espaces",
+      "Accès aux dunes, à la mer, au GR 223 et aux activités nautiques",
+      "Wi-Fi près de l'accueil, étang de pêche et services saisonniers"
+    ],
+    "source": "Site officiel du Camping Bel Sito",
+    "gpsSource": "Coordonnées du repérage Label Vanlife, adresse confirmée par le site officiel",
+    "gpsVerifiedAt": "2026-09-18",
     "googleMapsUrl": "https://www.google.com/maps/search/?api=1&query=Camping+Bel+Sito%2049.4296689%2C-1.8048052"
   },
   {
