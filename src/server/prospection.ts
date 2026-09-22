@@ -607,7 +607,7 @@ async function sendOne(prospect: Prospect): Promise<"sent" | "skipped" | "failed
       headers: {
         "List-Unsubscribe": `<${getAppUrl()}/api/prospection/unsubscribe?token=${encodeURIComponent(prospect.unsubscribeToken)}>`,
         "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
-        "List-ID": "Prospection Label Vanlife <prospection.partenaires.labelvanlife.fr>",
+        "List-ID": "Prospection Label Vanlife <prospection.partenaires.labelvanlife.com>",
         "Feedback-ID": `prospection:${stage.toLowerCase()}:labelvanlife:resend`,
       },
       tags: [

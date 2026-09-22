@@ -183,7 +183,7 @@ async function sendSalesReply(prospect: { id: string; sourceId: string | null; n
       signature: "Clément — Label Vanlife",
     }),
     headers: {
-      "List-ID": "Prospection Label Vanlife <prospection.partenaires.labelvanlife.fr>",
+      "List-ID": "Prospection Label Vanlife <prospection.partenaires.labelvanlife.com>",
       "Feedback-ID": "prospection:auto-reply:labelvanlife:resend",
     },
   }, { idempotencyKey: campaignKey });

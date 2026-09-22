@@ -23,6 +23,46 @@ const PLACE_TYPES = [
   ["ACTIVITE", "Activité touristique"],
 ] as const;
 
+// Vercel refuse les requêtes de fonction au-delà de 4,5 Mo. Garder une marge
+// pour le JSON et l'enveloppe multipart, même lorsque quatre images sont jointes.
+const MAX_APPLICATION_BYTES = 4_000_000;
+const IMAGE_TARGET_BYTES = 850_000;
+
+async function prepareImage(file: File): Promise<File> {
+  if (file.type !== "image/jpeg" && file.type !== "image/png") {
+    throw new Error("Utilisez une image JPG ou PNG.");
+  }
+  if (file.size <= IMAGE_TARGET_BYTES) return file;
+  const image = await createImageBitmap(file);
+  try {
+    let smallest: Blob | null = null;
+    for (const width of [1800, 1400, 1100]) {
+      const scale = Math.min(1, width / Math.max(image.width, image.height));
+      const canvas = document.createElement("canvas");
+      canvas.width = Math.max(1, Math.round(image.width * scale));
+      canvas.height = Math.max(1, Math.round(image.height * scale));
+      const context = canvas.getContext("2d");
+      if (!context) throw new Error("Impossible de préparer l'image. Essayez un autre fichier.");
+      context.fillStyle = "#fff";
+      context.fillRect(0, 0, canvas.width, canvas.height);
+      context.drawImage(image, 0, 0, canvas.width, canvas.height);
+      for (const quality of [0.82, 0.7, 0.58]) {
+        const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, "image/jpeg", quality));
+        if (blob && (!smallest || blob.size < smallest.size)) smallest = blob;
+        if (blob && blob.size <= IMAGE_TARGET_BYTES) {
+          return new File([blob], file.name.replace(/\.[^.]+$/, "") + ".jpg", { type: "image/jpeg" });
+        }
+      }
+    }
+    if (!smallest || smallest.size > 1_200_000) {
+      throw new Error("Cette image est trop volumineuse. Essayez une version plus légère.");
+    }
+    return new File([smallest], file.name.replace(/\.[^.]+$/, "") + ".jpg", { type: "image/jpeg" });
+  } finally {
+    image.close();
+  }
+}
+
 type CriterionAnswer = { status: "yes" | "no" | ""; examples: string[]; detail: string };
 
 function scrollToTopImmediately() {
@@ -194,12 +234,19 @@ export default function CandidaturePage() {
         planFileName: planFile.name,
         photoFileNames: photoFiles.map((file) => file.name),
       };
+      const uploadBytes = planFile.size + photoFiles.reduce((total, file) => total + file.size, 0)
+        + new TextEncoder().encode(JSON.stringify(draft)).byteLength + 16_000;
+      if (uploadBytes > MAX_APPLICATION_BYTES) {
+        throw new Error("Les fichiers dépassent 4 Mo au total. Choisissez un plan PDF plus léger ou des images plus petites, puis réessayez.");
+      }
       const body = new FormData();
       body.append("payload", JSON.stringify(draft));
       body.append("plan", planFile);
       photoFiles.forEach((file) => body.append("photos", file));
       const response = await fetch("/api/labellisation/submit-draft", { method: "POST", body });
-      const result = await response.json();
+      const result = await response.json().catch(() => ({ error: response.status === 413
+        ? "Les fichiers sont trop volumineux pour être transmis. Réduisez leur taille et réessayez."
+        : "Le service n'a pas répondu correctement. Votre dossier est conservé sur cet appareil ; réessayez dans quelques instants." }));
       if (!response.ok) throw new Error(result.error || "Impossible d'envoyer la candidature.");
       const finalizedDraft = { ...draft, draftId: result.draftId, attachmentPaths: result.attachmentPaths, draftToken: result.draftToken };
       sessionStorage.setItem("labellisation-draft", JSON.stringify(finalizedDraft));
@@ -210,7 +257,7 @@ export default function CandidaturePage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(finalizedDraft),
       });
-      const checkoutResult = await checkoutResponse.json();
+      const checkoutResult = await checkoutResponse.json().catch(() => ({ error: "Paiement momentanément indisponible" }));
       if (!checkoutResponse.ok || !checkoutResult.url) {
         router.push("/labellisation/paiement?checkout=retry");
         return;
@@ -303,7 +350,22 @@ export default function CandidaturePage() {
               </fieldset>
               </div>
             ); })}
-            <label className="block text-sm font-medium text-neutral-700">Plan de votre établissement <span className="text-red-500">— Obligatoire</span><span className="mt-1 block font-normal text-neutral-500">Partagez le plan de votre établissement pour aider les vanlifers à s'orienter.</span><span className="mt-3 flex min-h-28 cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-[#c39960]/40 bg-[#f7f1e8]/50 p-4 text-[#8b673d]"><Upload className="h-6 w-6" /><strong>{form.planFileName || "Cliquez pour télécharger"}</strong><small>Image ou PDF (max 10MB)</small></span><input className="sr-only" type="file" accept="image/jpeg,image/png,application/pdf" onChange={(e) => { const file = e.target.files?.[0]; if (file && file.size > 10 * 1024 * 1024) { setPlanError("Le fichier dépasse la limite de 10MB."); setPlanFile(null); update({ planFileName: "" }); } else { setPlanError(""); setPlanFile(file || null); update({ planFileName: file?.name || "" }); } }} /></label>
+            <label className="block text-sm font-medium text-neutral-700">Plan de votre établissement <span className="text-red-500">— Obligatoire</span><span className="mt-1 block font-normal text-neutral-500">Partagez le plan de votre établissement pour aider les vanlifers à s'orienter.</span><span className="mt-3 flex min-h-28 cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-[#c39960]/40 bg-[#f7f1e8]/50 p-4 text-[#8b673d]"><Upload className="h-6 w-6" /><strong>{form.planFileName || "Cliquez pour télécharger"}</strong><small>Image optimisée automatiquement ou PDF léger (1,2 Mo maximum)</small></span><input className="sr-only" type="file" accept="image/jpeg,image/png,application/pdf" onChange={async (event) => {
+              const selected = event.target.files?.[0];
+              event.target.value = "";
+              if (!selected) return;
+              try {
+                const file = selected.type === "application/pdf" ? selected : await prepareImage(selected);
+                if (file.size > 1_200_000) throw new Error("Le plan doit faire 1,2 Mo maximum. Essayez un PDF plus léger ou une image JPG.");
+                setPlanError("");
+                setPlanFile(file);
+                update({ planFileName: file.name });
+              } catch (error) {
+                setPlanError(error instanceof Error ? error.message : "Plan non pris en charge.");
+                setPlanFile(null);
+                update({ planFileName: "" });
+              }
+            }} /></label>
             {planError && <p role="alert" className="text-sm font-medium text-red-600">{planError}</p>}
             <label className="block text-sm font-medium text-neutral-700">Pourquoi souhaitez-vous accueillir des vanlifers ? Qu'est-ce qui rend votre lieu spécial ? *<textarea rows={5} className={textareaClass} value={form.welcomeMessage} onChange={(e) => update({ welcomeMessage: e.target.value })} placeholder="Ex : Nous proposons 5 emplacements au calme en bordure de rivière, à l'ombre des chênes. Les vanlifers apprécient notre accueil familial et nos produits du jardin..." /></label>
             <div className="flex flex-wrap gap-2">{["Calme assuré", "Proche rivière", "Vue montagne", "Produits locaux", "Animaux acceptés", "Électricité", "Wifi", "Point d'eau"].map((suggestion) => <button type="button" key={suggestion} onClick={() => update({ welcomeMessage: `${form.welcomeMessage}${form.welcomeMessage.trim() ? " · " : ""}${suggestion}` })} className="rounded-full border border-[#c39960]/40 bg-white px-3 py-2 text-xs font-medium text-[#7c5a34] hover:bg-[#f7f1e8]">+ {suggestion}</button>)}</div>
@@ -352,7 +414,23 @@ export default function CandidaturePage() {
             <div className="rounded-2xl border border-neutral-200 p-5 sm:p-6">
               <div className="flex flex-wrap items-center gap-2"><h3 className="font-bold text-neutral-900">Photos vanlife</h3><span className="rounded-full bg-red-50 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-red-700">Obligatoire</span></div>
               <p className="mt-2 text-sm text-neutral-500">Emplacements, vue, ambiance — au moins 1 photo est obligatoire, avec un maximum de 3 photos.</p>
-              <label className="mt-4 block"><span className="flex min-h-32 cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-[#c39960]/40 bg-[#f7f1e8]/50 p-5 text-center text-[#8b673d]"><Upload className="h-6 w-6" /><strong>Glissez ou cliquez pour sélectionner 1 à 3 photos</strong><small>JPG, PNG — chaque photo est téléchargée une par une · max. 3 photos</small></span><input className="sr-only" type="file" accept="image/jpeg,image/png" onChange={(e) => { const file = e.target.files?.[0]; e.target.value = ""; if (!file) return; if (file.size > 10 * 1024 * 1024) { setSubmitError("Chaque photo doit faire moins de 10MB."); return; } setSubmitError(""); setPhotoFiles((current) => current.length >= 3 ? current : [...current, file]); update({ photoFileNames: photoFiles.length >= 3 ? form.photoFileNames : [...form.photoFileNames, file.name] }); }} /></label>
+              <label className="mt-4 block"><span className="flex min-h-32 cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-[#c39960]/40 bg-[#f7f1e8]/50 p-5 text-center text-[#8b673d]"><Upload className="h-6 w-6" /><strong>Glissez ou cliquez pour sélectionner 1 à 3 photos</strong><small>JPG ou PNG — optimisées automatiquement avant l'envoi · max. 3 photos</small></span><input className="sr-only" type="file" accept="image/jpeg,image/png" onChange={async (event) => {
+                const selected = event.target.files?.[0];
+                event.target.value = "";
+                if (!selected) return;
+                if (photoFiles.length >= 3) {
+                  setSubmitError("Trois photos maximum.");
+                  return;
+                }
+                try {
+                  const file = await prepareImage(selected);
+                  setSubmitError("");
+                  setPhotoFiles((current) => [...current, file].slice(0, 3));
+                  update({ photoFileNames: [...form.photoFileNames, file.name].slice(0, 3) });
+                } catch (error) {
+                  setSubmitError(error instanceof Error ? error.message : "Photo non prise en charge.");
+                }
+              }} /></label>
               {photoFiles.length > 0 && <div className="mt-3 space-y-2">{photoFiles.map((file, index) => <div key={`${file.name}-${index}`} className="flex items-center justify-between rounded-lg bg-neutral-50 px-3 py-2 text-sm text-neutral-600"><span className="truncate">{index + 1}. {file.name}</span><button type="button" aria-label={`Supprimer ${file.name}`} onClick={() => { setPhotoFiles((current) => current.filter((_, itemIndex) => itemIndex !== index)); update({ photoFileNames: form.photoFileNames.filter((_, itemIndex) => itemIndex !== index) }); }} className="ml-3 rounded-full p-1 text-neutral-400 hover:bg-red-50 hover:text-red-600"><X className="h-4 w-4" /></button></div>)}</div>}
             </div>
 

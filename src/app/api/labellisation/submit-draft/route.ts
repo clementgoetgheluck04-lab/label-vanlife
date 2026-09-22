@@ -14,7 +14,8 @@ import { getPrisma } from "@/lib/prisma";
 export const dynamic = "force-dynamic";
 const BUCKET = "labellisation-attachments";
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
-const MAX_REQUEST_SIZE = (4 * MAX_FILE_SIZE) + (1024 * 1024);
+// Vercel rejette les corps de requête de plus de 4,5 Mo avant l'exécution.
+const MAX_REQUEST_SIZE = 4_000_000;
 const PHOTO_TYPES = new Set(["image/jpeg", "image/png"]);
 const PLAN_TYPES = new Set(["image/jpeg", "image/png", "application/pdf"]);
 

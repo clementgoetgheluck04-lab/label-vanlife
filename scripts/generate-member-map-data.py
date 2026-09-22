@@ -191,7 +191,7 @@ def geocode(query: str, cache: dict[str, dict[str, object]]) -> dict[str, object
     params = urllib.parse.urlencode({"q": f"{query}, France", "format": "jsonv2", "limit": 1, "countrycodes": "fr"})
     request = urllib.request.Request(
         f"https://nominatim.openstreetmap.org/search?{params}",
-        headers={"User-Agent": "LabelVanlife-map-import/1.0 (contact@labelvanlife.fr)"},
+        headers={"User-Agent": "LabelVanlife-map-import/1.0 (contact@labelvanlife.com)"},
     )
     with urllib.request.urlopen(request, timeout=20) as response:
         results = json.load(response)

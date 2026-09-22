@@ -21,12 +21,13 @@ test("membership journey keeps confirmation, Stripe and activation connected", (
   assert.match(webhook, /memberCard\.upsert/);
   assert.match(webhook, /activationEmailSentAt/);
   assert.match(webhook, /getBackOfficeEmails\(\)/);
-  assert.match(contact, /contact@labelvanlife\.fr/);
-  assert.doesNotMatch(webhook, /contact@labelvanlife\.com/);
+  assert.match(contact, /contact@labelvanlife\.com/);
+  assert.doesNotMatch(webhook, /contact@labelvanlife\.fr/);
 });
 
 test("labellisation journey keeps dossier, Stripe, webhook and both emails connected", () => {
   const candidature = source("../src/app/labellisation/candidature/page.tsx");
+  const draft = source("../src/app/api/labellisation/submit-draft/route.ts");
   const checkout = source("../src/app/api/stripe/checkout-labellisation/route.ts");
   const webhook = source("../src/app/api/stripe/webhook/route.ts");
   const contact = source("../src/config/contact.ts");
@@ -34,12 +35,15 @@ test("labellisation journey keeps dossier, Stripe, webhook and both emails conne
   assert.match(candidature, /\/api\/labellisation\/submit-draft/);
   assert.match(candidature, /\/api\/stripe\/checkout-labellisation/);
   assert.match(candidature, /photoFiles\.length >= 1/);
+  assert.match(candidature, /prepareImage\(selected\)/);
+  assert.match(candidature, /uploadBytes > MAX_APPLICATION_BYTES/);
+  assert.match(draft, /MAX_REQUEST_SIZE = 4_000_000/);
   assert.match(checkout, /labellisation\/success\?session_id=\{CHECKOUT_SESSION_ID\}/);
   assert.match(webhook, /sendLabellisationPaymentConfirmation/);
   assert.match(webhook, /getBackOfficeEmails\(\)/);
   assert.match(webhook, /to: candidateEmail/);
-  assert.match(contact, /contact@labelvanlife\.fr/);
-  assert.doesNotMatch(webhook, /contact@labelvanlife\.com/);
+  assert.match(contact, /contact@labelvanlife\.com/);
+  assert.doesNotMatch(webhook, /contact@labelvanlife\.fr/);
 });
 
 test("commercial campaign previews stay limited to the requested test inbox", () => {
