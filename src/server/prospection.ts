@@ -7,6 +7,7 @@ import { INTERNATIONAL_PROSPECTION_CANDIDATES } from "@/data/international-place
 import { getPrisma } from "@/lib/prisma";
 import { labelVanlifeEmail } from "@/server/email-template";
 import { getAppUrl, getBackOfficeEmails, getProspectionEmailFrom, getTransactionalEmailFrom, requireServerEnv } from "@/server/env";
+import { CONTACT_EMAIL } from "@/config/contact";
 
 const DAY = 24 * 60 * 60 * 1_000;
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -76,7 +77,7 @@ export function prospectingDailyLimit(): number {
 }
 
 export function getProspectionReplyTo(): string {
-  return process.env.PROSPECTION_REPLY_TO || "contact@labelvanlife.com";
+  return CONTACT_EMAIL;
 }
 
 function stageForProspect(prospect: Prospect): ProspectingStage | null {
@@ -151,7 +152,7 @@ function messageFor(prospect: Prospect, stage: ProspectingStage) {
   const labellisation = track("/labellisation", "labellisation");
   const candidature = track(candidatureUrl(prospect), "candidature");
   const explorer = track("/explorer", "explorer");
-  const legal = `Pourquoi cet email ? Les coordonnées professionnelles publiques de ${prospect.name} ont été utilisées uniquement pour présenter une offre en lien direct avec son activité d’accueil. Label Vanlife — 10 chemin des Écoles, 31260 Montsaunès — contact@labelvanlife.com.`;
+  const legal = `Pourquoi cet email ? Les coordonnées professionnelles publiques de ${prospect.name} ont été utilisées uniquement pour présenter une offre en lien direct avec son activité d’accueil. Label Vanlife — 10 chemin des Écoles, 31260 Montsaunès — ${CONTACT_EMAIL}.`;
 
   if (stage === "INITIAL") {
     const variant = initialVariantFor(prospect);

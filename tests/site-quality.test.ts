@@ -15,6 +15,15 @@ function sourceFiles(path: string): string[] {
   });
 }
 
+test("the sole public and back-office contact mailbox is contact@labelvanlife.fr", () => {
+  assert.match(read("src/config/contact.ts"), /contact@labelvanlife\.fr/);
+  assert.match(read("src/server/env.ts"), /return \[CONTACT_EMAIL\]/);
+  assert.match(read("src/server/prospection.ts"), /export function getProspectionReplyTo\(\): string \{\s*return CONTACT_EMAIL/);
+  for (const path of sourceFiles("src").filter((file) => /\.(?:ts|tsx)$/.test(file))) {
+    assert.doesNotMatch(readFileSync(path, "utf8"), /contact@labelvanlife\.com/i, path);
+  }
+});
+
 test("SEO essentials, social preview, favicon, sitemap and robots are present", () => {
   const layout = read("src/app/layout.tsx");
   const sitemap = read("src/app/sitemap.ts");

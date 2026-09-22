@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { CheckCircle2, Loader2, MailX } from "lucide-react";
+import { CONTACT_EMAIL } from "@/config/contact";
 
 export function UnsubscribeForm({ token }: { token: string }) {
   const [state, setState] = useState<"idle" | "loading" | "done" | "error">("idle");
@@ -36,7 +37,7 @@ export function UnsubscribeForm({ token }: { token: string }) {
         {state === "loading" && <Loader2 className="h-4 w-4 animate-spin" />}
         Confirmer la désinscription
       </button>
-      {state === "error" && <p role="alert" className="mt-4 text-sm font-semibold text-red-700">Le lien est invalide ou a expiré. Écrivez-nous à contact@labelvanlife.com.</p>}
+      {state === "error" && <p role="alert" className="mt-4 text-sm font-semibold text-red-700">Le lien est invalide ou a expiré. Écrivez-nous à {CONTACT_EMAIL}.</p>}
     </div>
   );
 }

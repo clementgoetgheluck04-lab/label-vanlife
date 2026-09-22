@@ -55,10 +55,5 @@ export function getBackOfficeEmail(): string {
 }
 
 export function getBackOfficeEmails(): string[] {
-  const raw = process.env.BACKOFFICE_EMAILS || process.env.BACKOFFICE_EMAIL || CONTACT_EMAIL;
-  const emails = raw
-    .split(",")
-    .map((email) => email.trim())
-    .filter(Boolean);
-  return emails.length > 0 ? emails : [CONTACT_EMAIL];
+  return [CONTACT_EMAIL];
 }

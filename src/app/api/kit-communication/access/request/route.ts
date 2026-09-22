@@ -8,6 +8,7 @@ import { labelVanlifeEmail } from "@/server/email-template";
 import { apiError } from "@/server/http";
 import { assertSameOrigin, enforceRateLimit, readJsonRequest } from "@/server/request-security";
 import { parseEmail } from "@/server/validation";
+import { CONTACT_EMAIL } from "@/config/contact";
 
 export const dynamic = "force-dynamic";
 
@@ -41,7 +42,7 @@ export async function POST(request: NextRequest) {
       const { error } = await resend.emails.send({
         from: getTransactionalEmailFrom(),
         to: email,
-        replyTo: "contact@labelvanlife.com",
+        replyTo: CONTACT_EMAIL,
         subject: labelledPlace.contact.kitEmailSubject || `${placeName} — votre kit de communication Label Vanlife 2027`,
         text: `Bonjour ${greetingName},\n\n${messageParagraphs.join("\n\n")}\n\nAccéder au kit :\n${accessUrl}\n\nCe lien personnel expire dans 15 minutes. Après ouverture, l’accès restera actif pendant 30 jours sur le même appareil.\n\nVotre fiche : https://www.labelvanlife.fr/lieux/${labelledPlace.placeId}\nPage Facebook : https://www.facebook.com/labelvanlife\n\nBelle saison 2027 à vos côtés,\nL’équipe Label Vanlife`,
         html: labelVanlifeEmail({

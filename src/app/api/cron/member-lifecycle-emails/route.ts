@@ -9,6 +9,7 @@ import { generateMemberAccessCode } from "@/server/member-access";
 import { parseEmail } from "@/server/validation";
 import { readJsonRequest, secretsMatch } from "@/server/request-security";
 import { labelVanlifeEmail } from "@/server/email-template";
+import { CONTACT_EMAIL } from "@/config/contact";
 
 export const dynamic = "force-dynamic";
 
@@ -141,7 +142,7 @@ async function sendCommercialPreviewEmails(previewEmail: string) {
   const resend = new Resend(requireServerEnv("RESEND_API_KEY"));
   const from = getTransactionalEmailFrom();
   const appUrl = getAppUrl();
-  const replyTo = "contact@labelvanlife.com";
+  const replyTo = CONTACT_EMAIL;
 
   const messages = [
     resend.emails.send({
@@ -163,7 +164,7 @@ async function sendCommercialPreviewEmails(previewEmail: string) {
           { label: "Renouvellement 2027", value: "Offert" },
           { label: "À confirmer", value: "Fiche, avantage membre et retour 2026" },
         ],
-        action: { label: "Répondre pour confirmer", href: "mailto:contact@labelvanlife.com?subject=Renouvellement%20partenaire%202027" },
+        action: { label: "Répondre pour confirmer", href: `mailto:${CONTACT_EMAIL}?subject=Renouvellement%20partenaire%202027` },
         notice: "Cette offre est réservée aux 26 lieux déjà labellisés. Aucun paiement n’est nécessaire.",
       }),
     }),

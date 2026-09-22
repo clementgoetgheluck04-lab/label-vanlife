@@ -9,6 +9,7 @@ import {
   LABEL_VERIFICATION_LEVELS,
 } from "@/config/label-standard";
 import { LABEL_VALIDITY_TEXT } from "@/config/commercial";
+import { CONTACT_EMAIL } from "@/config/contact";
 
 export const metadata: Metadata = {
   title: "Référentiel Label Vanlife 2027 | Critères et méthode de contrôle",
@@ -90,7 +91,7 @@ export default function LabelStandardPage() {
         <div className="rounded-[2rem] border border-emerald-900/10 bg-emerald-950 px-6 py-10 text-white sm:px-10">
           <div className="grid gap-8 lg:grid-cols-2">
             <div><ShieldCheck className="h-8 w-8 text-[#dfc59f]" /><h2 className="mt-4 text-2xl font-black">Indépendance de la décision</h2><ul className="mt-5 space-y-3 text-sm leading-6 text-white/75">{["Le paiement finance l’étude et ne garantit pas l’attribution.", "Un refus pour non-conformité déclenche le remboursement prévu par l’offre.", "Toute décision est datée, rattachée à la version du référentiel et justifiée en interne.", "Aucun volume de visiteurs ou de réservations n’est garanti au lieu labellisé."].map((text) => <li key={text} className="flex gap-3"><Check className="mt-1 h-4 w-4 shrink-0 text-[#dfc59f]" />{text}</li>)}</ul></div>
-            <div className="rounded-2xl bg-white/10 p-6"><p className="text-xs font-bold uppercase tracking-[0.18em] text-[#dfc59f]">Portée du label</p><p className="mt-3 text-sm leading-6 text-white/80">Label Vanlife est un label privé indépendant. Il ne remplace ni une autorisation administrative, ni un classement touristique, ni une certification publique ou réglementaire. Il atteste qu’un lieu a satisfait au référentiel Label Vanlife applicable à la date de sa décision.</p><p className="mt-4 text-xs text-white/60">Version {LABEL_STANDARD_VERSION} · applicable depuis le {LABEL_STANDARD_EFFECTIVE_DATE}<br />{LABEL_VALIDITY_TEXT}</p><a href="mailto:contact@labelvanlife.com?subject=Signalement%20référentiel%20Label%20Vanlife" className="mt-5 inline-flex min-h-11 items-center gap-2 rounded-full bg-white px-5 text-sm font-black text-emerald-950">Signaler une information <ArrowRight className="h-4 w-4" /></a></div>
+            <div className="rounded-2xl bg-white/10 p-6"><p className="text-xs font-bold uppercase tracking-[0.18em] text-[#dfc59f]">Portée du label</p><p className="mt-3 text-sm leading-6 text-white/80">Label Vanlife est un label privé indépendant. Il ne remplace ni une autorisation administrative, ni un classement touristique, ni une certification publique ou réglementaire. Il atteste qu’un lieu a satisfait au référentiel Label Vanlife applicable à la date de sa décision.</p><p className="mt-4 text-xs text-white/60">Version {LABEL_STANDARD_VERSION} · applicable depuis le {LABEL_STANDARD_EFFECTIVE_DATE}<br />{LABEL_VALIDITY_TEXT}</p><a href={`mailto:${CONTACT_EMAIL}?subject=Signalement%20référentiel%20Label%20Vanlife`} className="mt-5 inline-flex min-h-11 items-center gap-2 rounded-full bg-white px-5 text-sm font-black text-emerald-950">Signaler une information <ArrowRight className="h-4 w-4" /></a></div>
           </div>
         </div>
       </section>
