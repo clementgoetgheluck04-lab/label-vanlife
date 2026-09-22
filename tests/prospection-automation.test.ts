@@ -85,7 +85,9 @@ test("a newly verified email replaces an untouched contact or an explicit founde
   assert.match(engine, /current\?\.status === "INVALID"/);
   assert.match(engine, /!untouched && !bounced && !place\.verifiedEmailOverride/);
   assert.match(engine, /contactEmailSource: place\.verifiedEmailOverride \? "founder_verified" : "catalog_sync"/);
-  assert.match(engine, /contactRevision: bounced \? currentRevision \+ 1 : currentRevision/);
+  assert.match(engine, /resetForNewContact = bounced \|\| Boolean\(place\.verifiedEmailOverride && ACTIVE_STATUSES\.includes\(current\.status\) && !untouched\)/);
+  assert.match(engine, /contactRevision: currentRevision \+ 1/);
+  assert.match(engine, /\.\.\.\(resetForNewContact \? \{/);
   assert.match(engine, /campaignKey = `prospection:\$\{stage\.toLowerCase\(\)\}:\$\{prospect\.id\}\$\{contactRevision\}`/);
   assert.match(engine, /suppressed\.has\(email\)/);
 });

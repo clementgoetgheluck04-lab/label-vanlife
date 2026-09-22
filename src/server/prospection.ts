@@ -407,16 +407,17 @@ export async function syncSpottedProspects(): Promise<number> {
       ? { ...(current.metadata as Record<string, unknown>) }
       : {};
     const currentRevision = typeof metadata.contactRevision === "number" ? metadata.contactRevision : 0;
+    const resetForNewContact = bounced || Boolean(place.verifiedEmailOverride && ACTIVE_STATUSES.includes(current.status) && !untouched);
     return [{
       id: current.id,
       email,
       place,
-      reactivated: bounced,
+      resetForNewContact,
       metadata: {
         ...metadata,
         previousEmail: current.email,
         contactEmailSource: place.verifiedEmailOverride ? "founder_verified" : "catalog_sync",
-        contactRevision: bounced ? currentRevision + 1 : currentRevision,
+        contactRevision: currentRevision + 1,
         contactEmailReplacedAt: new Date().toISOString(),
       } as Prisma.InputJsonObject,
     }];
@@ -444,7 +445,7 @@ export async function syncSpottedProspects(): Promise<number> {
       },
     }));
   if (!rows.length && !updates.length) return 0;
-  const operations = updates.map(({ id, email, place, reactivated, metadata }) => prisma.prospect.update({
+  const operations = updates.map(({ id, email, place, resetForNewContact, metadata }) => prisma.prospect.update({
     where: { id },
     data: {
       email,
@@ -456,7 +457,7 @@ export async function syncSpottedProspects(): Promise<number> {
       sourceLabel: place.source || "Repérage Label Vanlife",
       sourceUrl: place.sourceUrl || place.website,
       metadata,
-      ...(reactivated ? {
+      ...(resetForNewContact ? {
         status: "NEW" as const,
         followUpCount: 0,
         firstContactedAt: null,
