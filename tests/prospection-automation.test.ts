@@ -42,6 +42,8 @@ test("missing camping contacts are escalated once in manageable research batches
   const places = JSON.parse(source("../src/data/member-camping-network.json")) as Array<{
     id: string;
     emails?: string[];
+    sourceUrl?: string;
+    verifiedEmailOverride?: boolean;
   }>;
   const goutilier = places.find((place) => place.id === "bienvenue-ferme-camping-le-goutilier");
   const labau = places.find((place) => place.id === "bienvenue-ferme-camping-a-la-ferme-labau");
@@ -54,6 +56,7 @@ test("missing camping contacts are escalated once in manageable research batches
   const abeilleAuFruit = places.find((place) => place.id === "bienvenue-ferme-de-l-abeille-au-fruit-le-camping-du-verger");
   const prunay = places.find((place) => place.id === "bienvenue-ferme-camping-nature-ferme-pedagogique-de-prunay");
   const laRiviere = places.find((place) => place.id === "bienvenue-ferme-camping-la-riviere");
+  const laChaumiere = places.find((place) => place.id === "label-repere-camping-la-chaumiere-point-gps");
 
   assert.equal(goutilier?.emails?.[0], "dufraisse.m@wanadoo.fr");
   assert.equal(labau?.emails?.[0], "guydelrieu@dartybox.com");
@@ -66,6 +69,9 @@ test("missing camping contacts are escalated once in manageable research batches
   assert.equal(abeilleAuFruit?.emails?.[0], "delabeilleaufruit@gmail.com");
   assert.equal(prunay?.emails?.[0], "reservation@prunay.com");
   assert.equal(laRiviere?.emails?.[0], "camping.lariviere@gmail.com");
+  assert.equal(laChaumiere?.emails?.[0], "camping@parc-lachaumiere.fr");
+  assert.equal(laChaumiere?.verifiedEmailOverride, true);
+  assert.equal(laChaumiere?.sourceUrl, "https://www.campinglachaumiere59.com/contact-camping-buysscheure.html");
   assert.match(engine, /MISSING_CONTACT_DIGEST_SIZE = 15/);
   assert.match(engine, /PROSPECTION_MISSING_CONTACTS_DIGEST/);
   assert.match(engine, /alreadyNotified\.has\(place\.id\)/);

@@ -8032,22 +8032,24 @@
     "id": "label-repere-camping-la-chaumiere-point-gps",
     "name": "Camping la Chaumière",
     "network": "Rep?r? par Label Vanlife",
-    "address": "Point GPS rep?r? : 50.801743, 2.339624",
-    "postalCode": "",
-    "city": "Point GPS",
-    "region": "France",
+    "address": "501 Langhemast Straete",
+    "postalCode": "59285",
+    "city": "Buysscheure",
+    "region": "Hauts-de-France",
     "lat": 50.8017433,
     "lng": 2.3396238,
-    "website": null,
-    "description": "E-mail : contact@camping-lachaumiere.fr 30 emplacements : 29 emplacements nus 10 emplacements pour camping-car , piscine extérieure",
-    "phones": [],
+    "website": "https://www.campinglachaumiere59.com/",
+    "description": "Camping de 30 emplacements à Buysscheure, avec accueil des tentes, caravanes et camping-cars, piscine extérieure et étang de pêche.",
+    "phones": ["03 28 43 03 57"],
     "emails": [
-      "contact@camping-lachaumiere.fr"
+      "camping@parc-lachaumiere.fr"
     ],
     "details": [
-      "E-mail : contact@camping-lachaumiere.fr 30 emplacements : 29 emplacements nus 10 emplacements pour camping-car , piscine extérieure"
+      "Contact professionnel publié sur le site officiel du camping : camping@parc-lachaumiere.fr"
     ],
-    "source": "Rep?rage Label Vanlife 2026",
+    "source": "Site officiel du Camping La Chaumière",
+    "sourceUrl": "https://www.campinglachaumiere59.com/contact-camping-buysscheure.html",
+    "verifiedEmailOverride": true,
     "gpsSource": "Coordonn?es du rep?rage Label Vanlife",
     "gpsVerifiedAt": "2026-08-01",
     "googleMapsUrl": "https://www.google.com/maps/search/?api=1&query=Camping+la+Chaumi%C3%A8re%2050.8017433%2C2.3396238"
