@@ -1,0 +1,7 @@
+/artifacts
+/tmp
+/tsconfig.tsbuildinfo
+/next-env.d.ts
+/scripts/discover-spotted-emails.mjs
+/scripts/enrich-spotted-from-osm.mjs
+/scripts/send-priority-partner-previews.mjs
