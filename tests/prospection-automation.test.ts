@@ -20,6 +20,14 @@ test("prospection is disabled unless explicitly enabled and caps daily volume", 
   assert.match(engine, /take: remainingDailyCapacity/);
 });
 
+test("prospection brain reviews legacy untouched imports before their first email", () => {
+  const engine = source("../src/server/prospection.ts");
+  assert.match(engine, /legacyAssessments/);
+  assert.match(engine, /current\.status === "NEW" && current\.followUpCount === 0 && !current\.firstContactedAt/);
+  assert.match(engine, /brain\.nextStep === "PREPARER_APPROCHE"/);
+  assert.match(engine, /status: "NEEDS_HUMAN"/);
+});
+
 test("international expansion separates the sales list from the public spotted selection", () => {
   const international = source("../src/data/international-places.ts");
   const spotted = source("../src/data/spotted-places.ts");

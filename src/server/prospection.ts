@@ -9,7 +9,7 @@ import { labelVanlifeEmail } from "@/server/email-template";
 import { getAppUrl, getBackOfficeEmails, getProspectionEmailFrom, getTransactionalEmailFrom, requireServerEnv } from "@/server/env";
 import { CONTACT_EMAIL } from "@/config/contact";
 import { canReplaceProspectAddress } from "@/lib/prospection-contact-policy";
-import { assessProspectForLabelVanlife } from "@/lib/prospection-brain";
+import { assessProspectForLabelVanlife, type ProspectBrainAssessment } from "@/lib/prospection-brain";
 
 const DAY = 24 * 60 * 60 * 1_000;
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -40,6 +40,26 @@ type ProspectSourcePlace = {
   publishAsSpotted?: boolean;
   verifiedEmailOverride?: boolean;
 };
+
+function metadataRecord(value: Prisma.JsonValue | null): Record<string, unknown> {
+  return value && typeof value === "object" && !Array.isArray(value)
+    ? value as Record<string, unknown>
+    : {};
+}
+
+function assessStoredProspect(prospect: Prospect): ProspectBrainAssessment {
+  const metadata = metadataRecord(prospect.metadata);
+  return assessProspectForLabelVanlife({
+    name: prospect.name,
+    website: prospect.website,
+    city: prospect.city,
+    region: prospect.region,
+    email: prospect.email,
+    network: typeof metadata.network === "string" ? metadata.network : null,
+    country: typeof metadata.country === "string" ? metadata.country : null,
+    selectionNote: typeof metadata.selectionNote === "string" ? metadata.selectionNote : null,
+  });
+}
 
 const internationalSourceIds = new Set(INTERNATIONAL_PROSPECTION_CANDIDATES.map((place) => place.id));
 const PROSPECTION_PLACES: ProspectSourcePlace[] = [
@@ -436,7 +456,7 @@ export async function syncSpottedProspects(): Promise<number> {
     .filter(([email, place]) => !known.has(email) && !bySourceId.has(place.id) && !suppressed.has(email))
     .map(([email, place]) => {
       const brain = assessProspectForLabelVanlife({ ...place, email });
-      const readyForOutreach = brain.nextStep === "PREPARER_APPROCHE";
+      const readyForOutreach = brain.handlingMode === "STANDARD_AUTOMATION";
       return {
         sourceId: place.id,
         name: place.name.slice(0, 180),
@@ -458,7 +478,18 @@ export async function syncSpottedProspects(): Promise<number> {
         },
       };
     });
-  if (!rows.length && !updates.length) return 0;
+  // Bring untouched legacy imports under the same guard before their first email.
+  // Contacted prospects keep their current journey and are never silently reclassified.
+  const sourcesById = new Map(PROSPECTION_PLACES.map((place) => [place.id, place]));
+  const legacyAssessments = existing.flatMap((current) => {
+    const place = current.sourceId ? sourcesById.get(current.sourceId) : undefined;
+    const untouched = current.status === "NEW" && current.followUpCount === 0 && !current.firstContactedAt;
+    const metadata = current.metadata && typeof current.metadata === "object" && !Array.isArray(current.metadata)
+      ? current.metadata as Record<string, unknown> : {};
+    if (!place || !untouched || metadata.brain) return [];
+    return [{ id: current.id, brain: assessProspectForLabelVanlife({ ...place, email: current.email }) }];
+  });
+  if (!rows.length && !updates.length && !legacyAssessments.length) return 0;
   const operations = updates.map(({ id, previousEmail, previousStatus, email, place, resetForNewContact, metadata }) => prisma.prospect.updateMany({
     where: { id, email: previousEmail, status: previousStatus },
     data: {
@@ -480,6 +511,13 @@ export async function syncSpottedProspects(): Promise<number> {
       } : {}),
     },
   }));
+  operations.push(...legacyAssessments.map(({ id, brain }) => prisma.prospect.updateMany({
+    where: { id, status: "NEW", followUpCount: 0, firstContactedAt: null },
+    data: {
+      ...(brain.nextStep === "PREPARER_APPROCHE" ? {} : { status: "NEEDS_HUMAN" as const, nextActionAt: null }),
+      metadata: { brain } as Prisma.InputJsonObject,
+    },
+  })));
   const result = rows.length
     ? await prisma.$transaction([...operations, prisma.prospect.createMany({ data: rows, skipDuplicates: true })])
     : await prisma.$transaction(operations);
@@ -794,11 +832,34 @@ export async function runProspectionBatch() {
       skipped: 0,
     };
   }
-  const prospects = await prisma.prospect.findMany({
+  const dueProspects = await prisma.prospect.findMany({
     where: { status: { in: ACTIVE_STATUSES }, nextActionAt: { lte: now } },
     orderBy: [{ nextActionAt: "asc" }, { createdAt: "asc" }],
     take: remainingDailyCapacity,
   });
+  const prospects: Prospect[] = [];
+  const heldForStandingAgent: string[] = [];
+  const heldForReview: string[] = [];
+  const routingUpdates: Prisma.PrismaPromise<unknown>[] = [];
+  for (const prospect of dueProspects) {
+    const brain = assessStoredProspect(prospect);
+    if (brain.handlingMode === "STANDARD_AUTOMATION") {
+      if (prospects.length < remainingDailyCapacity) prospects.push(prospect);
+      continue;
+    }
+    const metadata = metadataRecord(prospect.metadata);
+    const isStanding = brain.handlingMode === "AGENT_STANDING";
+    (isStanding ? heldForStandingAgent : heldForReview).push(prospect.id);
+    routingUpdates.push(prisma.prospect.updateMany({
+      where: { id: prospect.id, status: prospect.status },
+      data: {
+        status: "NEEDS_HUMAN",
+        nextActionAt: null,
+        metadata: { ...metadata, brain } as Prisma.InputJsonObject,
+      },
+    }));
+  }
+  if (routingUpdates.length) await prisma.$transaction(routingUpdates);
   let sent = 0;
   let failed = 0;
   let skipped = 0;
@@ -816,7 +877,17 @@ export async function runProspectionBatch() {
   if (failed > 0) {
     await sendNeedHumanAlert("La prospection automatique a rencontré des erreurs", `${failed} message(s) n’ont pas pu être envoyés. Consultez le tableau de bord avant de relancer.`);
   }
-  return { enabled: true, imported, researchRequested, selected: prospects.length, sent, failed, skipped };
+  return {
+    enabled: true,
+    imported,
+    researchRequested,
+    selected: prospects.length,
+    standingAgentRequested: heldForStandingAgent.length,
+    manualReviewRequested: heldForReview.length,
+    sent,
+    failed,
+    skipped,
+  };
 }
 
 export async function sendNeedHumanAlert(subject: string, details: string): Promise<void> {

@@ -31,6 +31,10 @@ const BLOCKED_EMAILS = new Set([
   "service@linkeo.com",
   "staff@team-helper.fr",
 ]);
+const BLOCKED_EMAIL_DOMAINS = new Set([
+  "campingfrance.com",
+  "regicamp.com",
+]);
 const MANUAL_EMAILS = new Map([
   ["bienvenue-ferme-camping-du-lac-de-la-laure", { email: "roxane.verot@wanadoo.fr", sourceUrl: "https://ariege.chambres-agriculture.fr/fileadmin/user_upload/286_chambre_dagriculture_-_ariege/Interface/Documents/Illustration_du_site/CIRCUITS_COURTS/BAF-ARIEGE-2025.pdf" }],
   ["bienvenue-ferme-ferme-de-viescamp", { email: "lacaze@viescampers.com", sourceUrl: "https://www.viescampers.com/mentions-legales" }],
@@ -202,7 +206,10 @@ async function inspectPlace(place) {
     }
   }
   const ranked = [...candidates.values()].sort((a, b) => b.score - a.score || a.email.localeCompare(b.email));
-  const accepted = ranked.filter((item) => item.score >= 90 && !BLOCKED_EMAILS.has(item.email));
+  const accepted = ranked.filter((item) => {
+    const domain = item.email.split("@")[1]?.toLowerCase();
+    return item.score >= 90 && !BLOCKED_EMAILS.has(item.email) && !BLOCKED_EMAIL_DOMAINS.has(domain);
+  });
   return {
     id: place.id,
     name: place.name,

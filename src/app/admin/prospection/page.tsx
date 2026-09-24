@@ -24,7 +24,9 @@ type ProspectBrain = {
   suitableForLabelVanlife: boolean;
   reasons: string[];
   commercialArguments: string[];
-  nextStep: "PREPARER_APPROCHE" | "VERIFIER_ETABLISSEMENT" | "REVUE_HUMAINE" | "NE_PAS_CONTACTER";
+  nextStep: "AGENT_STANDING" | "PREPARER_APPROCHE" | "VERIFIER_ETABLISSEMENT" | "REVUE_HUMAINE" | "NE_PAS_CONTACTER";
+  handlingMode: "AGENT_STANDING" | "STANDARD_AUTOMATION" | "MANUAL_REVIEW" | "EXCLUDE";
+  standingBrief: string[];
 };
 type Dashboard = {
   settings: { enabled: boolean; dailyLimit: number; replyTo: string; webhookConfigured: boolean };
@@ -52,7 +54,7 @@ const BRAIN_CATEGORY_LABEL: Record<ProspectBrain["category"], string> = {
   COEUR_DE_CIBLE: "Cœur de cible", A_EXPLORER: "À explorer", DONNEES_A_VERIFIER: "À vérifier", HORS_CIBLE: "Hors cible",
 };
 const BRAIN_NEXT_STEP_LABEL: Record<ProspectBrain["nextStep"], string> = {
-  PREPARER_APPROCHE: "Préparer l’approche", VERIFIER_ETABLISSEMENT: "Vérifier l’établissement", REVUE_HUMAINE: "Revue humaine", NE_PAS_CONTACTER: "Ne pas contacter",
+  AGENT_STANDING: "Agent Standing", PREPARER_APPROCHE: "Approche standard", VERIFIER_ETABLISSEMENT: "Vérifier l’établissement", REVUE_HUMAINE: "Revue humaine", NE_PAS_CONTACTER: "Ne pas contacter",
 };
 
 function Metric({ icon: Icon, label, value, tone = "text-emerald-700" }: { icon: typeof Users; label: string; value: number; tone?: string }) {
@@ -68,7 +70,7 @@ export default function AdminProspectionPage() {
   const [loading, setLoading] = useState(true);
   const [working, setWorking] = useState("");
   const [error, setError] = useState("");
-  const [filter, setFilter] = useState<"all" | "attention" | "active" | "won">("all");
+  const [filter, setFilter] = useState<"all" | "standing" | "attention" | "active" | "won">("all");
 
   const load = useCallback(async () => {
     const response = await fetch("/api/admin/prospection", { cache: "no-store" });
@@ -90,6 +92,7 @@ export default function AdminProspectionPage() {
   };
 
   const visible = useMemo(() => (data?.prospects || []).filter((prospect) => {
+    if (filter === "standing") return prospect.metadata?.brain?.handlingMode === "AGENT_STANDING";
     if (filter === "attention") return ["INTERESTED", "NEEDS_HUMAN", "ERROR"].includes(prospect.status);
     if (filter === "active") return ["NEW", "SENDING", "CONTACTED", "FOLLOW_UP_1", "ENGAGED"].includes(prospect.status);
     if (filter === "won") return prospect.status === "CONVERTED";
@@ -109,7 +112,7 @@ export default function AdminProspectionPage() {
     <main className="min-h-screen bg-[#f8f6f1] px-4 pb-24 pt-28 sm:px-6">
       <div className="mx-auto max-w-7xl space-y-7">
         <header className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
-          <div><p className="text-xs font-black uppercase tracking-[.2em] text-emerald-700">Pilotage commercial</p><h1 className="mt-2 text-3xl font-black text-neutral-950 sm:text-4xl">Prospection autonome</h1><p className="mt-3 max-w-2xl text-sm leading-6 text-stone-600">Le moteur envoie au maximum trois messages sans engagement. Après un clic, un parcours éditorial progressif peut continuer jusqu’au dixième et dernier message.</p></div>
+            <div><p className="text-xs font-black uppercase tracking-[.2em] text-emerald-700">Pilotage commercial</p><h1 className="mt-2 text-3xl font-black text-neutral-950 sm:text-4xl">Prospection autonome</h1><p className="mt-3 max-w-2xl text-sm leading-6 text-stone-600">Les prospects standards suivent l’automatisation. Les P1 à forte valeur sont isolés avant tout envoi générique pour une analyse approfondie et un email réellement personnalisé par l’Agent Standing.</p></div>
           <div className="flex flex-wrap gap-2"><Link href="/admin" className="inline-flex min-h-11 items-center gap-2 rounded-full bg-emerald-800 px-5 text-sm font-bold text-white">Dashboard fondateur</Link><Link href="/admin/recommendations" className="inline-flex min-h-11 items-center gap-2 rounded-full border border-stone-300 bg-white px-5 text-sm font-bold text-neutral-800">Recommandations <ArrowUpRight className="h-4 w-4" /></Link><Link href="/admin/labellisations" className="inline-flex min-h-11 items-center gap-2 rounded-full border border-stone-300 bg-white px-5 text-sm font-bold text-neutral-800">Candidatures <ArrowUpRight className="h-4 w-4" /></Link><button onClick={() => action("sync")} disabled={working !== ""} className="inline-flex min-h-11 items-center gap-2 rounded-full bg-neutral-950 px-5 text-sm font-bold text-white"><RefreshCw className={`h-4 w-4 ${working.startsWith("sync") ? "animate-spin" : ""}`} />Synchroniser les prospects</button></div>
         </header>
 
@@ -148,12 +151,12 @@ export default function AdminProspectionPage() {
         </section>
 
         <section className="overflow-hidden rounded-3xl border border-stone-200 bg-white shadow-sm">
-          <div className="flex flex-col gap-4 border-b border-stone-200 p-5 sm:flex-row sm:items-center sm:justify-between"><div><h2 className="text-xl font-black text-neutral-950">Pipeline des 100 derniers prospects</h2><p className="mt-1 text-sm text-stone-500">Les réponses ambiguës restent bloquées jusqu’à votre décision.</p></div><div className="flex gap-1 rounded-full bg-stone-100 p-1">{([['all','Tous'],['attention','À traiter'],['active','Actifs'],['won','Vendus']] as const).map(([id,label]) => <button key={id} onClick={() => setFilter(id)} className={`rounded-full px-3 py-2 text-xs font-bold ${filter === id ? "bg-white text-neutral-950 shadow-sm" : "text-stone-500"}`}>{label}</button>)}</div></div>
+          <div className="flex flex-col gap-4 border-b border-stone-200 p-5 sm:flex-row sm:items-center sm:justify-between"><div><h2 className="text-xl font-black text-neutral-950">Pipeline des 100 derniers prospects</h2><p className="mt-1 text-sm text-stone-500">L’Agent Standing est réservé aux P1 ; les réponses ambiguës restent bloquées jusqu’à votre décision.</p></div><div className="flex flex-wrap gap-1 rounded-2xl bg-stone-100 p-1">{([['all','Tous'],['standing','Agent Standing'],['attention','À traiter'],['active','Actifs'],['won','Vendus']] as const).map(([id,label]) => <button key={id} onClick={() => setFilter(id)} className={`rounded-full px-3 py-2 text-xs font-bold ${filter === id ? "bg-white text-neutral-950 shadow-sm" : "text-stone-500"}`}>{label}</button>)}</div></div>
           <div className="divide-y divide-stone-100">
             {visible.length === 0 && <p className="p-10 text-center text-sm text-stone-500">Aucun prospect dans cette vue.</p>}
             {visible.map((prospect) => <article key={prospect.id} className="grid gap-4 p-5 lg:grid-cols-[1.5fr_1fr_auto] lg:items-center">
               <div className="min-w-0"><div className="flex flex-wrap items-center gap-2"><h3 className="truncate font-black text-neutral-950">{prospect.name}</h3><span className={`rounded-full px-2.5 py-1 text-[11px] font-bold ${STATUS_STYLE[prospect.status]}`}>{LABELS[prospect.status]}</span></div><p className="mt-1 truncate text-sm text-stone-500">{prospect.email}{prospect.city ? ` · ${prospect.city}` : ""}</p></div>
-              <div className="text-xs text-stone-500">{prospect.metadata?.brain ? <details><summary className="cursor-pointer font-semibold text-stone-700">Cerveau : {prospect.metadata.brain.priority} · {prospect.metadata.brain.score}/100 · {BRAIN_CATEGORY_LABEL[prospect.metadata.brain.category]}</summary><p className="mt-1">{BRAIN_NEXT_STEP_LABEL[prospect.metadata.brain.nextStep]}</p><p className="mt-1">{prospect.metadata.brain.reasons.join(" · ")}</p><p className="mt-1 text-emerald-800">Argument : {prospect.metadata.brain.commercialArguments[0]}</p></details> : prospect.messages[0] ? <><p className="truncate font-semibold text-stone-700"><Mail className="mr-1 inline h-3.5 w-3.5" />{prospect.messages[0].subject}</p><p className="mt-1">{new Date(prospect.messages[0].createdAt).toLocaleString("fr-FR")}</p></> : <p><Clock3 className="mr-1 inline h-3.5 w-3.5" />En attente du premier contact</p>}</div>
+              <div className="text-xs text-stone-500">{prospect.metadata?.brain ? <details open={prospect.metadata.brain.handlingMode === "AGENT_STANDING"}><summary className="cursor-pointer font-semibold text-stone-700">{prospect.metadata.brain.handlingMode === "AGENT_STANDING" ? "Agent Standing" : "Qualification"} : {prospect.metadata.brain.priority} · {prospect.metadata.brain.score}/100 · {BRAIN_CATEGORY_LABEL[prospect.metadata.brain.category]}</summary><p className="mt-1 font-semibold text-emerald-800">{BRAIN_NEXT_STEP_LABEL[prospect.metadata.brain.nextStep]}</p><p className="mt-1">{prospect.metadata.brain.reasons.join(" · ")}</p>{prospect.metadata.brain.standingBrief?.length ? <ol className="mt-2 list-decimal space-y-1 pl-4">{prospect.metadata.brain.standingBrief.map((task) => <li key={task}>{task}</li>)}</ol> : <p className="mt-1 text-emerald-800">Argument : {prospect.metadata.brain.commercialArguments[0]}</p>}</details> : prospect.messages[0] ? <><p className="truncate font-semibold text-stone-700"><Mail className="mr-1 inline h-3.5 w-3.5" />{prospect.messages[0].subject}</p><p className="mt-1">{new Date(prospect.messages[0].createdAt).toLocaleString("fr-FR")}</p></> : <p><Clock3 className="mr-1 inline h-3.5 w-3.5" />En attente du premier contact</p>}</div>
               <div className="flex flex-wrap justify-start gap-2 lg:justify-end">{["NEW","CONTACTED","FOLLOW_UP_1","ENGAGED"].includes(prospect.status) && <button title="Mettre en pause" onClick={() => action("pause", prospect.id)} className="rounded-full border border-stone-200 p-2 text-stone-600"><Pause className="h-4 w-4" /></button>}{["PAUSED","ERROR"].includes(prospect.status) && <button title="Reprendre" onClick={() => action(prospect.status === "ERROR" ? "retry" : "resume", prospect.id)} className="rounded-full border border-stone-200 p-2 text-emerald-700"><Play className="h-4 w-4" /></button>}{["INTERESTED","NEEDS_HUMAN"].includes(prospect.status) && <button onClick={() => action("qualified", prospect.id)} className="rounded-full bg-emerald-50 px-3 py-2 text-xs font-bold text-emerald-800">Qualifier</button>}{["INTERESTED","QUALIFIED","NEEDS_HUMAN"].includes(prospect.status) && <button onClick={() => action("converted", prospect.id)} className="rounded-full bg-neutral-950 px-3 py-2 text-xs font-bold text-white">Vente conclue</button>}{!["CONVERTED","UNSUBSCRIBED","NOT_INTERESTED","INVALID"].includes(prospect.status) && <button onClick={() => action("suppress", prospect.id)} className="rounded-full border border-stone-200 px-3 py-2 text-xs font-bold text-stone-600">Ne plus contacter</button>}</div>
             </article>)}
           </div>
