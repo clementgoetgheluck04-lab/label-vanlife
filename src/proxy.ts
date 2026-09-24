@@ -16,7 +16,7 @@ const PUBLIC_ROUTES = [
   "/member-login", "/membre", "/lieux", "/lieux-reperes", "/mentions-legales",
   "/admin-login",
   "/politique-confidentialite", "/blog", "/evenements",
-  "/road-trips", "/offline",
+  "/road-trips", "/guide-achat", "/offline",
   "/desinscription",
   "/recommander-un-lieu",
   "/verifier-carte",

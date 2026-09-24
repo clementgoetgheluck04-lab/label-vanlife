@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 import { Prisma } from "@/generated/prisma/client";
 import { formatEuro } from "@/config/products";
-import { MEMBER_PRODUCT_NAME, MEMBER_VALIDITY_TEXT } from "@/config/commercial";
+import { MEMBER_PRODUCT_NAME, MEMBER_VALIDITY_TEXT, MEMBER_PRICE_CENTS } from "@/config/commercial";
 import { getPrisma } from "@/lib/prisma";
 import { getAppUrl, getBackOfficeEmails, getTransactionalEmailFrom, requireServerEnv } from "@/server/env";
 import { generateMemberAccessCode } from "@/server/member-access";
@@ -57,13 +57,13 @@ async function sendRenewalReminderEmail(resend: Resend, to: string, name: string
     from: getTransactionalEmailFrom(),
     to,
     subject: "Votre carte membre arrive bientôt à échéance",
-    text: `Bonjour ${name},\n\nVotre carte membre Label Vanlife arrive à échéance le ${date}.\n\nComme vous êtes déjà membre, vous pourrez renouveler votre carte au prix payé l'année précédente : ${formatEuro(amount)}.\n\nC'est notre manière de protéger les membres existants si le tarif public évolue l'an prochain.\n\nPour renouveler, connectez-vous à votre espace membre puis relancez l'adhésion : ${getAppUrl()}/member-login\n\nL'équipe Label Vanlife`,
+    text: `Bonjour ${name},\n\nVotre carte membre Label Vanlife arrive à échéance le ${date}.\n\nComme vous êtes déjà membre, vous pourrez renouveler votre carte au tarif annuel protégé, ou au tarif actuel s’il est plus bas : ${formatEuro(amount)}.\n\nC'est notre manière de protéger les membres existants si le tarif public évolue l'an prochain.\n\nPour renouveler, connectez-vous à votre espace membre puis relancez l'adhésion : ${getAppUrl()}/member-login\n\nL'équipe Label Vanlife`,
     html: labelVanlifeEmail({
       preheader: `Votre Carte membre arrive à échéance le ${date}`,
       eyebrow: "RENOUVELLEMENT MEMBRE",
       title: "Votre Carte membre arrive bientôt à échéance",
       greeting: `Bonjour ${name},`,
-      paragraphs: ["Votre accès Label Vanlife approche de sa date d’échéance. En tant que membre actuel, vous conservez le prix payé l’année précédente."],
+      paragraphs: ["Votre accès Label Vanlife approche de sa date d’échéance. En tant que membre actuel, vous bénéficiez du tarif annuel protégé ou de l’offre actuelle si elle est plus avantageuse."],
       details: [
         { label: "Échéance", value: date },
         { label: "Prix protégé", value: formatEuro(amount) },
@@ -86,8 +86,8 @@ async function sendSimulationEmails(customerEmail: string) {
       from,
       to: customerEmail,
       subject: "[TEST] Bienvenue dans Label Vanlife",
-      text: `Bonjour Clément,\n\n[Simulation] Votre paiement de 29 € est confirmé.\n\n${MEMBER_PRODUCT_NAME}\n${MEMBER_VALIDITY_TEXT}\n\nVotre espace membre vous donne accès à la MAP Label Vanlife, à votre Carte membre numérique, aux fiches détaillées des lieux et au téléchargement de l'application depuis votre espace en ligne lorsqu'elle est disponible.\n\nL'équipe Label Vanlife`,
-      html: labelVanlifeEmail({ preheader: "Test du nouvel email de bienvenue", eyebrow: "TEST — BIENVENUE", title: "Votre Carte membre est active", greeting: "Bonjour Clément,", paragraphs: ["Votre paiement test de 29 € est confirmé. Votre espace membre, votre carte numérique et la MAP Label Vanlife sont prêts."], details: [{ label: "Offre", value: MEMBER_PRODUCT_NAME }, { label: "Validité", value: MEMBER_VALIDITY_TEXT }], action: { label: "Accéder à mon espace", href: `${appUrl}/member-login` } }),
+      text: `Bonjour Clément,\n\n[Simulation] Votre paiement de 19 € est confirmé.\n\n${MEMBER_PRODUCT_NAME}\n${MEMBER_VALIDITY_TEXT}\n\nVotre espace membre vous donne accès à la MAP Label Vanlife, à votre Carte membre numérique, aux fiches détaillées des lieux et au téléchargement de l'application depuis votre espace en ligne lorsqu'elle est disponible.\n\nL'équipe Label Vanlife`,
+      html: labelVanlifeEmail({ preheader: "Test du nouvel email de bienvenue", eyebrow: "TEST — BIENVENUE", title: "Votre Carte membre est active", greeting: "Bonjour Clément,", paragraphs: ["Votre paiement test de 19 € est confirmé. Votre espace membre, votre carte numérique et la MAP Label Vanlife sont prêts."], details: [{ label: "Offre", value: MEMBER_PRODUCT_NAME }, { label: "Validité", value: MEMBER_VALIDITY_TEXT }], action: { label: "Accéder à mon espace", href: `${appUrl}/member-login` } }),
     }),
     resend.emails.send({
       from,
@@ -114,8 +114,8 @@ async function sendSimulationEmails(customerEmail: string) {
       from,
       to: customerEmail,
       subject: "[TEST] Votre carte membre arrive bientôt à échéance",
-      text: `Bonjour Clément,\n\n[Simulation renouvellement] Votre carte membre arrive bientôt à échéance. Comme vous êtes déjà membre, vous pourrez renouveler au prix payé l'année précédente : 29 €.\n\nConnexion : ${appUrl}/member-login\n\nL'équipe Label Vanlife`,
-      html: labelVanlifeEmail({ preheader: "Test du rappel de renouvellement", eyebrow: "TEST — RENOUVELLEMENT", title: "Votre Carte membre arrive bientôt à échéance", greeting: "Bonjour Clément,", paragraphs: ["Votre prix membre est protégé pour le renouvellement."], details: [{ label: "Prix protégé", value: "29 €" }], action: { label: "Renouveler ma carte", href: `${appUrl}/member-login` }, notice: "Aucun renouvellement automatique." }),
+      text: `Bonjour Clément,\n\n[Simulation renouvellement] Votre carte membre arrive bientôt à échéance. Comme vous êtes déjà membre, vous pourrez renouveler au tarif annuel protégé, ou au tarif actuel s’il est plus bas : 19 €.\n\nConnexion : ${appUrl}/member-login\n\nL'équipe Label Vanlife`,
+      html: labelVanlifeEmail({ preheader: "Test du rappel de renouvellement", eyebrow: "TEST — RENOUVELLEMENT", title: "Votre Carte membre arrive bientôt à échéance", greeting: "Bonjour Clément,", paragraphs: ["Votre prix membre est protégé pour le renouvellement."], details: [{ label: "Prix protégé", value: "19 €" }], action: { label: "Renouveler ma carte", href: `${appUrl}/member-login` }, notice: "Aucun renouvellement automatique." }),
     }),
     resend.emails.send({
       from,
@@ -270,7 +270,7 @@ async function runDueLifecycleEmails() {
       resend,
       membership.user.email,
       firstName(membership.user.profile),
-      order.amount,
+      Math.min(order.amount, MEMBER_PRICE_CENTS),
       membership.expiresAt,
     );
     await prisma.checkoutOrder.update({
@@ -280,7 +280,7 @@ async function runDueLifecycleEmails() {
           ...payload,
           memberRenewalReminderAttemptedAt: now.toISOString(),
           memberRenewalReminderMembershipExpiresAt: membership.expiresAt.toISOString(),
-          memberRenewalProtectedPrice: order.amount,
+          memberRenewalProtectedPrice: Math.min(order.amount, MEMBER_PRICE_CENTS),
           ...(error
             ? { memberRenewalReminderEmailError: (error.message || error.name).slice(0, 500) }
             : { memberRenewalReminderSentAt: now.toISOString() }),

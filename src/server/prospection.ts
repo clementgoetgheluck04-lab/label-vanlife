@@ -8,6 +8,8 @@ import { getPrisma } from "@/lib/prisma";
 import { labelVanlifeEmail } from "@/server/email-template";
 import { getAppUrl, getBackOfficeEmails, getProspectionEmailFrom, getTransactionalEmailFrom, requireServerEnv } from "@/server/env";
 import { CONTACT_EMAIL } from "@/config/contact";
+import { canReplaceProspectAddress } from "@/lib/prospection-contact-policy";
+import { assessProspectForLabelVanlife } from "@/lib/prospection-brain";
 
 const DAY = 24 * 60 * 60 * 1_000;
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -387,10 +389,12 @@ export async function syncSpottedProspects(): Promise<number> {
   });
   const known = new Set(existing.map((item) => item.email));
   const bySourceId = new Map(existing.flatMap((item) => item.sourceId ? [[item.sourceId, item] as const] : []));
-  const suppressed = new Set((await prisma.prospectSuppression.findMany({
-    where: { email: { in: [...unique.keys()] } },
-    select: { email: true },
-  })).map((item) => item.email));
+  const suppressions = await prisma.prospectSuppression.findMany({
+    where: { email: { in: [...unique.keys(), ...existing.map((item) => item.email)] } },
+    select: { email: true, reason: true },
+  });
+  const suppressed = new Set(suppressions.map((item) => item.email));
+  const suppressionReasons = new Map(suppressions.map((item) => [item.email, item.reason]));
 
   const updates = [...unique.entries()].flatMap(([email, place]) => {
     const current = bySourceId.get(place.id);
@@ -398,6 +402,7 @@ export async function syncSpottedProspects(): Promise<number> {
     const bounced = current?.status === "INVALID";
     if (
       !current
+      || !canReplaceProspectAddress(current.status, suppressionReasons.get(current.email))
       || current.email === email
       || (!untouched && !bounced && !place.verifiedEmailOverride)
       || known.has(email)
@@ -411,11 +416,14 @@ export async function syncSpottedProspects(): Promise<number> {
     const resetForNewContact = bounced || Boolean(place.verifiedEmailOverride && ACTIVE_STATUSES.includes(current.status) && !untouched);
     return [{
       id: current.id,
+      previousEmail: current.email,
+      previousStatus: current.status,
       email,
       place,
       resetForNewContact,
       metadata: {
         ...metadata,
+        brain: assessProspectForLabelVanlife({ ...place, email }),
         previousEmail: current.email,
         contactEmailSource: place.verifiedEmailOverride ? "founder_verified" : "catalog_sync",
         contactRevision: currentRevision + 1,
@@ -426,28 +434,33 @@ export async function syncSpottedProspects(): Promise<number> {
 
   const rows = [...unique.entries()]
     .filter(([email, place]) => !known.has(email) && !bySourceId.has(place.id) && !suppressed.has(email))
-    .map(([email, place]) => ({
-      sourceId: place.id,
-      name: place.name.slice(0, 180),
-      contactName: cleanName(place.contactName),
-      email,
-      website: place.website,
-      city: place.city || null,
-      region: place.region || null,
-      sourceLabel: place.source || "Repérage Label Vanlife",
-      sourceUrl: place.sourceUrl || place.website,
-      nextActionAt: new Date(),
-      metadata: {
-        network: place.network,
-        postalCode: place.postalCode,
-        country: place.country,
-        selectionNote: place.selectionNote,
-        publishAsSpotted: place.publishAsSpotted,
-      },
-    }));
+    .map(([email, place]) => {
+      const brain = assessProspectForLabelVanlife({ ...place, email });
+      const readyForOutreach = brain.nextStep === "PREPARER_APPROCHE";
+      return {
+        sourceId: place.id,
+        name: place.name.slice(0, 180),
+        contactName: cleanName(place.contactName),
+        email,
+        website: place.website,
+        city: place.city || null,
+        region: place.region || null,
+        sourceLabel: place.source || "Repérage Label Vanlife",
+        sourceUrl: place.sourceUrl || place.website,
+        ...(readyForOutreach ? { nextActionAt: new Date() } : { status: "NEEDS_HUMAN" as const, nextActionAt: null }),
+        metadata: {
+          network: place.network,
+          postalCode: place.postalCode,
+          country: place.country,
+          selectionNote: place.selectionNote,
+          publishAsSpotted: place.publishAsSpotted,
+          brain,
+        },
+      };
+    });
   if (!rows.length && !updates.length) return 0;
-  const operations = updates.map(({ id, email, place, resetForNewContact, metadata }) => prisma.prospect.update({
-    where: { id },
+  const operations = updates.map(({ id, previousEmail, previousStatus, email, place, resetForNewContact, metadata }) => prisma.prospect.updateMany({
+    where: { id, email: previousEmail, status: previousStatus },
     data: {
       email,
       name: place.name.slice(0, 180),
@@ -471,7 +484,8 @@ export async function syncSpottedProspects(): Promise<number> {
     ? await prisma.$transaction([...operations, prisma.prospect.createMany({ data: rows, skipDuplicates: true })])
     : await prisma.$transaction(operations);
   const created = rows.length ? (result.at(-1) as { count: number }).count : 0;
-  return updates.length + created;
+  const changed = result.slice(0, operations.length).reduce((sum, item) => sum + (item as { count: number }).count, 0);
+  return changed + created;
 }
 
 function missingContactKey(place: (typeof SPOTTED_PLACES)[number]): string {
@@ -560,7 +574,7 @@ async function sendOne(prospect: Prospect): Promise<"sent" | "skipped" | "failed
   const prisma = getPrisma();
   const suppression = await prisma.prospectSuppression.findUnique({ where: { email: prospect.email } });
   if (suppression) {
-    await prisma.prospect.update({ where: { id: prospect.id }, data: { status: "UNSUBSCRIBED", nextActionAt: null } });
+    await prisma.prospect.updateMany({ where: { id: prospect.id, status: prospect.status }, data: { status: suppression.reason === "bounce" ? "INVALID" : "UNSUBSCRIBED", nextActionAt: null } });
     return "skipped";
   }
 
@@ -621,7 +635,7 @@ async function sendOne(prospect: Prospect): Promise<"sent" | "skipped" | "failed
     const message = (error instanceof Error ? error.message : "Échec réseau Resend").slice(0, 500);
     await prisma.$transaction([
       prisma.prospectMessage.update({ where: { id: record.id }, data: { status: "FAILED", error: message } }),
-      prisma.prospect.update({ where: { id: prospect.id }, data: { status: "ERROR", nextActionAt: null } }),
+      prisma.prospect.updateMany({ where: { id: prospect.id, status: "SENDING" }, data: { status: "ERROR", nextActionAt: null } }),
     ]);
     return "failed";
   }
@@ -631,7 +645,7 @@ async function sendOne(prospect: Prospect): Promise<"sent" | "skipped" | "failed
     const error = (result.error?.message || result.error?.name || "Échec Resend").slice(0, 500);
     await prisma.$transaction([
       prisma.prospectMessage.update({ where: { id: record.id }, data: { status: "FAILED", error } }),
-      prisma.prospect.update({ where: { id: prospect.id }, data: { status: "ERROR", nextActionAt: null, metadata: { emailError: error } } }),
+      prisma.prospect.updateMany({ where: { id: prospect.id, status: "SENDING" }, data: { status: "ERROR", nextActionAt: null, metadata: { ...metadata, emailError: error } as Prisma.InputJsonObject } }),
     ]);
     return "failed";
   }
@@ -665,8 +679,8 @@ async function sendOne(prospect: Prospect): Promise<"sent" | "skipped" | "failed
     : null;
   await prisma.$transaction([
     prisma.prospectMessage.update({ where: { id: record.id }, data: { status: "SENT", providerMessageId: result.data.id, sentAt: now } }),
-    prisma.prospect.update({
-      where: { id: prospect.id },
+    prisma.prospect.updateMany({
+      where: { id: prospect.id, status: "SENDING" },
       data: {
         status: nextStatus,
         followUpCount: progress,
@@ -679,7 +693,7 @@ async function sendOne(prospect: Prospect): Promise<"sent" | "skipped" | "failed
   return "sent";
 }
 
-async function deliverabilitySafetyCheck(): Promise<{
+export async function deliverabilitySafetyCheck(): Promise<{
   paused: boolean;
   sent: number;
   bounces: number;
@@ -728,8 +742,8 @@ async function alertDeliverabilityPause(metrics: Awaited<ReturnType<typeof deliv
 }
 
 export async function runProspectionBatch() {
+  if (!isProspectingEnabled()) return { enabled: false, imported: 0, researchRequested: 0, sent: 0, failed: 0, skipped: 0 };
   const imported = await syncSpottedProspects();
-  if (!isProspectingEnabled()) return { enabled: false, imported, researchRequested: 0, sent: 0, failed: 0, skipped: 0 };
   const now = new Date();
   const parisWeekday = new Intl.DateTimeFormat("en-US", { timeZone: "Europe/Paris", weekday: "short" }).format(now);
   if (parisWeekday === "Sat" || parisWeekday === "Sun") {

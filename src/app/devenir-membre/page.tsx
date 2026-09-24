@@ -26,6 +26,7 @@ import { Button } from "@/components/ui/Button";
 import { Card, CardContent } from "@/components/ui/Card";
 import { cn } from "@/lib/utils";
 import { MemberDigitalAccess } from "@/components/MemberDigitalAccess";
+import { MemberFutureOffers } from "@/components/MemberFutureOffers";
 import { MembershipCardPreview, MembershipJourneyNav } from "@/components/MembershipWelcome";
 import { CONTACT_EMAIL, CONTACT_MAILTO } from "@/config/contact";
 import { CURRENT_YEAR, MEMBER_CTA_LABEL, MEMBER_DISCOUNT_TEXT, MEMBER_PRICE_TEXT, MEMBER_VALIDITY_TEXT } from "@/config/commercial";
@@ -67,7 +68,7 @@ const CHIFFRES = [
   { valeur: String(SITE_STATS.labelledPlacesCount), label: "lieux labellisés" },
   { valeur: MEMBER_DISCOUNT_TEXT, label: "de réduction membre" },
   { valeur: "39 €", label: "prix public normal" },
-  { valeur: "29 €", label: `édition ${CURRENT_YEAR}` },
+  { valeur: "19 €", label: `édition ${CURRENT_YEAR}` },
 ];
 
 const PROBLEMES = [
@@ -146,6 +147,11 @@ export default function DevenirMembrePage() {
           <p className="mx-auto mb-7 max-w-xl rounded-2xl border border-amber-200 bg-amber-50 px-5 py-3 text-sm font-semibold text-amber-900">
             Offre 2027 ouverte dès maintenant : profite de tous les avantages immédiatement, jusqu&apos;au 31 décembre 2027.
           </p>
+          <div className="mx-auto mb-7 max-w-xl rounded-2xl border border-emerald-200 bg-emerald-50 px-5 py-4 text-left text-sm leading-6 text-emerald-950">
+            <p className="font-bold">Tarif fondateur : tes futurs renouvellements à 19 €/an</p>
+            <p className="mt-1">En achetant ta carte avec l’offre actuelle à 19 €, tu conserves ce tarif annuel à vie, même après une interruption de ton adhésion. Ton premier achat couvre la période jusqu’au 31 décembre 2027 ; il ne s’agit pas d’une carte valable à vie pour un paiement unique.</p>
+            <p className="mt-2">30 jours de grâce en cas d’incident de paiement. Après résiliation puis réinscription, les tarifs en vigueur s’appliquent. Aucun renouvellement automatique sans ton accord.</p>
+          </div>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Button variant="cta" size="lg" className="text-base px-10 py-4 h-auto shadow-lg shadow-amber-500/20" onClick={handleCheckout} disabled={loading}>
@@ -167,6 +173,8 @@ export default function DevenirMembrePage() {
         </div>
       </section>
 
+      <MemberFutureOffers />
+
       <section className="bg-neutral-950 py-20 text-white sm:py-28">
         <div className="mx-auto max-w-6xl px-6">
           <div className="mx-auto max-w-2xl text-center"><p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#c39960]">Tu te reconnais ?</p><h2 className="mt-3 text-3xl font-bold sm:text-4xl">Ce que vivent la plupart des vanlifers</h2></div>
@@ -184,7 +192,7 @@ export default function DevenirMembrePage() {
             <div className="mx-auto mt-5 max-w-md rounded-2xl bg-white p-4 text-sm text-neutral-700 shadow-sm">
               <strong>Exemple :</strong> 10 nuits × 30 € = 300 € · -10 % = 30 € économisés.
               <br />
-              <span className="text-emerald-700">Une Carte membre à 29 € peut ainsi être amortie au cours d’un séjour de 10 nuits, selon l’avantage appliqué par le lieu.</span>
+              <span className="text-emerald-700">Une Carte membre à 19 € peut ainsi être amortie au cours d’un séjour de 10 nuits, selon l’avantage appliqué par le lieu.</span>
             </div>
             <Button variant="cta" size="lg" className="mt-6" onClick={handleCheckout} disabled={loading}>{MEMBER_CTA_LABEL} <ArrowRight className="h-5 w-5" /></Button>
           </div>
@@ -262,7 +270,7 @@ export default function DevenirMembrePage() {
               <div className="max-w-2xl mx-auto px-6">
                 <div className="text-center mb-10 space-y-3">
                   <span className="inline-block text-xs font-semibold tracking-[0.2em] uppercase text-emerald-500">
-                    Un seul abonnement
+                    Une carte, un paiement unique
                   </span>
                   <h2 className="text-3xl sm:text-4xl font-bold text-neutral-800" style={{ fontFamily: "Outfit, sans-serif" }}>
                     Choisis la simplicité
@@ -278,7 +286,7 @@ export default function DevenirMembrePage() {
                         </p>
                         <div className="flex items-baseline justify-center gap-2">
                           <span className="text-2xl text-neutral-400 line-through">39 €</span>
-                          <span className="text-5xl sm:text-6xl font-bold text-neutral-900" style={{ fontFamily: "Outfit, sans-serif" }}>29 €</span>
+                          <span className="text-5xl sm:text-6xl font-bold text-neutral-900" style={{ fontFamily: "Outfit, sans-serif" }}>19 €</span>
                           <span className="text-lg text-neutral-400 font-medium">édition {CURRENT_YEAR}</span>
                         </div>
                         <p className="text-sm text-emerald-500 font-semibold mt-1">{MEMBER_VALIDITY_TEXT}</p>

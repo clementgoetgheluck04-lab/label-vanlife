@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
+import { readTextRequest, RequestBodyError } from "@/server/request-security";
 import { getPrisma } from "@/lib/prisma";
 import { labelVanlifeEmail } from "@/server/email-template";
 import { getAppUrl, getProspectionEmailFrom, requireSecretEnv, requireServerEnv } from "@/server/env";
@@ -247,7 +248,7 @@ async function handleInbound(event: ResendEvent): Promise<void> {
 
 export async function POST(request: NextRequest) {
   try {
-    const payload = await request.text();
+    const payload = await readTextRequest(request, 2 * 1024 * 1024);
     const webhookEventId = request.headers.get("svix-id") || "";
     const resend = new Resend(requireServerEnv("RESEND_API_KEY"));
     const event = resend.webhooks.verify({
@@ -265,6 +266,9 @@ export async function POST(request: NextRequest) {
     if (["email.bounced", "email.complained", "email.suppressed"].includes(event.type)) await handleDeliveryEvent(event);
     return NextResponse.json({ received: true });
   } catch (error) {
+    if (error instanceof RequestBodyError) {
+      return NextResponse.json({ error: error.message }, { status: error.status });
+    }
     console.error("[resend-webhook] rejected", error instanceof Error ? error.message : error);
     return NextResponse.json({ error: "Invalid webhook" }, { status: 400 });
   }

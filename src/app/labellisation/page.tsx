@@ -71,11 +71,11 @@ export default function LabellisationPage() {
                   Pensé par un vanlifer, avec l’expérience d’un directeur de camping
                 </h2>
                 <p className="mt-4 text-sm leading-relaxed text-neutral-600 sm:text-base">
-                  J’ai dirigé un camping et je voyage en van depuis plus de 15 ans. Je connais vos réalités : la saisonnalité, les réservations, l’accueil, les imprévus et la nécessité de préserver la tranquillité de votre établissement. Label Vanlife est né pour créer une relation simple et équilibrée entre des lieux de qualité et des voyageurs respectueux.
+                  J’ai dirigé un camping et je voyage en van depuis plus de 20 ans. Je connais vos réalités : la saisonnalité, les réservations, l’accueil, les imprévus et la nécessité de préserver la tranquillité de votre établissement. Label Vanlife est né pour créer une relation simple et équilibrée entre des lieux de qualité et des voyageurs respectueux.
                 </p>
                 <div className="mt-5 flex flex-wrap justify-center gap-2 md:justify-start">
                   <span className="rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700">Ancien directeur de camping</span>
-                  <span className="rounded-full bg-[#f7f1e8] px-3 py-1.5 text-xs font-semibold text-[#8b673d]">Vanlifer depuis plus de 15 ans</span>
+                  <span className="rounded-full bg-[#f7f1e8] px-3 py-1.5 text-xs font-semibold text-[#8b673d]">Vanlifer depuis plus de 20 ans</span>
                   <span className="rounded-full bg-neutral-100 px-3 py-1.5 text-xs font-semibold text-neutral-700">Vision terrain & établissement</span>
                 </div>
                 <p className="mt-5 text-sm font-bold text-neutral-900">Clément Goetgheluck <span className="font-normal text-neutral-500">· Fondateur de Label Vanlife</span></p>

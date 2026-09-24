@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "https://www.labelvanlife.fr/recommander-un-lieu" },
   title: "Recommander un lieu accueillant pour les vans",
   description: "Recommandez en moins d’une minute un lieu qui accueille réellement les voyageurs en van. Chaque proposition est vérifiée par Label Vanlife.",
 };

@@ -97,7 +97,7 @@ const destinations = [
 const relatedGuides = [
   { href: "/dormir-en-van", title: "Où dormir en van en France ?", text: "Règles, options légales, campings, terrains privés et bonnes pratiques." },
   { href: "/campings-van-friendly", title: "Campings van friendly en France", text: "Comprendre ce qu’un camping vraiment van friendly doit offrir." },
-  { href: "/road-trips", title: "Road trips en van en France", text: "Itinéraires par région pour construire un voyage réaliste." },
+  { href: "/blog#itineraires", title: "Road trips en van en France", text: "Itinéraires par région pour construire un voyage réaliste." },
   { href: "/vanlife-famille", title: "Vanlife en famille", text: "Conseils concrets pour voyager en van avec des enfants." },
 ] as const;
 
@@ -239,7 +239,7 @@ export default function VanlifeGuidePage() {
             <SectionHeading eyebrow="Prendre la route" title="Organiser son road trip sans tout figer" icon={<Compass className="h-5 w-5" />} />
             <p>Le bon itinéraire laisse de la place à l’imprévu. Une base simple consiste à prévoir quelques étapes importantes, puis à garder du temps entre elles. Visez des journées de route raisonnables : au-delà de 150 km quotidiens pendant plusieurs jours, le voyage peut vite devenir un transfert.</p>
             <div className="mt-6 rounded-2xl bg-neutral-950 p-6 text-white"><p className="text-xs font-bold uppercase tracking-[0.18em] text-[#dfc59f]">La règle des 150 km</p><p className="mt-3 text-lg leading-7 text-white/80">Moins de route, plus de haltes, de marchés, de baignades et de rencontres. La vanlife commence souvent là où l’itinéraire prévu s’arrête.</p></div>
-            <Link href="/road-trips" className="mt-7 inline-flex items-center gap-2 font-semibold text-emerald-700 hover:gap-3">Explorer les idées de road trips <ArrowRight className="h-4 w-4" /></Link>
+            <Link href="/blog#itineraires" className="mt-7 inline-flex items-center gap-2 font-semibold text-emerald-700 hover:gap-3">Explorer les idées de road trips <ArrowRight className="h-4 w-4" /></Link>
           </section>
 
           <section id="responsable" className="scroll-mt-28">

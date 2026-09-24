@@ -7,7 +7,7 @@ const CARDS = [
     title: "Carte membre Label Vanlife",
     subtitle: MEMBER_VALIDITY_TEXT,
     oldPrice: "39 €",
-    price: "29 €",
+    price: "19 €",
     period: `édition ${CURRENT_YEAR}`,
     badge: "OFFRE ACTUELLE",
     features: [`Avantage pouvant aller jusqu’à ${MEMBER_DISCOUNT_MAX} %`, "MAP Label Vanlife", "Road trip planner", "Carte membre numérique"],

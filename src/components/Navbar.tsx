@@ -8,7 +8,6 @@ import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
 import { BRAND_ASSETS } from "@/config/brand-assets";
-import { MEMBER_SHORT_LABEL } from "@/config/commercial";
 
 const NAV_ITEMS = [
   { label: "Accueil", href: "/" },
@@ -127,7 +126,7 @@ export default function Navbar() {
                 </Link>
                 <Link href="/devenir-membre" className="ml-1">
                   <Button variant="cta" size="sm" className="gap-1.5">
-                    {MEMBER_SHORT_LABEL}
+                    Carte membre
                   </Button>
                 </Link>
               </>
@@ -182,7 +181,7 @@ export default function Navbar() {
                   </Link>
                   <Link href="/devenir-membre" onClick={() => setOpen(false)} className="mt-2 block">
                     <Button variant="cta" className="w-full gap-2">
-                      {MEMBER_SHORT_LABEL}
+                      Carte membre
                     </Button>
                   </Link>
                 </>

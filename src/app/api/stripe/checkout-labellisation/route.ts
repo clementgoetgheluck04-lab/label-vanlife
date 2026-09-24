@@ -7,6 +7,7 @@ import { getStripe } from "@/server/stripe";
 import { parseLabellisationPayload } from "@/server/validation";
 import { assertSameOrigin, enforceRateLimit, readJsonRequest } from "@/server/request-security";
 import { verifyDraftToken } from "@/server/labellisation-draft";
+import { retrievePreviousCheckout } from "@/lib/stripe-session-recovery";
 
 export const dynamic = "force-dynamic";
 
@@ -52,8 +53,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "This application has already been processed" }, { status: 409 });
     }
     if (order.stripeCheckoutSessionId) {
-      const existingSession = await stripe.checkout.sessions.retrieve(order.stripeCheckoutSessionId);
-      if (existingSession.status === "open" && existingSession.url) {
+      const existingSession = await retrievePreviousCheckout(
+        order.stripeCheckoutSessionId,
+        process.env.STRIPE_SECRET_KEY || "",
+        (id) => stripe.checkout.sessions.retrieve(id),
+      );
+      if (existingSession?.status === "open" && existingSession.url) {
         return NextResponse.json({ url: existingSession.url }, { headers: { "Cache-Control": "no-store" } });
       }
     }

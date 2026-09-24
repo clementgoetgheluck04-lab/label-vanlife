@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "https://www.labelvanlife.fr/le-label" },
   title: "Le Label Vanlife — Pour une vanlife responsable et sereine",
   description:
     "Découvrez la charte Label Vanlife, son processus de sélection et les engagements demandés aux lieux d'accueil.",

@@ -41,6 +41,8 @@ import { getVerifiedPlaceGps } from "@/data/verified-place-gps";
 import { getOptionalActiveMember, hasActiveMemberAccess } from "@/server/auth";
 import { getPrisma } from "@/lib/prisma";
 import { redactPublicPlaceText } from "@/server/public-place";
+import { labelEditionSummary } from "@/lib/label-edition";
+import { CONTACT_EMAIL } from "@/config/contact";
 
 const SERVICE_ICONS: Record<string, { icon: LucideIcon; label: string }> = {
   wifi: { icon: Wifi, label: "Wi-Fi" },
@@ -79,7 +81,9 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
     };
   }
 
-  const title = `${lieu.nom} — lieu labellisé`;
+  const details = getRichPlaceDetails(lieu.id);
+  const edition = labelEditionSummary(details ? getVisibleLabelYears(details) : []);
+  const title = `${lieu.nom} — ${edition.title}${edition.renewalPending ? ", renouvellement 2027 à confirmer" : ""}`;
   const publicDescription = redactPublicPlaceText(lieu.description);
   const description = publicDescription.length <= 160
     ? publicDescription
@@ -184,6 +188,7 @@ export default async function LieuDetailPage({ params }: { params: Promise<{ id:
     : getPublicRichPlaceDetails(lieu.id);
   const sourceDetails = getLabelledSourceDetails(lieu.id);
   const visibleLabelYears = richDetails ? getVisibleLabelYears(richDetails) : [];
+  const edition = labelEditionSummary(visibleLabelYears);
   const phones = memberHasAccess ? [...new Set([verifiedContact.phone, lieu.telephone, ...sourceDetails.flatMap((source) => source.phones ?? [])].filter((value): value is string => Boolean(value)))] : [];
   const emails = memberHasAccess ? [...new Set([verifiedContact.email, lieu.email, ...sourceDetails.flatMap((source) => source.emails ?? [])].filter((value): value is string => Boolean(value)))] : [];
   const contactNames = memberHasAccess ? [...new Set([richDetails?.contactName, ...sourceDetails.map((source) => source.contactName)].filter((value): value is string => Boolean(value)))] : [];
@@ -255,6 +260,15 @@ export default async function LieuDetailPage({ params }: { params: Promise<{ id:
       </section>
 
       <div className="mx-auto mt-7 max-w-5xl space-y-10 px-4 sm:px-6">
+        <section aria-label="Millésime de labellisation" className="rounded-2xl border border-emerald-200 bg-emerald-50 p-5 text-emerald-950">
+          <h2 className="font-bold">{edition.title}</h2>
+          {edition.renewalPending && <>
+            <p className="mt-2 text-sm leading-6">{edition.message}</p>
+            <a className="mt-3 inline-block font-semibold underline underline-offset-4" href={`mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(`Renouvellement 2027 — ${lieu.nom}`)}&body=${encodeURIComponent(`Bonjour, je souhaite encourager le renouvellement 2027 de ${lieu.nom}.\nFiche : https://www.labelvanlife.fr/lieux/${lieu.id}\n`)}`}>
+              Encourager le renouvellement 2027
+            </a>
+          </>}
+        </section>
         <section className="flex items-start gap-4">
           {lieu.logoUrl ? (
             <Image src={lieu.logoUrl} alt={`Logo ${lieu.nom}`} width={64} height={64} className="h-16 w-16 rounded-2xl border border-neutral-200 bg-white object-contain p-1 shadow-sm" />
@@ -565,7 +579,7 @@ export default async function LieuDetailPage({ params }: { params: Promise<{ id:
         {!memberHasAccess && <section className="rounded-3xl bg-gradient-to-r from-emerald-700 to-emerald-600 p-7 text-center shadow-lg sm:p-10">
           <div className="flex items-baseline justify-center gap-2 text-white">
             <span className="text-xl text-emerald-200 line-through">39 €</span>
-            <span className="text-4xl font-bold">29 €</span>
+            <span className="text-4xl font-bold">19 €</span>
             <span className="text-emerald-100">édition 2027</span>
           </div>
           <p className="mt-2 text-sm font-semibold text-emerald-50">{MEMBER_VALIDITY_TEXT}</p>

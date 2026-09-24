@@ -30,18 +30,18 @@ export function OrganizationJsonLd() {
   const data = {
     "@context": "https://schema.org",
     "@type": "Organization",
+    "@id": "https://www.labelvanlife.fr/#organization",
     name: "Label Vanlife",
     url: "https://www.labelvanlife.fr",
     logo: "https://www.labelvanlife.fr/icons/icon-192.svg",
     description:
-      "Le premier label pour vanlifers. Lieux calmes, respectueux et adaptés à la vanlife.",
+      "Label Vanlife : un réseau de lieux d'accueil pour les voyageurs itinérants autour d'une charte de respect et de voyage responsable.",
     sameAs: ["https://www.facebook.com/labelvanlife"],
-    foundingDate: "2024",
     contactPoint: {
       "@type": "ContactPoint",
       email: CONTACT_EMAIL,
       contactType: "customer service",
-      availableLanguage: ["French", "English"],
+      availableLanguage: ["French"],
     },
   };
 
@@ -49,7 +49,7 @@ export function OrganizationJsonLd() {
 }
 
 /**
- * WebSite avec SearchAction (recherche en place)
+ * WebSite : la recherche de l'explorateur est locale, sans URL de recherche.
  */
 export function WebSiteJsonLd() {
   const data = {
@@ -58,17 +58,8 @@ export function WebSiteJsonLd() {
     name: "Label Vanlife",
     url: "https://www.labelvanlife.fr",
     description:
-      "Le premier label pour vanlifers. Lieux calmes, respectueux et adaptés à la vanlife.",
+      "Découvrez les lieux, les guides et la démarche de voyage responsable Label Vanlife.",
     inLanguage: "fr-FR",
-    potentialAction: {
-      "@type": "SearchAction",
-      target: {
-        "@type": "EntryPoint",
-        urlTemplate:
-          "https://www.labelvanlife.fr/explorer?search={search_term_string}",
-      },
-      "query-input": "required name=search_term_string",
-    },
   };
 
   return <JsonLd data={data} />;

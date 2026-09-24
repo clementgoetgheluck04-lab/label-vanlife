@@ -7,7 +7,7 @@ import { ECOSYSTEM_PRODUCTS } from "../src/config/ecosystem.ts";
 import { generateMemberAccessCode, hashMemberAccessCode, memberAccessCodeMatches } from "../src/server/member-access.ts";
 
 test("the server catalog contains the approved one-time prices", () => {
-  assert.equal(PRODUCTS.membership.amount, 2_900);
+  assert.equal(PRODUCTS.membership.amount, 1_900);
   assert.equal(PRODUCTS.membership.currency, "eur");
   assert.equal(PRODUCTS.labellisation.amount, 29_000);
   assert.equal(PRODUCTS.labellisation.currency, "eur");
@@ -114,6 +114,9 @@ test("labellisation payload is normalized and allow-listed", () => {
   assert.equal(result.email, "pro@example.com");
   assert.equal(result.website, "https://example.com/");
   assert.equal(result.country, "France");
+  assert.equal(result.excellenceContactRequested, false);
+  assert.equal(parseLabellisationPayload({ ...result, excellenceContactRequested: true })?.excellenceContactRequested, true);
+  assert.equal(parseLabellisationPayload({ ...result, excellenceContactRequested: "true" })?.excellenceContactRequested, false);
   assert.equal(parseLabellisationPayload({ ...result, website: "" }), null);
   assert.equal(parseLabellisationPayload({ ...result, photoFileNames: [] }), null);
   assert.equal(parseLabellisationPayload({ ...result, website: "example.org" })?.website, "https://example.org/");

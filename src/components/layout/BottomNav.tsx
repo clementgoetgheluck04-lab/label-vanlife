@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 const TABS = [
   { label: "Accueil", href: "/", icon: Home },
   { label: "Places", href: "/explorer", icon: Compass },
-  { label: "Trips", href: "/road-trips", icon: Route },
+  { label: "Trips", href: "/blog#itineraires", icon: Route },
   { label: "Pass", href: "/compte", icon: User },
   { label: "Friendly", href: "/le-label", icon: CircleUser },
 ] as const;

@@ -10,6 +10,7 @@ import { parseLabellisationPayload } from "@/server/validation";
 import { LABELLISATION_CRITERIA } from "@/config/labellisation-criteria";
 import { createDraftToken } from "@/server/labellisation-draft";
 import { getPrisma } from "@/lib/prisma";
+import { EXCELLENCE_CONTACT_LABEL, EXCELLENCE_CONTACT_VERSION } from "@/config/label-offers";
 
 export const dynamic = "force-dynamic";
 const BUCKET = "labellisation-attachments";
@@ -69,7 +70,8 @@ function formatApplication(payload: NonNullable<ReturnType<typeof parseLabellisa
     `Téléphone : ${payload.phone || "Non renseigné"}`,
     `Identifiant professionnel : ${payload.siret || "Non renseigné"}`,
     `Autorisation d'exploitation confirmée : ${payload.operatingAuthorization ? "Oui" : "Non"}`,
-    `Suit la page Facebook : ${payload.followFacebook ? "Oui" : "Non"}`,
+    `Contact Excellence demandé : ${payload.excellenceContactRequested ? "Oui — sans engagement ni changement du paiement Essentiel" : "Non"}`,
+    ...(payload.excellenceContactRequested ? [`Demande exprimée : ${EXCELLENCE_CONTACT_LABEL}`, `Version : ${EXCELLENCE_CONTACT_VERSION}`] : []),
     `Commentaires : ${payload.comments || "Aucun"}`,
     `Charte acceptée : ${payload.acceptCharter ? "Oui" : "Non"}`,
     "",
@@ -164,7 +166,7 @@ export async function POST(request: NextRequest) {
         await upload(`${basePath}/photo-${index + 1}.${extension(photos[index])}`, photos[index]);
       }
       const applicationPath = `${basePath}/application.json`;
-      const application = JSON.stringify({ ...payload, draftId, attachmentPaths: uploaded, submittedAt: new Date().toISOString() }, null, 2);
+      const application = JSON.stringify({ ...payload, draftId, attachmentPaths: uploaded, submittedAt: new Date().toISOString(), excellenceContact: payload.excellenceContactRequested ? { version: EXCELLENCE_CONTACT_VERSION, wording: EXCELLENCE_CONTACT_LABEL } : null }, null, 2);
       const { error } = await supabase.storage.from(BUCKET).upload(applicationPath, application, { contentType: "application/json", upsert: false });
       if (error) throw error;
       uploaded.push(applicationPath);
@@ -212,7 +214,7 @@ export async function POST(request: NextRequest) {
         from,
         to: getBackOfficeEmails(),
         replyTo: payload.email,
-        subject: `Nouvelle candidature — ${payload.establishmentName}`,
+        subject: `Nouvelle candidature${payload.excellenceContactRequested ? " · Contact Excellence demandé" : ""} — ${payload.establishmentName}`,
         text: fullApplication,
         html: labelVanlifeEmail({
           preheader: `Nouvelle candidature — ${payload.establishmentName}`,

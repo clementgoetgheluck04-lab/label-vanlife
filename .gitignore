@@ -40,6 +40,10 @@ backups/*.dump.sha256
 
 # Rapports temporaires
 RAPPORT_*.md
+/artifacts/
+/output/
+/tmp/
+/.codex-hostinger-cli/
 
 # vercel
 .vercel

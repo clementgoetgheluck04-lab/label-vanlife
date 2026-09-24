@@ -6,28 +6,31 @@ import Image from "next/image";
 import { ArrowRight, Check, Mail } from "lucide-react";
 import { BRAND_ASSETS } from "@/config/brand-assets";
 import { CONTACT_MAILTO } from "@/config/contact";
-import { MEMBER_DISCOUNT_TEXT, MEMBER_SHORT_LABEL, MEMBER_VALIDITY_TEXT } from "@/config/commercial";
+import { MEMBER_DISCOUNT_TEXT, MEMBER_VALIDITY_TEXT } from "@/config/commercial";
 import { SITE_STATS } from "@/config/site-stats";
 import { OPEN_CONSENT_EVENT } from "@/lib/privacy/consent";
 
 const NAVIGATION = [
   { label: "Accueil", href: "/" },
   { label: "Le Label", href: "/le-label" },
+  { label: "Presse et partenaires", href: "/presse-et-partenaires" },
   { label: "Labellisation", href: "/labellisation" },
   { label: "Lieux Label Vanlife", href: "/explorer" },
   { label: "Connexion", href: "/member-login?mode=login" },
 ] as const;
 
 const OFFERS = [
-  { label: `${MEMBER_SHORT_LABEL} au lieu de 39 €`, href: "/devenir-membre" },
+  { label: "Carte membre", href: "/devenir-membre" },
   { label: "Demander mon Label Vanlife 2027", href: "/labellisation/candidature" },
 ] as const;
 
 const SEO_GUIDES = [
+  { label: "Le Mag Label Vanlife", href: "/blog" },
+  { label: "Guide d’achat van & fourgon", href: "/guide-achat" },
+  { label: "Évènements vanlife", href: "/evenements" },
   { label: "Vanlife France", href: "/vanlife" },
   { label: "Où dormir en van", href: "/dormir-en-van" },
   { label: "Campings van friendly", href: "/campings-van-friendly" },
-  { label: "Road trips en van", href: "/road-trips" },
   { label: "Vanlife par région", href: "/vanlife-regions" },
 ] as const;
 

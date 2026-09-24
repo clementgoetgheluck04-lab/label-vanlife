@@ -8,6 +8,9 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { LABELLISATION_CRITERIA } from "@/config/labellisation-criteria";
 import { trackEvent } from "@/lib/analytics/browser";
+import { CONTACT_EMAIL, CONTACT_MAILTO } from "@/config/contact";
+import { optionalStorage } from "@/lib/optional-storage";
+import { OfferInterest } from "@/components/labellisation/OfferInterest";
 
 const STEPS = [
   { title: "Identité du lieu", icon: Building2 },
@@ -95,7 +98,7 @@ const initialCriteria = Object.fromEntries(
 const initialForm = {
   establishmentName: "", placeType: "CAMPING", address: "", postalCode: "", city: "", region: "", country: "France",
   website: "", facebook: "", contactName: "", jobTitle: "", email: "", phone: "", siret: "",
-  operatingAuthorization: false, followFacebook: false, comments: "",
+  operatingAuthorization: false, followFacebook: false, excellenceContactRequested: false, comments: "",
   criteria: initialCriteria, planFileName: "", welcomeMessage: "",
   hasParityClause: false, publicPrice: "", minimumAllowedPrice: "",
   discountPercent: "15", reservationModes: [] as string[], promoCode: "", discountConditions: "",
@@ -115,19 +118,20 @@ export default function CandidaturePage() {
   const [photoFiles, setPhotoFiles] = useState<File[]>([]);
   const [form, setForm] = useState(initialForm);
   const [progressRestored, setProgressRestored] = useState(false);
+  const [storageAvailable, setStorageAvailable] = useState(true);
   const [showCharterDetails, setShowCharterDetails] = useState(false);
   const [claimedPlaceName, setClaimedPlaceName] = useState("");
   const update = (patch: Partial<typeof form>) => setForm((current) => ({ ...current, ...patch }));
 
   useEffect(() => {
     const timeout = window.setTimeout(() => {
-      const saved = localStorage.getItem("labellisation-form-progress");
+      const saved = optionalStorage(() => localStorage.getItem("labellisation-form-progress"));
       let restored: Partial<typeof initialForm> = {};
       if (saved) {
         try {
           restored = JSON.parse(saved) as Partial<typeof initialForm>;
         } catch {
-          localStorage.removeItem("labellisation-form-progress");
+          optionalStorage(() => localStorage.removeItem("labellisation-form-progress"));
         }
       }
       const params = new URLSearchParams(window.location.search);
@@ -156,7 +160,15 @@ export default function CandidaturePage() {
   }, []);
 
   useEffect(() => {
-    if (progressRestored) localStorage.setItem("labellisation-form-progress", JSON.stringify(form));
+    if (!progressRestored) return;
+    const timeout = window.setTimeout(() => {
+      const saved = optionalStorage(() => {
+        localStorage.setItem("labellisation-form-progress", JSON.stringify(form));
+        return true;
+      });
+      setStorageAvailable(saved === true);
+    }, 0);
+    return () => window.clearTimeout(timeout);
   }, [form, progressRestored]);
 
   useEffect(() => {
@@ -198,16 +210,16 @@ export default function CandidaturePage() {
   const discountIsParitySafe = parityMaximum === null || Number(form.discountPercent) <= parityMaximum;
   const canContinue = [
     Boolean(form.establishmentName.trim() && form.address.trim() && form.postalCode.trim() && form.city.trim() && form.country.trim() && isValidWebsite(form.website) && form.contactName.trim() && form.email.includes("@") && /^[A-Za-z0-9 ./-]{3,30}$/.test(form.siret.trim()) && form.operatingAuthorization),
-    answeredCriteria === LABELLISATION_CRITERIA.length && Boolean(form.planFileName) && form.welcomeMessage.trim().length >= 20,
+    answeredCriteria === LABELLISATION_CRITERIA.length && Boolean(form.planFileName) && form.welcomeMessage.trim().length >= 20 && form.welcomeMessage.trim().length <= 1000,
     form.reservationModes.length > 0 && Number(form.discountPercent) >= 10 && Number(form.discountPercent) <= 20 && discountIsParitySafe && (!form.hasParityClause || parityMaximum !== null),
-    Boolean(Number(form.totalPitches) > 0 && photoFiles.length >= 1 && photoFiles.length <= 3 && form.acceptCharter),
+    Boolean(Number.isInteger(Number(form.totalPitches)) && Number(form.totalPitches) > 0 && Number(form.totalPitches) <= 10000 && photoFiles.length >= 1 && photoFiles.length <= 3 && form.acceptCharter),
   ][step];
 
   const missingMessage = [
     "Renseignez l’identité du lieu, le pays, un site internet valide, le contact, l’identifiant professionnel et confirmez votre autorisation d’exploitation.",
-    `Renseignez les ${LABELLISATION_CRITERIA.length} critères, ajoutez le plan et décrivez votre accueil en au moins 20 caractères.`,
+    `Renseignez les ${LABELLISATION_CRITERIA.length} critères, ajoutez le plan et décrivez votre accueil en 20 à 1 000 caractères.`,
     "Choisissez un mode de réservation et une réduction valide entre 10 % et 20 % compatible avec votre éventuelle clause de parité.",
-    "Indiquez le nombre d'emplacements, ajoutez au moins une photo et acceptez la charte Label Vanlife.",
+    "Indiquez un nombre entier d'emplacements entre 1 et 10 000, ajoutez au moins une photo et acceptez la charte Label Vanlife.",
   ][step];
 
   const next = () => {
@@ -249,9 +261,11 @@ export default function CandidaturePage() {
         : "Le service n'a pas répondu correctement. Votre dossier est conservé sur cet appareil ; réessayez dans quelques instants." }));
       if (!response.ok) throw new Error(result.error || "Impossible d'envoyer la candidature.");
       const finalizedDraft = { ...draft, draftId: result.draftId, attachmentPaths: result.attachmentPaths, draftToken: result.draftToken };
-      sessionStorage.setItem("labellisation-draft", JSON.stringify(finalizedDraft));
-      localStorage.removeItem("labellisation-form-progress");
-      sessionStorage.setItem("labellisation-confirmation", JSON.stringify({ establishmentName: form.establishmentName, email: form.email, draftId: result.draftId }));
+      const draftPersisted = optionalStorage(() => {
+        sessionStorage.setItem("labellisation-draft", JSON.stringify(finalizedDraft));
+        return true;
+      });
+      optionalStorage(() => sessionStorage.setItem("labellisation-confirmation", JSON.stringify({ establishmentName: form.establishmentName, email: form.email, draftId: result.draftId })));
       const checkoutResponse = await fetch("/api/stripe/checkout-labellisation", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -259,9 +273,13 @@ export default function CandidaturePage() {
       });
       const checkoutResult = await checkoutResponse.json().catch(() => ({ error: "Paiement momentanément indisponible" }));
       if (!checkoutResponse.ok || !checkoutResult.url) {
+        if (!draftPersisted) {
+          throw new Error(`Votre dossier a été reçu (référence ${result.draftId}), mais le paiement est indisponible et votre navigateur ne permet pas de mémoriser sa reprise. Contactez ${CONTACT_EMAIL} avec cette référence : inutile de renvoyer le dossier.`);
+        }
         router.push("/labellisation/paiement?checkout=retry");
         return;
       }
+      optionalStorage(() => localStorage.removeItem("labellisation-form-progress"));
       window.location.href = checkoutResult.url;
     } catch (error) {
       setSubmitError(error instanceof Error ? error.message : "Impossible d'envoyer la candidature.");
@@ -289,6 +307,9 @@ export default function CandidaturePage() {
           <p className="mx-auto mt-4 max-w-2xl rounded-xl border border-[#c39960]/25 bg-white px-4 py-3 text-xs leading-5 text-neutral-600"><strong className="text-neutral-900">4 étapes · environ 12 à 15 minutes.</strong> Votre progression textuelle est enregistrée sur cet appareil. Les questions recommandées servent directement à enrichir votre future fiche ; elles restent facultatives lorsqu’elles ne sont pas nécessaires à l’étude.</p>
         </header>
 
+        {step === 0 && <OfferInterest checked={form.excellenceContactRequested === true} onChange={(excellenceContactRequested) => update({ excellenceContactRequested })} />}
+
+        {!storageAvailable && <p role="status" className="rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-950">Votre navigateur ne permet pas de sauvegarder la progression sur cet appareil. Vous pouvez continuer et envoyer votre candidature ; gardez cette page ouverte jusqu’à l’envoi.</p>}
         <div className="grid grid-cols-4 gap-2" aria-label={`Étape ${step + 1} sur ${STEPS.length}`}>
           {STEPS.map((item, index) => { const Icon = item.icon; const active = index === step; const done = index < step; return (
             <div key={item.title} className="text-center">
@@ -321,7 +342,12 @@ export default function CandidaturePage() {
               <label className="block text-sm font-medium text-neutral-700">Identifiant professionnel *<span className="mt-1 block text-xs font-normal text-neutral-500">SIRET (France), BCE (Belgique), IDE (Suisse) ou numéro équivalent.</span><input className={fieldClass} maxLength={30} value={form.siret} onChange={(e) => update({ siret: e.target.value })} placeholder="Ex : 123 456 789 00012" /></label>
             </div>
             <label className="flex gap-3 rounded-xl border border-neutral-200 p-4 text-sm text-neutral-600"><input type="checkbox" className="mt-0.5 accent-[#c39960]" checked={form.operatingAuthorization} onChange={(e) => update({ operatingAuthorization: e.target.checked })} /> Je confirme disposer des autorisations nécessaires à l'exploitation de mon établissement.</label>
-            <label className="flex gap-3 rounded-xl border border-neutral-200 p-4 text-sm text-neutral-600"><input type="checkbox" className="mt-0.5 accent-[#c39960]" checked={form.followFacebook} onChange={(e) => update({ followFacebook: e.target.checked })} /> Je suis ou souhaite suivre la page Facebook Label Vanlife.</label>
+            <div className="rounded-xl border border-neutral-200 p-4">
+              <a href="https://www.facebook.com/labelvanlife" target="_blank" rel="noopener noreferrer" aria-describedby="facebook-follow-help" className="inline-flex items-center justify-center rounded-xl bg-[#315d4c] px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#234737] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#315d4c]">
+                Suivre Label Vanlife sur Facebook <span aria-hidden="true" className="ml-2">↗</span><span className="sr-only"> (nouvel onglet)</span>
+              </a>
+              <p id="facebook-follow-help" className="mt-2 text-xs leading-5 text-neutral-600">Facultatif, sans incidence sur votre candidature. La page s’ouvre dans un nouvel onglet : cliquez ensuite sur « Suivre » dans Facebook. Votre formulaire reste ouvert ici.</p>
+            </div>
             <label className="block text-sm font-medium text-neutral-700">Commentaires ou informations complémentaires<textarea rows={3} className={textareaClass} value={form.comments} onChange={(e) => update({ comments: e.target.value })} /></label>
           </section>}
 
@@ -465,7 +491,7 @@ export default function CandidaturePage() {
             </div>
 
             <div className="rounded-2xl border border-[#c39960]/30 bg-[#f7f1e8]/60 p-5 sm:p-6"><h3 className="font-bold text-neutral-900">Récapitulatif de votre candidature</h3><div className="mt-4 space-y-2 text-sm text-neutral-700"><p><strong className="text-lg text-[#8b673d]">{answeredCriteria}</strong> critères remplis</p><p>Réduction : <strong>{form.discountPercent}%</strong></p><p><strong>{form.establishmentName || "Votre établissement"}</strong> · {form.address || "Adresse"}, {form.postalCode || "Code postal"} {form.city || "Ville"}</p><p>{form.contactName || "Contact"} · {form.email || "Email"}</p></div><div className="mt-5 border-t border-[#c39960]/20 pt-4"><p className="font-bold text-neutral-900">📨 Votre candidature sera envoyée automatiquement avec toutes les pièces jointes</p><p className="mt-1 text-sm text-neutral-600">{photoFiles.length} photo{photoFiles.length > 1 ? "s" : ""} et plan inclus · Confirmation envoyée à {form.email || "votre adresse email"}</p></div></div>
-            {submitError && <p role="alert" className="rounded-xl bg-red-50 p-4 text-sm font-medium text-red-700">{submitError}</p>}
+            {submitError && <div role="alert" className="rounded-xl bg-red-50 p-4 text-sm font-medium text-red-700"><p>{submitError}</p><p className="mt-2">Besoin d’aide pour finaliser votre candidature ? Écrivez-nous à <a className="underline" href={`${CONTACT_MAILTO}?subject=${encodeURIComponent("Aide candidature Label Vanlife — " + form.establishmentName)}`}>{CONTACT_EMAIL}</a>. Nous pouvons vous accompagner par email. Aucun paiement n’est nécessaire pour nous contacter.</p></div>}
           </section>}
 
           <div className="mt-8 flex flex-col-reverse gap-3 border-t border-neutral-100 pt-6 sm:flex-row sm:justify-between">

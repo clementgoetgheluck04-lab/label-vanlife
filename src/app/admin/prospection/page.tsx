@@ -14,7 +14,17 @@ type Prospect = {
   followUpCount: number;
   nextActionAt?: string | null;
   updatedAt: string;
+  metadata?: { brain?: ProspectBrain } | null;
   messages: Array<{ direction: string; subject: string; createdAt: string }>;
+};
+type ProspectBrain = {
+  score: number;
+  priority: "P1" | "P2" | "P3" | "EXCLUDE";
+  category: "COEUR_DE_CIBLE" | "A_EXPLORER" | "DONNEES_A_VERIFIER" | "HORS_CIBLE";
+  suitableForLabelVanlife: boolean;
+  reasons: string[];
+  commercialArguments: string[];
+  nextStep: "PREPARER_APPROCHE" | "VERIFIER_ETABLISSEMENT" | "REVUE_HUMAINE" | "NE_PAS_CONTACTER";
 };
 type Dashboard = {
   settings: { enabled: boolean; dailyLimit: number; replyTo: string; webhookConfigured: boolean };
@@ -23,6 +33,7 @@ type Dashboard = {
     initialSubject: Record<"direction" | "opportunity", { sent: number; engaged: number }>;
   };
   prospects: Prospect[];
+  safety?: { paused: boolean; sent: number; bounces: number; complaints: number; bounceRate: number; sentToday: number; exclusions: Array<{ email: string; reason: string }> };
 };
 
 const LABELS: Record<ProspectStatus, string> = {
@@ -36,6 +47,12 @@ const STATUS_STYLE: Record<ProspectStatus, string> = {
   ENGAGED: "bg-violet-100 text-violet-800",
   INTERESTED: "bg-emerald-100 text-emerald-800", QUALIFIED: "bg-emerald-100 text-emerald-800", CONVERTED: "bg-[#174936] text-white", NOT_INTERESTED: "bg-stone-100 text-stone-500", UNSUBSCRIBED: "bg-stone-100 text-stone-500",
   INVALID: "bg-red-50 text-red-700", NEEDS_HUMAN: "bg-orange-100 text-orange-800", PAUSED: "bg-stone-100 text-stone-600", ERROR: "bg-red-100 text-red-800",
+};
+const BRAIN_CATEGORY_LABEL: Record<ProspectBrain["category"], string> = {
+  COEUR_DE_CIBLE: "Cœur de cible", A_EXPLORER: "À explorer", DONNEES_A_VERIFIER: "À vérifier", HORS_CIBLE: "Hors cible",
+};
+const BRAIN_NEXT_STEP_LABEL: Record<ProspectBrain["nextStep"], string> = {
+  PREPARER_APPROCHE: "Préparer l’approche", VERIFIER_ETABLISSEMENT: "Vérifier l’établissement", REVUE_HUMAINE: "Revue humaine", NE_PAS_CONTACTER: "Ne pas contacter",
 };
 
 function Metric({ icon: Icon, label, value, tone = "text-emerald-700" }: { icon: typeof Users; label: string; value: number; tone?: string }) {
@@ -101,6 +118,14 @@ export default function AdminProspectionPage() {
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"><div className="flex items-start gap-3">{data.settings.enabled && data.settings.webhookConfigured ? <ShieldCheck className="mt-0.5 h-6 w-6 text-emerald-700" /> : <AlertTriangle className="mt-0.5 h-6 w-6 text-amber-700" />}<div><p className="font-black text-neutral-950">{data.settings.enabled ? "Envois automatiques activés" : "Envois automatiques en attente d’activation"}</p><p className="mt-1 text-sm text-stone-600">{data.settings.dailyLimit} contacts maximum par jour ouvré · réponses vers {data.settings.replyTo} · webhook {data.settings.webhookConfigured ? "connecté" : "à connecter"}</p></div></div>{!data.settings.webhookConfigured && <button onClick={() => action("notify_setup")} className="shrink-0 rounded-full border border-amber-300 bg-white px-4 py-2 text-xs font-bold text-amber-900">M’envoyer les instructions par email</button>}</div>
         </section>
 
+        {data.safety && <section aria-label="Sécurité des envois" className={`rounded-2xl border p-5 ${data.safety.paused ? "border-red-200 bg-red-50" : "border-stone-200 bg-white"}`}>
+          <h2 className="font-black text-neutral-950">{data.safety.paused ? "Envois suspendus par la protection de délivrabilité" : "Contrôle de délivrabilité"}</h2>
+          <p className="mt-2 text-sm text-stone-700">{data.safety.sentToday} email(s) de prospection envoyé(s) aujourd’hui (UTC). Sur 30 jours : {data.safety.sent} envois, {data.safety.bounces} rebond(s), {data.safety.complaints} plainte(s), soit {(data.safety.bounceRate * 100).toFixed(1)} % de rebonds.</p>
+          <p className="mt-2 text-sm text-stone-700">Les exclusions sont conservées. Synchroniser les contacts ne lève pas cette suspension.</p>
+          <button disabled={working !== ""} onClick={() => action("reconcile_suppressions")} className="mt-4 min-h-11 rounded-full border border-stone-300 bg-white px-4 text-sm font-bold text-neutral-900">Appliquer les 4 exclusions Resend vérifiées le 22/09/2026</button>
+          <details className="mt-4 text-sm"><summary className="cursor-pointer font-bold">{data.safety.exclusions.length} adresse(s) exclue(s)</summary><ul className="mt-2 space-y-1">{data.safety.exclusions.map((entry) => <li key={entry.email}>{entry.email} — {entry.reason}</li>)}</ul></details>
+        </section>}
+
         <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-6">
           <Metric icon={Users} label="Prospects" value={data.totals.prospects} />
           <Metric icon={Send} label="Emails envoyés" value={data.totals.sent} tone="text-sky-700" />
@@ -128,7 +153,7 @@ export default function AdminProspectionPage() {
             {visible.length === 0 && <p className="p-10 text-center text-sm text-stone-500">Aucun prospect dans cette vue.</p>}
             {visible.map((prospect) => <article key={prospect.id} className="grid gap-4 p-5 lg:grid-cols-[1.5fr_1fr_auto] lg:items-center">
               <div className="min-w-0"><div className="flex flex-wrap items-center gap-2"><h3 className="truncate font-black text-neutral-950">{prospect.name}</h3><span className={`rounded-full px-2.5 py-1 text-[11px] font-bold ${STATUS_STYLE[prospect.status]}`}>{LABELS[prospect.status]}</span></div><p className="mt-1 truncate text-sm text-stone-500">{prospect.email}{prospect.city ? ` · ${prospect.city}` : ""}</p></div>
-              <div className="text-xs text-stone-500">{prospect.messages[0] ? <><p className="truncate font-semibold text-stone-700"><Mail className="mr-1 inline h-3.5 w-3.5" />{prospect.messages[0].subject}</p><p className="mt-1">{new Date(prospect.messages[0].createdAt).toLocaleString("fr-FR")}</p></> : <p><Clock3 className="mr-1 inline h-3.5 w-3.5" />En attente du premier contact</p>}</div>
+              <div className="text-xs text-stone-500">{prospect.metadata?.brain ? <details><summary className="cursor-pointer font-semibold text-stone-700">Cerveau : {prospect.metadata.brain.priority} · {prospect.metadata.brain.score}/100 · {BRAIN_CATEGORY_LABEL[prospect.metadata.brain.category]}</summary><p className="mt-1">{BRAIN_NEXT_STEP_LABEL[prospect.metadata.brain.nextStep]}</p><p className="mt-1">{prospect.metadata.brain.reasons.join(" · ")}</p><p className="mt-1 text-emerald-800">Argument : {prospect.metadata.brain.commercialArguments[0]}</p></details> : prospect.messages[0] ? <><p className="truncate font-semibold text-stone-700"><Mail className="mr-1 inline h-3.5 w-3.5" />{prospect.messages[0].subject}</p><p className="mt-1">{new Date(prospect.messages[0].createdAt).toLocaleString("fr-FR")}</p></> : <p><Clock3 className="mr-1 inline h-3.5 w-3.5" />En attente du premier contact</p>}</div>
               <div className="flex flex-wrap justify-start gap-2 lg:justify-end">{["NEW","CONTACTED","FOLLOW_UP_1","ENGAGED"].includes(prospect.status) && <button title="Mettre en pause" onClick={() => action("pause", prospect.id)} className="rounded-full border border-stone-200 p-2 text-stone-600"><Pause className="h-4 w-4" /></button>}{["PAUSED","ERROR"].includes(prospect.status) && <button title="Reprendre" onClick={() => action(prospect.status === "ERROR" ? "retry" : "resume", prospect.id)} className="rounded-full border border-stone-200 p-2 text-emerald-700"><Play className="h-4 w-4" /></button>}{["INTERESTED","NEEDS_HUMAN"].includes(prospect.status) && <button onClick={() => action("qualified", prospect.id)} className="rounded-full bg-emerald-50 px-3 py-2 text-xs font-bold text-emerald-800">Qualifier</button>}{["INTERESTED","QUALIFIED","NEEDS_HUMAN"].includes(prospect.status) && <button onClick={() => action("converted", prospect.id)} className="rounded-full bg-neutral-950 px-3 py-2 text-xs font-bold text-white">Vente conclue</button>}{!["CONVERTED","UNSUBSCRIBED","NOT_INTERESTED","INVALID"].includes(prospect.status) && <button onClick={() => action("suppress", prospect.id)} className="rounded-full border border-stone-200 px-3 py-2 text-xs font-bold text-stone-600">Ne plus contacter</button>}</div>
             </article>)}
           </div>

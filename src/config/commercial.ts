@@ -1,6 +1,6 @@
 export const CURRENT_YEAR = 2027;
 
-export const MEMBER_PRICE = 29;
+export const MEMBER_PRICE = 19;
 export const MEMBER_NORMAL_PRICE = 39;
 export const MEMBER_PRICE_CENTS = MEMBER_PRICE * 100;
 export const MEMBER_NORMAL_PRICE_CENTS = MEMBER_NORMAL_PRICE * 100;

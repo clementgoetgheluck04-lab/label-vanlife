@@ -149,7 +149,7 @@ export default function ExplorerPage() {
         </div>
 
         {/* Grille */}
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+        <div id="lieux-labellises" className="scroll-mt-24 grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {lieuxFiltres.map((lieu, index) => {
             const typeLabel: Record<string, string> = {
               camping: "Camping",

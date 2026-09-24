@@ -35,7 +35,8 @@ test("SEO essentials, social preview, favicon, sitemap and robots are present", 
   assert.match(layout, /BRAND_ASSETS\.socialCover/);
   assert.match(layout, /BRAND_ASSETS\.favicon/);
   assert.match(sitemap, /conditions-generales-utilisation/);
-  assert.match(sitemap, /top-10-lieux-vanlife-bretagne/);
+  assert.match(sitemap, /MAG_ARTICLES\.map/);
+  assert.match(readFileSync("src/data/mag.ts", "utf8"), /top-10-lieux-vanlife-bretagne/);
   assert.match(robots, /sitemap: "https:\/\/www\.labelvanlife\.fr\/sitemap\.xml"/);
   assert.doesNotMatch(read("next.config.ts"), /fonts\.googleapis|fonts\.gstatic/);
   assert.doesNotMatch(layout, /google-site-verification":\s*""/);

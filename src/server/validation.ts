@@ -102,6 +102,7 @@ export type LabellisationPayload = {
   siret?: string;
   operatingAuthorization?: boolean;
   followFacebook?: boolean;
+  excellenceContactRequested?: boolean;
   comments?: string;
   criteria?: Record<string, { status: "yes" | "no"; examples: string[]; detail: string }>;
   planFileName?: string;
@@ -264,6 +265,7 @@ export function parseLabellisationPayload(value: unknown): LabellisationPayload 
     postalCode, city, region, country, capacity, services, discountPercent, description,
     motivation, acceptCharter: true, facebook, jobTitle: jobTitle || "", siret,
     operatingAuthorization: input.operatingAuthorization === true,
+    excellenceContactRequested: input.excellenceContactRequested === true,
     followFacebook: input.followFacebook === true, comments: comments || "", criteria,
     planFileName: planFileName || "", welcomeMessage: welcomeMessage || "", reservationModes,
     hasParityClause, publicPrice, minimumAllowedPrice,

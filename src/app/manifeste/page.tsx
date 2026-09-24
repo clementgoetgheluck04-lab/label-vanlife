@@ -27,7 +27,7 @@ export default function ManifestePage() {
               </Button>
             </a>
             <Link href="/devenir-membre">
-              <Button variant="cta" size="lg" className="text-base px-8">Devenir membre — 29 €</Button>
+              <Button variant="cta" size="lg" className="text-base px-8">Devenir membre — 19 €</Button>
             </Link>
           </div>
         </div>

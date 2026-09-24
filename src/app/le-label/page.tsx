@@ -433,7 +433,7 @@ export default function LeLabelPage() {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
             <Link href="/devenir-membre">
               <Button className="bg-white text-emerald-700 hover:bg-emerald-50 text-base px-8 py-3 rounded-xl font-semibold shadow-lg">
-                Devenir membre — 29 €
+                Devenir membre — 19 €
               </Button>
             </Link>
             <Link href="/explorer">

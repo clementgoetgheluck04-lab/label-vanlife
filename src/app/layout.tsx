@@ -14,6 +14,11 @@ const BASE_URL = "https://www.labelvanlife.fr";
 
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
+  // Public ownership proof issued by Search Console for the connected owner's account.
+  verification: {
+    google: "6bwbsnRbMkkydqBKLu890Gxb7Y84YEppsoL92e5dRZU",
+    other: { "msvalidate.01": "E42F2C71C129894E07119D36019BA82A" },
+  },
   title: {
     default: "Label Vanlife | Vanlife France : spots, guides, communauté de vanlifers",
     template: "%s | Label Vanlife",

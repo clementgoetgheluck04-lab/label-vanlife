@@ -36,7 +36,7 @@ const selectedIds = [
 
 const selectedCampings = selectedIds
   .map((id) => ENRICHED_LIEUX.find((place) => place.id === id))
-  .filter((place): place is NonNullable<typeof place> => Boolean(place));
+  .filter((place): place is NonNullable<typeof place> => Boolean(place && place.status === "actif"));
 
 const networkCount = ENRICHED_LIEUX.filter((place) => place.status === "actif").length;
 
@@ -52,7 +52,7 @@ const criteria = [
 const faqs = [
   { question: "Qu'est-ce qu'un camping van friendly ?", answer: "C'est un établissement qui accueille réellement les voyageurs en van : accès et emplacements adaptés aux véhicules acceptés, informations claires, services annoncés avec précision et équipe bienveillante. L'expérience compte autant que la taille de l'emplacement." },
   { question: "Quelle différence avec un camping labellisé Label Vanlife ?", answer: "Un lieu labellisé rejoint une démarche structurée : sa candidature, ses informations d'accueil et ses engagements sont étudiés par Label Vanlife. Il annonce également l'avantage réservé aux membres et s'engage à maintenir sa fiche à jour." },
-  { question: "Comment trouver un camping van friendly près de chez moi ?", answer: `L'explorateur Label Vanlife présente actuellement ${networkCount} lieux actifs en France. Vous pouvez rechercher un nom ou une ville et consulter librement les équipements et le pourcentage de réduction. La Carte membre Label Vanlife 2027 est proposée à 29 € au lieu de 39 €, active dès l'achat jusqu'au 31 décembre 2027 et sans renouvellement automatique.` },
+  { question: "Comment trouver un camping van friendly près de chez moi ?", answer: `L'explorateur Label Vanlife présente actuellement ${networkCount} lieux actifs en France. Vous pouvez rechercher un nom ou une ville et consulter librement les équipements et le pourcentage de réduction. La Carte membre Label Vanlife 2027 est proposée à 19 € au lieu de 39 €, active dès l'achat jusqu'au 31 décembre 2027 et sans renouvellement automatique.` },
 ] as const;
 
 export default function VanFriendlyCampingsPage() {

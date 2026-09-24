@@ -1,5 +1,10 @@
 /artifacts
+/output
+/backups
 /tmp
+/.codex-hostinger-cli
+/.env*
+/.git
 /tsconfig.tsbuildinfo
 /next-env.d.ts
 /scripts/discover-spotted-emails.mjs

@@ -86,7 +86,8 @@ export async function POST(request: NextRequest) {
     const protectedRenewalAmount = previousPaidOrder?.amount && previousPaidOrder.amount > 0
       ? previousPaidOrder.amount
       : null;
-    const amount = protectedRenewalAmount ?? product.amount;
+    // Preserve a lower legacy price, but never charge more than today's offer.
+    const amount = protectedRenewalAmount ? Math.min(protectedRenewalAmount, product.amount) : product.amount;
     const isProtectedRenewal = Boolean(protectedRenewalAmount);
     const order = await prisma.checkoutOrder.create({
       data: {
@@ -112,7 +113,7 @@ export async function POST(request: NextRequest) {
         product_data: {
           name: product.name,
           description: isProtectedRenewal
-            ? "Renouvellement au prix payé l'année précédente"
+            ? "Renouvellement au tarif le plus avantageux entre votre prix protégé et l’offre actuelle"
             : "Accès immédiat aux avantages membres jusqu'au 31 décembre 2027, sans renouvellement automatique",
         },
       },

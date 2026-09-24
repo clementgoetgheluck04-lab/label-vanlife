@@ -1,12 +1,19 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import Image from "next/image";
 import { ArrowRight, Star, Shield, Heart, Moon, Compass, ChevronDown, MapPin, Smartphone, Percent, Check } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { ENRICHED_LIEUX } from "@/data/enriched-lieux";
-import { MEMBER_CTA_LABEL, MEMBER_VALIDITY_TEXT } from "@/config/commercial";
+import { MEMBER_VALIDITY_TEXT } from "@/config/commercial";
 import { SITE_STATS } from "@/config/site-stats";
 import { redactPublicPlaceText } from "@/server/public-place";
+
+export const metadata: Metadata = {
+  title: { absolute: "Label Vanlife — Campings et lieux pour voyageurs itinérants" },
+  description: "Découvrez les lieux labellisés et les campings accueillant vans, fourgons et camping-cars. Explorez le réseau, la carte membre et la démarche Label Vanlife.",
+  alternates: { canonical: "/" },
+};
 
 function getTypeLabel(type: string): string {
   const labels: Record<string, string> = {
@@ -59,7 +66,7 @@ export default function Home() {
             <div className="flex justify-center">
               <Link href="/devenir-membre">
                 <Button variant="cta" size="lg" className="text-base px-10 shadow-xl shadow-amber-500/25">
-                  {MEMBER_CTA_LABEL} <ArrowRight className="h-4 w-4 ml-2" />
+                  Découvrir la Carte membre <ArrowRight className="h-4 w-4 ml-2" />
                 </Button>
               </Link>
             </div>
@@ -331,7 +338,7 @@ export default function Home() {
               { icon: "👨‍👩‍👧‍👦", title: "Vanlife en famille", desc: "Voyager en van avec des enfants : conseils, itinéraires, lieux adaptés.", href: "/vanlife-famille" },
               { icon: "🏕️", title: "Campings van-friendly", desc: "Les critères d'un bon camping pour vanlifers et notre sélection labellisée.", href: "/campings-van-friendly" },
               { icon: "🌿", title: "Slow travel & vanlife", desc: "Voyager moins vite pour profiter davantage — la philosophie du slow travel.", href: "/slow-travel-vanlife" },
-              { icon: "🗺️", title: "Road trips en van", desc: "Les meilleurs itinéraires van à travers toute la France.", href: "/road-trips" },
+              { icon: "🗺️", title: "Road trips en van", desc: "Les meilleurs itinéraires van à travers toute la France.", href: "/blog#itineraires" },
               { icon: "🌙", title: "Dormir en van en France", desc: "Règles, aires, campings et lieux d'accueil pour préparer chaque nuit.", href: "/dormir-en-van" },
               { icon: "🧭", title: "Vanlife solo", desc: "Voyager seul(e) en van : sécurité, choix du van, communauté et itinéraires.", href: "/vanlife-solo" },
               { icon: "🌊", title: "Vanlife par région", desc: "Bretagne, Provence, Ardèche, Pyrénées, Landes, Alpes — nos guides régionaux.", href: "/vanlife-regions" },

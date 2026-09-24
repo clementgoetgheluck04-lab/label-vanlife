@@ -9,7 +9,7 @@ import { getPrisma } from "@/lib/prisma";
 import { getAppUrl, getBackOfficeEmails, getTransactionalEmailFrom, requireSecretEnv, requireServerEnv } from "@/server/env";
 import { generateMemberAccessCode, hashMemberAccessCode, hashMemberAccessLookupCode } from "@/server/member-access";
 import { getStripe } from "@/server/stripe";
-import { assertRequestSize } from "@/server/request-security";
+import { assertRequestSize, readTextRequest } from "@/server/request-security";
 import { apiError } from "@/server/http";
 import { labelVanlifeEmail } from "@/server/email-template";
 
@@ -426,10 +426,17 @@ export async function POST(request: NextRequest) {
   const signature = request.headers.get("stripe-signature");
   if (!signature) return NextResponse.json({ error: "Missing signature" }, { status: 400 });
 
+  let payload: string;
+  try {
+    payload = await readTextRequest(request, 2 * 1024 * 1024);
+  } catch (error) {
+    return apiError(error, "stripe-webhook-body");
+  }
+
   let event: Stripe.Event;
   try {
     event = getStripe().webhooks.constructEvent(
-      await request.text(),
+      payload,
       signature,
       requireSecretEnv("STRIPE_WEBHOOK_SECRET"),
     );

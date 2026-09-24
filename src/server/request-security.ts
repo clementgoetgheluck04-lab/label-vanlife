@@ -4,6 +4,7 @@ import { NextRequest } from "next/server";
 
 type Bucket = { count: number; resetAt: number };
 const buckets = new Map<string, Bucket>();
+const MAX_RATE_LIMIT_BUCKETS = 10_000;
 
 export class RateLimitError extends Error {
   constructor(public readonly retryAfter: number) {
@@ -62,7 +63,7 @@ export function assertRequestSize(request: NextRequest, maxBytes: number): void 
 
 export function assertJsonRequest(request: NextRequest, maxBytes = 100_000): void {
   const contentType = request.headers.get("content-type")?.toLowerCase() || "";
-  if (!contentType.startsWith("application/json")) {
+  if (contentType.split(";", 1)[0].trim() !== "application/json") {
     throw new RequestBodyError("Content-Type must be application/json", 415);
   }
   assertRequestSize(request, maxBytes);
@@ -107,6 +108,15 @@ async function readBoundedBody(request: NextRequest, maxBytes: number): Promise<
   return body.buffer;
 }
 
+export async function readTextRequest(request: NextRequest, maxBytes: number): Promise<string> {
+  const body = await readBoundedBody(request, maxBytes);
+  try {
+    return new TextDecoder("utf-8", { fatal: true }).decode(body);
+  } catch {
+    throw new RequestBodyError("Invalid UTF-8 body", 400);
+  }
+}
+
 export async function readJsonRequest(request: NextRequest, maxBytes = 100_000): Promise<unknown> {
   assertJsonRequest(request, maxBytes);
   const body = await readBoundedBody(request, maxBytes);
@@ -148,6 +158,11 @@ export function enforceRateLimit(
   const key = `${namespace}:${getClientAddress(request)}`;
   const current = buckets.get(key);
   if (!current || current.resetAt <= now) {
+    // Never evict live counters: that would let rotating addresses reset limits.
+    // This is a per-process safety net, not a distributed abuse protection service.
+    if (!current && buckets.size >= MAX_RATE_LIMIT_BUCKETS) {
+      throw new RateLimitError(60);
+    }
     buckets.set(key, { count: 1, resetAt: now + windowMs });
     return;
   }
